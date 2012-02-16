@@ -51,7 +51,7 @@ case class LibraryBundleDefinition(jarFile:File, excludedPackages:List[String]) 
   def inputStream:InputStream = {
     val builder = new Builder()
     builder.addClasspath(jarFile)
-    builder.setProperty(BUNDLE_SYMBOLICNAME, nameª.name)
+    builder.setProperty(BUNDLE_SYMBOLICNAME, name.name)
     builder.setProperty(EXPORT_PACKAGE, "*")
     val allIncludes = List[String]()
     val allExcludes = excludedPackages
