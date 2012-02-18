@@ -69,21 +69,35 @@ case class OSGIJarBundleDefinition(jar:File) extends BundleDefinition {
   def inputStream:InputStream = new BufferedInputStream(new FileInputStream(jar))
 }
 
-case class ModuleBundleDefinition(moduleName:String) extends BundleDefinition {
-  private lazy val outputDirectory = new File("out/production/" + moduleName)
+case class ModuleBundleDefinition(topLevelModuleName:String, moduleType:ModuleType.ModuleType) extends BundleDefinition {
+  private lazy val moduleName = topLevelModuleName + (moduleType match {
+    case ModuleType.API => ".api"
+    case ModuleType.IMPL => ".impl"
+    case ModuleType.GUI => ".gui"
+    case ModuleType.Library => ""
+  })
+
+  private lazy val outputDirectory = new File("out" + File.separator + "production" + File.separator + moduleName)
   def name:BundleName = BundleName(moduleName, new Version(0, 0, 0))
   def lastModified:Long = FileUtils.findLastModified(outputDirectory, outputDirectory.lastModified())
   def inputStream:InputStream = {
     val builder = new Builder()
     builder.addClasspath(outputDirectory)
     builder.setProperty(BUNDLE_SYMBOLICNAME, moduleName)
-    builder.setProperty(BUNDLE_ACTIVATOR, "com.openaf." + moduleName + "." + moduleName.capitalize + "BundleActivator")
-    builder.setProperty(EXPORT_PACKAGE, "*")
+
+    moduleType match {
+      case ModuleType.IMPL | ModuleType.GUI => builder.setProperty(BUNDLE_ACTIVATOR, "com.openaf." + topLevelModuleName.toLowerCase + "." + topLevelModuleName.capitalize + "BundleActivator")
+      case _ =>
+    }
+    //if (module.moduleType != ModuleType.IMPL) {
+      builder.setProperty(EXPORT_PACKAGE, "*")
+    //}
     val allIncludes = List[String]()
     val allExcludes = List[String]()
     builder.setProperty(IMPORT_PACKAGE, (allExcludes.map(p => "!"+p) ::: allIncludes.toList ::: List("*")).mkString(","))
     val jar = builder.build()
     val out = new ByteArrayOutputStream()
+//    jar.writeManifest(System.out)
     jar.write(out)
     new ByteArrayInputStream(out.toByteArray)
   }
@@ -95,3 +109,8 @@ trait BundleDefinitions {
 }
 
 case class SimpleBundleDefinitions(systemPackages:List[String], bundles:List[BundleDefinition]) extends BundleDefinitions
+
+object ModuleType extends Enumeration {
+  type ModuleType = Value
+  val API, IMPL, GUI, Library = Value
+}

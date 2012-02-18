@@ -84,24 +84,30 @@ class OSGIInstance(name:String, bundles:BundleDefinitions) {
   }
 }
 
+case class OSGIInstanceConfig(name:String, properties:()=>Map[String,String], bundles:BundleDefinitions)
+
 object OSGIInstanceStarter {
-  private def startOrTrigger(name:String, properties:()=>Map[String,String], bundles: => BundleDefinitions) {
-    val port = 1024 + ((name.hashCode.abs % 6400) * 10) + 9
+  private def startOrTrigger(configName:String, configsFunction: () => List[OSGIInstanceConfig]) {
+    val port = 1024 + ((configName.hashCode.abs % 6400) * 10) + 9
     try {
       val socket = new Socket("localhost", port)
       socket.close()
       println("Triggered reload")
     } catch {
       case e:ConnectException => {
-        val instance = new OSGIInstance(name, bundles)
-        instance.start()
+        val configs = configsFunction()
+        val instances = configs.map(config => {
+          val instance = new OSGIInstance(config.name, config.bundles)
+          instance.start()
+          instance
+        })
         new Thread(new Runnable() { def run() {
           val server = new ServerSocket(port)
           println("Listening on port " + port)
           while (true) {
             val client = server.accept()
             client.close()
-            instance.update()
+            instances.foreach(_.update())
           }
         } }, "osgi-reload-listener").start()
       }
@@ -112,27 +118,47 @@ object OSGIInstanceStarter {
     val name = jarFile.getName.toLowerCase
     if (name.startsWith("log4j")) {
       List("com.ibm.uvm.tools", "com.sun.jdmk.comm", "javax.jmdns", "javax.jms", "javax.mail", "javax.mail.internet")
-    } /*else if (name.startsWith("slf4j")) {
-      List("org.slf4j.impl")
-    } */else {
+    } else {
       Nil
     }
   }
 
   def main(args: Array[String]) {
-    def bundles = {
-      val modules = FileUtils.allModules(new File("."))
+    val s = File.separator
+    val formattedArgs = args.map(_.trim().toLowerCase).toList.sorted
+    val serverArg = "server"
+    val guiArg = "gui"
+    if (formattedArgs.size == 0 || formattedArgs.size > 2 || formattedArgs.exists(arg => {arg != serverArg && arg != guiArg})) {
+      System.err.println("Args can be either \"gui\", \"server\" or both")
+      System.exit(-1)
+    }
 
-      val moduleBundleDefinitions = modules.filterNot(_ == "start").map(moduleName => ModuleBundleDefinition(moduleName))
+    // TODO - moduleMap should be specified by the build system or project file.
+    val moduleMap = Map(
+      serverArg -> List("test", "testConsumer", "utils"),
+      guiArg -> Nil
+    )
+
+    val argsString = "osgi" + s + formattedArgs.mkString
+
+    def bundles(modules:List[String]) = {
+      val moduleBundleDefinitions = modules.flatMap(topLevelModuleName => {
+        val subModules = FileUtils.subModules(topLevelModuleName)
+        subModules.map(subModule => ModuleBundleDefinition(topLevelModuleName, subModule))
+      })
 
       val libraryBundleDefinitions = List(
-        SimpleLibraryBundleDefinition("Scala", new File("lib/scala-library.jar"))
+        SimpleLibraryBundleDefinition("Scala", new File("lib" + s + "scala-library.jar"))
       ) ::: modules.flatMap(module => FileUtils.exportedLibraries(module)).map(jarFile => LibraryBundleDefinition(jarFile, excludedPackages(jarFile)))
 
       SimpleBundleDefinitions(List("sun.misc"), libraryBundleDefinitions ::: moduleBundleDefinitions)
     }
 
-    startOrTrigger("osgiData", () => Map(), bundles)
+    def configs = moduleMap.filter{case (typeName, _) => formattedArgs.contains(typeName)}
+            .map{case (typeName, modules) => (typeName -> bundles(modules))}
+            .map{case (typeName, bundleDefinitions) => OSGIInstanceConfig(argsString + "-" + typeName, () => Map(), bundleDefinitions)}.toList
+
+    startOrTrigger(argsString, configs _)
   }
 }
 

@@ -1,6 +1,7 @@
 package com.openaf.start
 
 import java.io.File
+import collection.mutable.ListBuffer
 
 object FileUtils {
   def findLastModified(dir:File, initialValue:Long = 0):Long = {
@@ -48,6 +49,34 @@ object FileUtils {
       })
     } else {
       Nil
+    }
+  }
+
+  def subModules(moduleName:String) = {
+    val componentsModulesDir = new File("modules-components")
+    val componentsModulesNames = componentsModulesDir.listFiles().map(_.getName)
+    if (componentsModulesNames.contains(moduleName)) {
+      val moduleDir = new File(componentsModulesDir, moduleName)
+      val subModulesNames = moduleDir.listFiles().map(_.getName)
+      val lb = new ListBuffer[ModuleType.ModuleType]()
+      if (subModulesNames.contains("api")) {
+        lb += ModuleType.API
+      }
+      if (subModulesNames.contains("impl")) {
+        lb += ModuleType.IMPL
+      }
+      if (subModulesNames.contains("gui")) {
+        lb += ModuleType.GUI
+      }
+      lb.toList
+    } else {
+      val librariesModulesDir = new File("modules-libraries")
+      val librariesModulesNames = librariesModulesDir.listFiles().map(_.getName)
+      if (librariesModulesNames.contains(moduleName)) {
+        List(ModuleType.Library)
+      } else {
+        Nil
+      }
     }
   }
 }
