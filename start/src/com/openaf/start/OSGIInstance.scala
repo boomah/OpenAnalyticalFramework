@@ -6,6 +6,7 @@ import org.osgi.framework.{FrameworkEvent, FrameworkListener}
 import java.net.{ServerSocket, ConnectException, Socket}
 import java.io.File
 import org.osgi.framework.wiring.FrameworkWiring
+import collection.mutable.ListBuffer
 
 class OSGIInstance(name:String, bundles:BundleDefinitions) {
   private val framework = {
@@ -114,7 +115,7 @@ object OSGIInstanceStarter {
     }
   }
 
-  private def excludedPackages(jarFile:File):List[String] = {
+  private def excludedPackages(jarFile:File) = {
     val name = jarFile.getName.toLowerCase
     if (name.startsWith("log4j")) {
       List("com.ibm.uvm.tools", "com.sun.jdmk.comm", "javax.jmdns", "javax.jms", "javax.mail", "javax.mail.internet")
@@ -123,8 +124,36 @@ object OSGIInstanceStarter {
     }
   }
 
+  private def formattedSubNames(file:File) = file.listFiles().toList.map(_.getName.trim())
+  private def componentsModulesDir = new File("modules-components")
+  private def moduleDir(module:String) = new File(componentsModulesDir, module)
+  private def modules = formattedSubNames(componentsModulesDir)
+  private def serverModules = modules.filter(module => {
+    val moduleDirs = formattedSubNames(moduleDir(module))
+    moduleDirs.contains("api") || moduleDirs.contains("impl")
+  })
+  private def guiModules = modules.filter(module => {
+    moduleDir(module).listFiles().map(_.getName.trim().toLowerCase).contains("gui")
+  })
+  private def serverModulesBundleDefinitions = serverModules.flatMap(module => {
+    val moduleDirs = formattedSubNames(moduleDir(module))
+    val lb = new ListBuffer[ModuleBundleDefinition]()
+    if (moduleDirs.contains("api")) {
+      lb += ModuleBundleDefinition(module, ModuleType.API)
+    }
+    if (moduleDirs.contains("impl")) {
+      lb += ModuleBundleDefinition(module, ModuleType.IMPL)
+    }
+    lb.toList
+  })
+  private def guiModulesBundleDefinitions = guiModules.map(module => ModuleBundleDefinition(module, ModuleType.GUI))
+
+  private def systemPackages = List("sun.misc")
+  private def globalLibraryBundleDefinitions = List(
+    SimpleLibraryBundleDefinition("Scala", new File("lib" + File.separator + "scala-library.jar"))
+  )
+
   def main(args: Array[String]) {
-    val s = File.separator
     val formattedArgs = args.map(_.trim().toLowerCase).toList.sorted
     val serverArg = "server"
     val guiArg = "gui"
@@ -132,31 +161,34 @@ object OSGIInstanceStarter {
       System.err.println("Args can be either \"gui\", \"server\" or both")
       System.exit(-1)
     }
+    val startGUI = formattedArgs.contains(guiArg)
+    val startServer = formattedArgs.contains(serverArg)
 
-    // TODO - moduleMap should be specified by the build system or project file.
-    val moduleMap = Map(
-      serverArg -> List("test", "testConsumer", "utils"),
-      guiArg -> Nil
+    // TODO - moduleTypeLibraryMap should be specified by the build system or project file.
+    val moduleTypeLibraryMap = Map(
+      guiArg -> Nil,
+      serverArg -> List("utils")
     )
 
-    val argsString = "osgi" + s + formattedArgs.mkString
+    val argsString = "osgi" + File.separator + formattedArgs.mkString
 
-    def bundles(modules:List[String]) = {
-      val moduleBundleDefinitions = modules.flatMap(topLevelModuleName => {
-        val subModules = FileUtils.subModules(topLevelModuleName)
-        subModules.map(subModule => ModuleBundleDefinition(topLevelModuleName, subModule))
-      })
-
-      val libraryBundleDefinitions = List(
-        SimpleLibraryBundleDefinition("Scala", new File("lib" + s + "scala-library.jar"))
-      ) ::: modules.flatMap(module => FileUtils.exportedLibraries(module)).map(jarFile => LibraryBundleDefinition(jarFile, excludedPackages(jarFile)))
-
-      SimpleBundleDefinitions(List("sun.misc"), libraryBundleDefinitions ::: moduleBundleDefinitions)
+    def configs = {
+      val serverConfig = if (startServer) {
+        val serverLibraryBundleDefinitions = moduleTypeLibraryMap(serverArg).map(library => ModuleBundleDefinition(library, ModuleType.Library))
+        val serverBundleDefinitions = SimpleBundleDefinitions(systemPackages, globalLibraryBundleDefinitions ::: serverModulesBundleDefinitions ::: serverLibraryBundleDefinitions)
+        List(OSGIInstanceConfig(argsString + "-" + serverArg, () => Map(), serverBundleDefinitions))
+      } else {
+        Nil
+      }
+      val guiConfig = if (startGUI) {
+        val guiLibraryBundleDefinitions = moduleTypeLibraryMap(guiArg).map(library => ModuleBundleDefinition(library, ModuleType.Library))
+        val guiBundleDefinitions = SimpleBundleDefinitions(systemPackages, globalLibraryBundleDefinitions ::: guiModulesBundleDefinitions ::: guiLibraryBundleDefinitions)
+        List(OSGIInstanceConfig(argsString + "-" + serverArg, () => Map(), guiBundleDefinitions))
+      } else {
+        Nil
+      }
+      serverConfig ::: guiConfig
     }
-
-    def configs = moduleMap.filter{case (typeName, _) => formattedArgs.contains(typeName)}
-            .map{case (typeName, modules) => (typeName -> bundles(modules))}
-            .map{case (typeName, bundleDefinitions) => OSGIInstanceConfig(argsString + "-" + typeName, () => Map(), bundleDefinitions)}.toList
 
     startOrTrigger(argsString, configs _)
   }
