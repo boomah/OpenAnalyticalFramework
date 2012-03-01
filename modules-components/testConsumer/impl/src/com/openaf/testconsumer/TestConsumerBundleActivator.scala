@@ -16,12 +16,16 @@ class TestConsumerBundleActivator extends BundleActivator {
         val service = context.getService(serviceReference)
         val message = service.message
         println("****")
-        println("Got a message from TestService : " + message)
+        println("A service has been added : " + message)
         println("****")
         "Not sure what to return"
       }
       def modifiedService(serviceReference:ServiceReference[TestService], string:String) {}
-      def removedService(serviceReference:ServiceReference[TestService], string:String) {}
+      def removedService(serviceReference:ServiceReference[TestService], string:String) {
+        println("****")
+        println("A service has been removed : " + string)
+        println("****")
+      }
     }).open()
   }
   def stop(context:BundleContext) {}

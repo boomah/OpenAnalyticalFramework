@@ -1,9 +1,10 @@
 package com.openaf.start
 
-import aQute.lib.osgi.Builder
 import aQute.lib.osgi.Constants._
 import org.osgi.framework.Version
 import java.io._
+import aQute.lib.osgi.Builder
+import java.util.jar.JarFile
 
 case class BundleName(name:String, version:Version)
 
@@ -64,7 +65,12 @@ case class LibraryBundleDefinition(jarFile:File, excludedPackages:List[String]) 
 }
 
 case class OSGIJarBundleDefinition(jar:File) extends BundleDefinition {
-  def name:BundleName = BundleName.fromJar(jar.getName)
+  def name:BundleName = {
+    val mainAttributes = new JarFile(jar).getManifest.getMainAttributes
+    val symbolicName = mainAttributes.getValue("Bundle-SymbolicName")
+    val version = new Version(mainAttributes.getValue("Bundle-Version"))
+    BundleName(symbolicName, version)
+  }
   def lastModified:Long = jar.lastModified()
   def inputStream:InputStream = new BufferedInputStream(new FileInputStream(jar))
 }

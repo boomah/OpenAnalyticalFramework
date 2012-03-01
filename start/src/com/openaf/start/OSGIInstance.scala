@@ -41,7 +41,7 @@ class OSGIInstance(name:String, bundles:BundleDefinitions) {
     // Uninstall, update, install, refresh & start.
     val unInstalled = (currentBundles.keySet -- newBundles.keySet).toList.map{bundleToRemove => currentBundles(bundleToRemove).uninstall(); currentBundles(bundleToRemove)}
 
-    println("Uninstalled bundles: " + unInstalled.map(_.getSymbolicName).mkString(", "))
+    println("Uninstalled bundles: " + unInstalled.map(r => (r.getSymbolicName + " : " + r.getVersion)).mkString(", "))
 
     val updated = (newBundles.keySet & currentBundles.keySet).toList.flatMap(commonBundle => {
       val newBundleDef = newBundles(commonBundle)
@@ -59,7 +59,7 @@ class OSGIInstance(name:String, bundles:BundleDefinitions) {
     println("Updated bundles: " + updated.map(_.getSymbolicName).mkString(", "))
 
     val installed = (newBundles.keySet -- currentBundles.keySet).toList.map(newBundleName => {
-      println("Installing: " + newBundleName + "...")
+      println("Installing: " + newBundleName + " : " + newBundleName.version + "...")
       val newBundleDef = newBundles(newBundleName)
       val res = context.installBundle("from-bnd:" + newBundleDef.name, newBundleDef.inputStream)
       println("Installed: %s (state: %s)".format(newBundleName, res.getState))
@@ -152,8 +152,13 @@ object OSGIInstanceStarter {
   private def globalLibraryBundleDefinitions = List(
     SimpleLibraryBundleDefinition("Scala", new File("lib" + File.separator + "scala-library.jar"))
   )
+  private def serverOSGIJarBundleDefinitions = {
+    new File("server-bundles").listFiles().filter(_.getName.trim.toLowerCase.endsWith(".jar"))
+            .map(OSGIJarBundleDefinition).toList
+  }
 
   def main(args: Array[String]) {
+    System.setProperty("org.osgi.service.http.port", "7777")
     val formattedArgs = args.map(_.trim().toLowerCase).toList.sorted
     val serverArg = "server"
     val guiArg = "gui"
@@ -175,14 +180,16 @@ object OSGIInstanceStarter {
     def configs = {
       val serverConfig = if (startServer) {
         val serverLibraryBundleDefinitions = moduleTypeLibraryMap(serverArg).map(library => ModuleBundleDefinition(library, ModuleType.Library))
-        val serverBundleDefinitions = SimpleBundleDefinitions(systemPackages, globalLibraryBundleDefinitions ::: serverModulesBundleDefinitions ::: serverLibraryBundleDefinitions)
+        val serverBundleDefinitions = SimpleBundleDefinitions(systemPackages, globalLibraryBundleDefinitions
+                ::: serverModulesBundleDefinitions ::: serverLibraryBundleDefinitions ::: serverOSGIJarBundleDefinitions)
         List(OSGIInstanceConfig(argsString + "-" + serverArg, () => Map(), serverBundleDefinitions))
       } else {
         Nil
       }
       val guiConfig = if (startGUI) {
         val guiLibraryBundleDefinitions = moduleTypeLibraryMap(guiArg).map(library => ModuleBundleDefinition(library, ModuleType.Library))
-        val guiBundleDefinitions = SimpleBundleDefinitions(systemPackages, globalLibraryBundleDefinitions ::: guiModulesBundleDefinitions ::: guiLibraryBundleDefinitions)
+        val guiBundleDefinitions = SimpleBundleDefinitions(systemPackages, globalLibraryBundleDefinitions
+                ::: guiModulesBundleDefinitions ::: guiLibraryBundleDefinitions)
         List(OSGIInstanceConfig(argsString + "-" + serverArg, () => Map(), guiBundleDefinitions))
       } else {
         Nil
