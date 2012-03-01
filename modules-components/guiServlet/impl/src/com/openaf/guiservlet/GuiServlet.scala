@@ -89,7 +89,7 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
 
   private def returnBootstrapperJAR(resp:HttpServletResponse) {
     println("")
-    println("!! WRITE BOOTSTRAPPER HERE ")
+    println("!! WRITE BOOTSTRAPPER ")
     println("")
   }
 }
