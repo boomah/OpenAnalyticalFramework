@@ -20,6 +20,10 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
   private val bootstrapperName = "bootstrapper.jar"
   private val webStartIcon = "webstart-icon.png"
 
+  private val webStartIconName = "com/openaf/guiservlet/resources/openaf.png"
+
+  private val bootstrapperMainClass = "com.openaf.bootstrapper.Bootstrapper"
+
   override def doGet(req:HttpServletRequest, resp:HttpServletResponse) {
     val path = req.getRequestURI.replaceFirst(GuiServlet.Address, "").replaceAll("/", "")
 
@@ -32,13 +36,14 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
     } else if (path == bootstrapperName) {
       returnBootstrapperJAR(resp)
     } else if (path == webStartIcon) {
-      returnImage("com/openaf/guiservlet/resources/openaf.png", resp)
+      returnImage(webStartIconName, resp)
     } else  {
       resp.sendError(404)
     }
   }
 
   private def returnGuiPage(resp:HttpServletResponse) {
+    def link(target:String) = GuiServlet.Address + "/" + target
     resp.setContentType("text/html")
     val writer = resp.getWriter
     writer.println("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">""")
@@ -55,8 +60,8 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
         </head>
         <body>
           <h1>Launch the GUI</h1>
-          <a href={webStartNormalMemory}>Launch via web start</a><br/>
-          <a href={webStartExtraMemory}>Launch via web start with extra memory</a>
+          <a href={link(webStartNormalMemory)}>Launch via web start</a><br/>
+          <a href={link(webStartExtraMemory)}>Launch via web start with extra memory</a>
         </body>
       </html>
 
@@ -103,7 +108,7 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
       if (bootstrapperJARFile.exists()) {
         bootstrapperJARFile
       } else {
-        generateAndWriteJARFile(bootstrapperJARFile, classesDir, Some("com.openaf.bootstrapper.Bootstrapper"))
+        generateAndWriteJARFile(bootstrapperJARFile, classesDir, Some(bootstrapperMainClass))
         signJARFile(bootstrapperJARFile)
         bootstrapperJARFile.setLastModified(lastModified)
         bootstrapperJARFile

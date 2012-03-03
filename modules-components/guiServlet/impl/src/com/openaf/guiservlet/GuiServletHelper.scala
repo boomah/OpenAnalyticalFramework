@@ -8,6 +8,7 @@ import org.eclipse.jetty.util.IO
 object GuiServletHelper {
   private val fileCache = new ConcurrentHashMap[String,FutureTask[File]]
   val FileCacheDir = new File("file-cache")
+  if (!FileCacheDir.exists) FileCacheDir.mkdir
 
   def memoizeFile(fileName:String, fileGenerator:(String)=>File):File = {
     val task = new FutureTask(new Callable[File] {def call = fileGenerator(fileName)})
@@ -68,7 +69,8 @@ Main-Class: """ + classToUse + "\n"
 
   def signJARFile(jarFile:File) {
     if (!jarFile.exists()) throw new FileNotFoundException("Can't sign the JAR file as " + jarFile.getPath + " doesn't exist")
-    val jarSignerPath = new File(System.getProperty("java.home")).getParent + "/bin/jarsigner"
+//    val jarSignerPath = new File(System.getProperty("java.home")).getParent + "/bin/jarsigner"
+    val jarSignerPath = "jarsigner"
     // Generate .jks file like this: keytool -genkey -alias openaf -keyalg RSA -dname "CN=openaf" -keypass password -storepass password -validity 18250 -keystore openaf.jks
     execute(jarSignerPath, "-keystore", "modules-components/guiServlet/impl/jks/openaf.jks", "-storepass", "password", "-keypass", "password", jarFile.getPath, "openaf")
   }

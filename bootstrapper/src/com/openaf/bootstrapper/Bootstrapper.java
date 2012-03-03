@@ -33,11 +33,10 @@ public class Bootstrapper {
         clearOldLogFiles(cacheDir);
         Date currentTime = new Date();
         String currentTimeString = new SimpleDateFormat("HH-mm-ss--dd-MM-yyyy").format(currentTime);
-        File logFile = new File(cacheDir, "_log-" + currentTimeString + ".txt");
+        File logFile = new File(cacheDir, "__log-" + currentTimeString + ".txt");
         System.setOut(new java.io.PrintStream(new TeeOutputStream(System.out, new FileOutputStream(logFile))));
         System.setErr(new java.io.PrintStream(new TeeOutputStream(System.err, new FileOutputStream(logFile))));
         Proxy proxy = Proxy.NO_PROXY;
-
 
     }
 
@@ -46,7 +45,7 @@ public class Bootstrapper {
         ArrayList<File> logFiles = new ArrayList<File>();
         for (File file : files) {
             String fileName = file.getName().toLowerCase();
-            if (fileName.contains("log") && fileName.endsWith(".txt")) {
+            if (fileName.contains("_log") && fileName.endsWith(".txt")) {
                 logFiles.add(file);
             }
         }
@@ -66,6 +65,12 @@ public class Bootstrapper {
             for (int i = 0; i < numberToRemove; i++) {
                 File logFile = logFiles.get(i);
                 logFile.delete();
+            }
+        }
+        for (File logFile : logFiles) {
+            if (logFile.getName().startsWith("__log")) {
+                File newFile = new File(logFile.getParent(), logFile.getName().replaceFirst("_", ""));
+                logFile.renameTo(newFile);
             }
         }
     }
