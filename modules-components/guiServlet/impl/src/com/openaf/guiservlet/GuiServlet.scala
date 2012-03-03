@@ -2,6 +2,9 @@ package com.openaf.guiservlet
 
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 import xml.XML
+import GuiServletHelper._
+import java.io.{FileInputStream, BufferedInputStream, File}
+import org.eclipse.jetty.util.IO
 
 object GuiServlet {
   val Address = "/gui"
@@ -11,10 +14,11 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
   private val standardMemory = "512m"
   private val specifiedMemory1024 = "1024m"
 
-  private val webStartNormalMemory = "openAF.jnlp"
+  private val webStartNormalMemory = "openaf.jnlp"
   private val webStartExtraMemory = "openAFExtra.jnlp"
 
   private val bootstrapperName = "bootstrapper.jar"
+  private val webStartIcon = "webstart-icon.png"
 
   override def doGet(req:HttpServletRequest, resp:HttpServletResponse) {
     val path = req.getRequestURI.replaceFirst(GuiServlet.Address, "").replaceAll("/", "")
@@ -27,6 +31,8 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
       returnJNLPFile(resp, webStartExtraMemory, specifiedMemory1024)
     } else if (path == bootstrapperName) {
       returnBootstrapperJAR(resp)
+    } else if (path == webStartIcon) {
+      returnImage("com/openaf/guiservlet/resources/openaf.png", resp)
     } else  {
       resp.sendError(404)
     }
@@ -62,11 +68,11 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
     val jnlp =
       <jnlp spec='1.0+' codebase={externalURL + GuiServlet.Address + "/"} href={jnlpName}>
         <information>
-          <vendor>OpenAF.com</vendor>
           <title>OpenAF - {serverName}</title>
+          <vendor>OpenAF.com</vendor>
             <homepage href='http://www.openaf.com'/>
           <description>OpenAF - {serverName + (if (standardMemory != memory) memory else "")}</description>
-            <icon href='icon.png'/>
+            <icon href={webStartIcon}/>
             <offline-allowed/>
           <shortcut><menu submenu="OpenAF"/></shortcut>
         </information>
@@ -80,7 +86,7 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
         <application-desc main-class="com.openaf.bootstrapper.Bootstrapper">
           <argument>{externalURL}</argument>
           <argument>{serverName.replaceAll(" ", "_")}</argument>
-        </application-desc>ª
+        </application-desc>
           <update check='always' policy='always'/>
       </jnlp>
 
@@ -88,8 +94,38 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
   }
 
   private def returnBootstrapperJAR(resp:HttpServletResponse) {
-    println("")
-    println("!! WRITE BOOTSTRAPPER ")
-    println("")
+    val classesDir = new File("out/production/bootstrapper")
+    val lastModified = findLastModified(classesDir)
+    val bootstrapperName = "bootstrapper-" + lastModified + ".jar"
+
+    def getOrGenerateBootstrapperJAR(name:String) = {
+      val bootstrapperJARFile = new File(FileCacheDir, name)
+      if (bootstrapperJARFile.exists()) {
+        bootstrapperJARFile
+      } else {
+        generateAndWriteJARFile(bootstrapperJARFile, classesDir, Some("com.openaf.bootstrapper.Bootstrapper"))
+        signJARFile(bootstrapperJARFile)
+        bootstrapperJARFile.setLastModified(lastModified)
+        bootstrapperJARFile
+      }
+    }
+
+    val bootstrapperJARFile = memoizeFile(bootstrapperName, getOrGenerateBootstrapperJAR)
+    writeFileAsResponse(bootstrapperJARFile, resp)
+  }
+
+  private def writeFileAsResponse(file:File, resp:HttpServletResponse) {
+    resp.setContentType("application/octet-stream")
+    resp.setDateHeader("Last-Modified", file.lastModified)
+    val bufferedInputStream = new BufferedInputStream(new FileInputStream(file))
+    IO.copy(bufferedInputStream, resp.getOutputStream)
+    bufferedInputStream.close()
+    resp.getOutputStream.flush()
+    resp.getOutputStream.close()
+  }
+
+  private def returnImage(imagePath:String, resp:HttpServletResponse) {
+    resp.setContentType("image/png")
+    IO.copy(classOf[GuiServlet].getClassLoader.getResourceAsStream(imagePath), resp.getOutputStream)
   }
 }

@@ -2,6 +2,18 @@
   <dictionary name="nick">
     <words>
       <w>bootstrapper</w>
+      <w>dname</w>
+      <w>genkey</w>
+      <w>javaw</w>
+      <w>keyalg</w>
+      <w>keypass</w>
+      <w>keystore</w>
+      <w>keytool</w>
+      <w>memoize</w>
+      <w>openaf</w>
+      <w>storepass</w>
+      <w>tmpdir</w>
+      <w>yyyy</w>
     </words>
   </dictionary>
 </component>
