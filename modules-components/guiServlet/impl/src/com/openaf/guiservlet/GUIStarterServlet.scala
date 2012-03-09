@@ -2,48 +2,59 @@ package com.openaf.guiservlet
 
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 import xml.XML
-import GuiServletHelper._
-import java.io.{FileInputStream, BufferedInputStream, File}
+import ServletHelper._
+import java.io.File
 import org.eclipse.jetty.util.IO
 
-object GuiServlet {
+object GUIStarterServlet {
   val Address = "/gui"
+  val OutputPathPrefix = "out/production/"
 }
 
-class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
+import GUIStarterServlet._
+
+class GUIStarterServlet(serverName:String, externalURL:String) extends HttpServlet {
+  private val mainClassConfigLine = "com.openaf.start.GUIStarter 7778"
+
   private val standardMemory = "512m"
   private val specifiedMemory1024 = "1024m"
+
+  private val scalaLibraryJAR = new File("lib/scala-library.jar")
+  private val scalaLibraryName = scalaLibraryJAR.getName
 
   private val webStartNormalMemory = "openaf.jnlp"
   private val webStartExtraMemory = "openAFExtra.jnlp"
 
   private val bootstrapperName = "bootstrapper.jar"
   private val webStartIcon = "webstart-icon.png"
+  private val configName = "config.txt"
+  private val osgiStartModuleName = "osgi-module-start.jar"
+  private val felixJAR = new File("start/lib/felix.jar")
+  private val felixName = felixJAR.getName
 
   private val webStartIconName = "com/openaf/guiservlet/resources/openaf.png"
 
   private val bootstrapperMainClass = "com.openaf.bootstrapper.Bootstrapper"
 
   override def doGet(req:HttpServletRequest, resp:HttpServletResponse) {
-    val path = req.getRequestURI.replaceFirst(GuiServlet.Address, "").replaceAll("/", "")
+    val path = req.getRequestURI.stripPrefix(Address).replaceAll("/", "").trim
 
-    if (path.isEmpty) {
-      returnGuiPage(resp)
-    } else if (path == webStartNormalMemory) {
-      returnJNLPFile(resp, webStartNormalMemory, standardMemory)
-    } else if (path == webStartExtraMemory) {
-      returnJNLPFile(resp, webStartExtraMemory, specifiedMemory1024)
-    } else if (path == bootstrapperName) {
-      returnBootstrapperJAR(resp)
-    } else if (path == webStartIcon) {
-      returnImage(webStartIconName, resp)
-    } else  {
-      resp.sendError(404)
+    path match {
+      case "" => returnGuiPage(resp)
+      case `webStartNormalMemory` => returnJNLPFile(resp, webStartNormalMemory, standardMemory)
+      case `webStartExtraMemory` => returnJNLPFile(resp, webStartExtraMemory, specifiedMemory1024)
+      case `bootstrapperName` => returnBootstrapperJAR(resp)
+      case `webStartIcon` => returnImage(webStartIconName, resp)
+      case `configName` => returnConfigPage(resp)
+      case `osgiStartModuleName` => returnStartModuleJAR(req, resp)
+      case `felixName` => returnFelixJAR(req, resp)
+      case `scalaLibraryName` => returnScalaLibraryJAR(req, resp)
+      case _ => resp.sendError(404)
     }
   }
 
   private def returnGuiPage(resp:HttpServletResponse) {
-    def link(target:String) = GuiServlet.Address + "/" + target
+    def link(target:String) = Address + "/" + target
     resp.setContentType("text/html")
     val writer = resp.getWriter
     writer.println("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">""")
@@ -71,7 +82,7 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
   private def returnJNLPFile(resp:HttpServletResponse, jnlpName:String, memory:String) {
     resp.setContentType("application/x-java-jnlp-file")
     val jnlp =
-      <jnlp spec='1.0+' codebase={externalURL + GuiServlet.Address + "/"} href={jnlpName}>
+      <jnlp spec='1.0+' codebase={externalURL + Address + "/"} href={jnlpName}>
         <information>
           <title>OpenAF - {serverName}</title>
           <vendor>OpenAF.com</vendor>
@@ -99,13 +110,13 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
   }
 
   private def returnBootstrapperJAR(resp:HttpServletResponse) {
-    val classesDir = new File("out/production/bootstrapper")
+    val classesDir = new File(OutputPathPrefix + "bootstrapper")
     val lastModified = findLastModified(classesDir)
     val bootstrapperName = "bootstrapper-" + lastModified + ".jar"
 
-    def getOrGenerateBootstrapperJAR(name:String) = {
-      val bootstrapperJARFile = new File(FileCacheDir, name)
-      if (bootstrapperJARFile.exists()) {
+    def getOrGenerateBootstrapperJAR = {
+      val bootstrapperJARFile = new File(FileCacheDir, bootstrapperName)
+      if (bootstrapperJARFile.exists) {
         bootstrapperJARFile
       } else {
         generateAndWriteJARFile(bootstrapperJARFile, classesDir, Some(bootstrapperMainClass))
@@ -119,18 +130,33 @@ class GuiServlet(serverName:String, externalURL:String) extends HttpServlet {
     writeFileAsResponse(bootstrapperJARFile, resp)
   }
 
-  private def writeFileAsResponse(file:File, resp:HttpServletResponse) {
-    resp.setContentType("application/octet-stream")
-    resp.setDateHeader("Last-Modified", file.lastModified)
-    val bufferedInputStream = new BufferedInputStream(new FileInputStream(file))
-    IO.copy(bufferedInputStream, resp.getOutputStream)
-    bufferedInputStream.close()
-    resp.getOutputStream.flush()
-    resp.getOutputStream.close()
-  }
-
   private def returnImage(imagePath:String, resp:HttpServletResponse) {
     resp.setContentType("image/png")
-    IO.copy(classOf[GuiServlet].getClassLoader.getResourceAsStream(imagePath), resp.getOutputStream)
+    IO.copy(classOf[GUIStarterServlet].getClassLoader.getResourceAsStream(imagePath), resp.getOutputStream)
+  }
+
+  private def returnConfigPage(resp:HttpServletResponse) {
+    val scalaLibraryJARMD5 = md5String(scalaLibraryJAR)
+    val startModuleMD5 = md5String(startModuleJAR)
+    val felixJARMD5 = md5String(felixJAR)
+    resp.setContentType("text/plain")
+    val writer = resp.getWriter
+    writer.println(mainClassConfigLine)
+    writer.println(scalaLibraryName + " " + scalaLibraryJARMD5)
+    writer.println(osgiStartModuleName + " " + startModuleMD5)
+    writer.println(felixName + " " + felixJARMD5)
+  }
+
+  private def returnStartModuleJAR(req:HttpServletRequest, resp:HttpServletResponse) {
+    val startModuleJARFile = startModuleJAR
+    writeFileAsResponse(startModuleJARFile, resp, Some(req.getParameter("md5")))
+  }
+
+  private def returnFelixJAR(req:HttpServletRequest, resp:HttpServletResponse) {
+    writeFileAsResponse(felixJAR, resp, Some(req.getParameter("md5")))
+  }
+
+  private def returnScalaLibraryJAR(req:HttpServletRequest, resp:HttpServletResponse) {
+    writeFileAsResponse(scalaLibraryJAR, resp, Some(req.getParameter("md5")))
   }
 }

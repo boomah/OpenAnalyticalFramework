@@ -4,14 +4,24 @@ import java.util.concurrent.{Callable, FutureTask, ConcurrentHashMap}
 import java.util.jar.{JarEntry, JarOutputStream}
 import java.io._
 import org.eclipse.jetty.util.IO
+import java.security.MessageDigest
+import GUIStarterServlet._
+import javax.servlet.http.HttpServletResponse
+import java.util.Calendar
 
-object GuiServletHelper {
+object ServletHelper {
+  private val expiryTimeForProxies = {
+    val cal = Calendar.getInstance()
+    cal.set(2099, 0, 1)
+    cal.getTimeInMillis
+  }
+
   private val fileCache = new ConcurrentHashMap[String,FutureTask[File]]
   val FileCacheDir = new File("file-cache")
   if (!FileCacheDir.exists) FileCacheDir.mkdir
 
-  def memoizeFile(fileName:String, fileGenerator:(String)=>File):File = {
-    val task = new FutureTask(new Callable[File] {def call = fileGenerator(fileName)})
+  def memoizeFile(fileName:String, fileGenerator: =>File):File = {
+    val task = new FutureTask(new Callable[File] {def call = fileGenerator})
     var taskToUse = fileCache.putIfAbsent(fileName, task)
     if (taskToUse == null) {
       taskToUse = task
@@ -69,7 +79,6 @@ Main-Class: """ + classToUse + "\n"
 
   def signJARFile(jarFile:File) {
     if (!jarFile.exists()) throw new FileNotFoundException("Can't sign the JAR file as " + jarFile.getPath + " doesn't exist")
-//    val jarSignerPath = new File(System.getProperty("java.home")).getParent + "/bin/jarsigner"
     val jarSignerPath = "jarsigner"
     // Generate .jks file like this: keytool -genkey -alias openaf -keyalg RSA -dname "CN=openaf" -keypass password -storepass password -validity 18250 -keystore openaf.jks
     execute(jarSignerPath, "-keystore", "modules-components/guiServlet/impl/jks/openaf.jks", "-storepass", "password", "-keypass", "password", jarFile.getPath, "openaf")
@@ -86,5 +95,76 @@ Main-Class: """ + classToUse + "\n"
       if (output != null) println("^^^ " + output)
     }
     bufferedReader.close()
+  }
+
+  def md5String(file:File) = {
+    generateMD5(file)
+  }
+
+  private def generateMD5(file:File) = {
+    val inputStream = new BufferedInputStream(new FileInputStream(file))
+    val buffer = new Array[Byte](1024)
+    val md5 = MessageDigest.getInstance("MD5")
+    var bytesRead = 0
+    while (bytesRead != -1) {
+      bytesRead = inputStream.read(buffer)
+      if (bytesRead > 0) {
+        md5.update(buffer, 0, bytesRead)
+      }
+    }
+    inputStream.close()
+    val md5Bytes = md5.digest
+    val sb = new StringBuilder
+    for (b <- md5Bytes) {
+      sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1))
+    }
+    sb.toString()
+  }
+
+  def startModuleJAR = {
+    val moduleName = "start"
+    val classesDir = new File(OutputPathPrefix + moduleName)
+    val lastModified = findLastModified(classesDir)
+    val moduleJARName = moduleName + "_" + lastModified + ".jar"
+
+    def getOrGenerateStartModuleJAR = {
+      val moduleJARFile = new File(FileCacheDir, moduleJARName)
+      if (moduleJARFile.exists) {
+        moduleJARFile
+      } else {
+        generateAndWriteJARFile(moduleJARFile, classesDir)
+        moduleJARFile.setLastModified(lastModified)
+        moduleJARFile
+      }
+    }
+
+    memoizeFile(moduleJARName, getOrGenerateStartModuleJAR)
+  }
+
+  def writeFileAsResponse(file:File, resp:HttpServletResponse, requestedMD5:Option[String]=None) {
+    def writeFile() {
+      resp.setContentType("application/octet-stream")
+      val bufferedInputStream = new BufferedInputStream(new FileInputStream(file))
+      IO.copy(bufferedInputStream, resp.getOutputStream)
+      bufferedInputStream.close()
+    }
+
+    requestedMD5 match {
+      case None => {
+        resp.setDateHeader("Last-Modified", file.lastModified)
+        writeFile()
+      }
+      case Some(md5) => {
+        val currentMD5 = md5String(file)
+        if (currentMD5 != md5) {
+          resp.setContentType("text/plain")
+          resp.setStatus(404)
+          resp.getWriter.write("The requested MD5 (" + md5 + ") doesn't match the current MD5 (" + currentMD5 + ")")
+        } else {
+          resp.setDateHeader("Expires", expiryTimeForProxies)
+          writeFile()
+        }
+      }
+    }
   }
 }

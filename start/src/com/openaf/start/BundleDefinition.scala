@@ -64,7 +64,7 @@ case class LibraryBundleDefinition(jarFile:File, excludedPackages:List[String]) 
   }
 }
 
-case class OSGIJarBundleDefinition(jar:File) extends BundleDefinition {
+case class OSGIJARBundleDefinition(jar:File) extends BundleDefinition {
   def name:BundleName = {
     val mainAttributes = new JarFile(jar).getManifest.getMainAttributes
     val symbolicName = mainAttributes.getValue("Bundle-SymbolicName")
@@ -73,6 +73,12 @@ case class OSGIJarBundleDefinition(jar:File) extends BundleDefinition {
   }
   def lastModified:Long = jar.lastModified()
   def inputStream:InputStream = new BufferedInputStream(new FileInputStream(jar))
+}
+
+class RemoteOSGIJARBundleDefinition(osgiJARConfig:OSGIJARConfig, generateInputStream:(OSGIJARConfig)=>InputStream) extends BundleDefinition {
+  def name = BundleName(osgiJARConfig.symbolicName, osgiJARConfig.version)
+  def lastModified = osgiJARConfig.timestamp
+  def inputStream = generateInputStream(osgiJARConfig)
 }
 
 case class ModuleBundleDefinition(topLevelModuleName:String, moduleType:ModuleType.ModuleType) extends BundleDefinition {
@@ -114,7 +120,10 @@ trait BundleDefinitions {
   def systemPackages:List[String]
 }
 
-case class SimpleBundleDefinitions(systemPackages:List[String], bundles:List[BundleDefinition]) extends BundleDefinitions
+class SimpleBundleDefinitions(systemPackages0:()=>List[String], bundles0:()=>List[BundleDefinition]) extends BundleDefinitions {
+  def systemPackages = systemPackages0()
+  def bundles = bundles0()
+}
 
 object ModuleType extends Enumeration {
   type ModuleType = Value
