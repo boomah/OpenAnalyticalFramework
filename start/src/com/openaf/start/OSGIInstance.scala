@@ -204,7 +204,7 @@ object ServerOSGIInstanceStarter {
     }
   }
 
-  def formattedSubNames(file:File) = file.listFiles().toList.map(_.getName.trim())
+  def formattedSubNames(file:File) = file.listFiles().toList.map(_.getName.trim()).filterNot(_.toLowerCase == ".ds_store")
   def componentsModulesDir = new File("modules-components")
   def moduleDir(module:String) = new File(componentsModulesDir, module)
   def modules = formattedSubNames(componentsModulesDir)

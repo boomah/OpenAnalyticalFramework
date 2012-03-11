@@ -3,3 +3,4 @@ osgi
 out
 file-cache
 gui-bundle-cache
+openaf.properties

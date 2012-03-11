@@ -6,6 +6,8 @@
       <module fileurl="file://$PROJECT_DIR$/bootstrapper/bootstrapper.iml" filepath="$PROJECT_DIR$/bootstrapper/bootstrapper.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/browser/gui/browser.gui.iml" filepath="$PROJECT_DIR$/modules-components/browser/gui/browser.gui.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/guiServlet/impl/guiServlet.impl.iml" filepath="$PROJECT_DIR$/modules-components/guiServlet/impl/guiServlet.impl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules-components/properties/api/properties.api.iml" filepath="$PROJECT_DIR$/modules-components/properties/api/properties.api.iml" group="properties" />
+      <module fileurl="file://$PROJECT_DIR$/modules-components/properties/impl/properties.impl.iml" filepath="$PROJECT_DIR$/modules-components/properties/impl/properties.impl.iml" group="properties" />
       <module fileurl="file://$PROJECT_DIR$/start/start.iml" filepath="$PROJECT_DIR$/start/start.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/test/api/test.api.iml" filepath="$PROJECT_DIR$/modules-components/test/api/test.api.iml" group="test" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/test/impl/test.impl.iml" filepath="$PROJECT_DIR$/modules-components/test/impl/test.impl.iml" group="test" />
