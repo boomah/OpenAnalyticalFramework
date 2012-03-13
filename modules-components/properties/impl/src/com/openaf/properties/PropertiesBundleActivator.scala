@@ -2,27 +2,32 @@ package com.openaf.properties
 
 import api.PropertiesService
 import org.osgi.framework.{BundleContext, BundleActivator}
-import java.io.{File, FileReader}
-import java.util.Properties
+import java.io.File
+import io.Source
 
 class PropertiesBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
     context.registerService(classOf[PropertiesService], new PropertiesServiceImpl, null)
   }
-
   def stop(context:BundleContext) {}
 }
 
 class PropertiesServiceImpl extends PropertiesService {
   private val userDefinedProperties = {
     val propertiesFile = new File("openaf.properties")
-    val properties = new Properties
     if (propertiesFile.exists) {
-      properties.load(new FileReader(propertiesFile))
+      val source = Source.fromFile(propertiesFile)
+      val lines = source.getLines.toList
+      source.close()
+      lines.map(line => {
+        val (start, end) = line.splitAt(line.indexOf("="))
+        (start.trim.toLowerCase -> end.trim.tail)
+      }).toMap
+    } else {
+      Map[String,String]()
     }
-    properties
   }
 
-  def name = "Test"
-  def externalURL = ""
+  def name = userDefinedProperties.getOrElse("name", "Test")
+  def externalURL = userDefinedProperties.getOrElse("externalurl", "http://localhost:7777").toLowerCase
 }
