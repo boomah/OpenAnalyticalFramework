@@ -8,6 +8,7 @@ import org.osgi.framework.wiring.FrameworkWiring
 import collection.mutable.ListBuffer
 import java.io._
 import java.util.concurrent.CopyOnWriteArraySet
+import java.util.jar.JarFile
 
 class OSGIInstance(name:String, bundles:BundleDefinitions) {
   private val framework = {
@@ -209,7 +210,19 @@ object ServerOSGIInstanceStarter {
   def moduleDir(module:String) = new File(componentsModulesDir, module)
   def modules = formattedSubNames(componentsModulesDir)
 
-  def systemPackagesToUse = List("sun.misc")
+  val javaFXPackages = {
+    val javaFXJarFile = new JarFile("/Users/nick/Downloads/javafx-sdk2.1.0-beta/rt/lib/jfxrt.jar")
+    val entries = javaFXJarFile.entries
+    val packageBuffer = new ListBuffer[String]
+    while (entries.hasMoreElements) {
+      val entry = entries.nextElement
+      if (entry.isDirectory) {
+        packageBuffer += entry.getName
+      }
+    }
+    packageBuffer.toList.filter(_.startsWith("javafx")).filterNot(_ == "javafx.").map(_.replaceAll("/", ".").dropRight(1))
+  }
+  def systemPackagesToUse = List("sun.misc", "com.sun.javafx.application") ::: javaFXPackages
   def globalLibraryBundleDefinitions = List(
     SimpleLibraryBundleDefinition("Scala", new File("lib" + File.separator + "scala-library.jar"))
   )
