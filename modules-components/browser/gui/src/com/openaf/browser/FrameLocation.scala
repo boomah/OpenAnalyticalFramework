@@ -15,6 +15,10 @@ case class FrameLocation(rectangle:Rectangle2D, fullScreen:Boolean) {
   def y = rectangle.getMinY
   def width = rectangle.getWidth
   def height = rectangle.getHeight
+  def offSet(offSet:Int) = {
+    val rect = new Rectangle2D(rectangle.getMinX + offSet, rectangle.getMinY + offSet, rectangle.getWidth, rectangle.getHeight)
+    copy(rectangle = rect).valid()
+  }
 }
 
 object FrameLocation {
