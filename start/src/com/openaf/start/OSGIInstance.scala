@@ -9,6 +9,7 @@ import collection.mutable.ListBuffer
 import java.io._
 import java.util.concurrent.CopyOnWriteArraySet
 import java.util.jar.JarFile
+import com.openaf.utils.{Global, JavaVersion, Utils}
 
 class OSGIInstance(name:String, bundles:BundleDefinitions) {
   private val framework = {
@@ -211,7 +212,7 @@ object ServerOSGIInstanceStarter {
   def modules = formattedSubNames(componentsModulesDir)
 
   val javaFXPackages = {
-    val javaFXJarFile = new JarFile("/Users/nick/Downloads/javafx-sdk2.1.0-beta/rt/lib/jfxrt.jar")
+    val javaFXJarFile = new JarFile("/Library/Java/JavaVirtualMachines/1.7.0.jdk/Contents/Home/jre/lib/jfxrt.jar")
     val entries = javaFXJarFile.entries
     val packageBuffer = new ListBuffer[String]
     while (entries.hasMoreElements) {
@@ -220,7 +221,7 @@ object ServerOSGIInstanceStarter {
         packageBuffer += entry.getName
       }
     }
-    packageBuffer.toList.filter(_.startsWith("javafx")).filterNot(_ == "javafx.").map(_.replaceAll("/", ".").dropRight(1))
+    packageBuffer.toList/*.filter(_.startsWith("javafx")).filterNot(_ == "javafx.")*/.map(_.replaceAll("/", ".").dropRight(1))
   }
   def systemPackagesToUse = List("sun.misc", "com.sun.javafx.application") ::: javaFXPackages
   def globalLibraryBundleDefinitions = List(
@@ -338,6 +339,11 @@ class GUIUpdater(baseURL:URL, instanceName:String) {
 
 object GUIStarter {
   def main(args:Array[String]) {
+    if (!Utils.javaVersionValid(Global.MinimumJavaVersion)) {
+      throw new IllegalStateException(
+        "You need Java %s update %s or above to run OpenAF. ".format(Global.MinimumJavaVersion.major, Global.MinimumJavaVersion.update) +
+        "You currently have Java %s update %s.".format(Utils.ActualJavaVersion.major, Utils.ActualJavaVersion.update))
+    }
     val baseURL = new URL(args(0))
     val guiUpdater = new GUIUpdater(baseURL, args(1))
     val guiConfig = guiUpdater.guiConfig
