@@ -96,8 +96,6 @@ public class Bootstrapper {
         for (String jarName : latestJARsToMD5.keySet()) {
             urlsOfLatestJARs.add(new File(cacheDir, jarName).toURI().toURL());
         }
-        URL javaFXURL = new File("/Library/Java/JavaVirtualMachines/1.7.0.jdk/Contents/Home/jre/lib/jfxrt.jar").toURI().toURL();
-        urlsOfLatestJARs.add(javaFXURL);
 
         URLClassLoader urlClassLoader = new URLClassLoader(urlsOfLatestJARs.toArray(new URL[urlsOfLatestJARs.size()]));
         Policy.setPolicy(new Policy() {
