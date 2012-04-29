@@ -5,7 +5,7 @@ import java.util.jar.{JarEntry, JarOutputStream}
 import java.io._
 import org.eclipse.jetty.util.IO
 import java.security.MessageDigest
-import GUIStarterServlet._
+import GUIServlet._
 import javax.servlet.http.HttpServletResponse
 import java.util.Calendar
 

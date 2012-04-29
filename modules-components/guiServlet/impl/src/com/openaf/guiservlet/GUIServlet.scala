@@ -6,15 +6,15 @@ import ServletHelper._
 import java.io.File
 import org.eclipse.jetty.util.IO
 
-object GUIStarterServlet {
+object GUIServlet {
   val Address = "/gui"
   val OutputPathPrefix = "out/production/"
 }
 
-import GUIStarterServlet._
+import GUIServlet._
 
-class GUIStarterServlet(serverName:String, externalURL:String) extends HttpServlet {
-  private val mainClassConfigLine = "com.openaf.start.GUIStarter 7778"
+class GUIServlet(serverName:String, externalURL:String) extends HttpServlet {
+  private val mainClassConfigLine = "com.openaf.start.GUI 7778"
 
   private val standardMemory = "512m"
   private val specifiedMemory1024 = "1024m"
@@ -132,7 +132,7 @@ class GUIStarterServlet(serverName:String, externalURL:String) extends HttpServl
 
   private def returnImage(imagePath:String, resp:HttpServletResponse) {
     resp.setContentType("image/png")
-    IO.copy(classOf[GUIStarterServlet].getClassLoader.getResourceAsStream(imagePath), resp.getOutputStream)
+    IO.copy(classOf[GUIServlet].getClassLoader.getResourceAsStream(imagePath), resp.getOutputStream)
   }
 
   private def returnConfigPage(resp:HttpServletResponse) {

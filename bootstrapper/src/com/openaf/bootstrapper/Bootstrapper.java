@@ -41,10 +41,10 @@ public class Bootstrapper {
         String[] mainClassAndArgs = configLines.get(0).split(" ");
         String mainClass = mainClassAndArgs[0];
         String[] configArgsArray = Arrays.copyOfRange(mainClassAndArgs, 1, mainClassAndArgs.length);
-        String[] argsToPassToGUIStarter = new String[configArgsArray.length + 2];
-        argsToPassToGUIStarter[0] = url.toExternalForm();
-        argsToPassToGUIStarter[1] = instanceName;
-        System.arraycopy(configArgsArray, 0, argsToPassToGUIStarter, 2, configArgsArray.length);
+        String[] argsToPassToGUI = new String[configArgsArray.length + 2];
+        argsToPassToGUI[0] = url.toExternalForm();
+        argsToPassToGUI[1] = instanceName;
+        System.arraycopy(configArgsArray, 0, argsToPassToGUI, 2, configArgsArray.length);
 
         List<String> latestJARLines = configLines.subList(1, configLines.size());
         Map<String,String> latestJARsToMD5 = jarsWithMD5(latestJARLines);
@@ -111,7 +111,7 @@ public class Bootstrapper {
         Thread.currentThread().setContextClassLoader(urlClassLoader);
         Class launcher = urlClassLoader.loadClass(mainClass);
         Method mainMethod = launcher.getMethod("main", new Class[]{String[].class});
-        mainMethod.invoke(null, new Object[]{argsToPassToGUIStarter});
+        mainMethod.invoke(null, new Object[]{argsToPassToGUI});
     }
 
     private static InputStream openConnection(URL url, Proxy proxy) throws Exception {

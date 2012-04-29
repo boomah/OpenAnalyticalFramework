@@ -9,7 +9,6 @@ import collection.mutable.ListBuffer
 import java.io._
 import java.util.concurrent.CopyOnWriteArraySet
 import java.util.jar.JarFile
-import com.openaf.utils.{Global, JavaVersion, Utils}
 
 class OSGIInstance(name:String, bundles:BundleDefinitions) {
   private val framework = {
@@ -221,69 +220,15 @@ object ServerOSGIInstanceStarter {
         packageBuffer += entry.getName
       }
     }
-    packageBuffer.toList/*.filter(_.startsWith("javafx")).filterNot(_ == "javafx.")*/.map(_.replaceAll("/", ".").dropRight(1))
+    packageBuffer.toList.map(_.replaceAll("/", ".").dropRight(1))
   }
-  def systemPackagesToUse = List("sun.misc", "com.sun.javafx.application") ::: javaFXPackages
+  def systemPackagesToUse = List("sun.misc") ::: javaFXPackages
   def globalLibraryBundleDefinitions = List(
     SimpleLibraryBundleDefinition("Scala", new File("lib" + File.separator + "scala-library.jar"))
   )
   def serverOSGIJarBundleDefinitions = {
     new File("server-bundles").listFiles().filter(_.getName.trim.toLowerCase.endsWith(".jar"))
             .map(OSGIJARBundleDefinition).toList
-  }
-}
-
-import ServerOSGIInstanceStarter._
-
-object ServerStarter {
-  // TODO - These libraries should be specified by the build system or project file.
-  private val ServerLibraries = List("utils")
-  private val GUILibraries = List[String]()
-
-  private def serverModules = modules.filter(module => {
-    val moduleDirs = formattedSubNames(moduleDir(module))
-    moduleDirs.contains("api") || moduleDirs.contains("impl")
-  })
-  private def serverModulesBundleDefinitions = serverModules.flatMap(module => {
-    val moduleDirs = formattedSubNames(moduleDir(module))
-    val lb = new ListBuffer[ModuleBundleDefinition]()
-    if (moduleDirs.contains("api")) {
-      lb += ModuleBundleDefinition(module, ModuleType.API)
-    }
-    if (moduleDirs.contains("impl")) {
-      lb += ModuleBundleDefinition(module, ModuleType.IMPL)
-    }
-    lb.toList
-  })
-
-  private def serverBundleDefinitions = {
-    val serverLibraryBundleDefinitions = ServerLibraries.map(library => ModuleBundleDefinition(library, ModuleType.Library))
-    globalLibraryBundleDefinitions ::: serverModulesBundleDefinitions ::: serverLibraryBundleDefinitions ::: serverOSGIJarBundleDefinitions
-  }
-
-  private def serverConfig = {
-    val bundleDefinitions = new SimpleBundleDefinitions(systemPackagesToUse _, serverBundleDefinitions _)
-    OSGIInstanceConfig(TopLevel + "server", () => Map(), bundleDefinitions)
-  }
-
-  private def guiModules = modules.filter(module => {
-    moduleDir(module).listFiles().map(_.getName.trim().toLowerCase).contains("gui")
-  })
-  private def guiModulesBundleDefinitions = guiModules.map(module => ModuleBundleDefinition(module, ModuleType.GUI))
-
-  private def guiBundleDefinitions = {
-    val guiLibraryBundleDefinitions = GUILibraries.map(library => ModuleBundleDefinition(library, ModuleType.Library))
-    globalLibraryBundleDefinitions ::: guiModulesBundleDefinitions ::: guiLibraryBundleDefinitions
-  }
-
-  private def guiConfig = {
-    val bundleDefinitions = new SimpleBundleDefinitions(systemPackagesToUse _, guiBundleDefinitions _)
-    OSGIInstanceConfig(TopLevel + "gui", () => Map(), bundleDefinitions)
-  }
-
-  def main(args:Array[String]) {
-    System.setProperty("org.osgi.service.http.port", "7777")
-    startOrTrigger(TopLevel, guiConfig _, serverConfig _)
   }
 }
 
@@ -331,34 +276,9 @@ class GUIUpdater(baseURL:URL, instanceName:String) {
   }
 
   def guiConfig:OSGIInstanceConfig = {
-    val simpleBundleDefinitions = new SimpleBundleDefinitions(systemPackagesToUse _, guiBundleDefinitions _)
+    val simpleBundleDefinitions = new SimpleBundleDefinitions(ServerOSGIInstanceStarter.systemPackagesToUse _, guiBundleDefinitions _)
     val configName = cacheDir.getPath + File.separator + "osgiData"
     OSGIInstanceConfig(configName, () => Map(), simpleBundleDefinitions)
-  }
-}
-
-object GUIStarter {
-  def main(args:Array[String]) {
-    if (!Utils.javaVersionValid(Global.MinimumJavaVersion)) {
-      throw new IllegalStateException(
-        "You need Java %s update %s or above to run OpenAF. ".format(Global.MinimumJavaVersion.major, Global.MinimumJavaVersion.update) +
-        "You currently have Java %s update %s.".format(Utils.ActualJavaVersion.major, Utils.ActualJavaVersion.update))
-    }
-    val baseURL = new URL(args(0))
-    val guiUpdater = new GUIUpdater(baseURL, args(1))
-    val guiConfig = guiUpdater.guiConfig
-    val guiInstance = new OSGIInstance(guiConfig.name, guiConfig.bundles)
-    guiInstance.start()
-
-    val hostForUpdate = baseURL.getHost
-    val portForUpdates = args(2).toInt
-    val socketForUpdate = new Socket(hostForUpdate, portForUpdates)
-    val inputStream = socketForUpdate.getInputStream
-    while (true) {
-      inputStream.read
-      println("^^^ Update GUI")
-      guiInstance.update()
-    }
   }
 }
 

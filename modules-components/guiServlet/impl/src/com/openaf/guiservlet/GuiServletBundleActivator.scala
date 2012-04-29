@@ -12,9 +12,9 @@ class GuiServletBundleActivator extends BundleActivator {
       def addingService(serviceReference:ServiceReference[PropertiesService]) = {
         val propertiesService = context.getService(serviceReference)
 
-        val guiStarterProps = new Hashtable[String,AnyRef]()
-        guiStarterProps.put("alias", GUIStarterServlet.Address)
-        context.registerService(classOf[HttpServlet], new GUIStarterServlet(propertiesService.name, propertiesService.externalURL), guiStarterProps)
+        val guiProps = new Hashtable[String,AnyRef]()
+        guiProps.put("alias", GUIServlet.Address)
+        context.registerService(classOf[HttpServlet], new GUIServlet(propertiesService.name, propertiesService.externalURL), guiProps)
 
         val guiOSGIProps = new Hashtable[String,AnyRef]()
         guiOSGIProps.put("alias", OSGIGUIServlet.Address)
