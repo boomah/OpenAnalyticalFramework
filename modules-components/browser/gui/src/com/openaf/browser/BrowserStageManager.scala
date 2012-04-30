@@ -1,28 +1,20 @@
 package com.openaf.browser
 
 import javafx.stage.Stage
-import javafx.scene.Scene
-import javafx.scene.layout.BorderPane
+import pages.HomePage
 import utils.BrowserUtils._
 import collection.mutable.ListBuffer
 import java.lang.{Boolean => JBoolean}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 
-class FrameManager extends javafx.application.Application {
+class BrowserStageManager extends javafx.application.Application {
   private val stages = ListBuffer[Stage]()
   private var lastFocusedStage:Stage = _
 
   private def frameTitle = "OpenAF - " + getParameters.getUnnamed.get(0)
 
   def start(stage:Stage) {
-    stages += stage
-    val frameLocation = initialFrameLocation
-
-    val layout = new BorderPane
-    val scene = new Scene(layout)
-    stage.setScene(scene)
-    initialiseStage(stage, frameTitle, frameLocation)
-    stage.show()
+    createBrowserStage(initialFrameLocation)
   }
 
   override def stop() {
@@ -30,7 +22,9 @@ class FrameManager extends javafx.application.Application {
     System.exit(0)
   }
 
-  private def initialiseStage(stage:Stage, frameTitle:String, frameLocation:FrameLocation) {
+  private def createBrowserStage(frameLocation:FrameLocation) {
+    val stage = new BrowserStage(HomePage, this)
+    stages += stage
     stage.setTitle(frameTitle)
     stage.focusedProperty.addListener(new ChangeListener[JBoolean] {
       def changed(observable:ObservableValue[_<:JBoolean], oldValue:JBoolean, newValue:JBoolean) {
@@ -42,13 +36,18 @@ class FrameManager extends javafx.application.Application {
     stage.setY(frameLocation.y)
     stage.setWidth(frameLocation.width)
     stage.setHeight(frameLocation.height)
+
+    stage.show()
   }
 
-  private def createStage(from:Stage) = {
-    val stage = new Stage
-    initialiseStage(stage, frameTitle, FrameLocation(from).offSet(30))
-    stage
+  def createBrowserStage(from:Stage) {
+    createBrowserStage(FrameLocation(from).offSet(30))
   }
 
-  private def createAndShowStage(from:Stage) {createStage(from).show()}
+  def closeBrowserStage(stage:Stage) {
+    stages -= stage
+    if (stages.isEmpty) {
+      stop()
+    }
+  }
 }
