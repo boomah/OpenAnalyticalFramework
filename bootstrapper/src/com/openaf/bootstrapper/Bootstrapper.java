@@ -11,14 +11,26 @@ import java.util.*;
 
 public class Bootstrapper {
     public static void main(String[] args) throws Exception {
-        if (args.length < 2) {
-            System.err.println("Usage: javaw -jar bootstrapper.jar <serverURL> <instanceName>");
+        if (args.length < 1) {
+            System.err.println("Usage: javaw -jar bootstrapper.jar <serverURL>");
             Thread.sleep(10 * 1000);
             System.exit(1);
         }
 
+        Proxy proxy = Proxy.NO_PROXY;
         URL url = new URL(args[0]);
-        String instanceName = args[1];
+        URL configURL = new URL(url + "/gui/config.txt");
+
+        List<String> configLines = readLines(openConnection(configURL, proxy));
+        String[] programArgs = configLines.get(0).split(" ");
+        String instanceName = programArgs[0];
+        String mainClass = programArgs[1];
+        String[] configArgsArray = Arrays.copyOfRange(programArgs, 2, programArgs.length);
+        String[] argsToPassToGUI = new String[configArgsArray.length + 2];
+        argsToPassToGUI[0] = url.toExternalForm();
+        argsToPassToGUI[1] = instanceName;
+        System.arraycopy(configArgsArray, 0, argsToPassToGUI, 2, configArgsArray.length);
+
         File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         File rootCacheDir = new File(tmpDir, "openaf");
         if (!rootCacheDir.exists()) rootCacheDir.mkdir();
@@ -33,18 +45,6 @@ public class Bootstrapper {
         File logFile = new File(cacheDir, "__log-" + currentTimeString + ".txt");
         System.setOut(new java.io.PrintStream(new TeeOutputStream(System.out, new FileOutputStream(logFile))));
         System.setErr(new java.io.PrintStream(new TeeOutputStream(System.err, new FileOutputStream(logFile))));
-
-        Proxy proxy = Proxy.NO_PROXY;
-        URL configURL = new URL(url + "/gui/config.txt");
-
-        List<String> configLines = readLines(openConnection(configURL, proxy));
-        String[] mainClassAndArgs = configLines.get(0).split(" ");
-        String mainClass = mainClassAndArgs[0];
-        String[] configArgsArray = Arrays.copyOfRange(mainClassAndArgs, 1, mainClassAndArgs.length);
-        String[] argsToPassToGUI = new String[configArgsArray.length + 2];
-        argsToPassToGUI[0] = url.toExternalForm();
-        argsToPassToGUI[1] = instanceName;
-        System.arraycopy(configArgsArray, 0, argsToPassToGUI, 2, configArgsArray.length);
 
         List<String> latestJARLines = configLines.subList(1, configLines.size());
         Map<String,String> latestJARsToMD5 = jarsWithMD5(latestJARLines);

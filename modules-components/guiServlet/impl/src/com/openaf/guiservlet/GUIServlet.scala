@@ -14,7 +14,8 @@ object GUIServlet {
 import GUIServlet._
 
 class GUIServlet(serverName:String, externalURL:String) extends HttpServlet {
-  private val mainClassConfigLine = "com.openaf.start.GUI 7778"
+  private val sanitisedServerName = serverName.replaceAll(" ", "_")
+  private val programArgsConfigLine = sanitisedServerName + " com.openaf.start.GUI 7778"
 
   private val standardMemory = "512m"
   private val specifiedMemory1024 = "1024m"
@@ -101,7 +102,6 @@ class GUIServlet(serverName:String, externalURL:String) extends HttpServlet {
         </resources>
         <application-desc main-class="com.openaf.bootstrapper.Bootstrapper">
           <argument>{externalURL}</argument>
-          <argument>{serverName.replaceAll(" ", "_")}</argument>
         </application-desc>
           <update check='always' policy='always'/>
       </jnlp>
@@ -141,7 +141,7 @@ class GUIServlet(serverName:String, externalURL:String) extends HttpServlet {
     val felixJARMD5 = md5String(felixJAR)
     resp.setContentType("text/plain")
     val writer = resp.getWriter
-    writer.println(mainClassConfigLine)
+    writer.println(programArgsConfigLine)
     writer.println(scalaLibraryName + " " + scalaLibraryJARMD5)
     writer.println(osgiStartModuleName + " " + startModuleMD5)
     writer.println(felixName + " " + felixJARMD5)

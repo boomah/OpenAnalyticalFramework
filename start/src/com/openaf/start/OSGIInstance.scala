@@ -211,7 +211,7 @@ object ServerOSGIInstanceStarter {
   def modules = formattedSubNames(componentsModulesDir)
 
   val javaFXPackages = {
-    val javaFXJarFile = new JarFile("/Library/Java/JavaVirtualMachines/1.7.0.jdk/Contents/Home/jre/lib/jfxrt.jar")
+    val javaFXJarFile = new JarFile(System.getProperty("java.home") + "/lib/jfxrt.jar")
     val entries = javaFXJarFile.entries
     val packageBuffer = new ListBuffer[String]
     while (entries.hasMoreElements) {

@@ -8,7 +8,7 @@
     </extension>
     <option name="MAIN_CLASS_NAME" value="com.openaf.bootstrapper.Bootstrapper" />
     <option name="VM_PARAMETERS" value="" />
-    <option name="PROGRAM_PARAMETERS" value="http://localhost:7777 Test" />
+    <option name="PROGRAM_PARAMETERS" value="http://localhost:7777" />
     <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" value="" />

@@ -10,15 +10,15 @@ object GUI {
         "You need Java %s update %s or above to run OpenAF. ".format(MinimumJavaVersion.major, MinimumJavaVersion.update) +
         "You currently have Java %s update %s.".format(ActualJavaVersion.major, ActualJavaVersion.update))
     }
-    val baseURL = new URL(args(0))
-    val guiUpdater = new GUIUpdater(baseURL, args(1))
+    val (url :: instanceName :: portForUpdates :: Nil) = args.toList
+    val baseURL = new URL(url)
+    val guiUpdater = new GUIUpdater(baseURL, instanceName)
     val guiConfig = guiUpdater.guiConfig
     val guiInstance = new OSGIInstance(guiConfig.name, guiConfig.bundles)
     guiInstance.start()
 
     val hostForUpdate = baseURL.getHost
-    val portForUpdates = args(2).toInt
-    val socketForUpdate = new Socket(hostForUpdate, portForUpdates)
+    val socketForUpdate = new Socket(hostForUpdate, portForUpdates.toInt)
     val inputStream = socketForUpdate.getInputStream
     while (true) {
       inputStream.read
