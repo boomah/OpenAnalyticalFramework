@@ -12,7 +12,7 @@ class FrameManager extends javafx.application.Application {
   private val stages = ListBuffer[Stage]()
   private var lastFocusedStage:Stage = _
 
-  private def frameTitle = getParameters.getUnnamed.get(0)
+  private def frameTitle = "OpenAF - " + getParameters.getUnnamed.get(0)
 
   def start(stage:Stage) {
     stages += stage

@@ -11,6 +11,7 @@ object GUI {
         "You currently have Java %s update %s.".format(ActualJavaVersion.major, ActualJavaVersion.update))
     }
     val (url :: instanceName :: portForUpdates :: Nil) = args.toList
+    System.setProperty("instanceName", instanceName)
     val baseURL = new URL(url)
     val guiUpdater = new GUIUpdater(baseURL, instanceName)
     val guiConfig = guiUpdater.guiConfig
