@@ -14,8 +14,7 @@ object GUIServlet {
 import GUIServlet._
 
 class GUIServlet(serverName:String, externalURL:String) extends HttpServlet {
-  private val sanitisedServerName = serverName.replaceAll(" ", "_")
-  private val programArgsConfigLine = sanitisedServerName + " com.openaf.start.GUI 7778"
+  private val programArgsConfigLine = serverName + " com.openaf.start.GUI 7778"
 
   private val standardMemory = "512m"
   private val specifiedMemory1024 = "1024m"

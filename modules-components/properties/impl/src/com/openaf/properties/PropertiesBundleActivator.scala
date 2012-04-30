@@ -28,6 +28,6 @@ class PropertiesServiceImpl extends PropertiesService {
     }
   }
 
-  def name = userDefinedProperties.getOrElse("name", "Test")
+  def name = userDefinedProperties.getOrElse("name", "Test").replaceAll(" ", "_")
   def externalURL = userDefinedProperties.getOrElse("externalurl", "http://localhost:7777").toLowerCase
 }
