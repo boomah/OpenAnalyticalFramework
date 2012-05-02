@@ -14,7 +14,7 @@ class BrowserStageManager extends javafx.application.Application {
   private def frameTitle = "OpenAF - " + getParameters.getUnnamed.get(0)
 
   def start(stage:Stage) {
-    createBrowserStage(initialFrameLocation)
+    createBrowserStage(initialFrameLocation, HomePage)
   }
 
   override def stop() {
@@ -22,8 +22,8 @@ class BrowserStageManager extends javafx.application.Application {
     System.exit(0)
   }
 
-  private def createBrowserStage(frameLocation:FrameLocation) {
-    val stage = new BrowserStage(HomePage, this)
+  private def createBrowserStage(frameLocation:FrameLocation, initialPage:Page) {
+    val stage = new BrowserStage(initialPage, this)
     stages += stage
     stage.setTitle(frameTitle)
     stage.focusedProperty.addListener(new ChangeListener[JBoolean] {
@@ -40,11 +40,12 @@ class BrowserStageManager extends javafx.application.Application {
     stage.show()
   }
 
-  def createBrowserStage(from:Stage) {
-    createBrowserStage(FrameLocation(from).offSet(30))
+  def createBrowserStage(from:Stage, initialPage:Page) {
+    createBrowserStage(FrameLocation(from).offSet(30), initialPage)
   }
 
   def closeBrowserStage(stage:Stage) {
+    stage.close()
     stages -= stage
     if (stages.isEmpty) {
       stop()
