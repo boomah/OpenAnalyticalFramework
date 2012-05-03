@@ -2,7 +2,6 @@ package com.openaf.browser
 
 import javafx.event.EventHandler
 import javafx.scene.input.KeyEvent
-import pages.HomePage
 import javafx.scene.control.{Tab, TabPane}
 
 class BrowserTabPane(initialPage:Page, stage:BrowserStage, manager:BrowserStageManager) extends TabPane {
@@ -10,7 +9,7 @@ class BrowserTabPane(initialPage:Page, stage:BrowserStage, manager:BrowserStageM
   createTab(initialPage)
 
   def createTab(page:Page) {
-    val browser = new Browser(page)
+    val browser = new Browser(page, this, stage, manager)
     val tab = new Tab(page.name)
     tab.setContent(browser)
     getTabs.add(getTabs.size(), tab)
@@ -26,11 +25,7 @@ class BrowserTabPane(initialPage:Page, stage:BrowserStage, manager:BrowserStageM
 
   setOnKeyTyped(new EventHandler[KeyEvent] {
     def handle(e:KeyEvent) {
-      if ("n" == e.getCharacter && e.isShortcutDown) {
-        manager.createBrowserStage(stage, HomePage)
-      } else if ("t" == e.getCharacter && e.isShortcutDown) {
-        createTab(HomePage)
-      } else if ("w" == e.getCharacter && e.isShortcutDown) {
+      if ("w" == e.getCharacter && e.isShortcutDown) {
         closeTab(getSelectionModel.getSelectedItem)
       }
     }

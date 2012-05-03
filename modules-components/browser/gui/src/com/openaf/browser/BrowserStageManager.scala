@@ -14,7 +14,7 @@ class BrowserStageManager extends javafx.application.Application {
   private def frameTitle = "OpenAF - " + getParameters.getUnnamed.get(0)
 
   def start(stage:Stage) {
-    createBrowserStage(initialFrameLocation, HomePage)
+    createStage(initialFrameLocation, HomePage)
   }
 
   override def stop() {
@@ -22,7 +22,7 @@ class BrowserStageManager extends javafx.application.Application {
     System.exit(0)
   }
 
-  private def createBrowserStage(frameLocation:FrameLocation, initialPage:Page) {
+  private def createStage(frameLocation:FrameLocation, initialPage:Page) {
     val stage = new BrowserStage(initialPage, this)
     stages += stage
     stage.setTitle(frameTitle)
@@ -40,8 +40,8 @@ class BrowserStageManager extends javafx.application.Application {
     stage.show()
   }
 
-  def createBrowserStage(from:Stage, initialPage:Page) {
-    createBrowserStage(FrameLocation(from).offSet(30), initialPage)
+  def createStage(from:Stage, initialPage:Page) {
+    createStage(FrameLocation(from).offSet(30), initialPage)
   }
 
   def closeBrowserStage(stage:Stage) {
