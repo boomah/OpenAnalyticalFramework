@@ -90,6 +90,10 @@ class OSGIInstance(name:String, bundles:BundleDefinitions) {
   }
 }
 
+object OSGIInstance {
+  def commonSystemPackages = List("sun.misc")
+}
+
 case class OSGIInstanceConfig(name:String, properties:()=>Map[String,String], bundles:BundleDefinitions)
 
 object ServerOSGIInstanceStarter {
@@ -209,20 +213,7 @@ object ServerOSGIInstanceStarter {
   def componentsModulesDir = new File("modules-components")
   def moduleDir(module:String) = new File(componentsModulesDir, module)
   def modules = formattedSubNames(componentsModulesDir)
-
-  val javaFXPackages = {
-    val javaFXJarFile = new JarFile(System.getProperty("java.home") + "/lib/jfxrt.jar")
-    val entries = javaFXJarFile.entries
-    val packageBuffer = new ListBuffer[String]
-    while (entries.hasMoreElements) {
-      val entry = entries.nextElement
-      if (entry.isDirectory) {
-        packageBuffer += entry.getName
-      }
-    }
-    packageBuffer.toList.map(_.replaceAll("/", ".").dropRight(1))
-  }
-  def systemPackagesToUse = List("sun.misc") ::: javaFXPackages
+  def systemPackages = OSGIInstance.commonSystemPackages
   def globalLibraryBundleDefinitions = List(
     SimpleLibraryBundleDefinition("Scala", new File("lib" + File.separator + "scala-library.jar"))
   )
@@ -274,9 +265,22 @@ class GUIUpdater(baseURL:URL, instanceName:String) {
       new RemoteOSGIJARBundleDefinition(osgiJARConfig, (config) => generateInputStream(config))
     })
   }
+  private val javaFXPackages = {
+    val javaFXJarFile = new JarFile(System.getProperty("java.home") + "/lib/jfxrt.jar")
+    val entries = javaFXJarFile.entries
+    val packageBuffer = new ListBuffer[String]
+    while (entries.hasMoreElements) {
+      val entry = entries.nextElement
+      if (entry.isDirectory) {
+        packageBuffer += entry.getName
+      }
+    }
+    packageBuffer.toList.map(_.replaceAll("/", ".").dropRight(1))
+  }
+  private def systemPackages = OSGIInstance.commonSystemPackages ::: javaFXPackages
 
   def guiConfig:OSGIInstanceConfig = {
-    val simpleBundleDefinitions = new SimpleBundleDefinitions(ServerOSGIInstanceStarter.systemPackagesToUse _, guiBundleDefinitions _)
+    val simpleBundleDefinitions = new SimpleBundleDefinitions(systemPackages _, guiBundleDefinitions _)
     val configName = cacheDir.getPath + File.separator + "osgiData"
     OSGIInstanceConfig(configName, () => Map(), simpleBundleDefinitions)
   }

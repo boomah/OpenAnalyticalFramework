@@ -35,7 +35,7 @@ object Server {
   }
 
   private def serverConfig = {
-    val bundleDefinitions = new SimpleBundleDefinitions(systemPackagesToUse _, serverBundleDefinitions _)
+    val bundleDefinitions = new SimpleBundleDefinitions(systemPackages _, serverBundleDefinitions _)
     OSGIInstanceConfig(TopLevel + "server", () => Map(), bundleDefinitions)
   }
 
@@ -50,7 +50,8 @@ object Server {
   }
 
   private def guiConfig = {
-    val bundleDefinitions = new SimpleBundleDefinitions(systemPackagesToUse _, guiBundleDefinitions _)
+    def fakeSystemPackages:List[String] = Nil // This guiConfig just needs the bundles
+    val bundleDefinitions = new SimpleBundleDefinitions(fakeSystemPackages _, guiBundleDefinitions _)
     OSGIInstanceConfig(TopLevel + "gui", () => Map(), bundleDefinitions)
   }
 }
