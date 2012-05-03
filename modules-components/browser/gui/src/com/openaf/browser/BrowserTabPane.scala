@@ -8,11 +8,14 @@ class BrowserTabPane(initialPage:Page, stage:BrowserStage, manager:BrowserStageM
   setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE)
   createTab(initialPage)
 
-  def createTab(page:Page) {
+  def createTab(page:Page, goToNewTab:Boolean=true) {
     val browser = new Browser(page, this, stage, manager)
     val tab = new Tab(page.name)
     tab.setContent(browser)
     getTabs.add(getTabs.size(), tab)
+    if (goToNewTab) {
+      getSelectionModel.select(tab)
+    }
   }
 
   def closeTab(tab:Tab) {
