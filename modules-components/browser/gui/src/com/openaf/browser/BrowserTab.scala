@@ -1,37 +1,34 @@
 package com.openaf.browser
 
-import javafx.scene.layout.HBox
-import javafx.scene.image.{ImageView, Image}
 import javafx.scene.control._
 import javafx.event.{ActionEvent, EventHandler}
 import pages.HomePage
+import javafx.scene.image.{ImageView, Image}
+import javafx.beans.binding.BooleanBinding
 
-class BrowserTab(name:String, image:Image, tabPane:BrowserTabPane) extends Tab {
-  private val graphic = new BrowserTabGraphic(name, image, this, tabPane)
-  setGraphic(graphic)
-}
+class BrowserTab(name:String, image:Image, tabPane:BrowserTabPane) extends Tab(name) {
+  setGraphic(new ImageView(image))
+  private val newTabMenuItem = new MenuItem("New Tab")
+  newTabMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.createTab(HomePage)}})
+  private val closeTabMenuItem = new MenuItem("Close Tab")
+  closeTabMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.closeTab(BrowserTab.this)}})
+  private val closeOtherTabsMenuItem = new MenuItem("Close Other Tabs")
+  closeOtherTabsMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.closeOtherTabs(BrowserTab.this)}})
+  private val closeTabsToTheRightMenuItem = new MenuItem("Close Tabs to the Right")
+  closeTabsToTheRightMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.closeTabsToTheRight(BrowserTab.this)}})
+  private val contextMenu = new ContextMenu(newTabMenuItem, new SeparatorMenuItem, closeTabMenuItem, closeOtherTabsMenuItem, closeTabsToTheRightMenuItem)
+  setContextMenu(contextMenu)
 
-class BrowserTabGraphic(name:String, image:Image, tab:BrowserTab, tabPane:BrowserTabPane) extends HBox {
-  private val imageView = new ImageView(image)
-  private val closeTabEventHandler = new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.closeTab(tab)}}
-  private val nameLabel = {
-    val label = new Label(name, imageView)
-    val newTabMenuItem = new MenuItem("New Tab")
-    newTabMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.createTab(HomePage)}})
-    val closeTabMenuItem = new MenuItem("Close Tab")
-    closeTabMenuItem.setOnAction(closeTabEventHandler)
-    val closeOtherTabsMenuItem = new MenuItem("Close Other Tabs")
-    closeOtherTabsMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.closeOtherTabs(tab)}})
-    val closeTabsToTheRightMenuItem = new MenuItem("Close Tabs to the Right")
-    closeTabsToTheRightMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.closeTabsToTheRight(tab)}})
-    val contextMenu = new ContextMenu(newTabMenuItem, new SeparatorMenuItem, closeTabMenuItem, closeOtherTabsMenuItem, closeTabsToTheRightMenuItem)
-    label.setContextMenu(contextMenu)
-    label
+  private val closeOtherTabsDisabled = new BooleanBinding {
+    bind(tabPane.getTabs)
+    def computeValue = (tabPane.getTabs.size <= 1)
   }
-  private val closeButton = {
-    val button = new Button("X")
-    button.setOnAction(closeTabEventHandler)
-    button
+  closeOtherTabsMenuItem.disableProperty.bind(closeOtherTabsDisabled)
+  private val closeTabsToTheRightDisabled = new BooleanBinding {
+    bind(tabPane.getTabs)
+    def computeValue = (tabPane.getTabs.indexOf(BrowserTab.this) == (tabPane.getTabs.size - 1))
   }
-  getChildren.addAll(nameLabel, closeButton)
+  closeTabsToTheRightMenuItem.disableProperty.bind(closeTabsToTheRightDisabled)
+
+  tabPane.getTabs
 }
