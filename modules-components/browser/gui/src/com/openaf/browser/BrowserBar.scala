@@ -1,18 +1,25 @@
 package com.openaf.browser
 
-import javafx.scene.layout.HBox
-import javafx.scene.control.{MenuItem, MenuButton, Label}
 import javafx.scene.input.KeyCombination
 import javafx.event.{ActionEvent, EventHandler}
 import pages.HomePage
+import javafx.scene.control._
+import javafx.scene.layout.{Priority, HBox}
 
-class BrowserBar(tabPane:BrowserTabPane, stage:BrowserStage) extends HBox {
+class BrowserBar(tabPane:BrowserTabPane, stage:BrowserStage) extends ToolBar {
   setStyle("-fx-background-color: #336699")
-  getChildren.add(new Label("Hello"))
 
+  private val backButton = new Button("Back")
+  private val undoButton = new Button("Undo")
+  private val redoButton = new Button("Redo")
+  private val forwardButton = new Button("Forward")
+  private val refreshButton = new Button("Refresh")
+  private val homeButton = new Button("Home")
+  private val addressBar = new AddressBar
+  HBox.setHgrow(addressBar, Priority.ALWAYS)
   private val settingsButton = new SettingsMenuButton(tabPane, stage)
 
-  getChildren.add(settingsButton)
+  getItems.addAll(backButton, undoButton, redoButton, forwardButton, refreshButton, homeButton, addressBar, settingsButton)
 }
 
 class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage) extends MenuButton("Settings") {
@@ -25,4 +32,8 @@ class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage) extends Men
   newWindowMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {stage.createStage(HomePage)}})
 
   getItems.addAll(newTabMenuItem, newWindowMenuItem)
+}
+
+class AddressBar extends TextField {
+
 }
