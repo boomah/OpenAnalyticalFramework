@@ -5,6 +5,7 @@ import com.openaf.browser.FrameLocation
 import javafx.stage.{Stage, Screen}
 import collection.mutable.WeakHashMap
 import javafx.scene.image.Image
+import com.openaf.browser.shortcutkeys.OSXShortCutKeys
 
 object BrowserUtils {
   private val FrameLocationName = "frameLocation"
@@ -21,4 +22,6 @@ object BrowserUtils {
     ImageMap.getOrElseUpdate(name, new Image(resourceAsInputStream(name)))
   }
   private def resourceAsInputStream(name:String) = getClass.getResourceAsStream(name)
+
+  val keyMap = new OSXShortCutKeys
 }
