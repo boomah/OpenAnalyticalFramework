@@ -5,7 +5,7 @@ import com.openaf.browser.FrameLocation
 import javafx.stage.{Stage, Screen}
 import collection.mutable.WeakHashMap
 import javafx.scene.image.Image
-import com.openaf.browser.shortcutkeys.OSXShortCutKeys
+import com.openaf.browser.shortcutkeys.{WindowsShortCutKeys, OSXShortCutKeys}
 
 object BrowserUtils {
   private val FrameLocationName = "frameLocation"
@@ -23,5 +23,30 @@ object BrowserUtils {
   }
   private def resourceAsInputStream(name:String) = getClass.getResourceAsStream(name)
 
-  val keyMap = new OSXShortCutKeys
+  lazy val OS = {
+    val osName = System.getProperty("os.name").toLowerCase
+    if (osName.startsWith("mac")) OSX
+    else if (osName.startsWith("linux")) Linux
+    else if (osName.startsWith("windows")) WindowsUnknown
+  }
+
+  lazy val keyMap = {
+    OS match {
+      case OSX => new OSXShortCutKeys
+      case _ => new WindowsShortCutKeys
+    }
+  }
+}
+
+sealed trait OS {
+  def windows = true
+}
+case object OSX extends OS {
+  override def windows = false
+}
+case object WindowsXP extends OS
+case object Windows7 extends OS
+case object WindowsUnknown extends OS
+case object Linux extends OS {
+  override def windows = false
 }
