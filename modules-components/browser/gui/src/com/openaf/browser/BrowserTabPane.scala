@@ -48,6 +48,22 @@ class BrowserTabPane(initialPage:Page, stage:BrowserStage, manager:BrowserStageM
 
   private def currentBrowser = getSelectionModel.getSelectedItem.getContent.asInstanceOf[Browser]
 
+  private def selectNextTabWithWrapAround() {
+    if (getSelectionModel.getSelectedIndex == getTabs.size - 1) {
+      getSelectionModel.selectFirst()
+    } else {
+      getSelectionModel.selectNext()
+    }
+  }
+  ª
+  private def selectPreviousTabWithWrapAround() {
+    if (getSelectionModel.getSelectedIndex == 0) {
+      getSelectionModel.selectLast()
+    } else {
+      getSelectionModel.selectPrevious()
+    }
+  }
+
   setOnKeyPressed(new EventHandler[KeyEvent] {
       def handle(e:KeyEvent) {
         val km = BrowserUtils.keyMap
@@ -56,6 +72,8 @@ class BrowserTabPane(initialPage:Page, stage:BrowserStage, manager:BrowserStageM
         else if (km.undo.matches(e)) currentBrowser.undo()
         else if (km.redo.matches(e)) currentBrowser.redo()
         else if (km.pageForward.matches(e)) currentBrowser.forward()
+        else if (km.nextTab.matches(e)) selectNextTabWithWrapAround()
+        else if (km.previousTab.matches(e)) selectPreviousTabWithWrapAround()
       }
   })
 }
