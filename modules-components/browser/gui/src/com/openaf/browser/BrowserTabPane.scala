@@ -55,7 +55,7 @@ class BrowserTabPane(initialPage:Page, stage:BrowserStage, manager:BrowserStageM
       getSelectionModel.selectNext()
     }
   }
-  ª
+
   private def selectPreviousTabWithWrapAround() {
     if (getSelectionModel.getSelectedIndex == 0) {
       getSelectionModel.selectLast()
