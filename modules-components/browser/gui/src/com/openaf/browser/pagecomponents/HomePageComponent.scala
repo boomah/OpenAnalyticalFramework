@@ -7,7 +7,7 @@ import com.openaf.browser.PageData
 class HomePageComponent extends BorderPane with PageComponent {
   setTop(new Text("Nick"))
 
-  def initialise(pageData:ªPageData) {}
+  def initialise(pageData:PageData) {}
 }
 
 object HomePageComponentFactory extends PageComponentFactory {
