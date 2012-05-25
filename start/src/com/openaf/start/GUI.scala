@@ -16,16 +16,21 @@ object GUI {
     val guiUpdater = new GUIUpdater(baseURL, instanceName)
     val guiConfig = guiUpdater.guiConfig
     val guiInstance = new OSGIInstance(guiConfig.name, guiConfig.bundles)
-    guiInstance.start()
 
-    val hostForUpdate = baseURL.getHost
-    val socketForUpdate = new Socket(hostForUpdate, portForUpdates.toInt)
-    val inputStream = socketForUpdate.getInputStream
-    while (true) {
-      inputStream.read
-      println("^^^ Update GUI")
-      guiInstance.update()
-    }
+    new Thread(new Runnable {
+      def run() {
+        val hostForUpdate = baseURL.getHost
+        val socketForUpdate = new Socket(hostForUpdate, portForUpdates.toInt)
+        val inputStream = socketForUpdate.getInputStream
+        while (true) {
+          inputStream.read
+          println("^^^ Update GUI")
+          guiInstance.update()
+        }
+      }
+    }, "GUI Updater Thread").start()
+
+    guiInstance.start()
   }
 }
 

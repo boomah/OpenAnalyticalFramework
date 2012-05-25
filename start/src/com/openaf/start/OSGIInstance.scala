@@ -55,7 +55,7 @@ class OSGIInstance(name:String, bundles:BundleDefinitions) {
         println("Updating: " + currentBundle.getSymbolicName + "...")
         currentBundle.update(newBundleDef.inputStream)
         println("Updated: %s (state: %s)".format(currentBundle.getSymbolicName, currentBundle.getState))
-        Some( currentBundle )
+        Some(currentBundle)
       } else {
         None
       }

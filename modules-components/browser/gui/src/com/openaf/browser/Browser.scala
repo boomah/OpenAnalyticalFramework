@@ -8,7 +8,7 @@ import javafx.collections.FXCollections
 class Browser(initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager) extends BorderPane {
   private val currentPagePosition = new SimpleIntegerProperty(-1)
   private val pages = FXCollections.observableArrayList[Page]()
-  private val working = new SimpleBooleanProperty(false)
+  private val working = new SimpleBooleanProperty(true)
   val backAndUndoDisabledProperty = new BooleanBinding {
     bind(currentPagePosition, working)
     def computeValue = (currentPagePosition.get <= 0) || working.get
