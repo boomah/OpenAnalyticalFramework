@@ -5,12 +5,12 @@ import javafx.event.{Event, EventHandler}
 import javafx.scene.input.KeyEvent
 import utils.BrowserUtils
 
-class BrowserTabPane(initialPage:Page, stage:BrowserStage, manager:BrowserStageManager) extends TabPane {
+class BrowserTabPane(initialPage:Page, stage:BrowserStage, manager:BrowserStageManager, pageBuilder:PageBuilder) extends TabPane {
   setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS)
   createTab(initialPage)
 
   def createTab(page:Page, goToNewTab:Boolean=true) {
-    val browser = new Browser(page, this, stage, manager)
+    val browser = new Browser(page, this, stage, manager, pageBuilder)
     val tab = new BrowserTab(page.name, page.image, this)
     tab.setContent(browser)
     tab.setOnClosed(new EventHandler[Event] {def handle(e:Event) {ensureTabSelected()}})

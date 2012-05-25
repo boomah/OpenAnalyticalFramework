@@ -4,10 +4,13 @@ import javafx.scene.layout.BorderPane
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.{SimpleBooleanProperty, SimpleIntegerProperty}
 import javafx.collections.FXCollections
+import pagecomponents.{PageComponentCache, PageComponent}
 
-class Browser(initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager) extends BorderPane {
+class Browser(initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager,
+              pageBuilder:PageBuilder) extends BorderPane {
+  private val pageComponentCache = new PageComponentCache
   private val currentPagePosition = new SimpleIntegerProperty(-1)
-  private val pages = FXCollections.observableArrayList[Page]()
+  private val pages = FXCollections.observableArrayList[PageInfo]()
   private val working = new SimpleBooleanProperty(true)
   val backAndUndoDisabledProperty = new BooleanBinding {
     bind(currentPagePosition, working)
@@ -65,4 +68,19 @@ class Browser(initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, mana
       println("home")
     }
   }
+
+  private def goTo(page:Page) {
+    println("Go to " + page)
+    pages.add(PageInfo(page))
+    val pageData = pageBuilder.build(page)
+    val pageComponent = pageComponentCache.pageComponent(page)
+    pageComponent.pageData = pageData
+    showPageComponent(pageComponent)
+  }
+
+  private def showPageComponent(pageComponent:PageComponent) {
+    setCenter(pageComponent)
+  }
+
+  goTo(initialPage)
 }

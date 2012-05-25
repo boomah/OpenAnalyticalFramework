@@ -10,6 +10,7 @@ import javafx.beans.value.{ObservableValue, ChangeListener}
 class BrowserStageManager extends javafx.application.Application {
   private val stages = ListBuffer[Stage]()
   private var lastFocusedStage:Stage = _
+  private val pageBuilder = new PageBuilder
 
   private def frameTitle = "OpenAF - " + getParameters.getUnnamed.get(0)
 
@@ -23,7 +24,7 @@ class BrowserStageManager extends javafx.application.Application {
   }
 
   private def createStage(frameLocation:FrameLocation, initialPage:Page) {
-    val stage = new BrowserStage(initialPage, this)
+    val stage = new BrowserStage(initialPage, this, pageBuilder)
     stages += stage
     stage.setTitle(frameTitle)
     stage.focusedProperty.addListener(new ChangeListener[JBoolean] {

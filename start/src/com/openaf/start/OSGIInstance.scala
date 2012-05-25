@@ -214,12 +214,16 @@ object ServerOSGIInstanceStarter {
   def moduleDir(module:String) = new File(componentsModulesDir, module)
   def modules = formattedSubNames(componentsModulesDir)
   def systemPackages = OSGIInstance.commonSystemPackages
+  def commonOSGIJARBundleDefinitions = {
+    new File("common-bundles").listFiles.filter(_.getName.trim.toLowerCase.endsWith(".jar"))
+      .map(OSGIJARBundleDefinition).toList
+  }
   def globalLibraryBundleDefinitions = List(
     SimpleLibraryBundleDefinition("Scala", new File("lib" + File.separator + "scala-library.jar"))
   )
-  def serverOSGIJarBundleDefinitions = {
-    new File("server-bundles").listFiles().filter(_.getName.trim.toLowerCase.endsWith(".jar"))
-            .map(OSGIJARBundleDefinition).toList
+  def serverOSGIJARBundleDefinitions = {
+    new File("server-bundles").listFiles.filter(_.getName.trim.toLowerCase.endsWith(".jar"))
+      .map(OSGIJARBundleDefinition).toList
   }
 }
 

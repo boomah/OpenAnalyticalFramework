@@ -31,7 +31,8 @@ object Server {
 
   private def serverBundleDefinitions = {
     val serverLibraryBundleDefinitions = ServerLibraries.map(library => ModuleBundleDefinition(library, ModuleType.Library))
-    globalLibraryBundleDefinitions ::: serverModulesBundleDefinitions ::: serverLibraryBundleDefinitions ::: serverOSGIJarBundleDefinitions
+    globalLibraryBundleDefinitions ::: serverModulesBundleDefinitions ::: serverLibraryBundleDefinitions :::
+      serverOSGIJARBundleDefinitions ::: commonOSGIJARBundleDefinitions
   }
 
   private def serverConfig = {
@@ -46,7 +47,7 @@ object Server {
 
   private def guiBundleDefinitions = {
     val guiLibraryBundleDefinitions = GUILibraries.map(library => ModuleBundleDefinition(library, ModuleType.Library))
-    globalLibraryBundleDefinitions ::: guiModulesBundleDefinitions ::: guiLibraryBundleDefinitions
+    globalLibraryBundleDefinitions ::: guiModulesBundleDefinitions ::: guiLibraryBundleDefinitions ::: commonOSGIJARBundleDefinitions
   }
 
   private def guiConfig = {
