@@ -24,7 +24,7 @@ class BrowserStageManager extends javafx.application.Application {
   }
 
   private def createStage(frameLocation:FrameLocation, initialPage:Page) {
-    val stage = new BrowserStage(initialPage, this, pageBuilder)
+    val stage = new BrowserStage(HomePage, initialPage, this, pageBuilder)
     stages += stage
     stage.setTitle(frameTitle)
     stage.focusedProperty.addListener(new ChangeListener[JBoolean] {

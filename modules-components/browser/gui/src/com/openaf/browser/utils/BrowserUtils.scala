@@ -6,6 +6,7 @@ import javafx.stage.{Stage, Screen}
 import collection.mutable.WeakHashMap
 import javafx.scene.image.Image
 import com.openaf.browser.shortcutkeys.{WindowsShortCutKeys, OSXShortCutKeys}
+import javafx.application.Platform
 
 object BrowserUtils {
   private val FrameLocationName = "frameLocation"
@@ -35,5 +36,9 @@ object BrowserUtils {
       case OSX => new OSXShortCutKeys
       case _ => new WindowsShortCutKeys
     }
+  }
+
+  def runLater(function: =>Unit) {
+    Platform.runLater(new Runnable {def run() {function}})
   }
 }

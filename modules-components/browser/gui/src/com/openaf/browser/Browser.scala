@@ -5,8 +5,9 @@ import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.{SimpleBooleanProperty, SimpleIntegerProperty}
 import javafx.collections.FXCollections
 import pagecomponents.{PageComponentCache, PageComponent}
+import javafx.application.Platform
 
-class Browser(initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager,
+class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager,
               pageBuilder:PageBuilder) extends BorderPane {
   private val pageComponentCache = new PageComponentCache
   private val currentPagePosition = new SimpleIntegerProperty(-1)
@@ -26,8 +27,16 @@ class Browser(initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, mana
     def computeValue = !refreshable.get || working.get
   }
   val homeDisabledProperty = new BooleanBinding {
-    bind(working)
-    def computeValue = working.get
+    bind(working, currentPagePosition, pages)
+    def computeValue = working.get || (currentPage == homePage)
+  }
+
+  private val currentPage = {
+    if (currentPagePosition.get != -1) {
+      pages.get(currentPagePosition.get)
+    } else {
+      initialPage
+    }
   }
 
   private val browserBar = new BrowserBar(this, tabPane, stage)
@@ -65,21 +74,35 @@ class Browser(initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, mana
 
   def home() {
     if (!homeDisabledProperty.get) {
-      println("home")
+      goTo(homePage)
     }
   }
 
   private def goTo(page:Page) {
     println("Go to " + page)
-    pages.add(PageInfo(page))
-    val pageData = pageBuilder.build(page)
-    val pageComponent = pageComponentCache.pageComponent(page)
-    pageComponent.pageData = pageData
-    showPageComponent(pageComponent)
+    working.set(true)
+
+    def withResult(pageResponse:PageResponse) {
+      assert(Platform.isFxApplicationThread)
+      pageResponse match {
+        case SuccessPageResponse(pageData) => {
+          pages.add(PageInfo(page))
+          currentPagePosition.set(currentPagePosition.get + 1)
+          val pageComponent = pageComponentCache.pageComponent(page)
+          pageComponent.pageData = pageData
+          showPageComponent(pageComponent)
+        }
+        case ProblemPageResponse(throwable) => throwable.printStackTrace()
+      }
+    }
+
+    pageBuilder.build(page, withResult)
   }
 
   private def showPageComponent(pageComponent:PageComponent) {
+    assert(Platform.isFxApplicationThread)
     setCenter(pageComponent)
+    working.set(false)
   }
 
   goTo(initialPage)
