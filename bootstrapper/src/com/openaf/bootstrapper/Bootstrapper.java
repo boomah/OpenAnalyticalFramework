@@ -49,14 +49,14 @@ public class Bootstrapper {
         List<String> latestJARLines = configLines.subList(1, configLines.size());
         Map<String,String> latestJARsToMD5 = jarsWithMD5(latestJARLines);
         File localConfigFile = new File(cacheDir, "config.txt");
-        Map<String, String> localJARsToMD5 = new HashMap<String,String>();
+        Map<String, String> localJARsToMD5 = new HashMap<>();
         if (localConfigFile.exists()) {
             List<String> allLocalConfigLines = readLines(new FileInputStream(localConfigFile));
             List<String> localConfigLines = allLocalConfigLines.subList(1, allLocalConfigLines.size());
             localJARsToMD5 = jarsWithMD5(localConfigLines);
         }
 
-        Map<String, String> missingOrOutOfDateJARs = new HashMap<String, String>();
+        Map<String, String> missingOrOutOfDateJARs = new HashMap<>();
         for (Map.Entry<String, String> entry : latestJARsToMD5.entrySet()) {
             String jar = entry.getKey();
             String md5 = entry.getValue();
@@ -86,13 +86,13 @@ public class Bootstrapper {
         }
         localConfigFileWriter.close();
 
-        Set<String> jarsToRemove = new HashSet<String>(localJARsToMD5.keySet());
+        Set<String> jarsToRemove = new HashSet<>(localJARsToMD5.keySet());
         jarsToRemove.removeAll(latestJARsToMD5.keySet());
         for (String jarName : jarsToRemove) {
             new File(cacheDir, jarName).delete();
         }
 
-        List<URL> urlsOfLatestJARs = new LinkedList<URL>();
+        List<URL> urlsOfLatestJARs = new LinkedList<>();
         for (String jarName : latestJARsToMD5.keySet()) {
             urlsOfLatestJARs.add(new File(cacheDir, jarName).toURI().toURL());
         }
@@ -108,6 +108,7 @@ public class Bootstrapper {
         });
         Thread.currentThread().setContextClassLoader(urlClassLoader);
         Class launcher = urlClassLoader.loadClass(mainClass);
+        @SuppressWarnings("unchecked")
         Method mainMethod = launcher.getMethod("main", new Class[]{String[].class});
         mainMethod.invoke(null, new Object[]{argsToPassToGUI});
     }
@@ -129,7 +130,7 @@ public class Bootstrapper {
 
     private static List<String> readLines(InputStream in) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        List<String> lines = new LinkedList<String>();
+        List<String> lines = new LinkedList<>();
         String line;
         while ((line = reader.readLine()) != null) {
             lines.add(line);
@@ -139,7 +140,7 @@ public class Bootstrapper {
     }
 
     private static Map<String,String> jarsWithMD5(List<String> lines) {
-        Map<String, String> jarsToMd5s = new HashMap<String, String>();
+        Map<String, String> jarsToMd5s = new HashMap<>();
         for (String line : lines) {
             String[] components = line.split(" ");
             jarsToMd5s.put(components[0], components[1]);
@@ -149,11 +150,13 @@ public class Bootstrapper {
 
     private static void clearOldLogFiles(File dir) {
         File[] files = dir.listFiles();
-        ArrayList<File> logFiles = new ArrayList<File>();
-        for (File file : files) {
-            String fileName = file.getName().toLowerCase();
-            if (fileName.contains("_log") && fileName.endsWith(".txt")) {
-                logFiles.add(file);
+        ArrayList<File> logFiles = new ArrayList<>();
+        if (files != null) {
+            for (File file : files) {
+                String fileName = file.getName().toLowerCase();
+                if (fileName.contains("_log") && fileName.endsWith(".txt")) {
+                    logFiles.add(file);
+                }
             }
         }
         int maxLogFiles = 5;

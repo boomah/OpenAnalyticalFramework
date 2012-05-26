@@ -12,19 +12,19 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   private val pageComponentCache = new PageComponentCache
   private val currentPagePosition = new SimpleIntegerProperty(-1)
   private val pages = FXCollections.observableArrayList[PageInfo]()
-  private val working = new SimpleBooleanProperty(true)
+  val working = new SimpleBooleanProperty(true)
   val backAndUndoDisabledProperty = new BooleanBinding {
     bind(currentPagePosition, working)
-    def computeValue = (currentPagePosition.get <= 0) || working.get
+    def computeValue = !(!working.get && (currentPagePosition.get > 0))
   }
   val redoAndForwardDisabledProperty = new BooleanBinding {
     bind(currentPagePosition, pages, working)
-    def computeValue = (currentPagePosition.get >= (pages.size - 1)) || working.get
+    def computeValue = !(!working.get && (currentPagePosition.get < (pages.size - 1)))
   }
   private val refreshable = new SimpleBooleanProperty(false)
-  val refreshDisabledProperty = new BooleanBinding {
+  val stopOrRefreshDisabledProperty = new BooleanBinding {
     bind(refreshable, working)
-    def computeValue = !refreshable.get || working.get
+    def computeValue = !((working.get && (currentPagePosition.get >= 0)) || (!working.get && refreshable.get))
   }
   val homeDisabledProperty = new BooleanBinding {
     bind(working, currentPagePosition, pages)
@@ -67,9 +67,19 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   }
 
   def refresh() {
-    if (!refreshDisabledProperty.get) {
+    if (!stopOrRefreshDisabledProperty.get) {
       println("refresh")
     }
+  }
+
+  def stop() {
+    if (!stopOrRefreshDisabledProperty.get) {
+      println("Stop")
+    }
+  }
+
+  def stopOrRefresh(isStop:Boolean) {
+    if (isStop) stop() else refresh()
   }
 
   def home() {

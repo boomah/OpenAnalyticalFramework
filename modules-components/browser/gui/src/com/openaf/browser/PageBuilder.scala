@@ -29,6 +29,10 @@ class PageBuilder {
       }
     })
   }
+
+  def clearPageDataCache() {
+    pageDataCache.asMap.clear()
+  }
 }
 
 sealed trait PageResponse
