@@ -11,7 +11,7 @@ object Server {
 
   // TODO - These libraries should be specified by the build system or project file.
   private val ServerLibraries = List("utils")
-  private val GUILibraries = List[String]()
+  private val GUILibraries = List("rmi.client", "rmi.common")
 
   private def serverModules = modules.filter(module => {
     val moduleDirs = formattedSubNames(moduleDir(module))
