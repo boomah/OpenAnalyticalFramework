@@ -211,8 +211,19 @@ object ServerOSGIInstanceStarter {
 
   def formattedSubNames(file:File) = file.listFiles().toList.map(_.getName.trim()).filterNot(_.toLowerCase == ".ds_store")
   def componentsModulesDir = new File("modules-components")
+  def librariesModulesDir = new File("modules-libraries")
   def moduleDir(module:String) = new File(componentsModulesDir, module)
+  def libraryDir(library:String) = new File(librariesModulesDir, library)
   def modules = formattedSubNames(componentsModulesDir)
+  def libraryModuleJARs(library:String) = {
+    val libDir = new File(libraryDir(library), "lib")
+    if (libDir.exists) {
+      libDir.listFiles.toList.filter(file => (!file.isDirectory && file.getName.toLowerCase.endsWith(".jar")))
+    } else {
+      Nil
+    }
+  }
+  def formattedFileName(file:File) = file.getName.replaceAll("-", ".") // TODO - This doesn't work
   def systemPackages = OSGIInstance.commonSystemPackages
   def commonOSGIJARBundleDefinitions = {
     new File("common-bundles").listFiles.filter(_.getName.trim.toLowerCase.endsWith(".jar"))

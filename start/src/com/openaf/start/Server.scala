@@ -45,8 +45,14 @@ object Server {
   })
   private def guiModulesBundleDefinitions = guiModules.map(module => ModuleBundleDefinition(module, ModuleType.GUI))
 
+  private def guiLibraryBundleDefinitions = {
+    GUILibraries.flatMap(library => {
+      val libraryJARBundles = libraryModuleJARs(library).map(jar => SimpleLibraryBundleDefinition(formattedFileName(jar), jar))
+      ModuleBundleDefinition(library, ModuleType.Library) :: libraryJARBundles
+    })
+  }
+
   private def guiBundleDefinitions = {
-    val guiLibraryBundleDefinitions = GUILibraries.map(library => ModuleBundleDefinition(library, ModuleType.Library))
     globalLibraryBundleDefinitions ::: guiModulesBundleDefinitions ::: guiLibraryBundleDefinitions ::: commonOSGIJARBundleDefinitions
   }
 

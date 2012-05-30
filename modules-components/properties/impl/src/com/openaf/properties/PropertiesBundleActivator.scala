@@ -29,5 +29,8 @@ class PropertiesServiceImpl extends PropertiesService {
   }
 
   def name = userDefinedProperties.getOrElse("name", "Test").trim.replaceAll(" ", "_")
-  def externalURL = userDefinedProperties.getOrElse("externalurl", "http://localhost:7777").trim.toLowerCase
+
+  def hostName = userDefinedProperties.getOrElse("hostname", "localhost").trim.toLowerCase
+  def webPort = userDefinedProperties.getOrElse("webport", "7777").trim.toInt
+  def servicesPort = userDefinedProperties.getOrElse("servicesport", "8567").trim.toInt
 }

@@ -1,12 +1,12 @@
 package com.openaf.rmi.client
 
-import org.apache.mina.transport.socket.nio.NioSocketConnector
-import org.apache.mina.filter.codec.serialization.ObjectSerializationCodecFactory
-import org.apache.mina.filter.codec.ProtocolCodecFilter
+import org.jboss.netty.bootstrap.ClientBootstrap
+import java.util.concurrent.Executors
+import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory
 
 class RMIClient(hostName:String, port:Int) {
   def connect() {
-    val connector = new NioSocketConnector
-    connector.getFilterChain.addLast("Serialization", new ProtocolCodecFilter(new ObjectSerializationCodecFactory))
+    val factory = new NioClientSocketChannelFactory(Executors.newCachedThreadPool(),Executors.newCachedThreadPool())
+    val bootstrap = new ClientBootstrap(factory)
   }
 }
