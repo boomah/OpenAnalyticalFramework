@@ -10,13 +10,14 @@ import java.io._
 import java.util.concurrent.CopyOnWriteArraySet
 import java.util.jar.JarFile
 
-class OSGIInstance(name:String, bundles:BundleDefinitions) {
+class OSGIInstance(name:String, bundles:BundleDefinitions, openAFFrameworkProperties:Map[String,String]=Map.empty) {
   private val framework = {
     val frameworkProps = {
       val hm = new HashMap[String, String]
       hm.put("org.osgi.framework.storage", name)
       hm.put("org.osgi.framework.bootdelegation", "sun.*,com.sun.*")
       hm.put("org.osgi.framework.system.packages.extra", bundles.systemPackages.mkString(","))
+      openAFFrameworkProperties.foreach{case (key,value) => hm.put(key, value)}
       hm
     }
     val framework = ServiceLoader.load(classOf[FrameworkFactory], getClass.getClassLoader).iterator.next.newFramework(frameworkProps)

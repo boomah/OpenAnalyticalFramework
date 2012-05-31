@@ -32,5 +32,6 @@ class PropertiesServiceImpl extends PropertiesService {
 
   def hostName = userDefinedProperties.getOrElse("hostname", "localhost").trim.toLowerCase
   def webPort = userDefinedProperties.getOrElse("webport", "7777").trim.toInt
+  def portForGUIUpdates = userDefinedProperties.getOrElse("portforguiupdates", "7778").trim.toInt
   def servicesPort = userDefinedProperties.getOrElse("servicesport", "8567").trim.toInt
 }

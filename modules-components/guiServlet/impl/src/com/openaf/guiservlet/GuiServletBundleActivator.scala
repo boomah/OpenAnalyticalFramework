@@ -14,7 +14,9 @@ class GuiServletBundleActivator extends BundleActivator {
 
         val guiProps = new Hashtable[String,AnyRef]()
         guiProps.put("alias", GUIServlet.Address)
-        context.registerService(classOf[HttpServlet], new GUIServlet(propertiesService.name, propertiesService.webExternalURL), guiProps)
+        context.registerService(classOf[HttpServlet],
+          new GUIServlet(propertiesService.name, propertiesService.webExternalURL,
+            propertiesService.portForGUIUpdates.toString, propertiesService.servicesPort.toString), guiProps)
 
         val guiOSGIProps = new Hashtable[String,AnyRef]()
         guiOSGIProps.put("alias", OSGIGUIServlet.Address)

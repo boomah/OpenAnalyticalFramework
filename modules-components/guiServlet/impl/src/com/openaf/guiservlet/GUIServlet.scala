@@ -13,8 +13,8 @@ object GUIServlet {
 
 import GUIServlet._
 
-class GUIServlet(serverName:String, externalURL:String) extends HttpServlet {
-  private val programArgsConfigLine = serverName + " com.openaf.start.GUI 7778"
+class GUIServlet(serverName:String, externalURL:String, guiUpdatePort:String, servicePort:String) extends HttpServlet {
+  private val programArgsConfigLine = serverName + " com.openaf.start.GUI " + guiUpdatePort + " " + servicePort
 
   private val standardMemory = "512m"
   private val specifiedMemory1024 = "1024m"

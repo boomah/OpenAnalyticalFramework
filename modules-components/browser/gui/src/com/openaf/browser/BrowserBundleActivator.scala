@@ -6,7 +6,7 @@ class BrowserBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
     new Thread(new Runnable {
       def run() {
-        javafx.application.Application.launch(classOf[BrowserStageManager], System.getProperty("instanceName"))
+        javafx.application.Application.launch(classOf[BrowserStageManager], context.getProperty("openAF.instanceName"))
       }
     }, "Browser Bundle Activator starter").start()
   }

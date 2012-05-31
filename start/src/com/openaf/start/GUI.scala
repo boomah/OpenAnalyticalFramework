@@ -10,16 +10,18 @@ object GUI {
         "You need Java %s update %s or above to run OpenAF. ".format(MinimumJavaVersion.major, MinimumJavaVersion.update) +
         "You currently have Java %s update %s.".format(ActualJavaVersion.major, ActualJavaVersion.update))
     }
-    val (url :: instanceName :: portForUpdates :: Nil) = args.toList
-    System.setProperty("instanceName", instanceName)
+    println("Args: " + args.toList)
+    val (url :: instanceName :: portForUpdates :: servicePort :: Nil) = args.toList
     val baseURL = new URL(url)
+    val hostName = baseURL.getHost
+    val guiProperties = Map("openAF.instanceName" -> instanceName, "openAF.hostName" -> hostName, "openAF.servicePort" -> servicePort)
     val guiUpdater = new GUIUpdater(baseURL, instanceName)
     val guiConfig = guiUpdater.guiConfig
-    val guiInstance = new OSGIInstance(guiConfig.name, guiConfig.bundles)
+    val guiInstance = new OSGIInstance(guiConfig.name, guiConfig.bundles, guiProperties)
 
     new Thread(new Runnable {
       def run() {
-        val hostForUpdate = baseURL.getHost
+        val hostForUpdate = hostName
         val socketForUpdate = new Socket(hostForUpdate, portForUpdates.toInt)
         val inputStream = socketForUpdate.getInputStream
         while (true) {
@@ -46,3 +48,5 @@ object StartUtils {
   }
 }
 case class JavaVersion(major:Int, update:Int)
+
+case class GUIProperties(instanceName:String, hostName:String, servicePort:String)
