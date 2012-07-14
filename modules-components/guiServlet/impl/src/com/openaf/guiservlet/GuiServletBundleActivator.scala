@@ -8,7 +8,7 @@ import org.osgi.framework.{ServiceReference, BundleContext, BundleActivator}
 
 class GuiServletBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
-    new ServiceTracker(context, classOf[PropertiesService], new ServiceTrackerCustomizer[PropertiesService, String] {
+    new ServiceTracker(context, classOf[PropertiesService], new ServiceTrackerCustomizer[PropertiesService,String] {
       def addingService(serviceReference:ServiceReference[PropertiesService]) = {
         val propertiesService = context.getService(serviceReference)
 

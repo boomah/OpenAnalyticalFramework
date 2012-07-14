@@ -6,10 +6,10 @@ import org.jboss.netty.channel.{ChannelFuture, ChannelFutureListener}
 
 class RmiClientConnectorBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
-    println("Starting RMI Client...")
     val hostName = context.getProperty("openAF.hostName")
-    val servicePort = context.getProperty("openAF.servicePort").toInt
-    val client = new RMIClient(hostName, servicePort)
+    val servicesPort = context.getProperty("openAF.servicesPort").toInt
+    println("Starting RMI Client (connecting to %s:%s)...".format(hostName, servicesPort))
+    val client = new RMIClient(hostName, servicesPort)
     val connectFuture = client.connect
     connectFuture.addListener(new ChannelFutureListener {
       def operationComplete(future:ChannelFuture) {
