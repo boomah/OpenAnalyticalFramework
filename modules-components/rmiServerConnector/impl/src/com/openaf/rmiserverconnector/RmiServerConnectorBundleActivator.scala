@@ -9,11 +9,12 @@ class RmiServerConnectorBundleActivator extends BundleActivator {
   private var server:RMIServer = _
 
   def start(context:BundleContext) {
+    println("Starting RMI Server (waiting for port)...")
     new ServiceTracker(context, classOf[PropertiesService], new ServiceTrackerCustomizer[PropertiesService,String] {
       def addingService(serviceReference:ServiceReference[PropertiesService]) = {
         val propertiesService = context.getService(serviceReference)
         val servicesPort = propertiesService.servicesPort
-        println("Starting RMI Server (opening port %s)...".format(servicesPort))
+        println("Starting RMI Server (opening port %s).......".format(servicesPort))
         server = new RMIServer(servicesPort)
         server.start()
         ""
@@ -24,6 +25,7 @@ class RmiServerConnectorBundleActivator extends BundleActivator {
   }
 
   def stop(context:BundleContext) {
+    println("Stopping RMI Server")
     Option(server).foreach(_.stop())
   }
 }

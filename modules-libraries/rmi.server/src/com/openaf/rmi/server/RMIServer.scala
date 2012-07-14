@@ -21,8 +21,8 @@ class RMIServer(port:Int) {
 
   def stop() {
     Option(channel).foreach(chan => {
-      val closeFuture = chan.close
-      closeFuture.await
+      chan.close.await
     })
+    bootstrap.releaseExternalResources()
   }
 }

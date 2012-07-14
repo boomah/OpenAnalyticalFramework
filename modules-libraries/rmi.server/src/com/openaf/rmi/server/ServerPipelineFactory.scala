@@ -15,6 +15,7 @@ class ServerPipelineFactory extends ChannelPipelineFactory {
 class ServerHandler extends SimpleChannelUpstreamHandler {
   override def channelConnected(ctx:ChannelHandlerContext, e:ChannelStateEvent) {
     println("Channel Connected")
+    ctx.getChannel.write("The server hears you")
   }
 
   override def channelDisconnected(ctx:ChannelHandlerContext, e:ChannelStateEvent) {
