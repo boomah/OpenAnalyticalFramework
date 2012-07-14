@@ -28,8 +28,7 @@ class PropertiesServiceImpl extends PropertiesService {
     }
   }
 
-  def name = userDefinedProperties.getOrElse("name", "Test").trim.replaceAll(" ", "_")
-
+  def name = userDefinedProperties.getOrElse("name", "(set the name in openaaf.properties)").trim.replaceAll(" ", "_")
   def hostName = userDefinedProperties.getOrElse("hostname", "localhost").trim.toLowerCase
   def webPort = userDefinedProperties.getOrElse("webport", "7777").trim.toInt
   def portForGUIUpdates = userDefinedProperties.getOrElse("portforguiupdates", "7778").trim.toInt
