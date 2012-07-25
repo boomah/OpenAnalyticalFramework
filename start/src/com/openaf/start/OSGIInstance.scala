@@ -100,7 +100,7 @@ case class OSGIInstanceConfig(name:String, properties:()=>Map[String,String], bu
 object ServerOSGIInstanceStarter {
   private val GUIBundlesDir = new File("gui-bundle-cache")
   if (!GUIBundlesDir.exists) GUIBundlesDir.mkdir
-  val TopLevel = "osgi" + File.separator
+  val TopLevel = "osgi-cache" + File.separator
 
   private def fileNamesToMap(fileNames:List[String]) = {
     fileNames.map(fileName => {

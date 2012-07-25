@@ -1,7 +1,7 @@
 package com.openaf.rmi.server
 
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory
-import java.util.concurrent.Executors
+import java.util.concurrent.{ConcurrentHashMap, Executors}
 import org.jboss.netty.bootstrap.ServerBootstrap
 import java.net.InetSocketAddress
 import org.jboss.netty.channel.Channel
@@ -15,6 +15,8 @@ class RMIServer(port:Int) {
 
   private var channel:Channel = _
 
+  private val services = new ConcurrentHashMap[Class[_],AnyRef]()
+
   def start() {
     channel = bootstrap.bind(new InetSocketAddress(port))
   }
@@ -25,4 +27,7 @@ class RMIServer(port:Int) {
     })
     bootstrap.releaseExternalResources()
   }
+
+  def addService(klass:Class[_], service:AnyRef) {services.put(klass, service)}
+  def removeService(klass:Class[_]) {services.remove(klass)}
 }

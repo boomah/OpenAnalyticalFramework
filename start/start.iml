@@ -25,7 +25,9 @@
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/felix.jar!/" />
         </CLASSES>
-        <JAVADOC />
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/lib/doc/osgi.core.javadoc-4.3.0.zip!/core" />
+        </JAVADOC>
         <SOURCES />
       </library>
     </orderEntry>

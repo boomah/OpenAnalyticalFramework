@@ -20,7 +20,11 @@ class TestConsumerBundleActivator extends BundleActivator {
         println("****")
         "Not sure what to return"
       }
-      def modifiedService(serviceReference:ServiceReference[TestService], string:String) {}
+      def modifiedService(serviceReference:ServiceReference[TestService], string:String) {
+        println("----")
+        println("A service has been Modified!!!")
+        println("----")
+      }
       def removedService(serviceReference:ServiceReference[TestService], string:String) {
         println("****")
         println("A service has been removed : " + string)
@@ -28,5 +32,9 @@ class TestConsumerBundleActivator extends BundleActivator {
       }
     }).open()
   }
-  def stop(context:BundleContext) {}
+  def stop(context:BundleContext) {
+    println("")
+    println("-- Stopping Testconsumer --")
+    println("")
+  }
 }

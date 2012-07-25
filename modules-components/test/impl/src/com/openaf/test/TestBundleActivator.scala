@@ -3,10 +3,13 @@ package com.openaf.test
 import api.TestService
 import org.osgi.framework.{BundleContext, BundleActivator}
 import com.openaf.utils.Utils
+import com.openaf.osgi.OSGIUtils
 
 class TestBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
-    context.registerService(classOf[TestService], new TestServiceImpl, null)
+    println("--- Test bundle activator")
+    val dictionary = OSGIUtils.mapToDictionary(Map(OSGIUtils.ExportService -> true))
+    context.registerService(classOf[TestService], new TestServiceImpl, dictionary)
   }
   def stop(context:BundleContext) {}
 }

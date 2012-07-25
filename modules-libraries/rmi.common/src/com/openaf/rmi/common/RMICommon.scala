@@ -9,3 +9,5 @@ object RMICommon {
     pipeline.addLast("objectDecoder", new ObjectDecoder(ClassResolvers.weakCachingConcurrentResolver(classLoader)))
   }
 }
+
+case class ServiceListings(services:List[Class[_]])
