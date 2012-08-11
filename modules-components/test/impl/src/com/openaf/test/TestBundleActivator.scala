@@ -16,4 +16,6 @@ class TestBundleActivator extends BundleActivator {
 
 class TestServiceImpl extends TestService {
   def message:String = Utils.UtilsString
+  def message2(text:String) = "Hello " + text
+  def message3(say:Boolean, text:String) = "Should I say something? " + say + " ok, " + text
 }

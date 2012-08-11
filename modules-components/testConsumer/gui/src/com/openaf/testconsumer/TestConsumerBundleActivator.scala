@@ -17,6 +17,8 @@ class TestConsumerBundleActivator extends BundleActivator {
         val message = service.message
         println("****")
         println("A service has been added : " + message)
+        println("Call something else " + service.message2("Nick"))
+        println("Call the 3rd service : " + service.message3(true, "Rosie"))
         println("****")
         "Not sure what to return"
       }

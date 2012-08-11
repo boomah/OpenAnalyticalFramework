@@ -1,21 +1,20 @@
 package com.openaf.rmi.server
 
-import com.openaf.rmi.common.RMICommon
+import com.openaf.rmi.common.{MethodInvocationRequest, RMICommon}
 import org.jboss.netty.channel._
 
-class ServerPipelineFactory extends ChannelPipelineFactory {
+class ServerPipelineFactory(serverFunctions:ServerFunctions) extends ChannelPipelineFactory {
   def getPipeline = {
     val pipeline = Channels.pipeline
     RMICommon.addHandlers(pipeline, getClass.getClassLoader)
-    pipeline.addLast("serverHandler", new ServerHandler)
+    pipeline.addLast("serverHandler", new ServerHandler(serverFunctions))
     pipeline
   }
 }
 
-class ServerHandler extends SimpleChannelUpstreamHandler {
+class ServerHandler(serverFunctions:ServerFunctions) extends SimpleChannelUpstreamHandler {
   override def channelConnected(ctx:ChannelHandlerContext, e:ChannelStateEvent) {
     println("Channel Connected")
-    ctx.getChannel.write("The server hears you")
   }
 
   override def channelDisconnected(ctx:ChannelHandlerContext, e:ChannelStateEvent) {
@@ -23,10 +22,17 @@ class ServerHandler extends SimpleChannelUpstreamHandler {
   }
 
   override def exceptionCaught(ctx:ChannelHandlerContext, e:ExceptionEvent) {
-    println("Exception Caught")
+    e.getCause.printStackTrace()
   }
 
   override def messageReceived(ctx:ChannelHandlerContext, e:MessageEvent) {
-    println("Message Recieved " + e.getMessage)
+    val message = e.getMessage
+    println("Message Recieved " + message)
+    message match {
+      case methodInvocationRequest:MethodInvocationRequest => {
+        val result = serverFunctions.invokeMethod(methodInvocationRequest)
+        e.getChannel.write(result)
+      }
+    }
   }
 }

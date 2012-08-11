@@ -12,6 +12,7 @@ object Server {
   // TODO - These libraries should be specified by the build system or project file.
   private val ServerLibraries = List("utils", "rmi.server", "rmi.common", "osgi")
   private val GUILibraries = List("rmi.client", "rmi.common")
+  private val GUIAPIDependencies = List("test")
 
   private def serverModules = modules.filter(module => {
     val moduleDirs = formattedSubNames(moduleDir(module))
@@ -52,8 +53,14 @@ object Server {
     })
   }
 
+  private def guiAPIDependencies = {
+    GUIAPIDependencies.map(apiDependency => {
+      ModuleBundleDefinition(apiDependency, ModuleType.API)
+    })
+  }
+
   private def guiBundleDefinitions = {
-    globalLibraryBundleDefinitions ::: guiModulesBundleDefinitions ::: guiLibraryBundleDefinitions ::: commonOSGIJARBundleDefinitions
+    globalLibraryBundleDefinitions ::: guiModulesBundleDefinitions ::: guiLibraryBundleDefinitions ::: guiAPIDependencies ::: commonOSGIJARBundleDefinitions
   }
 
   private def guiConfig = {

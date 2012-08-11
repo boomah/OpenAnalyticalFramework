@@ -11,35 +11,28 @@ class RmiServerConnectorBundleActivator extends BundleActivator {
 
   def start(context:BundleContext) {
     println("Starting RMI Server (waiting for port)...")
-    val propertiesServiceTracker = new ServiceTracker(context, classOf[PropertiesService], new ServiceTrackerCustomizer[PropertiesService,String] {
-      def addingService(serviceReference:ServiceReference[PropertiesService]) = {
-        val propertiesService = context.getService(serviceReference)
-        val servicesPort = propertiesService.servicesPort
-        println("Starting RMI Server (opening port %s).......".format(servicesPort))
-        server = new RMIServer(servicesPort)
-        server.start()
-        ""
-      }
-      def modifiedService(serviceReference:ServiceReference[PropertiesService], string:String) {}
-      def removedService(serviceReference:ServiceReference[PropertiesService], string:String) {}
-    })
+    val propertiesServiceTracker = new ServiceTracker[PropertiesService,PropertiesService](context, classOf[PropertiesService], null)
     propertiesServiceTracker.open()
-    propertiesServiceTracker.waitForService(0)
+    val propertiesService = propertiesServiceTracker.getService
+
+    val servicesPort = propertiesService.servicesPort
+    println("Starting RMI Server (opening port %s).......".format(servicesPort))
+    server = new RMIServer(servicesPort)
+    server.start()
 
     val filterString = "(" + OSGIUtils.ExportService + "=true)"
     val filter = context.createFilter(filterString)
-    new ServiceTracker(context, filter, new ServiceTrackerCustomizer[AnyRef,String] {
-      def addingService(serviceReference:ServiceReference[AnyRef]) = {
+
+    new ServiceTracker(context, filter, new ServiceTrackerCustomizer[Any,Any] {
+      def addingService(serviceReference:ServiceReference[Any]) = {
         addServiceToServer(serviceReference, context)
         ""
       }
-      def modifiedService(serviceReference:ServiceReference[AnyRef], string:String) {}
-      def removedService(serviceReference:ServiceReference[AnyRef], string:String) {}
+      def modifiedService(serviceReference:ServiceReference[Any], any:Any) {}
+      def removedService(serviceReference:ServiceReference[Any], any:Any) {
+        removeServiceFromServer(serviceReference, context)
+      }
     }).open()
-    val currentExportedServices = context.getAllServiceReferences(null, filterString)
-    currentExportedServices.foreach(ref => {
-      addServiceToServer(ref, context)
-    })
   }
 
   def stop(context:BundleContext) {
@@ -52,9 +45,13 @@ class RmiServerConnectorBundleActivator extends BundleActivator {
   }
 
   private def addServiceToServer(serviceReference:ServiceReference[_], context:BundleContext) {
-    val firstServiceName = serviceNames(serviceReference).head
-    val serviceAPI = Class.forName(firstServiceName)
     val service = context.getService(serviceReference).asInstanceOf[AnyRef]
-    server.addService(serviceAPI, service)
+    val addedServiceNames = serviceNames(serviceReference)
+    addedServiceNames.foreach(serviceName => {server.addService(serviceName, service)})
+  }
+
+  private def removeServiceFromServer(serviceReference:ServiceReference[_], context:BundleContext) {
+    val removedServiceNames = serviceNames(serviceReference)
+    removedServiceNames.foreach(serviceName => {server.removeService(serviceName)})
   }
 }
