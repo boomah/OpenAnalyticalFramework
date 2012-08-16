@@ -22,7 +22,6 @@
     <orderEntry type="module" module-name="start" />
     <orderEntry type="module" module-name="rmi.server" />
     <orderEntry type="module" module-name="properties.api" />
-    <orderEntry type="module" module-name="osgi" />
   </component>
 </module>
 

@@ -109,7 +109,14 @@ case class ModuleBundleDefinition(topLevelModuleName:String, moduleType:ModuleTy
     builder.setProperty(IMPORT_PACKAGE, (allExcludes.map(p => "!"+p) ::: allIncludes.toList ::: List("*")).mkString(","))
     val jar = builder.build()
     val out = new ByteArrayOutputStream()
-//    jar.writeManifest(System.out)
+
+    println("--------------------")
+    println(topLevelModuleName)
+    jar.writeManifest(System.out)
+    println("^^")
+
+    println("--------------------")
+    println("")
     jar.write(out)
     new ByteArrayInputStream(out.toByteArray)
   }

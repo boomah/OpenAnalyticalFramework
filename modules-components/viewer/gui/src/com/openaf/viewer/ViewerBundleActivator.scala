@@ -1,9 +1,10 @@
 package com.openaf.viewer
 
-import org.osgi.framework.{BundleContext, BundleActivator}
+import org.osgi.framework.BundleContext
 import com.openaf.browser.{BrowserApplicationButton, PageContext, BrowserApplication}
+import com.openaf.osgi.OpenAFBundleActivator
 
-class ViewerBundleActivator extends BundleActivator {
+class ViewerBundleActivator extends OpenAFBundleActivator {
   def start(context:BundleContext) {
     println("Viewer Started!!")
     context.registerService(classOf[BrowserApplication], ViewerBrowserApplication, null)

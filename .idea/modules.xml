@@ -6,7 +6,6 @@
       <module fileurl="file://$PROJECT_DIR$/bootstrapper/bootstrapper.iml" filepath="$PROJECT_DIR$/bootstrapper/bootstrapper.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/browser/gui/browser.gui.iml" filepath="$PROJECT_DIR$/modules-components/browser/gui/browser.gui.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/guiServlet/impl/guiServlet.impl.iml" filepath="$PROJECT_DIR$/modules-components/guiServlet/impl/guiServlet.impl.iml" />
-      <module fileurl="file://$PROJECT_DIR$/modules-libraries/osgi/osgi.iml" filepath="$PROJECT_DIR$/modules-libraries/osgi/osgi.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/properties/api/properties.api.iml" filepath="$PROJECT_DIR$/modules-components/properties/api/properties.api.iml" group="properties" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/properties/impl/properties.impl.iml" filepath="$PROJECT_DIR$/modules-components/properties/impl/properties.impl.iml" group="properties" />
       <module fileurl="file://$PROJECT_DIR$/modules-libraries/rmi.client/rmi.client.iml" filepath="$PROJECT_DIR$/modules-libraries/rmi.client/rmi.client.iml" />

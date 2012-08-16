@@ -92,7 +92,8 @@ class OSGIInstance(name:String, bundles:BundleDefinitions, openAFFrameworkProper
 }
 
 object OSGIInstance {
-  def commonSystemPackages = List("sun.misc")
+  def commonSystemPackages = List("sun.misc", "com.openaf.osgi")
+//  def commonSystemPackages = List("sun.misc")
 }
 
 case class OSGIInstanceConfig(name:String, properties:()=>Map[String,String], bundles:BundleDefinitions)
