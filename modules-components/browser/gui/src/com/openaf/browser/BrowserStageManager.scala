@@ -6,11 +6,28 @@ import utils.BrowserUtils._
 import collection.mutable.ListBuffer
 import java.lang.{Boolean => JBoolean}
 import javafx.beans.value.{ObservableValue, ChangeListener}
+import java.util.concurrent.CountDownLatch
+
+object BrowserStageManager {
+  private val browserCountDownLatch = new CountDownLatch(1)
+  private var browserCommunicator:BrowserCommunicator = _
+
+  def waitForBrowserCommunicator:BrowserCommunicator = {
+    browserCountDownLatch.await()
+    browserCommunicator
+  }
+
+  private def setBrowserCommunicator(browserCommunicator0:BrowserCommunicator) {
+    browserCommunicator = browserCommunicator0
+    browserCountDownLatch.countDown()
+  }
+}
 
 class BrowserStageManager extends javafx.application.Application {
   private val stages = ListBuffer[Stage]()
   private var lastFocusedStage:Stage = _
   private val pageBuilder = new PageBuilder
+  private val browserCommunicator = new BrowserCommunicator
 
   private def frameTitle = "OpenAF - " + getParameters.getUnnamed.get(0)
 
@@ -52,4 +69,5 @@ class BrowserStageManager extends javafx.application.Application {
       stop()
     }
   }
+  BrowserStageManager.setBrowserCommunicator(browserCommunicator)
 }

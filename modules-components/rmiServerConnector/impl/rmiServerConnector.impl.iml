@@ -20,6 +20,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="scala-library" level="project" />
     <orderEntry type="module" module-name="start" />
+    <orderEntry type="module" module-name="osgi" />
     <orderEntry type="module" module-name="rmi.server" />
     <orderEntry type="module" module-name="properties.api" />
   </component>

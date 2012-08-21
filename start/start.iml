@@ -31,7 +31,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="osgi" exported="" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
