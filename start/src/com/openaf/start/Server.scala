@@ -10,8 +10,9 @@ object Server {
   }
 
   // TODO - These libraries should be specified by the build system or project file.
-  private val ServerLibraries = List("utils", "rmi.server", "rmi.common", "osgi")
-  private val GUILibraries = List("rmi.client", "rmi.common")
+  private val CommonLibraries = List("osgi", "rmi.common")
+  private val ServerLibraries = List("utils", "rmi.server") ::: CommonLibraries
+  private val GUILibraries = List("rmi.client") ::: CommonLibraries
   private val GUIAPIDependencies = List("test")
 
   private def serverModules = modules.filter(module => {

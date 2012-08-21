@@ -110,13 +110,13 @@ case class ModuleBundleDefinition(topLevelModuleName:String, moduleType:ModuleTy
     val jar = builder.build()
     val out = new ByteArrayOutputStream()
 
-    println("--------------------")
+    /*println("--------------------")
     println(topLevelModuleName)
     jar.writeManifest(System.out)
     println("^^")
 
     println("--------------------")
-    println("")
+    println("")*/
     jar.write(out)
     new ByteArrayInputStream(out.toByteArray)
   }
