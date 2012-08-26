@@ -2,6 +2,7 @@
   <dictionary name="nick">
     <words>
       <w>bootstrapper</w>
+      <w>customizer</w>
       <w>dname</w>
       <w>genkey</w>
       <w>javaw</w>

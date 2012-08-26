@@ -1,7 +1,9 @@
 package com.openaf.browser
 
-import org.osgi.framework.BundleContext
+import org.osgi.framework.{ServiceReference, BundleContext}
 import com.openaf.osgi.OpenAFBundleActivator
+import com.google.common.eventbus.EventBus
+import org.osgi.util.tracker.{ServiceTrackerCustomizer, ServiceTracker}
 
 class BrowserBundleActivator extends OpenAFBundleActivator {
   def start(context:BundleContext) {
@@ -9,8 +11,18 @@ class BrowserBundleActivator extends OpenAFBundleActivator {
       javafx.application.Application.launch(classOf[BrowserStageManager], context.getProperty("openAF.instanceName"))
     }, "Browser Bundle Activator starter")
     run({
-      val browserCommunicator = BrowserStageManager.waitForBrowserCommunicator
-      browserCommunicator.sayHi()
+      val eventBus = new EventBus
+      val browserStageManager = BrowserStageManager.waitForBrowserStageManager
+      eventBus.register(browserStageManager)
+      new ServiceTracker(context, classOf[BrowserApplication], new ServiceTrackerCustomizer[BrowserApplication,BrowserApplication]{
+        def addingService(serviceReference:ServiceReference[BrowserApplication]) = {
+          val browserApplication = context.getService(serviceReference)
+          eventBus.post(browserApplication)
+          browserApplication
+        }
+        def modifiedService(serviceReference:ServiceReference[BrowserApplication], browserApplication:BrowserApplication) {}
+        def removedService(serviceReference:ServiceReference[BrowserApplication], browserApplication:BrowserApplication) {}
+      }).open()
     })
   }
   def stop(context:BundleContext) {

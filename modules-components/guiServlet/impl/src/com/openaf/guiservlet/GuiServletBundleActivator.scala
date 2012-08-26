@@ -8,7 +8,7 @@ import org.osgi.framework.{ServiceReference, BundleContext, BundleActivator}
 
 class GuiServletBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
-    new ServiceTracker(context, classOf[PropertiesService], new ServiceTrackerCustomizer[PropertiesService,String] {
+    new ServiceTracker(context, classOf[PropertiesService], new ServiceTrackerCustomizer[PropertiesService,PropertiesService] {
       def addingService(serviceReference:ServiceReference[PropertiesService]) = {
         val propertiesService = context.getService(serviceReference)
 
@@ -22,10 +22,10 @@ class GuiServletBundleActivator extends BundleActivator {
         guiOSGIProps.put("alias", OSGIGUIServlet.Address)
         context.registerService(classOf[HttpServlet], new OSGIGUIServlet(), guiOSGIProps)
 
-        ""
+        propertiesService
       }
-      def modifiedService(serviceReference:ServiceReference[PropertiesService], string:String) {}
-      def removedService(serviceReference:ServiceReference[PropertiesService], string:String) {}
+      def modifiedService(serviceReference:ServiceReference[PropertiesService], propertiesService:PropertiesService) {}
+      def removedService(serviceReference:ServiceReference[PropertiesService], propertiesService:PropertiesService) {}
     }).open()
   }
 

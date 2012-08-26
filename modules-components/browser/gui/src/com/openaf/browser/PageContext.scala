@@ -1,5 +1,5 @@
 package com.openaf.browser
 
-class PageContext {
+class PageContext(val browserCache:BrowserCache) {
 
 }

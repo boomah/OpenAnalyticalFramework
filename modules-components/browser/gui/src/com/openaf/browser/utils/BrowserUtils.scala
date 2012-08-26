@@ -41,4 +41,6 @@ object BrowserUtils {
   def runLater(function: =>Unit) {
     Platform.runLater(new Runnable {def run() {function}})
   }
+
+  def checkFXThread() {require(Platform.isFxApplicationThread, "This must be called on the FX Application Thread")}
 }

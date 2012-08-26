@@ -2,23 +2,25 @@ package com.openaf.browser
 
 import javafx.stage.Stage
 import pages.HomePage
+import utils.BrowserUtils
 import utils.BrowserUtils._
 import collection.mutable.ListBuffer
 import java.lang.{Boolean => JBoolean}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.util.concurrent.CountDownLatch
+import com.google.common.eventbus.Subscribe
 
 object BrowserStageManager {
   private val browserCountDownLatch = new CountDownLatch(1)
-  private var browserCommunicator:BrowserCommunicator = _
+  private var browserStageManager:BrowserStageManager = _
 
-  def waitForBrowserCommunicator:BrowserCommunicator = {
+  def waitForBrowserStageManager:BrowserStageManager = {
     browserCountDownLatch.await()
-    browserCommunicator
+    browserStageManager
   }
 
-  private def setBrowserCommunicator(browserCommunicator0:BrowserCommunicator) {
-    browserCommunicator = browserCommunicator0
+  private def setBrowserStageManager(browserStageManager0:BrowserStageManager) {
+    browserStageManager = browserStageManager0
     browserCountDownLatch.countDown()
   }
 }
@@ -26,8 +28,8 @@ object BrowserStageManager {
 class BrowserStageManager extends javafx.application.Application {
   private val stages = ListBuffer[Stage]()
   private var lastFocusedStage:Stage = _
-  private val pageBuilder = new PageBuilder
-  private val browserCommunicator = new BrowserCommunicator
+  val cache = new BrowserCache
+  val pageBuilder = new PageBuilder
 
   private def frameTitle = "OpenAF - " + getParameters.getUnnamed.get(0)
 
@@ -41,7 +43,7 @@ class BrowserStageManager extends javafx.application.Application {
   }
 
   private def createStage(frameLocation:FrameLocation, initialPage:Page) {
-    val stage = new BrowserStage(HomePage, initialPage, this, pageBuilder)
+    val stage = new BrowserStage(HomePage, initialPage, this)
     stages += stage
     stage.setTitle(frameTitle)
     stage.focusedProperty.addListener(new ChangeListener[JBoolean] {
@@ -69,5 +71,12 @@ class BrowserStageManager extends javafx.application.Application {
       stop()
     }
   }
-  BrowserStageManager.setBrowserCommunicator(browserCommunicator)
+
+  @Subscribe def browserApplicationAdded(browserApplication:BrowserApplication) {
+    BrowserUtils.runLater({
+      cache.update(BrowserCacheKey.BrowserApplicationsKey, List(browserApplication))
+    })
+  }
+
+  BrowserStageManager.setBrowserStageManager(this)
 }

@@ -5,10 +5,10 @@ import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.{SimpleBooleanProperty, SimpleIntegerProperty}
 import javafx.collections.FXCollections
 import pagecomponents.{PageComponentCache, PageComponent}
-import javafx.application.Platform
+import utils.BrowserUtils
 
-class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager,
-              pageBuilder:PageBuilder) extends BorderPane {
+class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager) extends BorderPane {
+  private val pageContext = new PageContext(manager.cache)
   private val pageComponentCache = new PageComponentCache
   private val currentPagePosition = new SimpleIntegerProperty(-1)
   private val pages = FXCollections.observableArrayList[PageInfo]()
@@ -93,12 +93,12 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     working.set(true)
 
     def withResult(pageResponse:PageResponse) {
-      assert(Platform.isFxApplicationThread)
+      BrowserUtils.checkFXThread()
       pageResponse match {
         case SuccessPageResponse(pageData) => {
           pages.add(PageInfo(page))
           currentPagePosition.set(currentPagePosition.get + 1)
-          val pageComponent = pageComponentCache.pageComponent(page)
+          val pageComponent = pageComponentCache.pageComponent(page, pageContext)
           pageComponent.pageData = pageData
           showPageComponent(pageComponent)
         }
@@ -106,11 +106,11 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
       }
     }
 
-    pageBuilder.build(page, withResult)
+    manager.pageBuilder.build(page, withResult)
   }
 
   private def showPageComponent(pageComponent:PageComponent) {
-    assert(Platform.isFxApplicationThread)
+    BrowserUtils.checkFXThread()
     setCenter(pageComponent)
     working.set(false)
   }
