@@ -17,3 +17,7 @@ object PageData {
 class NoPageData extends PageData
 
 case class PageInfo(page:Page)
+
+trait PageFactory {
+  def page:Page
+}

@@ -37,7 +37,7 @@ object GUI {
 }
 
 object StartUtils {
-  val MinimumJavaVersion = JavaVersion(7, 4)
+  val MinimumJavaVersion = JavaVersion(7, 6)
   val ActualJavaVersion = {
     val javaVersion = System.getProperty("java.version")
     val (_ :: major :: update :: Nil) = javaVersion.split("\\.").toList

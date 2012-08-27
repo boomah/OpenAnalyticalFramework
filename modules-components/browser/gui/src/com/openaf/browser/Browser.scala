@@ -4,14 +4,14 @@ import javafx.scene.layout.BorderPane
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.{SimpleBooleanProperty, SimpleIntegerProperty}
 import javafx.collections.FXCollections
-import pagecomponents.{PageComponentCache, PageComponent}
+import components.{PageComponentCache, PageComponent}
 import utils.BrowserUtils
 
 class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager) extends BorderPane {
-  private val pageContext = new PageContext(manager.cache)
+  private val pageContext = new PageContext(manager.cache, this)
   private val pageComponentCache = new PageComponentCache
   private val currentPagePosition = new SimpleIntegerProperty(-1)
-  private val pages = FXCollections.observableArrayList[PageInfo]()
+  private val pages = FXCollections.observableArrayList[PageInfo]
   val working = new SimpleBooleanProperty(true)
   val backAndUndoDisabledProperty = new BooleanBinding {
     bind(currentPagePosition, working)
@@ -31,7 +31,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     def computeValue = working.get || (currentPage == homePage)
   }
 
-  private val currentPage = {
+  private var currentPage = {
     if (currentPagePosition.get != -1) {
       pages.get(currentPagePosition.get)
     } else {
@@ -98,9 +98,9 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
         case SuccessPageResponse(pageData) => {
           pages.add(PageInfo(page))
           currentPagePosition.set(currentPagePosition.get + 1)
-          val pageComponent = pageComponentCache.pageComponent(page, pageContext)
+          val pageComponent = pageComponentCache.pageComponent(page.name, pageContext)
           pageComponent.pageData = pageData
-          showPageComponent(pageComponent)
+          showPageComponent(pageComponent, page)
         }
         case ProblemPageResponse(throwable) => throwable.printStackTrace()
       }
@@ -109,10 +109,15 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     manager.pageBuilder.build(page, withResult)
   }
 
-  private def showPageComponent(pageComponent:PageComponent) {
+  private def showPageComponent(pageComponent:PageComponent, page:Page) {
     BrowserUtils.checkFXThread()
     setCenter(pageComponent)
+    currentPage = page
     working.set(false)
+  }
+
+  def goToPage(page:Page) {
+    goTo(page)
   }
 
   goTo(initialPage)

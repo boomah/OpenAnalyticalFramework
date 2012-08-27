@@ -9,6 +9,7 @@ import java.lang.{Boolean => JBoolean}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.util.concurrent.CountDownLatch
 import com.google.common.eventbus.Subscribe
+import javafx.collections.FXCollections
 
 object BrowserStageManager {
   private val browserCountDownLatch = new CountDownLatch(1)
@@ -74,7 +75,8 @@ class BrowserStageManager extends javafx.application.Application {
 
   @Subscribe def browserApplicationAdded(browserApplication:BrowserApplication) {
     BrowserUtils.runLater({
-      cache.update(BrowserCacheKey.BrowserApplicationsKey, List(browserApplication))
+      val currentApplications = cache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
+      currentApplications.add(browserApplication)
     })
   }
 

@@ -1,4 +1,4 @@
-package com.openaf.browser.pagecomponents
+package com.openaf.browser.components
 
 import com.openaf.browser.PageData
 import javafx.scene.Parent
