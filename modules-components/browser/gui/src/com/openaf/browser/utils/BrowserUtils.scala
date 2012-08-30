@@ -3,10 +3,11 @@ package com.openaf.browser.utils
 import java.util.prefs.Preferences
 import com.openaf.browser.FrameLocation
 import javafx.stage.{Stage, Screen}
-import collection.mutable.WeakHashMap
-import javafx.scene.image.Image
+import collection.mutable
+import javafx.scene.image.{ImageView, Image}
 import com.openaf.browser.shortcutkeys.{WindowsShortCutKeys, OSXShortCutKeys}
 import javafx.application.Platform
+import javafx.scene.Node
 
 object BrowserUtils {
   private val FrameLocationName = "frameLocation"
@@ -17,7 +18,7 @@ object BrowserUtils {
   }
   def storeFrameLocation(stage:Stage) {Prefs.put(FrameLocationName, FrameLocation(stage).asString)}
   def deletePreferences() {Prefs.remove(FrameLocationName)}
-  private val ImageMap = new WeakHashMap[String,Image]()
+  private val ImageMap = new mutable.WeakHashMap[String,Image]()
   def icon(iconName:String) = {
     val name = "/com/openaf/browser/resources/" + iconName
     ImageMap.getOrElseUpdate(name, new Image(resourceAsInputStream(name)))
@@ -43,4 +44,9 @@ object BrowserUtils {
   }
 
   def checkFXThread() {require(Platform.isFxApplicationThread, "This must be called on the FX Application Thread")}
+
+  def imageViewOfNode(node:Node) = {
+    val image = node.snapshot(null, null)
+    new ImageView(image)
+  }
 }
