@@ -98,7 +98,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     println("Go to " + page)
     working.set(true)
 
-    // TODO - wipe history forward of here
+    pages.remove(currentPagePosition.get + 1, pages.size)
 
     def withResult(pageResponse:PageResponse) {
       BrowserUtils.checkFXThread()
@@ -111,7 +111,9 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
           val pageComponent = pageComponentCache.pageComponent(page.name, pageContext)
           pageComponent.pageData = pageData
           content.getChildren.add(0, pageComponent)
-          pageAnimation.animate(content, currentImageView, imageViewOfNode(pageComponent), onComplete = {
+          val newImageView = imageViewOfNode(pageComponent)
+          content.getChildren.remove(0)
+          pageAnimation.animate(content, currentImageView, newImageView, onComplete = {
             showPageComponent(pageComponent, page)
           })
         }

@@ -1,8 +1,8 @@
 package com.openaf.browser.animation
 
-import javafx.animation.{Interpolator, TranslateTransition}
+import javafx.animation._
 import javafx.util.Duration
-import javafx.scene.layout.{StackPane, HBox}
+import javafx.scene.layout.StackPane
 import javafx.event.{ActionEvent, EventHandler}
 import javafx.scene.image.ImageView
 
@@ -11,7 +11,7 @@ trait BrowserPageAnimation {
 }
 
 object BrowserPageAnimation {
-  val PageSlideTime = new Duration(250.0)
+  val PageSlideTime = Duration.millis(250.0)
   val NoAnimation = new BrowserPageAnimation {
     def animate(content:StackPane, fromPageComponent:ImageView, toPageComponent:ImageView, onComplete: => Unit) {onComplete}
   }
@@ -20,31 +20,42 @@ import BrowserPageAnimation._
 
 object ForwardOnePageTransition extends BrowserPageAnimation {
   def animate(content:StackPane, fromPageComponent:ImageView, toPageComponent:ImageView, onComplete: => Unit) {
-    val combinedNode = new HBox
-    combinedNode.getChildren.addAll(fromPageComponent, toPageComponent)
-    content.getChildren.add(combinedNode)
-    val transition = new TranslateTransition(PageSlideTime, combinedNode)
-    transition.setToX(-fromPageComponent.getImage.getWidth)
-    transition.setInterpolator(Interpolator.EASE_BOTH)
-    transition.setOnFinished(new EventHandler[ActionEvent] {
+    toPageComponent.setTranslateX(toPageComponent.getImage.getWidth)
+    content.getChildren.add(toPageComponent)
+
+    val fromTransition = new TranslateTransition(PageSlideTime, fromPageComponent)
+    fromTransition.setToX(-fromPageComponent.getImage.getWidth)
+    fromTransition.setInterpolator(Interpolator.EASE_BOTH)
+
+    val toTransition = new TranslateTransition(PageSlideTime, toPageComponent)
+    toTransition.setToX(0.0)
+    toTransition.setInterpolator(Interpolator.EASE_BOTH)
+    toTransition.setOnFinished(new EventHandler[ActionEvent] {
       def handle(event:ActionEvent) {onComplete}
     })
-    transition.playFromStart()
+
+    fromTransition.playFromStart()
+    toTransition.playFromStart()
   }
 }
 
 object BackOnePageTransition extends BrowserPageAnimation {
   def animate(content:StackPane, fromPageComponent:ImageView, toPageComponent:ImageView, onComplete: => Unit) {
-    val combinedNode = new HBox
-    combinedNode.getChildren.addAll(toPageComponent, fromPageComponent)
-    combinedNode.setTranslateX(-fromPageComponent.getImage.getWidth)
-    content.getChildren.add(combinedNode)
-    val transition = new TranslateTransition(PageSlideTime, combinedNode)
-    transition.setToX(0)
-    transition.setInterpolator(Interpolator.EASE_BOTH)
-    transition.setOnFinished(new EventHandler[ActionEvent] {
+    toPageComponent.setTranslateX(-toPageComponent.getImage.getWidth)
+    content.getChildren.add(toPageComponent)
+
+    val fromTransition = new TranslateTransition(PageSlideTime, fromPageComponent)
+    fromTransition.setToX(fromPageComponent.getImage.getWidth)
+    fromTransition.setInterpolator(Interpolator.EASE_BOTH)
+
+    val toTransition = new TranslateTransition(PageSlideTime, toPageComponent)
+    toTransition.setToX(0.0)
+    toTransition.setInterpolator(Interpolator.EASE_BOTH)
+    toTransition.setOnFinished(new EventHandler[ActionEvent] {
       def handle(event:ActionEvent) {onComplete}
     })
-    transition.playFromStart()
+
+    fromTransition.playFromStart()
+    toTransition.playFromStart()
   }
 }
