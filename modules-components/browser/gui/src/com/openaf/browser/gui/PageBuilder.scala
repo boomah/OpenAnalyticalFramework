@@ -4,7 +4,7 @@ import com.google.common.cache.CacheBuilder
 import java.util.concurrent.{ThreadFactory, Executors, Callable}
 import utils.BrowserUtils
 
-class PageBuilder {
+class PageBuilder(serverContext:ServerContext) {
   private val pageDataCache = CacheBuilder.newBuilder.softValues.build[Page,PageData]
   private val threadPool = Executors.newFixedThreadPool(10, new ThreadFactory {
     def newThread(r:Runnable) = {
@@ -19,7 +19,7 @@ class PageBuilder {
       def run() {
         val pageResponse = try {
           val pageData = pageDataCache.get(page, new Callable[PageData] {
-            def call = page.build
+            def call = page.build(page.createServerContext(serverContext))
           })
           SuccessPageResponse(pageData)
         } catch {

@@ -6,7 +6,14 @@ import ref.SoftReference
 trait Page {
   def name:String
   def image:Image
-  def build:PageData
+  type SC
+  def createServerContext(serverContext:ServerContext):SC
+  def build(serverContext:SC):PageData
+}
+
+trait BrowserPage extends Page {
+  type SC = String
+  def createServerContext(serverContext:ServerContext) = ""
 }
 
 trait PageData

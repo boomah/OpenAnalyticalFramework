@@ -21,7 +21,6 @@
     <orderEntry type="library" name="scala-library" level="project" />
     <orderEntry type="module" module-name="start" />
     <orderEntry type="module" module-name="osgi" />
-    <orderEntry type="module" module-name="browser.gui" />
     <orderEntry type="module" module-name="viewer.api" />
   </component>
 </module>

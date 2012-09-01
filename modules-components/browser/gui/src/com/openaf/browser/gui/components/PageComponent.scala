@@ -1,14 +1,18 @@
 package com.openaf.browser.gui.components
 
-import com.openaf.browser.gui.PageData
+import com.openaf.browser.gui.{PageContext, Page, PageData}
 import javafx.scene.layout.Region
 
 trait PageComponent extends Region {
-  private var currentPageData:PageData = _
-  final def pageData = currentPageData
-  final def pageData_=(pd:PageData) {
-    currentPageData = pd
-    initialise(pageData)
+  protected var page:Page = _
+  protected var pageData:PageData = _
+  protected var pageContext:PageContext = _
+  def initialise(page0:Page, pageData0:PageData, pageContext0:PageContext) {
+    page = page0
+    pageData = pageData0
+    pageContext = pageContext0
+    setup()
   }
-  def initialise(pageData:PageData)
+
+  def setup()
 }

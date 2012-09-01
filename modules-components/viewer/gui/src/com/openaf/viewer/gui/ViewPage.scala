@@ -1,15 +1,18 @@
 package com.openaf.viewer.gui
 
-import com.openaf.browser.gui.{PageData, PageFactory, Page}
+import com.openaf.browser.gui.{ServerContext, PageData, PageFactory, Page}
+import com.openaf.viewer.api.ViewerFacility
 
-case object ViewPage extends Page {
+case class ViewPage(number:Int) extends Page {
   def name = "View"
   def image = null
-  def build = ViewPageData("This is the viewer page component")
+  type SC = ViewerFacility
+  def createServerContext(serverContext:ServerContext) = serverContext.facility(classOf[ViewerFacility])
+  def build(viewerFacility:ViewerFacility) = ViewPageData(viewerFacility.text)
 }
 
 object ViewerPageFactory extends PageFactory {
-  def page = ViewPage
+  def page = ViewPage(0)
 }
 
 case class ViewPageData(text:String) extends PageData

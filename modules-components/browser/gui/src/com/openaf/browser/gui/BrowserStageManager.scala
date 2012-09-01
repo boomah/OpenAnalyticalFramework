@@ -30,11 +30,14 @@ class BrowserStageManager extends javafx.application.Application {
   private val stages = ListBuffer[Stage]()
   private var lastFocusedStage:Stage = _
   val cache = new BrowserCache
-  val pageBuilder = new PageBuilder
+  var pageBuilder:PageBuilder = _
 
   private def frameTitle = "OpenAF - " + getParameters.getUnnamed.get(0)
 
-  def start(stage:Stage) {
+  def start(stage:Stage) {}
+
+  def start(pageBuilder0:PageBuilder) {
+    pageBuilder = pageBuilder0
     createStage(initialFrameLocation, HomePage)
   }
 

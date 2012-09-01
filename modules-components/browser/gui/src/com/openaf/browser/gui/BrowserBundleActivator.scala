@@ -4,6 +4,7 @@ import org.osgi.framework.{ServiceReference, BundleContext}
 import com.openaf.osgi.OpenAFBundleActivator
 import com.google.common.eventbus.EventBus
 import org.osgi.util.tracker.{ServiceTrackerCustomizer, ServiceTracker}
+import utils.BrowserUtils
 
 class BrowserBundleActivator extends OpenAFBundleActivator {
   def start(context:BundleContext) {
@@ -23,6 +24,10 @@ class BrowserBundleActivator extends OpenAFBundleActivator {
         def modifiedService(serviceReference:ServiceReference[BrowserApplication], browserApplication:BrowserApplication) {}
         def removedService(serviceReference:ServiceReference[BrowserApplication], browserApplication:BrowserApplication) {}
       }).open()
+      BrowserUtils.runLater({
+        val pageBuilder = new PageBuilder(new OSGIServerContext(context))
+        browserStageManager.start(pageBuilder)
+      })
     })
   }
   def stop(context:BundleContext) {

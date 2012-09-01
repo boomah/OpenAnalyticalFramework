@@ -2,7 +2,7 @@ package com.openaf.browser.gui.components
 
 import javafx.scene.text.Text
 import javafx.scene.layout.{FlowPane, BorderPane}
-import com.openaf.browser.gui.{BrowserApplication, BrowserCacheKey, PageContext, PageData}
+import com.openaf.browser.gui._
 import javafx.collections.ListChangeListener
 import javafx.collections.ListChangeListener.Change
 import scala.collection.JavaConversions._
@@ -25,7 +25,7 @@ class HomePageComponent(pageContext:PageContext) extends BorderPane with PageCom
   setTop(new Text("Nick"))
   setCenter(content)
 
-  def initialise(pageData:PageData) {}
+  def setup() {}
 }
 
 object HomePageComponentFactory extends PageComponentFactory {

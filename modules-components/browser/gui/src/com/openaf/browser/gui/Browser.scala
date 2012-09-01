@@ -129,8 +129,8 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
       case SuccessPageResponse(pageData) => {
         val pageInfoToGoTo = pages.get(currentPagePosition.get).copy(softPageResponse = new SoftReference(pageResponse))
         pages.set(currentPagePosition.get, pageInfoToGoTo)
-        val pageComponentToGoTo = pageComponentCache.pageComponent(pageInfoToGoTo.page.name, pageContext)
-        pageComponentToGoTo.pageData = pageData
+        val pageComponentToGoTo = pageComponentCache.pageComponent(pageInfoToGoTo.page.getClass.getName, pageContext)
+        pageComponentToGoTo.initialise(pageInfoToGoTo.page, pageData, pageContext)
         if (shouldAnimate(oldPagePosition)) {
           val fromPageComponent = currentPageComponent
           content.getChildren.add(0, pageComponentToGoTo)
