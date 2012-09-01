@@ -1,6 +1,7 @@
 package com.openaf.browser
 
 import javafx.scene.image.Image
+import ref.SoftReference
 
 trait Page {
   def name:String
@@ -16,7 +17,7 @@ object PageData {
 
 class NoPageData extends PageData
 
-case class PageInfo(page:Page)
+case class PageInfo(page:Page, softPageResponse:SoftReference[PageResponse])
 
 trait PageFactory {
   def page:Page

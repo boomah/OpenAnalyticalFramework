@@ -1,16 +1,16 @@
 package com.openaf.browser
 
-import animation.{BackOnePageTransition, ForwardOnePageTransition, BrowserPageAnimation}
-import javafx.scene.layout.{StackPane, FlowPane, BorderPane}
+import animation.{BackOnePageTransition, ForwardOnePageTransition}
+import javafx.scene.layout.{StackPane, BorderPane}
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.{SimpleBooleanProperty, SimpleIntegerProperty}
 import javafx.collections.FXCollections
 import components.{PageComponentCache, PageComponent}
-import utils.BrowserUtils, BrowserUtils._
+import utils.BrowserUtils
+import ref.SoftReference
 
 class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager) extends BorderPane {
   private val content = new StackPane
-  content.getChildren.add(new FlowPane)
   setCenter(content)
   private val pageContext = new PageContext(manager.cache, this)
   private val pageComponentCache = new PageComponentCache
@@ -90,71 +90,89 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
 
   def home() {
     if (!homeDisabledProperty.get) {
-      goTo(homePage, BrowserPageAnimation.NoAnimation)
+      goToPage(homePage)
     }
-  }
-
-  private def goTo(page:Page, pageAnimation:BrowserPageAnimation) {
-    println("Go to " + page)
-    working.set(true)
-
-    pages.remove(currentPagePosition.get + 1, pages.size)
-
-    def withResult(pageResponse:PageResponse) {
-      BrowserUtils.checkFXThread()
-      val currentImageView = imageViewOfNode(content)
-      content.getChildren.add(currentImageView)
-      pageResponse match {
-        case SuccessPageResponse(pageData) => {
-          pages.add(PageInfo(page))
-          currentPagePosition.set(currentPagePosition.get + 1)
-          val pageComponent = pageComponentCache.pageComponent(page.name, pageContext)
-          pageComponent.pageData = pageData
-          content.getChildren.add(0, pageComponent)
-          val newImageView = imageViewOfNode(pageComponent)
-          content.getChildren.remove(0)
-          pageAnimation.animate(content, currentImageView, newImageView, onComplete = {
-            showPageComponent(pageComponent, page)
-          })
-        }
-        case ProblemPageResponse(throwable) => throwable.printStackTrace()
-      }
-    }
-
-    manager.pageBuilder.build(page, withResult)
-  }
-
-  private def showPageComponent(pageComponent:PageComponent, page:Page) {
-    BrowserUtils.checkFXThread()
-    content.getChildren.clear()
-    content.getChildren.add(pageComponent)
-    working.set(false)
-  }
-
-  private def transitionToPage(direction:Int, animation:BrowserPageAnimation) {
-    val currentImageView = imageViewOfNode(content)
-    content.getChildren.add(currentImageView)
-    currentPagePosition.set(currentPagePosition.get + direction)
-    val pageToGoTo = currentPage
-    val pageComponent = pageComponentCache.pageComponent(pageToGoTo.name, pageContext)
-    // TODO set the page data
-    content.getChildren.add(0, pageComponent)
-    animation.animate(content, currentImageView, imageViewOfNode(pageComponent), onComplete = {
-      showPageComponent(pageComponent, pageToGoTo)
-    })
   }
 
   private def goBackOnePage() {
-    transitionToPage(-1, BackOnePageTransition)
+    val oldPagePosition = currentPagePosition.get
+    currentPagePosition.set(currentPagePosition.get - 1)
+    goToCurrentPagePosition(oldPagePosition)
   }
 
   private def goForwardOnePage() {
-    transitionToPage(1, ForwardOnePageTransition)
+    val oldPagePosition = currentPagePosition.get
+    currentPagePosition.set(currentPagePosition.get + 1)
+    goToCurrentPagePosition(oldPagePosition)
+  }
+
+  private def shouldAnimate(oldPagePosition:Int) = {
+    (oldPagePosition != -1) && (pages.get(oldPagePosition).page.name != currentPage.name)
+  }
+
+  private def animation(oldPagePosition:Int) = {
+    if (currentPagePosition.get > oldPagePosition) {
+      ForwardOnePageTransition
+    } else {
+      BackOnePageTransition
+    }
+  }
+
+  private def currentPageComponent = {
+    if (content.getChildren.size != 1) throw new IllegalStateException("More than one component")
+    content.getChildren.get(0).asInstanceOf[PageComponent]
+  }
+
+  private def withPageResponse(pageResponse:PageResponse, oldPagePosition:Int) {
+    BrowserUtils.checkFXThread()
+    pageResponse match {
+      case SuccessPageResponse(pageData) => {
+        val pageInfoToGoTo = pages.get(currentPagePosition.get).copy(softPageResponse = new SoftReference(pageResponse))
+        pages.set(currentPagePosition.get, pageInfoToGoTo)
+        val pageComponentToGoTo = pageComponentCache.pageComponent(pageInfoToGoTo.page.name, pageContext)
+        pageComponentToGoTo.pageData = pageData
+        if (shouldAnimate(oldPagePosition)) {
+          val fromPageComponent = currentPageComponent
+          content.getChildren.add(0, pageComponentToGoTo)
+          animation(oldPagePosition).animate(fromPageComponent, pageComponentToGoTo, onComplete = {
+            content.getChildren.removeAll(fromPageComponent)
+            working.set(false)
+          })
+        } else {
+          if (content.getChildren.isEmpty) content.getChildren.add(pageComponentToGoTo)
+          working.set(false)
+        }
+      }
+      case ProblemPageResponse(throwable) => throwable.printStackTrace()
+    }
+  }
+
+  private def goToCurrentPagePosition(oldPagePosition:Int) {
+    val pageInfoToGoTo = pages.get(currentPagePosition.get)
+    pageInfoToGoTo.softPageResponse.get match {
+      case Some(pageResponse) => withPageResponse(pageResponse, oldPagePosition)
+      case _ => {
+        working.set(true)
+        def withResult(pageResponse:PageResponse) {
+          withPageResponse(pageResponse, oldPagePosition)
+        }
+        manager.pageBuilder.build(pageInfoToGoTo.page, withResult)
+      }
+    }
   }
 
   def goToPage(page:Page) {
-    goTo(page, ForwardOnePageTransition)
+    pages.remove(currentPagePosition.get + 1, pages.size)
+
+    val emptyPageDataSoftReference = new SoftReference(SuccessPageResponse(PageData.NoPageData))
+    emptyPageDataSoftReference.clear()
+    pages.add(PageInfo(page, emptyPageDataSoftReference))
+
+    val oldPagePosition = currentPagePosition.get
+    currentPagePosition.set(currentPagePosition.get + 1)
+
+    goToCurrentPagePosition(oldPagePosition)
   }
 
-  goTo(initialPage, BrowserPageAnimation.NoAnimation)
+  goToPage(initialPage)
 }
