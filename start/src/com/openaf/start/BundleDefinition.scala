@@ -98,7 +98,8 @@ case class ModuleBundleDefinition(topLevelModuleName:String, moduleType:ModuleTy
     builder.setProperty(BUNDLE_SYMBOLICNAME, moduleName)
 
     moduleType match {
-      case ModuleType.IMPL | ModuleType.GUI => builder.setProperty(BUNDLE_ACTIVATOR, "com.openaf." + topLevelModuleName.toLowerCase + "." + topLevelModuleName.capitalize + "BundleActivator")
+      case ModuleType.IMPL => builder.setProperty(BUNDLE_ACTIVATOR, "com.openaf." + topLevelModuleName.toLowerCase + "." + topLevelModuleName.capitalize + "BundleActivator")
+      case ModuleType.GUI => builder.setProperty(BUNDLE_ACTIVATOR, "com.openaf." + topLevelModuleName.toLowerCase + ".gui." + topLevelModuleName.capitalize + "BundleActivator")
       case _ =>
     }
     //if (module.moduleType != ModuleType.IMPL) {
