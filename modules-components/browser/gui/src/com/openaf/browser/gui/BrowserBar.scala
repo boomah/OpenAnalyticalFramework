@@ -14,8 +14,8 @@ import java.lang.{Boolean => JBoolean}
 class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage) extends ToolBar {
   setStyle("-fx-background-color: #336699")
 
-  private val backButton = new SingleActionToolBarButton("Back", browser.back, browser.backAndUndoDisabledProperty)
-  private val forwardButton = new SingleActionToolBarButton("Forward", browser.forward, browser.redoAndForwardDisabledProperty)
+  private val backButton = new SingleActionToolBarButton("Back", browser.back, browser.backDisabledProperty)
+  private val forwardButton = new SingleActionToolBarButton("Forward", browser.forward, browser.forwardDisabledProperty)
   private val stopOrRefreshButton = new StopOrRefreshToolBarButton("Stop", (isStop) => browser.stopOrRefresh(isStop),
                                                                    browser.stopOrRefreshDisabledProperty, browser.working)
   private val homeButton = new SingleActionToolBarButton("Home", browser.home, browser.homeDisabledProperty)
