@@ -130,7 +130,11 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
         val pageInfoToGoTo = pages.get(currentPagePosition.get).copy(softPageResponse = new SoftReference(pageResponse))
         pages.set(currentPagePosition.get, pageInfoToGoTo)
         val pageComponentToGoTo = pageComponentCache.pageComponent(pageInfoToGoTo.page.getClass.getName, pageContext)
-        pageComponentToGoTo.initialise(pageInfoToGoTo.page, pageData, pageContext)
+        pageComponentToGoTo.initialise(
+          pageInfoToGoTo.page.asInstanceOf[pageComponentToGoTo.P],
+          pageData.asInstanceOf[pageComponentToGoTo.PD],
+          pageContext
+        )
         if (shouldAnimate(oldPagePosition)) {
           val fromPageComponent = currentPageComponent
           content.getChildren.add(0, pageComponentToGoTo)
@@ -164,7 +168,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   def goToPage(page:Page) {
     pages.remove(currentPagePosition.get + 1, pages.size)
 
-    val emptyPageDataSoftReference = new SoftReference(SuccessPageResponse(PageData.NoPageData))
+    val emptyPageDataSoftReference = new SoftReference(SuccessPageResponse(NoPageData))
     emptyPageDataSoftReference.clear()
     pages.add(PageInfo(page, emptyPageDataSoftReference))
 

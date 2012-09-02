@@ -5,9 +5,13 @@ import javafx.scene.layout.{FlowPane, BorderPane}
 import com.openaf.browser.gui._
 import javafx.collections.ListChangeListener
 import javafx.collections.ListChangeListener.Change
+import pages.HomePage
 import scala.collection.JavaConversions._
 
 class HomePageComponent(pageContext:PageContext) extends BorderPane with PageComponent {
+  type P = HomePage.type
+  type PD = NoPageData.type
+
   private val browserApplications = pageContext.browserCache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
   browserApplications.addListener(new ListChangeListener[BrowserApplication] {
     def onChanged(change:Change[_<:BrowserApplication]) {updateBrowserApplications()}

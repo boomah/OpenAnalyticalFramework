@@ -18,11 +18,7 @@ trait BrowserPage extends Page {
 
 trait PageData
 
-object PageData {
-  val NoPageData = new NoPageData
-}
-
-class NoPageData extends PageData
+case object NoPageData extends PageData
 
 case class PageInfo(page:Page, softPageResponse:SoftReference[PageResponse])
 
