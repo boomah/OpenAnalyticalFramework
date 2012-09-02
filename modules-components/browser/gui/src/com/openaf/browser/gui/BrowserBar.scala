@@ -15,8 +15,6 @@ class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage) ex
   setStyle("-fx-background-color: #336699")
 
   private val backButton = new SingleActionToolBarButton("Back", browser.back, browser.backAndUndoDisabledProperty)
-  private val undoButton = new SingleActionToolBarButton("Undo", browser.undo, browser.backAndUndoDisabledProperty)
-  private val redoButton = new SingleActionToolBarButton("Redo", browser.redo, browser.redoAndForwardDisabledProperty)
   private val forwardButton = new SingleActionToolBarButton("Forward", browser.forward, browser.redoAndForwardDisabledProperty)
   private val stopOrRefreshButton = new StopOrRefreshToolBarButton("Stop", (isStop) => browser.stopOrRefresh(isStop),
                                                                    browser.stopOrRefreshDisabledProperty, browser.working)
@@ -25,7 +23,7 @@ class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage) ex
   HBox.setHgrow(addressBar, Priority.ALWAYS)
   private val settingsButton = new SettingsMenuButton(tabPane, stage)
 
-  getItems.addAll(backButton, undoButton, redoButton, forwardButton, stopOrRefreshButton, homeButton, addressBar, settingsButton)
+  getItems.addAll(backButton, forwardButton, stopOrRefreshButton, homeButton, addressBar, settingsButton)
 }
 
 class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage) extends MenuButton("Settings") {

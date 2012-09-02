@@ -46,29 +46,29 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   private val browserBar = new BrowserBar(this, tabPane, stage)
   setTop(browserBar)
 
+  def backBack() {
+    if (!backAndUndoDisabledProperty.get) {
+      println("backBack")
+    }
+  }
+
   def back() {
     if (!backAndUndoDisabledProperty.get) {
       println("back")
-    }
-  }
-
-  def undo() {
-    if (!backAndUndoDisabledProperty.get) {
-      println("undo")
       goBackOnePage()
-    }
-  }
-
-  def redo() {
-    if (!redoAndForwardDisabledProperty.get) {
-      println("redo")
-      goForwardOnePage()
     }
   }
 
   def forward() {
     if (!redoAndForwardDisabledProperty.get) {
       println("forward")
+      goForwardOnePage()
+    }
+  }
+
+  def forwardForward() {
+    if (!redoAndForwardDisabledProperty.get) {
+      println("forwardForward")
     }
   }
 
