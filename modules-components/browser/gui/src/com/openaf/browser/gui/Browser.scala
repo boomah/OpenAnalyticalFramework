@@ -19,6 +19,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   private val currentPagePosition = new SimpleIntegerProperty(-1)
   private val pages = FXCollections.observableArrayList[PageInfo]
   val working = new SimpleBooleanProperty(true)
+  private var generatingPage:Option[Page] = None
   val backDisabledProperty = new BooleanBinding {
     bind(currentPagePosition, working)
     def computeValue = !(!working.get && (currentPagePosition.get > 0))
@@ -85,7 +86,8 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
 
   def stop() {
     if (!stopOrRefreshDisabledProperty.get) {
-      println("Stop")
+      generatingPage = None
+      working.set(false)
     }
   }
 
@@ -167,8 +169,11 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
       case Some(pageResponse) => withPageResponse(pageResponse, fromPagePosition, toPagePosition, pageInfoToGoTo, newPage)
       case _ => {
         working.set(true)
+        generatingPage = Some(pageInfoToGoTo.page)
         def withResult(pageResponse:PageResponse) {
-          withPageResponse(pageResponse, fromPagePosition, toPagePosition, pageInfoToGoTo, newPage)
+          if (generatingPage == Some(pageInfoToGoTo.page)) {
+            withPageResponse(pageResponse, fromPagePosition, toPagePosition, pageInfoToGoTo, newPage)
+          }
         }
         manager.pageBuilder.build(pageInfoToGoTo.page, withResult)
       }
