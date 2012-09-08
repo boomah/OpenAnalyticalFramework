@@ -7,6 +7,7 @@ abstract class GenericShortCutKeys {
   protected def shortCut(key:String) = keyEvent("Shortcut+" + key)
   protected def alt(key:String) = keyEvent("Alt+" + key)
   protected def shortCutAlt(key:String) = keyEvent("Shortcut+Alt+" + key)
+  protected def shortCutShift(key:String) = keyEvent("Shortcut+Shift+" + key)
 
   def exitApplication = shortCut("Q")
   def newWindow = shortCut("N")

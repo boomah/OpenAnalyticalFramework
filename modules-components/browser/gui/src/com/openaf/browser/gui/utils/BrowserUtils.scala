@@ -4,7 +4,7 @@ import java.util.prefs.Preferences
 import javafx.stage.{Stage, Screen}
 import collection.mutable
 import javafx.scene.image.{ImageView, Image}
-import com.openaf.browser.gui.shortcutkeys.{WindowsShortCutKeys, OSXShortCutKeys}
+import com.openaf.browser.gui.shortcutkeys.{LinuxShortCutKeys, WindowsShortCutKeys, OSXShortCutKeys}
 import javafx.application.Platform
 import javafx.scene.Node
 import com.openaf.browser.gui.FrameLocation
@@ -35,6 +35,7 @@ object BrowserUtils {
   lazy val keyMap = {
     OS match {
       case OSX => new OSXShortCutKeys
+      case Linux => new LinuxShortCutKeys
       case _ => new WindowsShortCutKeys
     }
   }
