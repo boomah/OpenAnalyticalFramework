@@ -20,6 +20,7 @@ abstract class GenericShortCutKeys {
   def pageForwardForward = shortCutAlt("Right")
   def nextTab:EnhancedKeyEvent
   def previousTab:EnhancedKeyEvent
+  def utilsPage = shortCutShift("U")
 }
 
 class EnhancedKeyEvent(private val names:String*) {

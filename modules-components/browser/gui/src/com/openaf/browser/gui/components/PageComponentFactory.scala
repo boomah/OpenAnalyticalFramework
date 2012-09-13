@@ -1,7 +1,7 @@
 package com.openaf.browser.gui.components
 
 import com.openaf.browser.gui.{BrowserCacheKey, PageContext}
-import com.openaf.browser.gui.pages.HomePage
+import com.openaf.browser.gui.pages.{UtilsPage, HomePage}
 import collection.mutable
 import collection.JavaConversions._
 
@@ -12,7 +12,8 @@ trait PageComponentFactory {
 class PageComponentCache {
   private val cache = new mutable.WeakHashMap[String,PageComponent]
   private val factoryMap = Map[String,PageComponentFactory](
-    HomePage.getClass.getName -> HomePageComponentFactory
+    HomePage.getClass.getName -> HomePageComponentFactory,
+    UtilsPage.getClass.getName -> UtilsPageComponentFactory
   )
 
   def pageComponent(pageClassName:String, pageContext:PageContext):PageComponent = {

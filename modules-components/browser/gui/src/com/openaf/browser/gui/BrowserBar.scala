@@ -1,7 +1,7 @@
 package com.openaf.browser.gui
 
 import javafx.event.{ActionEvent, EventHandler}
-import pages.HomePage
+import pages.{HomePage, UtilsPage}
 import javafx.scene.control._
 import javafx.scene.layout.{Priority, HBox}
 import javafx.beans.binding.BooleanBinding
@@ -35,7 +35,11 @@ class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage) extends Men
   newWindowMenuItem.setAccelerator(BrowserUtils.keyMap.newWindow.accelerator)
   newWindowMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {stage.createStage(HomePage)}})
 
-  getItems.addAll(newTabMenuItem, newWindowMenuItem)
+  private val utilsMenuItem = new MenuItem("Utils")
+  utilsMenuItem.setAccelerator(BrowserUtils.keyMap.utilsPage.accelerator)
+  utilsMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.createTab(UtilsPage)}})
+
+  getItems.addAll(newTabMenuItem, newWindowMenuItem, new SeparatorMenuItem, utilsMenuItem)
 }
 
 class AddressBar extends TextField {

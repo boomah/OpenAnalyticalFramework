@@ -24,8 +24,7 @@ class ViewPageComponent extends BorderPane with PageComponent {
   val button = new Button("Click HERE")
   button.setOnAction(new EventHandler[ActionEvent] {
     def handle(event:ActionEvent) {
-      val viewPage = page
-      pageContext.goToPage(viewPage.copy(number = viewPage.number + 1))
+      pageContext.goToPage(page.copy(number = page.number + 1))
     }
   })
   setBottom(button)
