@@ -1,12 +1,10 @@
 package com.openaf.browser.gui
 
-import components.PageComponentFactory
+import components.ManageCachesPageComponentFactory
+import pages.{ManageCachesPage, ManageCachesPageFactory}
 
-trait BrowserApplication {
-  def applicationName:String
-  def browserApplicationButtons(context:PageContext):List[BrowserActionButton] = Nil
-  def browserUtilsButtons(context:PageContext):List[BrowserActionButton] = Nil
-  def componentFactoryMap:Map[String,PageComponentFactory] = Map.empty
+object BrowserApplication extends OpenAFApplication {
+  def applicationName = "Browser"
+  override def utilButtons(context:PageContext) = List(BrowserActionButton("Manage Caches", ManageCachesPageFactory))
+  override def componentFactoryMap = Map(ManageCachesPage.getClass.getName -> ManageCachesPageComponentFactory)
 }
-
-case class BrowserActionButton(name:String, pageFactory:PageFactory)

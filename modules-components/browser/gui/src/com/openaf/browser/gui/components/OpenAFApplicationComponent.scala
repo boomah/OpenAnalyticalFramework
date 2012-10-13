@@ -1,16 +1,17 @@
 package com.openaf.browser.gui.components
 
-import com.openaf.browser.gui.{PageContext, BrowserApplication}
+import com.openaf.browser.gui.{BrowserActionButton, PageContext}
 import javafx.scene.layout.VBox
 import javafx.scene.control.{Button, Label}
 import javafx.event.{ActionEvent, EventHandler}
 
-class BrowserApplicationComponent(pageContext:PageContext, browserApplication:BrowserApplication) extends VBox {
-  private val nameLabel = new Label(browserApplication.applicationName)
+class OpenAFApplicationComponent(pageContext:PageContext, applicationName:String,
+                                 actionButtons:List[BrowserActionButton]) extends VBox {
+  private val nameLabel = new Label(applicationName)
 
   getChildren.add(nameLabel)
 
-  browserApplication.browserApplicationButtons(pageContext).map(button => {
+  actionButtons.map(button => {
     val buttonNameButton = new Button(button.name)
     buttonNameButton.setOnAction(new EventHandler[ActionEvent] {
       def handle(event:ActionEvent) {pageContext.goToPage(button.pageFactory.page)}

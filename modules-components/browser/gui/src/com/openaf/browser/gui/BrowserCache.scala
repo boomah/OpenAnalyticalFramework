@@ -31,8 +31,8 @@ abstract class BrowserCacheKeyWithDefault[T](val browserCacheKey:BrowserCacheKey
 
 object BrowserCacheKey {
   val BrowserApplicationsKeyWithDefault = {
-    val key = BrowserCacheKey[ObservableList[BrowserApplication]]("Browser Applications")
-    BrowserCacheKeyWithDefault.create(key, FXCollections.observableArrayList[BrowserApplication])
+    val key = BrowserCacheKey[ObservableList[OpenAFApplication]]("Browser Applications")
+    BrowserCacheKeyWithDefault.create(key, FXCollections.observableArrayList[OpenAFApplication])
   }
 }
 

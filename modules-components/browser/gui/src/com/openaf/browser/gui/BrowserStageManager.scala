@@ -76,7 +76,7 @@ class BrowserStageManager extends javafx.application.Application {
     }
   }
 
-  @Subscribe def browserApplicationAdded(browserApplication:BrowserApplication) {
+  @Subscribe def browserApplicationAdded(browserApplication:OpenAFApplication) {
     BrowserUtils.runLater({
       val currentApplications = cache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
       currentApplications.add(browserApplication)
