@@ -3,12 +3,14 @@ package com.openaf.browser.gui
 import javafx.scene.control._
 import javafx.event.{ActionEvent, EventHandler}
 import pages.HomePage
-import javafx.scene.image.ImageView
+import javafx.scene.image.{Image, ImageView}
 import javafx.beans.binding.{ObjectBinding, StringBinding, BooleanBinding}
 
-class BrowserTab(name:StringBinding, image:ObjectBinding[ImageView], tabPane:BrowserTabPane) extends Tab {
+class BrowserTab(name:StringBinding, image:ObjectBinding[Image], tabPane:BrowserTabPane) extends Tab {
   textProperty.bind(name)
-  graphicProperty.bind(image)
+  private val imageView = new ImageView
+  imageView.imageProperty.bind(image)
+  setGraphic(imageView)
   private val newTabMenuItem = new MenuItem("New Tab")
   newTabMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.createTab(HomePage)}})
   private val closeTabMenuItem = new MenuItem("Close Tab")

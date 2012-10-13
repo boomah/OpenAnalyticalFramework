@@ -9,7 +9,7 @@ import components.{PageComponentCache, PageComponent}
 import utils.BrowserUtils, BrowserUtils._
 import collection.JavaConversions._
 import ref.SoftReference
-import javafx.scene.image.ImageView
+import javafx.scene.image.Image
 
 class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager) extends BorderPane {
   checkFXThread()
@@ -57,9 +57,9 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     bind(goingToPage, currentPage)
     def computeValue = goingToOrCurrentPage.longText
   }
-  val pageImageView = new ObjectBinding[ImageView] {
+  val pageImage = new ObjectBinding[Image] {
     bind(goingToPage, currentPage)
-    def computeValue = new ImageView(goingToOrCurrentPage.image)
+    def computeValue = goingToOrCurrentPage.image
   }
 
   private def page(pagePosition:Int) = {

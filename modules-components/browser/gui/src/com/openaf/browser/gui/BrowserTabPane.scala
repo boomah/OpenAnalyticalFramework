@@ -11,7 +11,7 @@ class BrowserTabPane(homePage:Page, initialPage:Page, stage:BrowserStage, manage
 
   def createTab(page:Page, goToNewTab:Boolean=true) {
     val browser = new Browser(homePage, page, this, stage, manager)
-    val tab = new BrowserTab(browser.pageShortText, browser.pageImageView, this)
+    val tab = new BrowserTab(browser.pageShortText, browser.pageImage, this)
     tab.setContent(browser)
     tab.setOnClosed(new EventHandler[Event] {def handle(e:Event) {ensureTabSelected()}})
     getTabs.add(getTabs.size(), tab)
