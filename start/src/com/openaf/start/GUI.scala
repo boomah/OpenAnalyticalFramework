@@ -32,6 +32,7 @@ object GUI {
       }
     }, "GUI Updater Thread").start()
 
+    println("Starting GUI")
     guiInstance.start()
   }
 }

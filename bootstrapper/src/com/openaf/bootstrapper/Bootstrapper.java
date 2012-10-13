@@ -31,14 +31,15 @@ public class Bootstrapper {
         argsToPassToGUI[1] = instanceName;
         System.arraycopy(configArgsArray, 0, argsToPassToGUI, 2, configArgsArray.length);
 
-        File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        File rootCacheDir = new File(tmpDir, "openaf");
+        File tmpDir = new File(System.getProperty("user.home"));
+        File rootCacheDir = new File(tmpDir, ".openaf");
         if (!rootCacheDir.exists()) rootCacheDir.mkdir();
 
         String cacheDirName = instanceName + "-" + url.getHost() + (url.getPort() == 80 ? "" : ("-" + url.getPort())) +
                 (url.getPath().equals("") ? "" : "-" + url.getPath()).replaceAll("/", "-");
         File cacheDir = new File(rootCacheDir, cacheDirName);
         if (!cacheDir.exists()) cacheDir.mkdir();
+        System.out.println("Cache Dir: " + cacheDir.getAbsolutePath());
         clearOldLogFiles(cacheDir);
         Date currentTime = new Date();
         String currentTimeString = new SimpleDateFormat("HH-mm-ss--dd-MM-yyyy").format(currentTime);

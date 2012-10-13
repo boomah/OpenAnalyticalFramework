@@ -2,7 +2,7 @@ package com.openaf.start
 
 import org.osgi.framework.launch.FrameworkFactory
 import java.util.{ServiceLoader, HashMap}
-import org.osgi.framework.{FrameworkEvent, FrameworkListener}
+import org.osgi.framework.{Bundle, FrameworkEvent, FrameworkListener}
 import java.net.{ServerSocket, ConnectException, Socket, URL, SocketException}
 import org.osgi.framework.wiring.FrameworkWiring
 import collection.mutable.ListBuffer
@@ -64,13 +64,15 @@ class OSGIInstance(name:String, bundles:BundleDefinitions, openAFFrameworkProper
 
     println("Updated bundles: " + updated.map(_.getSymbolicName).mkString(", "))
 
+    def realBundle(bundle:Bundle) = (bundle.getHeaders.get("Fragment-Host") == null)
+
     val installed = (newBundles.keySet -- currentBundles.keySet).toList.map(newBundleName => {
       println("Installing: " + newBundleName + " : " + newBundleName.version + "...")
       val newBundleDef = newBundles(newBundleName)
       val res = context.installBundle("from-bnd:" + newBundleDef.name, newBundleDef.inputStream)
       println("Installed: %s (state: %s)".format(newBundleName, res.getState))
       res
-    })
+    }).filter(realBundle(_))
 
     println("Installed bundles: " + installed.map(_.getSymbolicName).mkString(", "))
 
@@ -242,8 +244,8 @@ object ServerOSGIInstanceStarter {
 class GUIUpdater(baseURL:URL, instanceName:String) {
   private val proxy = java.net.Proxy.NO_PROXY
   private val configURL = new URL(baseURL + "/osgigui/")
-  private val tmpDir = new File(System.getProperty("java.io.tmpdir"))
-  private val rootCacheDir = new File(tmpDir, "openaf")
+  private val tmpDir = new File(System.getProperty("user.home"))
+  private val rootCacheDir = new File(tmpDir, ".openaf")
   private val cacheDirName = {
     instanceName + "-" + configURL.getHost + (if (configURL.getPort == 80) "" else ("-" + configURL.getPort))
   }
