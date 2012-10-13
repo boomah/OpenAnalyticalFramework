@@ -18,14 +18,12 @@ class HomePageComponent(pageContext:PageContext) extends BorderPane with PageCom
   })
   private val content = new FlowPane
   private def updateBrowserApplications() {
-    val browserApplicationButtons = browserApplications.listIterator
+    val applicationButtons = browserApplications.listIterator
       .filter(_.applicationButtons(pageContext).nonEmpty).map(application => {
       new OpenAFApplicationComponent(pageContext, application.applicationName, application.applicationButtons(pageContext))
     })
     content.getChildren.clear()
-    browserApplicationButtons.foreach(component => {
-      content.getChildren.add(component)
-    })
+    content.getChildren.addAll(applicationButtons.toArray :_*)
   }
   updateBrowserApplications()
 
