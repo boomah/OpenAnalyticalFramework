@@ -8,6 +8,7 @@ import com.openaf.browser.gui.shortcutkeys.{LinuxShortCutKeys, WindowsShortCutKe
 import javafx.application.Platform
 import javafx.scene.Node
 import com.openaf.browser.gui.FrameLocation
+import javafx.scene.control.SeparatorMenuItem
 
 object BrowserUtils {
   private val FrameLocationName = "frameLocation"
@@ -50,4 +51,6 @@ object BrowserUtils {
     val image = node.snapshot(null, null)
     new ImageView(image)
   }
+
+  def separatorMenuItem = new SeparatorMenuItem
 }

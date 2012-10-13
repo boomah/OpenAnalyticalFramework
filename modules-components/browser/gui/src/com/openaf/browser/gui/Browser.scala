@@ -2,13 +2,14 @@ package com.openaf.browser.gui
 
 import animation.{BackOnePageTransition, ForwardOnePageTransition}
 import javafx.scene.layout.{StackPane, BorderPane}
-import javafx.beans.binding.BooleanBinding
-import javafx.beans.property.{SimpleBooleanProperty, SimpleIntegerProperty}
+import javafx.beans.binding.{StringBinding, ObjectBinding, BooleanBinding}
+import javafx.beans.property.{SimpleObjectProperty, SimpleBooleanProperty, SimpleIntegerProperty}
 import javafx.collections.FXCollections
 import components.{PageComponentCache, PageComponent}
 import utils.BrowserUtils, BrowserUtils._
 import collection.JavaConversions._
 import ref.SoftReference
+import javafx.scene.image.ImageView
 
 class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager) extends BorderPane {
   checkFXThread()
@@ -20,7 +21,6 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   private val pages = FXCollections.observableArrayList[PageInfo]
   val working = new SimpleBooleanProperty(true)
   private val animating = new SimpleBooleanProperty(false)
-  private var generatingPage:Option[Page] = None
   val backDisabledProperty = new BooleanBinding {
     bind(currentPagePosition, working)
     def computeValue = !(!working.get && (currentPagePosition.get > 0))
@@ -37,6 +37,29 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   val homeDisabledProperty = new BooleanBinding {
     bind(working, currentPagePosition, pages)
     def computeValue = working.get || (page(currentPagePosition.get) == homePage)
+  }
+  private val goingToPage = new SimpleObjectProperty[Option[Page]](None)
+  private val currentPage = new ObjectBinding[Page] {
+    bind(currentPagePosition, pages)
+    def computeValue = page(currentPagePosition.get)
+  }
+  private def goingToOrCurrentPage = {
+    goingToPage.get match {
+      case Some(page) => page
+      case _ => currentPage.get
+    }
+  }
+  val pageShortText = new StringBinding {
+    bind(goingToPage, currentPage)
+    def computeValue = goingToOrCurrentPage.shortText
+  }
+  val pageLongText = new StringBinding {
+    bind(goingToPage, currentPage)
+    def computeValue = goingToOrCurrentPage.longText
+  }
+  val pageImageView = new ObjectBinding[ImageView] {
+    bind(goingToPage, currentPage)
+    def computeValue = new ImageView(goingToOrCurrentPage.image)
   }
 
   private def page(pagePosition:Int) = {
@@ -92,7 +115,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   }
 
   private def forceStop() {
-    generatingPage = None
+    goingToPage.set(None)
     working.set(false)
   }
 
@@ -182,9 +205,9 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     pageInfoToGoTo.softPageResponse.get match {
       case Some(pageResponse) => withPageResponse(pageResponse, fromPagePosition, toPagePosition, pageInfoToGoTo, newPage)
       case _ => {
-        generatingPage = Some(pageInfoToGoTo.page)
+        goingToPage.set(Some(pageInfoToGoTo.page))
         def withResult(pageResponse:PageResponse) {
-          if (generatingPage == Some(pageInfoToGoTo.page)) {
+          if (goingToPage.get == Some(pageInfoToGoTo.page)) {
             withPageResponse(pageResponse, fromPagePosition, toPagePosition, pageInfoToGoTo, newPage)
           }
         }
@@ -195,7 +218,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
 
   def goToPage(page:Page) {
     checkFXThread()
-    if (generatingPage != Some(page)) {
+    if (goingToPage.get != Some(page)) {
       val fromPagePosition = currentPagePosition.get
       val toPagePosition = fromPagePosition + 1
 

@@ -5,6 +5,8 @@ import ref.SoftReference
 
 trait Page {
   def name:String
+  def shortText = name
+  def longText = name
   def image:Image
   type SC
   def createServerContext(serverContext:ServerContext):SC
