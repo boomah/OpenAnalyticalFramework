@@ -8,9 +8,16 @@ import com.google.common.eventbus.EventBus
 object CacheFactory {
   private val eventBus = new EventBus
   private val cacheCache = new Cache(soft = false)
-  def cache(cacheName:String, soft:Boolean=false) = cacheCache.memoize(cacheName) {
-    eventBus.post(CacheChanged())
-    new Cache(soft)
+  def cache(cacheName:String, soft:Boolean=false) = {
+    var cacheAdded = false
+    val cache = cacheCache.memoize(cacheName) {
+      cacheAdded = true
+      new Cache(soft)
+    }
+    if (cacheAdded) {
+      eventBus.post(CacheChanged())
+    }
+    cache
   }
   def allCacheNames = cacheCache.keys[String]
   def clearCache(cacheName:String) {cache(cacheName).clear()}
