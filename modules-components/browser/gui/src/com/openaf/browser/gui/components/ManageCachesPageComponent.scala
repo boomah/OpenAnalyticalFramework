@@ -17,8 +17,11 @@ class ManageCachesPageComponent extends BorderPane with PageComponent {
   private val content = new FlowPane
 
   private def updateContent() {
+    val clearAllButton = new Button("Clear All Caches")
+    clearAllButton.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {CacheFactory.clearAllCaches()}})
+
     val allCacheNames = CacheFactory.allCacheNames.toList.sorted
-    val buttons = allCacheNames.map(cacheName => {
+    val buttons = clearAllButton :: allCacheNames.map(cacheName => {
       val button = new Button("Clear " + cacheName + " Cache")
       button.setUserData(cacheName)
       button.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {CacheFactory.clearCache(button.getUserData.toString)}})

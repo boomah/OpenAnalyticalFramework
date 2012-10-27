@@ -21,6 +21,7 @@ object CacheFactory {
   }
   def allCacheNames = cacheCache.keys[String]
   def clearCache(cacheName:String) {cache(cacheName).clear()}
+  def clearAllCaches() {cacheCache.keys.foreach(clearCache)}
   def registerListener(listener:AnyRef) {eventBus.register(listener)}
 }
 
