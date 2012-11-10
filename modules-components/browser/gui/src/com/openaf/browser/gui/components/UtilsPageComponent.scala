@@ -1,16 +1,19 @@
 package com.openaf.browser.gui.components
 
-import com.openaf.browser.gui.{OpenAFApplication, BrowserCacheKey, NoPageData, PageContext}
+import com.openaf.browser.gui.{OpenAFApplication, BrowserCacheKey, PageContext}
 import javafx.scene.layout.{FlowPane, BorderPane}
 import com.openaf.browser.gui.pages.UtilsPage
 import javafx.scene.control.Label
 import javafx.collections.ListChangeListener
 import javafx.collections.ListChangeListener.Change
 import scala.collection.JavaConversions._
+import com.openaf.pagemanager.api.NoPageData
+import com.openaf.browser.gui.utils.BrowserUtils
 
 class UtilsPageComponent(pageContext:PageContext) extends BorderPane with PageComponent {
   type P = UtilsPage.type
   type PD = NoPageData.type
+  override val image = Some(BrowserUtils.icon("16x16_home.png"))
 
   private val browserApplications = pageContext.browserCache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
   browserApplications.addListener(new ListChangeListener[OpenAFApplication] {

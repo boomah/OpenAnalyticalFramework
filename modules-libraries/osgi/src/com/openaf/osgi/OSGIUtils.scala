@@ -4,7 +4,7 @@ import collection.mutable
 import scala.collection.JavaConverters._
 
 object OSGIUtils {
-  val ExportService = "openaf.exportService"
+  val ExportService = "com.openaf.exportService"
 
   def mapToDictionary(map:Map[String, _]) = {
     val props = new mutable.HashMap[String, Any]()

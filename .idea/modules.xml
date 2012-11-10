@@ -8,6 +8,8 @@
       <module fileurl="file://$PROJECT_DIR$/modules-libraries/cache/cache.iml" filepath="$PROJECT_DIR$/modules-libraries/cache/cache.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/guiServlet/impl/guiServlet.impl.iml" filepath="$PROJECT_DIR$/modules-components/guiServlet/impl/guiServlet.impl.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-libraries/osgi/osgi.iml" filepath="$PROJECT_DIR$/modules-libraries/osgi/osgi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules-components/pageManager/api/pageManager.api.iml" filepath="$PROJECT_DIR$/modules-components/pageManager/api/pageManager.api.iml" group="pageManager" />
+      <module fileurl="file://$PROJECT_DIR$/modules-components/pageManager/impl/pageManager.impl.iml" filepath="$PROJECT_DIR$/modules-components/pageManager/impl/pageManager.impl.iml" group="pageManager" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/properties/api/properties.api.iml" filepath="$PROJECT_DIR$/modules-components/properties/api/properties.api.iml" group="properties" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/properties/impl/properties.impl.iml" filepath="$PROJECT_DIR$/modules-components/properties/impl/properties.impl.iml" group="properties" />
       <module fileurl="file://$PROJECT_DIR$/modules-libraries/rmi.client/rmi.client.iml" filepath="$PROJECT_DIR$/modules-libraries/rmi.client/rmi.client.iml" group="rmi" />

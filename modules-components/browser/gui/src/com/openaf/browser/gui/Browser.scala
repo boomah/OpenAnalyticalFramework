@@ -10,6 +10,7 @@ import utils.BrowserUtils, BrowserUtils._
 import collection.JavaConversions._
 import ref.SoftReference
 import javafx.scene.image.Image
+import com.openaf.pagemanager.api.{NoPageData, Page}
 
 class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager) extends BorderPane {
   checkFXThread()
@@ -58,8 +59,12 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     def computeValue = goingToOrCurrentPage.longText
   }
   val pageImage = new ObjectBinding[Image] {
-    bind(goingToPage, currentPage)
-    def computeValue = goingToOrCurrentPage.image
+    bind(stopOrRefreshDisabledProperty, content.getChildren)
+    def computeValue = if (stopOrRefreshDisabledProperty.get && (content.getChildren.size == 1)) {
+      currentPageComponent.image.getOrElse(null)
+    } else {
+      null
+    }
   }
 
   private def page(pagePosition:Int) = {

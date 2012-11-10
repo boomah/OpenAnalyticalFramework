@@ -7,10 +7,13 @@ import javafx.collections.ListChangeListener
 import javafx.collections.ListChangeListener.Change
 import pages.HomePage
 import scala.collection.JavaConversions._
+import com.openaf.pagemanager.api.NoPageData
+import utils.BrowserUtils
 
 class HomePageComponent(pageContext:PageContext) extends BorderPane with PageComponent {
   type P = HomePage.type
   type PD = NoPageData.type
+  override val image = Some(BrowserUtils.icon("16x16_home.png"))
 
   private val browserApplications = pageContext.browserCache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
   browserApplications.addListener(new ListChangeListener[OpenAFApplication] {

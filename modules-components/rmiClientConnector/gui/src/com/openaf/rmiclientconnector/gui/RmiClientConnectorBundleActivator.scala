@@ -6,8 +6,8 @@ import com.openaf.rmi.common.ServicesListing
 
 class RmiClientConnectorBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
-    val hostName = context.getProperty("openAF.hostName")
-    val servicesPort = context.getProperty("openAF.servicesPort").toInt
+    val hostName = context.getProperty("com.openAF.hostName")
+    val servicesPort = context.getProperty("com.openAF.servicesPort").toInt
     println("Starting RMI Client (connecting to %s:%s)...".format(hostName, servicesPort))
     val client = new RMIClient(hostName, servicesPort)
     client.connectBlocking()

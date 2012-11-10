@@ -47,24 +47,23 @@ class ClientHandler extends SimpleChannelHandler {
     }
   }
 
-  def sendMessage(method:Method, args:Array[AnyRef]) = {
+  def sendMessage(proxyClass:Class[_], method:Method, args:Array[AnyRef]) = {
     val id = requestID.getAndIncrement
-    val requestDetails = RequestDetails(id, method)
+    val requestDetails = RequestDetails(id, method, proxyClass.getClassLoader)
     requestDetailsMap.put(id, requestDetails)
     val paramValuesBytes = if (args != null) {
       args.map(arg => DefaultObjectEncoder.encode(arg))
     } else {
       Array[Array[Byte]]()
     }
-    val request = MethodInvocationRequest(id, method.getDeclaringClass.getName, method.getName,
+    val request = MethodInvocationRequest(id, proxyClass.getName, method.getName,
       method.getParameterTypes.map(_.getName), paramValuesBytes)
     channel.write(request)
     requestDetails.waitForResult
   }
 }
 
-case class RequestDetails(id:Long, method:Method) {
-  def classLoader = method.getDeclaringClass.getClassLoader
+case class RequestDetails(id:Long, method:Method, classLoader:ClassLoader) {
   private val lock = new Object
   private var result0:AnyRef = _
   def result = result0

@@ -14,7 +14,7 @@ object GUI {
     val (url :: instanceName :: portForUpdates :: servicePort :: Nil) = args.toList
     val baseURL = new URL(url)
     val hostName = baseURL.getHost
-    val guiProperties = Map("openAF.instanceName" -> instanceName, "openAF.hostName" -> hostName, "openAF.servicesPort" -> servicePort)
+    val guiProperties = Map("com.openAF.instanceName" -> instanceName, "com.openAF.hostName" -> hostName, "com.openAF.servicesPort" -> servicePort)
     val guiUpdater = new GUIUpdater(baseURL, instanceName)
     val guiConfig = guiUpdater.guiConfig
     val guiInstance = new OSGIInstance(guiConfig.name, guiConfig.bundles, guiProperties)

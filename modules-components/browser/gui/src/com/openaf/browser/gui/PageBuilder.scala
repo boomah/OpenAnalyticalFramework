@@ -3,6 +3,7 @@ package com.openaf.browser.gui
 import java.util.concurrent.{ThreadFactory, Executors}
 import utils.BrowserUtils
 import com.openaf.cache.CacheFactory
+import com.openaf.pagemanager.api._
 
 class PageBuilder(serverContext:ServerContext) {
   private val pageDataCache = CacheFactory.cache("browser.pageData", soft = true)
@@ -18,7 +19,7 @@ class PageBuilder(serverContext:ServerContext) {
     threadPool.submit(new Runnable {
       def run() {
         val pageResponse = try {
-          val pageData = pageDataCache.memoize(page) {page.build(page.createServerContext(serverContext))}
+          val pageData = pageDataCache.memoize(page) {page.pageDataFacility(serverContext).pageData(page)}
           SuccessPageResponse(pageData)
         } catch {
           case t:Throwable => ProblemPageResponse(t)

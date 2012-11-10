@@ -4,6 +4,7 @@ import javafx.scene.control.{Tab, TabPane}
 import javafx.event.{Event, EventHandler}
 import javafx.scene.input.KeyEvent
 import utils.BrowserUtils
+import com.openaf.pagemanager.api.Page
 
 class BrowserTabPane(homePage:Page, initialPage:Page, stage:BrowserStage, manager:BrowserStageManager) extends TabPane {
   setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS)

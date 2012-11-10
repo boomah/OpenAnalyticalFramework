@@ -9,7 +9,7 @@ import utils.BrowserUtils
 class BrowserBundleActivator extends OpenAFBundleActivator {
   def start(context:BundleContext) {
     run({
-      javafx.application.Application.launch(classOf[BrowserStageManager], context.getProperty("openAF.instanceName"))
+      javafx.application.Application.launch(classOf[BrowserStageManager], context.getProperty("com.openAF.instanceName"))
     }, "Browser Bundle Activator starter")
     run({
       context.registerService(classOf[OpenAFApplication], BrowserApplication, null)

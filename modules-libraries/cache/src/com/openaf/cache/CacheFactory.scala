@@ -40,8 +40,8 @@ class Cache(soft:Boolean) {
     }).asInstanceOf[V]
   }
 
+  def invalidate[K](key:K) {cache.invalidate(key)}
   def keys[K]:Set[K] = cache.asMap.keySet.toSet.asInstanceOf[Set[K]]
-
   def clear() {cache.invalidateAll()}
 }
 

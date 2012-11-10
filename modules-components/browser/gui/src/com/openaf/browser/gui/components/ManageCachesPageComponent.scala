@@ -2,15 +2,18 @@ package com.openaf.browser.gui.components
 
 import javafx.scene.layout.{FlowPane, BorderPane}
 import com.openaf.browser.gui.pages.ManageCachesPage
-import com.openaf.browser.gui.{PageContext, NoPageData}
+import com.openaf.browser.gui.PageContext
 import javafx.scene.control.{Button, Label}
 import javafx.event.{ActionEvent, EventHandler}
 import com.openaf.cache.{CacheChanged, CacheFactory}
 import com.google.common.eventbus.Subscribe
+import com.openaf.pagemanager.api.NoPageData
+import com.openaf.browser.gui.utils.BrowserUtils
 
 class ManageCachesPageComponent extends BorderPane with PageComponent {
   type P = ManageCachesPage.type
   type PD = NoPageData.type
+  override val image = Some(BrowserUtils.icon("16x16_home.png"))
 
   CacheFactory.registerListener(this)
 

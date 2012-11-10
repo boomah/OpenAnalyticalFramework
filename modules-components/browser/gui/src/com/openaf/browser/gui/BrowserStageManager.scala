@@ -9,7 +9,7 @@ import java.lang.{Boolean => JBoolean}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.util.concurrent.CountDownLatch
 import com.google.common.eventbus.Subscribe
-import javafx.collections.FXCollections
+import com.openaf.pagemanager.api.Page
 
 object BrowserStageManager {
   private val browserCountDownLatch = new CountDownLatch(1)

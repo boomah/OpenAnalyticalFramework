@@ -2,6 +2,7 @@ package com.openaf.browser.gui
 
 import org.osgi.framework.BundleContext
 import org.osgi.util.tracker.ServiceTracker
+import com.openaf.pagemanager.api.ServerContext
 
 class OSGIServerContext(context:BundleContext) extends ServerContext {
   def facility[T](klass:Class[T]) = {

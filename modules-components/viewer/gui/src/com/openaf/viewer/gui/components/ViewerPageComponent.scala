@@ -6,12 +6,12 @@ import com.openaf.browser.gui.PageContext
 import javafx.scene.control.{Button, Label}
 import javafx.scene.shape.Rectangle
 import javafx.scene.paint.Color
-import com.openaf.viewer.gui.{ViewPage, ViewPageData}
 import javafx.event.{ActionEvent, EventHandler}
+import com.openaf.viewer.api.{ViewerPage, ViewerPageData}
 
-class ViewPageComponent extends BorderPane with PageComponent {
-  type P = ViewPage
-  type PD = ViewPageData
+class ViewerPageComponent extends BorderPane with PageComponent {
+  type P = ViewerPage
+  type PD = ViewerPageData
 
   val label = new Label()
 
@@ -34,6 +34,6 @@ class ViewPageComponent extends BorderPane with PageComponent {
   }
 }
 
-object ViewPageComponentFactory extends PageComponentFactory {
-  def pageComponent(pageContext:PageContext) = new ViewPageComponent
+object ViewerPageComponentFactory extends PageComponentFactory {
+  def pageComponent(pageContext:PageContext) = new ViewerPageComponent
 }
