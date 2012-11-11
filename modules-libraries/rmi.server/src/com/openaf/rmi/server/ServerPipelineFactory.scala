@@ -27,7 +27,7 @@ class ServerHandler(serverFunctions:ServerFunctions) extends SimpleChannelUpstre
 
   override def messageReceived(ctx:ChannelHandlerContext, e:MessageEvent) {
     val message = e.getMessage
-    println("Message Recieved " + message)
+    println("Server Message Recieved " + message)
     message match {
       case methodInvocationRequest:MethodInvocationRequest => {
         val result = serverFunctions.invokeMethod(methodInvocationRequest)

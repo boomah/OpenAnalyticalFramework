@@ -35,7 +35,7 @@ class ClientHandler extends SimpleChannelHandler {
 
   override def messageReceived(ctx:ChannelHandlerContext, e:MessageEvent) {
     val message = e.getMessage
-    println("Message Recieved " + message)
+    println("Client Message Recieved " + message)
     message match {
       case MethodInvocationResult(id, resultBytes) => {
         val requestDetails = requestDetailsMap.get(id)
@@ -65,18 +65,23 @@ class ClientHandler extends SimpleChannelHandler {
 
 case class RequestDetails(id:Long, method:Method, classLoader:ClassLoader) {
   private val lock = new Object
-  private var result0:AnyRef = _
-  def result = result0
+  private var result0:AnyRef = null // Only ever access in lock.synchronized block
+  def result = lock.synchronized{result0}
   def result_=(r:AnyRef) {
     lock.synchronized {
+      assert((result0 == null), "Result can only be set once. Current/New: " + (result0, r))
       result0 = r
       lock.notifyAll()
     }
   }
   def waitForResult = {
     lock.synchronized {
-      lock.wait()
-      result
+      if (result0 == null) {
+        lock.wait()
+        result0
+      } else {
+        result0
+      }
     }
   }
 }
