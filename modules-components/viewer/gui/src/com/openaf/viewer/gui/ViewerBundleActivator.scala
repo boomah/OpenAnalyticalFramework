@@ -8,10 +8,12 @@ import com.openaf.viewer.api.{ViewerPage, ViewerPageFactory}
 
 class ViewerBundleActivator extends OpenAFBundleActivator {
   def start(context:BundleContext) {
-    println("Viewer Started!!")
+    println("GUI Viewer Started!!")
     context.registerService(classOf[OpenAFApplication], ViewerBrowserApplication, null)
   }
-  def stop(context:BundleContext) {}
+  def stop(context:BundleContext) {
+    println("GUI Viewer Stopped!!")
+  }
 }
 
 object ViewerBrowserApplication extends OpenAFApplication {

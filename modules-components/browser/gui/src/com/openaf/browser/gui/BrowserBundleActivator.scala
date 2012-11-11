@@ -18,12 +18,15 @@ class BrowserBundleActivator extends OpenAFBundleActivator {
       eventBus.register(browserStageManager)
       new ServiceTracker(context, classOf[OpenAFApplication], new ServiceTrackerCustomizer[OpenAFApplication,OpenAFApplication]{
         def addingService(serviceReference:ServiceReference[OpenAFApplication]) = {
-          val browserApplication = context.getService(serviceReference)
-          eventBus.post(browserApplication)
-          browserApplication
+          val openAFApplication = context.getService(serviceReference)
+          eventBus.post(OpenAFApplicationAdded(openAFApplication))
+          openAFApplication
         }
-        def modifiedService(serviceReference:ServiceReference[OpenAFApplication], browserApplication:OpenAFApplication) {}
-        def removedService(serviceReference:ServiceReference[OpenAFApplication], browserApplication:OpenAFApplication) {}
+        def modifiedService(serviceReference:ServiceReference[OpenAFApplication], openAFApplication:OpenAFApplication) {}
+        def removedService(serviceReference:ServiceReference[OpenAFApplication], openAFApplication:OpenAFApplication) {
+          println("!! OpenAFApplication Removed")
+          eventBus.post(OpenAFApplicationRemoved(openAFApplication))
+        }
       }).open()
       BrowserUtils.runLater({
         val pageBuilder = new PageBuilder(new OSGIServerContext(context))

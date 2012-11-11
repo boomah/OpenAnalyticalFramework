@@ -6,11 +6,15 @@ import org.osgi.framework.BundleContext
 
 class ViewerBundleActivator extends OpenAFBundleActivator {
   def start(context:BundleContext) {
-    println("")
+    println("------------------------------------")
     println("Viewer Bundle Activator impl started")
-    println("")
+    println("------------------------------------")
     val dictionary = OSGIUtils.mapToDictionary(Map(OSGIUtils.ExportService -> true))
     context.registerService(classOf[ViewerPageDataFacility], new ViewerPageDataFacilityImpl, dictionary)
   }
-  def stop(context:BundleContext) {}
+  def stop(context:BundleContext) {
+    println("------------------------------------")
+    println("Viewer Bundle Activator impl stopped")
+    println("------------------------------------")
+  }
 }
