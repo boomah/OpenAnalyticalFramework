@@ -22,7 +22,7 @@ class PageBuilder(serverContext:ServerContext) {
           val pageData = pageDataCache.memoize(page) {page.pageDataFacility(serverContext).pageData(page)}
           SuccessPageResponse(pageData)
         } catch {
-          case t:Throwable => ProblemPageResponse(t)
+          case e:Exception => ProblemPageResponse(e)
         }
         BrowserUtils.runLater(withResult(pageResponse))
       }
@@ -32,4 +32,4 @@ class PageBuilder(serverContext:ServerContext) {
 
 sealed trait PageResponse
 case class SuccessPageResponse(pageData:PageData) extends PageResponse
-case class ProblemPageResponse(throwable:Throwable) extends PageResponse
+case class ProblemPageResponse(exception:Exception) extends PageResponse

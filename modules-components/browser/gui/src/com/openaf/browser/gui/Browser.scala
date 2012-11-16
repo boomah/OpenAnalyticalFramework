@@ -9,7 +9,6 @@ import components.{PageComponentCache, PageComponent}
 import utils.BrowserUtils, BrowserUtils._
 import collection.JavaConversions._
 import ref.SoftReference
-import javafx.scene.image.Image
 import com.openaf.pagemanager.api.{NoPageData, Page}
 import javafx.scene.Node
 
@@ -198,8 +197,8 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
           tidyUp()
         }
       }
-      case ProblemPageResponse(throwable) => {
-        throwable.printStackTrace()
+      case ProblemPageResponse(exception) => {
+        exception.printStackTrace()
         pages.remove(toPagePosition)
         forceStop()
       }
