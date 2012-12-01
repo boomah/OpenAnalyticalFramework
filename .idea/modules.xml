@@ -18,9 +18,15 @@
       <module fileurl="file://$PROJECT_DIR$/modules-components/rmiClientConnector/gui/rmiClientConnector.gui.iml" filepath="$PROJECT_DIR$/modules-components/rmiClientConnector/gui/rmiClientConnector.gui.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/rmiServerConnector/impl/rmiServerConnector.impl.iml" filepath="$PROJECT_DIR$/modules-components/rmiServerConnector/impl/rmiServerConnector.impl.iml" />
       <module fileurl="file://$PROJECT_DIR$/start/start.iml" filepath="$PROJECT_DIR$/start/start.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules-libraries/table.api/table.api.iml" filepath="$PROJECT_DIR$/modules-libraries/table.api/table.api.iml" group="table" />
+      <module fileurl="file://$PROJECT_DIR$/modules-libraries/table.gui/table.gui.iml" filepath="$PROJECT_DIR$/modules-libraries/table.gui/table.gui.iml" group="table" />
+      <module fileurl="file://$PROJECT_DIR$/modules-libraries/table.server/table.server.iml" filepath="$PROJECT_DIR$/modules-libraries/table.server/table.server.iml" group="table" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/test/api/test.api.iml" filepath="$PROJECT_DIR$/modules-components/test/api/test.api.iml" group="test" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/test/impl/test.impl.iml" filepath="$PROJECT_DIR$/modules-components/test/impl/test.impl.iml" group="test" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/testConsumer/gui//testConsumer.gui.iml" filepath="$PROJECT_DIR$/modules-components/testConsumer/gui//testConsumer.gui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules-components/travel/api//travel.api.iml" filepath="$PROJECT_DIR$/modules-components/travel/api//travel.api.iml" group="travel" />
+      <module fileurl="file://$PROJECT_DIR$/modules-components/travel/gui//travel.gui.iml" filepath="$PROJECT_DIR$/modules-components/travel/gui//travel.gui.iml" group="travel" />
+      <module fileurl="file://$PROJECT_DIR$/modules-components/travel/impl//travel.impl.iml" filepath="$PROJECT_DIR$/modules-components/travel/impl//travel.impl.iml" group="travel" />
       <module fileurl="file://$PROJECT_DIR$/modules-libraries/utils/utils.iml" filepath="$PROJECT_DIR$/modules-libraries/utils/utils.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/viewer/api//viewer.api.iml" filepath="$PROJECT_DIR$/modules-components/viewer/api//viewer.api.iml" group="viewer" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/viewer/gui/viewer.gui.iml" filepath="$PROJECT_DIR$/modules-components/viewer/gui/viewer.gui.iml" group="viewer" />

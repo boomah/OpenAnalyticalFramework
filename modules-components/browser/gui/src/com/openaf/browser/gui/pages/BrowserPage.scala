@@ -9,3 +9,11 @@ trait BrowserPage extends Page {
 object BrowserPageDataFacility extends PageDataFacility {
   def pageData(page:Page) = NoPageData
 }
+
+object BlankPage extends BrowserPage {
+  def name = "Blank Page"
+}
+
+object BlankPageFactory extends PageFactory {
+  def page = BlankPage
+}
