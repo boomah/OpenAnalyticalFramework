@@ -13,6 +13,7 @@ import utils.BrowserUtils
 class HomePageComponent(pageContext:PageContext) extends BorderPane with PageComponent {
   type P = HomePage.type
   type PD = NoPageData.type
+  def name = "OpenAF"
   override val image = Some(BrowserUtils.icon("16x16_home.png"))
 
   private val browserApplications = pageContext.browserCache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)

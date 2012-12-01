@@ -3,7 +3,6 @@ package com.openaf.viewer.api
 import com.openaf.pagemanager.api._
 
 case class ViewerPage(number:Int) extends Page {
-  def name = "View"
   def pageDataFacility(serverContext:ServerContext) = serverContext.facility(classOf[ViewerPageDataFacility])
 }
 

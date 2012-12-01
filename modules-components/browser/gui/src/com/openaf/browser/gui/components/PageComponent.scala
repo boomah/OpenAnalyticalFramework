@@ -13,6 +13,10 @@ trait PageComponent extends Region {
   protected var pageData:PD = _
   protected var pageContext:PageContext = _
 
+  def name:String
+  def shortText = name
+  def longText = name
+
   def initialise(page:P, pageData:PD, pageContext0:PageContext) {
     this.page = page
     this.pageData = pageData

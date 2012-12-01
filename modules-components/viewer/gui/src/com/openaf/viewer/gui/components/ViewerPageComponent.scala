@@ -12,6 +12,7 @@ import com.openaf.viewer.api.{ViewerPage, ViewerPageData}
 class ViewerPageComponent extends BorderPane with PageComponent {
   type P = ViewerPage
   type PD = ViewerPageData
+  def name = "View"
 
   val label = new Label()
 

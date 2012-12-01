@@ -13,6 +13,7 @@ import com.openaf.browser.gui.utils.BrowserUtils
 class ManageCachesPageComponent extends BorderPane with PageComponent {
   type P = ManageCachesPage.type
   type PD = NoPageData.type
+  def name = "Manage Caches"
   override val image = Some(BrowserUtils.icon("16x16_home.png"))
 
   CacheFactory.registerListener(this)

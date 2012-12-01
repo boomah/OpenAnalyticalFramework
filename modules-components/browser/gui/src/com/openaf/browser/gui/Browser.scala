@@ -52,19 +52,15 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   }
   val pageShortText = new StringBinding {
     bind(goingToPage, currentPage)
-    def computeValue = goingToOrCurrentPage.shortText
+    def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), pageContext).shortText
   }
   val pageLongText = new StringBinding {
     bind(goingToPage, currentPage)
-    def computeValue = goingToOrCurrentPage.longText
+    def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), pageContext).longText
   }
   val pageImage = new ObjectBinding[Node] {
-    bind(stopOrRefreshDisabledProperty, content.getChildren)
-    def computeValue = if (stopOrRefreshDisabledProperty.get && (content.getChildren.size == 1)) {
-      currentPageComponent.image.getOrElse(null)
-    } else {
-      null
-    }
+    bind(goingToPage, currentPage)
+    def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), pageContext).image.getOrElse(null)
   }
 
   private def page(pagePosition:Int) = {
@@ -212,6 +208,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
       case _ => {
         goingToPage.set(Some(pageInfoToGoTo.page))
         def withResult(pageResponse:PageResponse) {
+          checkFXThread()
           if (goingToPage.get == Some(pageInfoToGoTo.page)) {
             withPageResponse(pageResponse, fromPagePosition, toPagePosition, pageInfoToGoTo, newPage)
           }

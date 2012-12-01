@@ -10,9 +10,7 @@ object BrowserPageDataFacility extends PageDataFacility {
   def pageData(page:Page) = NoPageData
 }
 
-object BlankPage extends BrowserPage {
-  def name = "Blank Page"
-}
+object BlankPage extends BrowserPage
 
 object BlankPageFactory extends PageFactory {
   def page = BlankPage

@@ -1,7 +1,7 @@
 package com.openaf.browser.gui.components
 
 import com.openaf.browser.gui.{BrowserCacheKey, PageContext}
-import com.openaf.browser.gui.pages.{UtilsPage, HomePage}
+import com.openaf.browser.gui.pages.{BlankPage, UtilsPage, HomePage}
 import collection.mutable
 import collection.JavaConversions._
 
@@ -16,10 +16,20 @@ class PageComponentCache {
     UtilsPage.getClass.getName -> UtilsPageComponentFactory
   )
 
-  def pageComponent(pageClassName:String, pageContext:PageContext):PageComponent = {
+  private def pageComponentFactoryOption(pageClassName:String, pageContext:PageContext) = {
     val browserApplications = pageContext.browserCache(BrowserCacheKey.BrowserApplicationsKeyWithDefault).listIterator.toList
-    val totalFactoryMap = browserApplications.map(_.componentFactoryMap).foldLeft(factoryMap)((map, totalMap) => map ++ totalMap)
+    val allPageComponentFactories = browserApplications.map(_.componentFactoryMap).foldLeft(factoryMap)((map, totalMap) => map ++ totalMap)
+    allPageComponentFactories.get(pageClassName)
+  }
 
-    cache.getOrElseUpdate(pageClassName, totalFactoryMap(pageClassName).pageComponent(pageContext))
+  private def blankPageComponent(pageContext:PageContext) = {
+    cache.getOrElseUpdate(BlankPage.getClass.getName, BlankPageComponentFactory.pageComponent(pageContext))
+  }
+
+  def pageComponent(pageClassName:String, pageContext:PageContext):PageComponent = {
+    pageComponentFactoryOption(pageClassName, pageContext) match {
+      case Some(pageComponentFactory) => cache.getOrElseUpdate(pageClassName, pageComponentFactory.pageComponent(pageContext))
+      case _ => blankPageComponent(pageContext)
+    }
   }
 }

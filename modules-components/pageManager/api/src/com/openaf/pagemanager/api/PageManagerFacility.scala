@@ -5,9 +5,6 @@ trait PageManagerFacility {
 }
 
 trait Page {
-  def name:String
-  def shortText = name
-  def longText = name
   def pageDataFacility(sc:ServerContext):PageDataFacility
 }
 
