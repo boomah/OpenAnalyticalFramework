@@ -9,6 +9,7 @@ import javafx.application.Platform
 import javafx.scene.Node
 import com.openaf.browser.gui.FrameLocation
 import javafx.scene.control.SeparatorMenuItem
+import javafx.geometry.Insets
 
 object BrowserUtils {
   private val FrameLocationName = "frameLocation"
@@ -54,4 +55,6 @@ object BrowserUtils {
   }
 
   def separatorMenuItem = new SeparatorMenuItem
+
+  def standardInsets = new Insets(5)
 }

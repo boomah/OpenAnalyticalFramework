@@ -3,8 +3,7 @@ package com.openaf.travel.gui
 import com.openaf.osgi.OpenAFBundleActivator
 import org.osgi.framework.BundleContext
 import com.openaf.browser.gui.{BrowserActionButton, PageContext, OpenAFApplication}
-import com.openaf.browser.gui.pages.{BlankPage, BlankPageFactory}
-import com.openaf.browser.gui.components.BlankPageComponentFactory
+import com.openaf.travel.api.{FlightsAndHotelsPageFactory, HotelsPageFactory}
 
 class TravelBundleActivator extends OpenAFBundleActivator {
   def start(context:BundleContext) {
@@ -20,9 +19,9 @@ object TravelBrowserApplication extends OpenAFApplication {
   def applicationName = "Travel"
   override def applicationButtons(context:PageContext) = {
     List(
-      BrowserActionButton("Hotels", BlankPageFactory),
-      BrowserActionButton("Flights and Hotels", BlankPageFactory)
+      BrowserActionButton("Hotels", HotelsPageFactory),
+      BrowserActionButton("Flights and Hotels", FlightsAndHotelsPageFactory)
     )
   }
-  override def componentFactoryMap = Map(BlankPage.getClass.getName -> BlankPageComponentFactory)
+//  override def componentFactoryMap = Map(BlankPage.getClass.getName -> BlankPageComponentFactory)
 }

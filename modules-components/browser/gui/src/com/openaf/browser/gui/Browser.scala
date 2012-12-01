@@ -9,7 +9,7 @@ import components.{PageComponentCache, PageComponent}
 import utils.BrowserUtils, BrowserUtils._
 import collection.JavaConversions._
 import ref.SoftReference
-import com.openaf.pagemanager.api.{NoPageData, Page}
+import com.openaf.pagemanager.api.{ExceptionPageData, NoPageData, Page}
 import javafx.scene.Node
 
 class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager) extends BorderPane {
@@ -158,46 +158,46 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   private def withPageResponse(pageResponse:PageResponse, fromPagePosition:Int, toPagePosition:Int,
                                pageInfoToGoTo:PageInfo, newPage:Boolean) {
     checkFXThread()
-    pageResponse match {
+    val pageInfoWithResponseToGoTo = pageInfoToGoTo.copy(softPageResponse = new SoftReference(pageResponse))
+    val (pageComponentToGoTo, pageDataToUse) = pageResponse match {
       case SuccessPageResponse(pageData) => {
-        val pageInfoWithResponseToGoTo = pageInfoToGoTo.copy(softPageResponse = new SoftReference(pageResponse))
-        val pageComponentToGoTo = pageComponentCache.pageComponent(pageID(pageInfoWithResponseToGoTo.page), pageContext)
-        pageComponentToGoTo.initialise(
-          pageInfoWithResponseToGoTo.page.asInstanceOf[pageComponentToGoTo.P],
-          pageData.asInstanceOf[pageComponentToGoTo.PD],
-          pageContext
-        )
-
-        def tidyUp() {
-          if (newPage) {
-            pages.add(toPagePosition, pageInfoWithResponseToGoTo)
-            pages.remove(toPagePosition + 1, pages.size)
-          } else {
-            pages.set(toPagePosition, pageInfoWithResponseToGoTo)
-          }
-          currentPagePosition.set(toPagePosition)
-          forceStop()
-        }
-
-        if (shouldAnimate(fromPagePosition, pageInfoWithResponseToGoTo.page)) {
-          val fromPageComponent = currentPageComponent
-          content.getChildren.add(0, pageComponentToGoTo)
-          animating.set(true)
-          animation(fromPagePosition, toPagePosition).animate(fromPageComponent, pageComponentToGoTo, onComplete = {
-            content.getChildren.removeAll(fromPageComponent)
-            animating.set(false)
-            tidyUp()
-          })
-        } else {
-          if (content.getChildren.isEmpty) content.getChildren.add(pageComponentToGoTo)
-          tidyUp()
-        }
+        (pageComponentCache.pageComponent(pageID(pageInfoWithResponseToGoTo.page), pageContext), pageData)
       }
       case ProblemPageResponse(exception) => {
         exception.printStackTrace()
-        pages.remove(toPagePosition)
-        forceStop()
+        val exceptionPageData = ExceptionPageData(exception)
+        (pageComponentCache.exceptionComponent(pageContext), exceptionPageData)
       }
+    }
+    pageComponentToGoTo.initialise(
+      pageInfoWithResponseToGoTo.page.asInstanceOf[pageComponentToGoTo.P],
+      pageDataToUse.asInstanceOf[pageComponentToGoTo.PD],
+      pageContext
+    )
+
+    def tidyUp() {
+      if (newPage) {
+        pages.add(toPagePosition, pageInfoWithResponseToGoTo)
+        pages.remove(toPagePosition + 1, pages.size)
+      } else {
+        pages.set(toPagePosition, pageInfoWithResponseToGoTo)
+      }
+      currentPagePosition.set(toPagePosition)
+      forceStop()
+    }
+
+    if (shouldAnimate(fromPagePosition, pageInfoWithResponseToGoTo.page)) {
+      val fromPageComponent = currentPageComponent
+      content.getChildren.add(0, pageComponentToGoTo)
+      animating.set(true)
+      animation(fromPagePosition, toPagePosition).animate(fromPageComponent, pageComponentToGoTo, onComplete = {
+        content.getChildren.removeAll(fromPageComponent)
+        animating.set(false)
+        tidyUp()
+      })
+    } else {
+      if (content.getChildren.isEmpty) content.getChildren.add(pageComponentToGoTo)
+      tidyUp()
     }
   }
 

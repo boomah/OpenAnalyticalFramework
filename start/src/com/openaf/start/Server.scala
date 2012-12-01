@@ -13,7 +13,7 @@ object Server {
   private val CommonLibraries = List("osgi", "rmi.common", "cache")
   private val ServerLibraries = List("utils", "rmi.server") ::: CommonLibraries
   private val GUILibraries = List("rmi.client") ::: CommonLibraries
-  private val GUIAPIDependencies = List("test", "viewer", "pagemanager")
+  private val GUIAPIDependencies = List("test", "viewer", "pagemanager", "travel")
 
   private def serverModules = modules.filter(module => {
     val moduleDirs = formattedSubNames(moduleDir(module))

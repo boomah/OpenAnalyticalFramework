@@ -32,4 +32,8 @@ class PageComponentCache {
       case _ => blankPageComponent(pageContext)
     }
   }
+
+  def exceptionComponent(pageContext:PageContext) = {
+    cache.getOrElseUpdate(classOf[ExceptionPageComponent].getName, ExceptionPageComponentFactory.pageComponent(pageContext))
+  }
 }

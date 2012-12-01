@@ -1,5 +1,7 @@
 package com.openaf.table.gui
 
-class OpenAFTable {
+import javafx.scene.layout.GridPane
+
+class OpenAFTable extends GridPane {
 
 }
