@@ -18,7 +18,7 @@
     <orderEntry type="jdk" jdkName="JDK7" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="scala-library" level="project" />
-    <orderEntry type="module" module-name="table.api" />
+    <orderEntry type="module" module-name="table.api" exported="" />
   </component>
 </module>
 
