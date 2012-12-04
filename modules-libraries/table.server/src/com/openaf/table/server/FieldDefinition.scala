@@ -2,9 +2,7 @@ package com.openaf.table.server
 
 import com.openaf.table.api.{FieldGroups, FieldGroup, Field}
 
-class FieldDefinition(val field:Field) {
-  def name = field.name
-}
+class FieldDefinition(val field:Field)
 
 case class FieldDefinitionGroup(group:String, definitions:List[FieldDefinition]) {
   def fieldGroup = FieldGroup(group, definitions.map(_.field))
