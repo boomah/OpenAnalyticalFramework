@@ -8,6 +8,6 @@ object TableDataGenerator {
     val defaultTableState = tableDataSource.defaultTableState
     val result = tableDataSource.result(tableState)
 
-    TableData(fieldGroups, defaultTableState)
+    TableData(fieldGroups, tableState)
   }
 }

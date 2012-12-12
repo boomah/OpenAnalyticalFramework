@@ -1,16 +1,18 @@
 package com.openaf.travel.gui.components
 
 import com.openaf.browser.gui.components.{PageComponentFactory, PageComponent}
-import com.openaf.travel.api.HotelsPage
-import com.openaf.pagemanager.api.NoPageData
+import com.openaf.travel.api.{HotelsPageData, HotelsPage}
 import com.openaf.browser.gui.PageContext
 
 class HotelsPageComponent extends PageComponent {
   type P = HotelsPage
-  type PD = NoPageData.type
+  type PD = HotelsPageData
 
   def name = "Hotels"
-  def setup() {}
+  def setup() {
+    val tableState = pageData.tableData.tableState
+    println("TableState : " + tableState)
+  }
 }
 
 object HotelsPageComponentFactory extends PageComponentFactory {

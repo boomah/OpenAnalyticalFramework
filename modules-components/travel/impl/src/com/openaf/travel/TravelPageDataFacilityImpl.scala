@@ -1,6 +1,6 @@
 package com.openaf.travel
 
-import api.{FlightsAndHotelsPage, HotelsPage, TravelPageDataFacility}
+import api.{HotelsPageData, FlightsAndHotelsPage, HotelsPage, TravelPageDataFacility}
 import com.openaf.pagemanager.api.{NoPageData, Page}
 import com.openaf.table.server.TableDataGenerator
 
@@ -17,7 +17,7 @@ class TravelPageDataFacilityImpl extends TravelPageDataFacility {
 
   private def hotelsPageData(hotelsPage:HotelsPage) = {
     val tableData = TableDataGenerator.tableData(hotelsPage.tableState, hotelsTableDataSource)
-    NoPageData
+    HotelsPageData(tableData)
   }
 
   private def flightsAndHotelsPageData(flightsAndHotelsPage:FlightsAndHotelsPage) = {

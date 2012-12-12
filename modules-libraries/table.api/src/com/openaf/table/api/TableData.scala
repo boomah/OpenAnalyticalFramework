@@ -1,6 +1,6 @@
 package com.openaf.table.api
 
-case class TableData(fieldGroups:FieldGroups, defaultTableState:TableState) {
+case class TableData(fieldGroups:FieldGroups, tableState:TableState) {
   def fields = fieldGroups.groups.flatMap(_.fields).toSet
 }
 object TableData {
