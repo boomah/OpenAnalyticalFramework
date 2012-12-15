@@ -32,7 +32,6 @@ object DefaultObjectEncoder {
   def decode(bytes:Array[Byte], classLoader:ClassLoader) = {
     val byteArrayInputStream = new ByteArrayInputStream(bytes)
     // TODO - Either get netty to add a OSGI aware ObjectDecoderInputStream or write one myself
-    // TODO - Either get netty to add a OSGI aware ObjectDecoderInputStream or write one myself
 //    val objectInputStream = new ObjectDecoderInputStream(byteArrayInputStream, classLoader)
     val objectInputStream = new OSGIAwareObjectInputStream(byteArrayInputStream, classLoader)
     objectInputStream.readObject
