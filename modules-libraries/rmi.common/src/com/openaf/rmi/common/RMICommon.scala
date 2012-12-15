@@ -2,7 +2,7 @@ package com.openaf.rmi.common
 
 import org.jboss.netty.channel.ChannelPipeline
 import org.jboss.netty.handler.codec.serialization._
-import java.io.{ByteArrayOutputStream, ByteArrayInputStream}
+import java.io.{ObjectOutputStream, ByteArrayOutputStream, ByteArrayInputStream}
 
 object RMICommon {
   def addHandlers(pipeline:ChannelPipeline, classLoader:ClassLoader) {
@@ -21,15 +21,20 @@ trait ServicesListing {
 object DefaultObjectEncoder {
   def encode(obj:AnyRef) = {
     val byteArrayOutputStream = new ByteArrayOutputStream
-    val objectEncoderOutputStream = new ObjectEncoderOutputStream(byteArrayOutputStream)
-    objectEncoderOutputStream.writeObject(obj)
-    objectEncoderOutputStream.flush()
-    objectEncoderOutputStream.close()
+    // TODO - Either get netty to add a OSGI aware ObjectEncoderOutputStream or write one myself
+//    val objectOutputStream = new ObjectEncoderOutputStream(byteArrayOutputStream)
+    val objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)
+    objectOutputStream.writeObject(obj)
+    objectOutputStream.flush()
+    objectOutputStream.close()
     byteArrayOutputStream.toByteArray
   }
   def decode(bytes:Array[Byte], classLoader:ClassLoader) = {
     val byteArrayInputStream = new ByteArrayInputStream(bytes)
-    val objectDecoderInputStream = new ObjectDecoderInputStream(byteArrayInputStream, classLoader)
-    objectDecoderInputStream.readObject
+    // TODO - Either get netty to add a OSGI aware ObjectDecoderInputStream or write one myself
+    // TODO - Either get netty to add a OSGI aware ObjectDecoderInputStream or write one myself
+//    val objectInputStream = new ObjectDecoderInputStream(byteArrayInputStream, classLoader)
+    val objectInputStream = new OSGIAwareObjectInputStream(byteArrayInputStream, classLoader)
+    objectInputStream.readObject
   }
 }
