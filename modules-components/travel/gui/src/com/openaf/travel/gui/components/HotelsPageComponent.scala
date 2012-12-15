@@ -3,15 +3,16 @@ package com.openaf.travel.gui.components
 import com.openaf.browser.gui.components.{PageComponentFactory, PageComponent}
 import com.openaf.travel.api.{HotelsPageData, HotelsPage}
 import com.openaf.browser.gui.PageContext
+import com.openaf.table.gui.OpenAFTable
 
-class HotelsPageComponent extends PageComponent {
+class HotelsPageComponent extends OpenAFTable with PageComponent {
   type P = HotelsPage
   type PD = HotelsPageData
 
   def name = "Hotels"
   def setup() {
-    val tableState = pageData.tableData.tableState
-    println("TableState : " + tableState)
+    println("Page Data : " + pageData)
+    setTableData(pageData.tableData)
   }
 }
 

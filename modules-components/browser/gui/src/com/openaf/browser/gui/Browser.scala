@@ -151,7 +151,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   }
 
   private def currentPageComponent = {
-    if (content.getChildren.size != 1) throw new IllegalStateException("More than one component")
+    require(content.getChildren.size == 1, "Should only ever contain one component at this point")
     content.getChildren.get(0).asInstanceOf[PageComponent]
   }
 

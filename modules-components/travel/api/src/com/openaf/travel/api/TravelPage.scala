@@ -17,7 +17,7 @@ case class HotelsPage(tableState:TableState) extends TravelPage
 case class FlightsAndHotelsPage() extends TravelPage
 
 object HotelsPageFactory extends PageFactory {
-  def page = HotelsPage(TableState.Blank)
+  def page = HotelsPage(TableState.Blank.withRowHeaderFields(List(TravelPage.HotelNameField, TravelPage.PeriodField)))
 }
 
 object FlightsAndHotelsPageFactory extends PageFactory {
