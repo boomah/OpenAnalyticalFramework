@@ -3,7 +3,7 @@ package com.openaf.table.server
 import com.openaf.table.api.{Field, TableState}
 
 trait TableDataSource {
-  def fieldDefinitionGroups:FieldDefinitionGroups
+  def fieldDefinitionGroup:FieldDefinitionGroup
   def result(tableState:TableState):Result
   def defaultTableState = TableState.Blank
 }

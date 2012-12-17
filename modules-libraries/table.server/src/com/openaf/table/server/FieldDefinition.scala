@@ -1,15 +1,20 @@
 package com.openaf.table.server
 
-import com.openaf.table.api.{FieldGroups, FieldGroup, Field}
+import com.openaf.table.api.{FieldGroup, Field}
 
 class FieldDefinition(val field:Field)
 
-case class FieldDefinitionGroup(group:String, definitions:List[FieldDefinition]) {
-  def fieldGroup = FieldGroup(group, definitions.map(_.field))
+case class FieldDefinitionGroup(groupName:String, children:List[Either[FieldDefinitionGroup,FieldDefinition]]) {
+  def fieldGroup:FieldGroup = {
+    val convertedChildren = children.map(fieldDefinitionGroupOrFieldDefinition => {
+      fieldDefinitionGroupOrFieldDefinition match {
+        case Left(fieldDefinitionGroup) => Left(fieldDefinitionGroup.fieldGroup)
+        case Right(fieldDefinition) => Right(fieldDefinition.field)
+      }
+    })
+    FieldGroup(groupName, convertedChildren)
+  }
 }
-case class FieldDefinitionGroups(groups:List[FieldDefinitionGroup]) {
-  def fieldGroups = FieldGroups(groups.map(_.fieldGroup))
-}
-object FieldDefinitionGroups {
-  val Empty = FieldDefinitionGroups(Nil)
+object FieldDefinitionGroup {
+  val Empty = FieldDefinitionGroup("Fields", Nil)
 }

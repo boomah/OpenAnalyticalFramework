@@ -1,7 +1,15 @@
 package com.openaf.table.api
 
-case class FieldGroup(group:String, fields:List[Field])
-case class FieldGroups(groups:List[FieldGroup])
-object FieldGroups {
-  val Empty = FieldGroups(Nil)
+case class FieldGroup(groupName:String, children:List[Either[FieldGroup,Field]]) {
+  def fields:List[Field] = {
+    children.flatMap(fieldGroupOrField => {
+      fieldGroupOrField match {
+        case Left(fieldGroup) => fieldGroup.fields
+        case Right(field) => Some(field)
+      }
+    })
+  }
+}
+object FieldGroup {
+  val Empty = FieldGroup("Fields", Nil)
 }

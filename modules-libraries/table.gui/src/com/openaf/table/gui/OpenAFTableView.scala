@@ -1,17 +1,12 @@
 package com.openaf.table.gui
 
 import javafx.scene.control.{TableColumn, TableView}
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.Property
 import com.openaf.table.api.TableData
 import javafx.beans.value.{ObservableValue, ChangeListener}
 
-class OpenAFTableView extends TableView {
-  private val tableData = new SimpleObjectProperty[TableData]
-  def getTableData = tableData.get
-  def setTableData(tableData0:TableData) {tableData.set(tableData0)}
-  def tableDataProperty = tableData
-
-  tableData.addListener(new ChangeListener[TableData] {
+class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView {
+  tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {setUpTableView(newTableData)}
   })
 

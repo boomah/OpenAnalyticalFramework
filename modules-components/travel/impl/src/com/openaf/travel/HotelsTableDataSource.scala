@@ -1,9 +1,13 @@
 package com.openaf.travel
 
-import com.openaf.table.server.{FieldDefinitionGroups, Result, TableDataSource}
+import com.openaf.table.server._
 import com.openaf.table.api.TableState
+import com.openaf.travel.api.TravelPage._
+import com.openaf.table.server.FieldDefinitionGroup
 
 class HotelsTableDataSource extends TableDataSource {
-  def fieldDefinitionGroups = FieldDefinitionGroups.Empty
+  private val fieldDefinitions = List(HotelNameField, PeriodField, CostField, StarRatingField).map(field => Right(new FieldDefinition(field)))
+
+  def fieldDefinitionGroup = FieldDefinitionGroup("Hotel", fieldDefinitions)
   def result(tableState:TableState) = Result.Empty
 }

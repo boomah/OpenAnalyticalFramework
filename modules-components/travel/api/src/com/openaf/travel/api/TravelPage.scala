@@ -7,9 +7,9 @@ trait TravelPage extends Page {
   def pageDataFacility(serverContext:ServerContext) = serverContext.facility(classOf[TravelPageDataFacility])
 }
 object TravelPage {
-  val CostField = new Field("cost")
-  val PeriodField = new Field("period")
   val HotelNameField = new Field("hotelName")
+  val PeriodField = new Field("period")
+  val CostField = new Field("cost")
   val StarRatingField = new Field("starRating")
 }
 
