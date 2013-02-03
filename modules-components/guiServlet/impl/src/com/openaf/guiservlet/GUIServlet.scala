@@ -19,7 +19,7 @@ class GUIServlet(serverName:String, externalURL:String, guiUpdatePort:String, se
   private val standardMemory = "512m"
   private val specifiedMemory1024 = "1024m"
 
-  private val scalaLibraryJAR = new File("lib/scala-library.jar")
+  private val scalaLibraryJAR = new File("common-bundles/scala-library.jar")
   private val scalaLibraryName = scalaLibraryJAR.getName
 
   private val webStartNormalMemory = "openaf.jnlp"

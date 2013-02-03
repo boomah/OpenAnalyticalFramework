@@ -2,7 +2,8 @@
   <library name="scala-compiler">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/scala-compiler.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/scala-library.jar!/" />
+      <root url="jar://$PROJECT_DIR$/common-bundles/scala-library.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/scala-reflect.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -17,7 +17,7 @@ class RmiClientConnectorBundleActivator extends BundleActivator {
     val packagesToBundleMap = packagesToBundle(context)
     services.foreach(serviceName => {
       loadClass(serviceName, packagesToBundleMap) match {
-        case Some(serviceClass:Class[_]) => {
+        case Some(serviceClass:Class[Any]) => {
           val service = client.proxy(serviceClass.asInstanceOf[Class[AnyRef]])
           context.registerService(serviceClass, service, null)
         }

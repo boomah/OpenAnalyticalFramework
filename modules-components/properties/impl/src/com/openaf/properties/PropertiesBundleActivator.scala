@@ -7,6 +7,7 @@ import io.Source
 
 class PropertiesBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
+    println("Registering Properties Service")
     context.registerService(classOf[PropertiesService], new PropertiesServiceImpl, null)
   }
   def stop(context:BundleContext) {}

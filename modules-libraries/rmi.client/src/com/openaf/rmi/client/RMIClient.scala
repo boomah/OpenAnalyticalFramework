@@ -18,12 +18,12 @@ class RMIClient(hostName:String, port:Int) {
   def connect = {bootstrap.connect(new InetSocketAddress(hostName, port))}
   def connectBlocking() {connect.awaitUninterruptibly()}
 
-  def proxy[T](proxyClass:Class[T]):T = {
-    JProxy.newProxyInstance(proxyClass.getClassLoader, Array(proxyClass), new InvocationHandler {
+  def proxy[T](classToProxy:Class[T]):T = {
+    JProxy.newProxyInstance(classToProxy.getClassLoader, Array(classToProxy), new InvocationHandler {
       def invoke(proxy:Any, method:Method, args:Array[AnyRef]) = {
         assert(!objectMethods.contains(method.getName),
-          "It is unlikely correct to call an Object method across the wire: " + proxyClass.getName + "." + method.getName)
-        clientHandler.sendMessage(proxyClass, method, args)
+          "It is unlikely correct to call an Object method across the wire: " + classToProxy.getName + "." + method.getName)
+        clientHandler.sendMessage(classToProxy, method, args)
       }
     }).asInstanceOf[T]
   }

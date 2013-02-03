@@ -12,9 +12,9 @@ class OSGIAwareObjectInputStream(inputStream:InputStream, topLevelClassLoader:Cl
     for (classLoader <- classLoaders if (classAndClassLoader == None)) {
       try {
         val klass = classLoader.loadClass(desc.getName)
-        classAndClassLoader = Some(ClassAndClassLoader(klass, classLoader))
+        classAndClassLoader = Some(ClassAndClassLoader(klass, klass.getClassLoader))
       } catch {
-        case e:Exception => println("Can't find " + desc.getName)
+        case e:Exception => println("Can't find " + (desc.getName, classLoader))
       }
     }
     classAndClassLoader match {

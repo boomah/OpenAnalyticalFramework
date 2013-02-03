@@ -47,16 +47,16 @@ class ClientHandler extends SimpleChannelHandler {
     }
   }
 
-  def sendMessage(proxyClass:Class[_], method:Method, args:Array[AnyRef]) = {
+  def sendMessage(classToProxy:Class[_], method:Method, args:Array[AnyRef]) = {
     val id = requestID.getAndIncrement
-    val requestDetails = RequestDetails(id, method, proxyClass.getClassLoader)
+    val requestDetails = RequestDetails(id, method, classToProxy.getClassLoader)
     requestDetailsMap.put(id, requestDetails)
     val paramValuesBytes = if (args != null) {
       args.map(arg => DefaultObjectEncoder.encode(arg))
     } else {
       Array[Array[Byte]]()
     }
-    val request = MethodInvocationRequest(id, proxyClass.getName, method.getName,
+    val request = MethodInvocationRequest(id, classToProxy.getName, method.getName,
       method.getParameterTypes.map(_.getName), paramValuesBytes)
     channel.write(request)
     requestDetails.waitForResult

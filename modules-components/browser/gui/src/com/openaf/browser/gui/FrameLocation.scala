@@ -27,7 +27,7 @@ object FrameLocation {
       val (x :: y :: width :: height :: fullScreen :: Nil) = string.split(",").toList
       new FrameLocation(new Rectangle2D(x.toDouble, y.toDouble, width.toDouble, height.toDouble), fullScreen.toBoolean).valid()
     } catch {
-      case t => default()
+      case e:Exception => default()
     }
   }
   def apply(stage:Stage) = new FrameLocation(new Rectangle2D(stage.getX, stage.getY, stage.getWidth, stage.getHeight), stage.isFullScreen)

@@ -25,6 +25,7 @@ public class Bootstrapper {
         String[] programArgs = configLines.get(0).split(" ");
         String instanceName = programArgs[0];
         String mainClass = programArgs[1];
+        System.out.println("Main Class: " + mainClass);
         String[] configArgsArray = Arrays.copyOfRange(programArgs, 2, programArgs.length);
         String[] argsToPassToGUI = new String[configArgsArray.length + 2];
         argsToPassToGUI[0] = url.toExternalForm();
@@ -97,7 +98,7 @@ public class Bootstrapper {
         for (String jarName : latestJARsToMD5.keySet()) {
             urlsOfLatestJARs.add(new File(cacheDir, jarName).toURI().toURL());
         }
-
+        System.out.println("Classpath: " + urlsOfLatestJARs);
         URLClassLoader urlClassLoader = new URLClassLoader(urlsOfLatestJARs.toArray(new URL[urlsOfLatestJARs.size()]));
         Policy.setPolicy(new Policy() {
             public PermissionCollection getPermissions(CodeSource codesource) {

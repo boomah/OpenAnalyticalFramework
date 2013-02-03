@@ -1,7 +1,7 @@
 package com.openaf.start
 
 import org.osgi.framework.launch.FrameworkFactory
-import java.util.{ServiceLoader, HashMap}
+import java.util.ServiceLoader
 import org.osgi.framework.{Bundle, FrameworkEvent, FrameworkListener}
 import java.net.{ServerSocket, ConnectException, Socket, URL, SocketException}
 import org.osgi.framework.wiring.FrameworkWiring
@@ -9,14 +9,15 @@ import collection.mutable.ListBuffer
 import java.io._
 import java.util.concurrent.CopyOnWriteArraySet
 import java.util.jar.JarFile
+import java.util
 
-class OSGIInstance(name:String, bundles:BundleDefinitions, openAFFrameworkProperties:Map[String,String]=Map.empty) {
+class OSGIInstance(name:String, bundleDefinitions:BundleDefinitions, openAFFrameworkProperties:Map[String,String]=Map.empty) {
   private val framework = {
     val frameworkProps = {
-      val hm = new HashMap[String, String]
+      val hm = new util.HashMap[String,String]
       hm.put("org.osgi.framework.storage", name)
       hm.put("org.osgi.framework.bootdelegation", "sun.*,com.sun.*")
-      hm.put("org.osgi.framework.system.packages.extra", bundles.systemPackages.mkString(","))
+      hm.put("org.osgi.framework.system.packages.extra", bundleDefinitions.systemPackages.mkString(","))
       openAFFrameworkProperties.foreach{case (key,value) => hm.put(key, value)}
       hm
     }
@@ -36,9 +37,10 @@ class OSGIInstance(name:String, bundles:BundleDefinitions, openAFFrameworkProper
     val context = framework.getBundleContext
     val currentBundles = context.getBundles.map(bundle => BundleName(bundle.getSymbolicName, bundle.getVersion) -> bundle)
             .filter{case (_, bundle) => (bundle.getBundleId != 0)}.toMap
-    val newBundles = bundles.bundles.map(definition => definition.name -> definition).toMap
 
-    val ignoredBundles:Map[String, List[BundleDefinition]] = bundles.bundles.groupBy(_.name.name).filter(_._2.size > 1).mapValues(_.init)
+    val bundles = bundleDefinitions.bundles
+    val newBundles = bundles.map(definition => definition.name -> definition).toMap
+    val ignoredBundles:Map[String, List[BundleDefinition]] = bundles.groupBy(_.name.name).filter(_._2.size > 1).mapValues(_.init)
 
     println("Ignored bundles: " + ignoredBundles.flatMap(_._2.map(_.name)).mkString(", "))
 
@@ -232,9 +234,6 @@ object ServerOSGIInstanceStarter {
     new File("common-bundles").listFiles.filter(_.getName.trim.toLowerCase.endsWith(".jar"))
       .map(OSGIJARBundleDefinition).toList
   }
-  def globalLibraryBundleDefinitions = List(
-    SimpleLibraryBundleDefinition("Scala", new File("lib" + File.separator + "scala-library.jar"))
-  )
   def serverOSGIJARBundleDefinitions = {
     new File("server-bundles").listFiles.filter(_.getName.trim.toLowerCase.endsWith(".jar"))
       .map(OSGIJARBundleDefinition).toList
@@ -270,8 +269,8 @@ class GUIUpdater(baseURL:URL, instanceName:String) {
   }
 
   private def generateInputStream(osgiJARConfig:OSGIJARConfig) = {
-    val name = osgiJARConfig.symbolicName + "-" + osgiJARConfig.version + "-" + osgiJARConfig.timestamp.toString
-    val jarURL = new URL(baseURL + "/osgigui/" + name)
+    val name = "symbolicName=" + osgiJARConfig.symbolicName + "&version=" + osgiJARConfig.version + "&timestamp=" + osgiJARConfig.timestamp.toString
+    val jarURL = new URL(baseURL + "/osgigui?" + name)
     val byteArrayOutputStream = new ByteArrayOutputStream()
     FileUtils.copyStreams(openConnection(jarURL), byteArrayOutputStream)
     new ByteArrayInputStream(byteArrayOutputStream.toByteArray)

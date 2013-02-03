@@ -2,6 +2,7 @@
   <library name="guava">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/common-bundles/guava-13.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/common-bundles/compile-dependencies/jsr305-2.0.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
