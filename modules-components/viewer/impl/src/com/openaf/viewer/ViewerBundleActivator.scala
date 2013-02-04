@@ -1,10 +1,10 @@
 package com.openaf.viewer
 
 import api.ViewerPageDataFacility
-import com.openaf.osgi.{OSGIUtils, OpenAFBundleActivator}
-import org.osgi.framework.BundleContext
+import com.openaf.osgi.OSGIUtils
+import org.osgi.framework.{BundleActivator, BundleContext}
 
-class ViewerBundleActivator extends OpenAFBundleActivator {
+class ViewerBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
     println("------------------------------------")
     println("Viewer Bundle Activator impl started")

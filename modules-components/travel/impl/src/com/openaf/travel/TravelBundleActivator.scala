@@ -1,10 +1,10 @@
 package com.openaf.travel
 
 import api.TravelPageDataFacility
-import com.openaf.osgi.{OSGIUtils, OpenAFBundleActivator}
-import org.osgi.framework.BundleContext
+import com.openaf.osgi.OSGIUtils
+import org.osgi.framework.{BundleActivator, BundleContext}
 
-class TravelBundleActivator extends OpenAFBundleActivator {
+class TravelBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
     println("TravelBundleActivator started")
     val dictionary = OSGIUtils.mapToDictionary(Map(OSGIUtils.ExportService -> true))

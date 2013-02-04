@@ -55,9 +55,9 @@ class OSGIInstance(name:String, bundleDefinitions:BundleDefinitions, openAFFrame
       val newBundleDef = newBundles(commonBundle)
       val currentBundle = currentBundles(commonBundle)
       if (newBundleDef.lastModified > currentBundle.getLastModified) {
-        println("Updating: " + currentBundle.getSymbolicName + "...")
+        println(s"Updating: ${currentBundle.getSymbolicName}...")
         currentBundle.update(newBundleDef.inputStream)
-        println("Updated: %s (state: %s)".format(currentBundle.getSymbolicName, currentBundle.getState))
+        println(s"Updated: ${currentBundle.getSymbolicName} (state: ${currentBundle.getState})")
         Some(currentBundle)
       } else {
         None
@@ -72,7 +72,7 @@ class OSGIInstance(name:String, bundleDefinitions:BundleDefinitions, openAFFrame
       println("Installing: " + newBundleName + " : " + newBundleName.version + "...")
       val newBundleDef = newBundles(newBundleName)
       val res = context.installBundle("from-bnd:" + newBundleDef.name, newBundleDef.inputStream)
-      println("Installed: %s (state: %s)".format(newBundleName, res.getState))
+      println(s"Installed: $newBundleName (state: ${res.getState})")
       res
     }).filter(realBundle(_))
 

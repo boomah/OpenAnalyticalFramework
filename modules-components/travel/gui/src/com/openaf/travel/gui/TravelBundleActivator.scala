@@ -1,12 +1,11 @@
 package com.openaf.travel.gui
 
-import com.openaf.osgi.OpenAFBundleActivator
 import components.HotelsPageComponentFactory
-import org.osgi.framework.BundleContext
+import org.osgi.framework.{BundleActivator, BundleContext}
 import com.openaf.browser.gui.{BrowserActionButton, PageContext, OpenAFApplication}
 import com.openaf.travel.api.{HotelsPage, FlightsAndHotelsPageFactory, HotelsPageFactory}
 
-class TravelBundleActivator extends OpenAFBundleActivator {
+class TravelBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
     println("TravelBundleActivator gui started")
     context.registerService(classOf[OpenAFApplication], TravelBrowserApplication, null)

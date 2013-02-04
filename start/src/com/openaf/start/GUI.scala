@@ -7,8 +7,8 @@ object GUI {
     import StartUtils._
     if (!javaVersionValid(MinimumJavaVersion)) {
       throw new IllegalStateException(
-        "You need Java %s update %s or above to run OpenAF. ".format(MinimumJavaVersion.major, MinimumJavaVersion.update) +
-        "You currently have Java %s update %s.".format(ActualJavaVersion.major, ActualJavaVersion.update))
+        s"You need Java ${MinimumJavaVersion.major} update ${MinimumJavaVersion.update} or above to run OpenAF. " +
+        s"You currently have Java ${ActualJavaVersion.major} update ${ActualJavaVersion.update}.")
     }
     println("Args: " + args.toList)
     val (url :: instanceName :: portForUpdates :: servicePort :: Nil) = args.toList

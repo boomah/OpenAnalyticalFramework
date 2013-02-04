@@ -7,33 +7,32 @@ import org.osgi.util.tracker.{ServiceTrackerCustomizer, ServiceTracker}
 import utils.BrowserUtils
 
 class BrowserBundleActivator extends OpenAFBundleActivator {
-  def start(context:BundleContext) {
-    run({
-      javafx.application.Application.launch(classOf[BrowserStageManager], context.getProperty("com.openAF.instanceName"))
-    }, "Browser Bundle Activator starter")
-    run({
-      context.registerService(classOf[OpenAFApplication], BrowserApplication, null)
-      val eventBus = new EventBus
-      val browserStageManager = BrowserStageManager.waitForBrowserStageManager
-      eventBus.register(browserStageManager)
-      new ServiceTracker(context, classOf[OpenAFApplication], new ServiceTrackerCustomizer[OpenAFApplication,OpenAFApplication]{
-        def addingService(serviceReference:ServiceReference[OpenAFApplication]) = {
-          val openAFApplication = context.getService(serviceReference)
-          eventBus.post(OpenAFApplicationAdded(openAFApplication))
-          openAFApplication
-        }
-        def modifiedService(serviceReference:ServiceReference[OpenAFApplication], openAFApplication:OpenAFApplication) {}
-        def removedService(serviceReference:ServiceReference[OpenAFApplication], openAFApplication:OpenAFApplication) {
-          println("!! OpenAFApplication Removed")
-          eventBus.post(OpenAFApplicationRemoved(openAFApplication))
-        }
-      }).open()
-      BrowserUtils.runLater({
-        val pageBuilder = new PageBuilder(new OSGIServerContext(context))
-        browserStageManager.start(pageBuilder)
-      })
+  protected def startUp(context:BundleContext) {
+    // This is a blocking call so run it on another thread
+    run(javafx.application.Application.launch(classOf[BrowserStageManager], context.getProperty("com.openAF.instanceName")))
+
+    context.registerService(classOf[OpenAFApplication], BrowserApplication, null)
+    val eventBus = new EventBus
+    val browserStageManager = BrowserStageManager.waitForBrowserStageManager
+    eventBus.register(browserStageManager)
+    new ServiceTracker(context, classOf[OpenAFApplication], new ServiceTrackerCustomizer[OpenAFApplication,OpenAFApplication]{
+      def addingService(serviceReference:ServiceReference[OpenAFApplication]) = {
+        val openAFApplication = context.getService(serviceReference)
+        eventBus.post(OpenAFApplicationAdded(openAFApplication))
+        openAFApplication
+      }
+      def modifiedService(serviceReference:ServiceReference[OpenAFApplication], openAFApplication:OpenAFApplication) {}
+      def removedService(serviceReference:ServiceReference[OpenAFApplication], openAFApplication:OpenAFApplication) {
+        println("!! OpenAFApplication Removed")
+        eventBus.post(OpenAFApplicationRemoved(openAFApplication))
+      }
+    }).open()
+    BrowserUtils.runLater({
+      val pageBuilder = new PageBuilder(new OSGIServerContext(context))
+      browserStageManager.start(pageBuilder)
     })
   }
+
   def stop(context:BundleContext) {
     println("Can't restart the browser at the moment - will have to exit")
     Thread.sleep(3000)

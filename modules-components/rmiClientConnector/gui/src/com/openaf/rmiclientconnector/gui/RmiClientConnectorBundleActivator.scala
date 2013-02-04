@@ -3,12 +3,13 @@ package com.openaf.rmiclientconnector.gui
 import org.osgi.framework._
 import com.openaf.rmi.client.RMIClient
 import com.openaf.rmi.common.ServicesListing
+import com.openaf.osgi.OpenAFBundleActivator
 
-class RmiClientConnectorBundleActivator extends BundleActivator {
-  def start(context:BundleContext) {
+class RmiClientConnectorBundleActivator extends OpenAFBundleActivator {
+  def startUp(context:BundleContext) {
     val hostName = context.getProperty("com.openAF.hostName")
     val servicesPort = context.getProperty("com.openAF.servicesPort").toInt
-    println("Starting RMI Client (connecting to %s:%s)...".format(hostName, servicesPort))
+    println(s"Starting RMI Client (connecting to $hostName:$servicesPort)...")
     val client = new RMIClient(hostName, servicesPort)
     client.connectBlocking()
     val servicesListingClass = classOf[ServicesListing]

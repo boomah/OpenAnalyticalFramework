@@ -1,9 +1,8 @@
 package com.openaf.pagemanager
 
-import com.openaf.osgi.OpenAFBundleActivator
-import org.osgi.framework.BundleContext
+import org.osgi.framework.{BundleActivator, BundleContext}
 
-class PageManagerBundleActivator extends OpenAFBundleActivator {
+class PageManagerBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
     println("Starling PageManagerBundleActivator although it doesn't do anything at the moment")
   }
