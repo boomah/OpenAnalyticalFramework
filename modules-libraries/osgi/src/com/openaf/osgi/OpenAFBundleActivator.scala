@@ -16,9 +16,9 @@ abstract class OpenAFBundleActivator extends BundleActivator {
     }, threadName).start()
   }
   final protected def waitForService[T:ClassTag](context:BundleContext):T = {
-    val serviceTracker = new ServiceTracker(context, classTag[T].runtimeClass, null)
+    val serviceTracker = new ServiceTracker[T,T](context, classTag[T].runtimeClass.asInstanceOf[Class[T]], null)
     serviceTracker.open()
-    serviceTracker.waitForService(0).asInstanceOf[T]
+    serviceTracker.waitForService(0)
   }
 
   final def start(context:BundleContext) {run(startUp(context), s"Starting Activator ${getClass.getName}")}
