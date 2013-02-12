@@ -7,7 +7,7 @@ import com.openaf.table.api.{Field, FieldGroup, TableData}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.util.Callback
 import javafx.event.EventHandler
-import javafx.scene.input.{ClipboardContent, TransferMode, MouseEvent}
+import javafx.scene.input.{MouseDragEvent, MouseEvent}
 
 object AllFieldsArea {
   type TreeItemType = Either[String,Field]
@@ -15,7 +15,7 @@ object AllFieldsArea {
 
 import AllFieldsArea._
 
-class AllFieldsArea(tableDataProperty:Property[TableData]) extends StackPane {
+class AllFieldsArea(tableDataProperty:Property[TableData], dragAndDrop:DragAndDrop) extends StackPane {
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
       updateTreeView(newTableData)
@@ -25,7 +25,7 @@ class AllFieldsArea(tableDataProperty:Property[TableData]) extends StackPane {
   private val root = new TreeItem[TreeItemType]
   private val treeView = new TreeView[TreeItemType](root)
   treeView.setCellFactory(new Callback[TreeView[TreeItemType],TreeCell[TreeItemType]] {
-    def call(treeView:TreeView[TreeItemType]) = new TreeItemTypeTreeCell
+    def call(treeView:TreeView[TreeItemType]) = new TreeItemTypeTreeCell(dragAndDrop)
   })
 
   private def updateTreeItem(treeItem:TreeItem[TreeItemType], fieldGroup:FieldGroup) {
@@ -51,7 +51,7 @@ class AllFieldsArea(tableDataProperty:Property[TableData]) extends StackPane {
   getChildren.addAll(treeView)
 }
 
-class TreeItemTypeTreeCell extends TreeCell[TreeItemType] {
+class TreeItemTypeTreeCell(dragAndDrop:DragAndDrop) extends TreeCell[TreeItemType] {
   override def updateItem(treeItemType:TreeItemType, empty:Boolean) {
     super.updateItem(treeItemType, empty)
     if (empty) {
@@ -63,10 +63,21 @@ class TreeItemTypeTreeCell extends TreeCell[TreeItemType] {
           setText(field.displayName)
           setOnDragDetected(new EventHandler[MouseEvent] {
             def handle(event:MouseEvent) {
-              val dragboard = startDragAndDrop(TransferMode.ANY :_*)
-              val clipboardContent = new ClipboardContent
-              clipboardContent.putString(field.id)
-              dragboard.setContent(clipboardContent)
+              dragAndDrop.fieldBeingDragged.set(Some(field))
+              dragAndDrop.dragging.set(true)
+              event.consume()
+            }
+          })
+          setOnMouseReleased(new EventHandler[MouseEvent] {
+            def handle(event:MouseEvent) {
+              dragAndDrop.fieldBeingDragged.set(None)
+              dragAndDrop.dragging.set(false)
+              event.consume()
+            }
+          })
+          setOnMouseDragged(new EventHandler[MouseEvent] {
+            def handle(event:MouseEvent) {
+              println("Mouse dragged " + (event.getSceneX, event.getSceneY))
               event.consume()
             }
           })

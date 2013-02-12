@@ -8,10 +8,10 @@ import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.beans.property.Property
 import com.openaf.table.api.TableData
 
-class ConfigArea(tableDataProperty:Property[TableData]) extends HBox {
+class ConfigArea(tableDataProperty:Property[TableData], dragAndDrop:DragAndDrop) extends HBox {
   private val fieldsButton = new ToggleButton("Fields")
 
-  private val fieldsToConfigComponent = Map[Toggle,Node](fieldsButton -> new AllFieldsArea(tableDataProperty))
+  private val fieldsToConfigComponent = Map[Toggle,Node](fieldsButton -> new AllFieldsArea(tableDataProperty, dragAndDrop))
 
   private val toggleGroup = new ToggleGroup
   private val buttons = FXCollections.observableArrayList(fieldsButton)
