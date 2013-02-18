@@ -4,16 +4,16 @@ import javafx.scene.layout.StackPane
 import javafx.scene.control.Label
 import javafx.event.EventHandler
 import javafx.scene.input.DragEvent
-import java.lang.{Boolean => JBoolean}
 import javafx.beans.value.{ObservableValue, ChangeListener}
+import com.openaf.table.api.Field
 
-class RowHeaderFieldsArea(dragAndDrop:DragAndDrop) extends StackPane {
+class RowHeaderFieldsArea(val dragAndDrop:DragAndDrop) extends StackPane {
   private val descriptionLabel = new Label("Drop Row Header Fields Here")
   getChildren.add(descriptionLabel)
 
-  dragAndDrop.dragging.addListener(new ChangeListener[JBoolean] {
-    def changed(observable:ObservableValue[_<:JBoolean], oldValue:JBoolean, newValue:JBoolean) {
-      println("Dragging Changed - " + (oldValue, newValue, dragAndDrop.fieldBeingDragged.get))
+  dragAndDrop.fieldsBeingDragged.addListener(new ChangeListener[List[Field]] {
+    def changed(observable:ObservableValue[_<:List[Field]], oldValue:List[Field], newValue:List[Field]) {
+      println("Dragging Changed - " + (oldValue, newValue, dragAndDrop.fieldsBeingDragged.get))
     }
   })
 

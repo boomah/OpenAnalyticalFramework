@@ -6,12 +6,12 @@ import javafx.beans.property.Property
 import com.openaf.table.api.{Field, FieldGroup, TableData}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.util.Callback
-import javafx.event.EventHandler
-import javafx.scene.input.{MouseDragEvent, MouseEvent}
 
 object AllFieldsArea {
-  type TreeItemType = Either[String,Field]
+  type TreeItemType = Either[TreeGroup,Field]
 }
+
+case class TreeGroup(fieldGroup:String, allChildFields:List[Field])
 
 import AllFieldsArea._
 
@@ -29,7 +29,7 @@ class AllFieldsArea(tableDataProperty:Property[TableData], dragAndDrop:DragAndDr
   })
 
   private def updateTreeItem(treeItem:TreeItem[TreeItemType], fieldGroup:FieldGroup) {
-    treeItem.setValue(Left(fieldGroup.groupName))
+    treeItem.setValue(Left(TreeGroup(fieldGroup.groupName, fieldGroup.fields)))
     treeItem.setExpanded(true)
     fieldGroup.children.foreach(fieldGroupOrField => {
       fieldGroupOrField match {
@@ -51,36 +51,23 @@ class AllFieldsArea(tableDataProperty:Property[TableData], dragAndDrop:DragAndDr
   getChildren.addAll(treeView)
 }
 
-class TreeItemTypeTreeCell(dragAndDrop:DragAndDrop) extends TreeCell[TreeItemType] {
+class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop) extends TreeCell[TreeItemType] with Draggable {
+  private var fields0:List[Field] = Nil
+  def fields:List[Field] = fields0
   override def updateItem(treeItemType:TreeItemType, empty:Boolean) {
     super.updateItem(treeItemType, empty)
     if (empty) {
       setText(null)
+      fields0 = Nil
     } else {
       treeItemType match {
-        case Left(fieldGroup) => setText(fieldGroup)
+        case Left(treeGroup) => {
+          setText(treeGroup.fieldGroup)
+          fields0 = treeGroup.allChildFields
+        }
         case Right(field) => {
           setText(field.displayName)
-          setOnDragDetected(new EventHandler[MouseEvent] {
-            def handle(event:MouseEvent) {
-              dragAndDrop.fieldBeingDragged.set(Some(field))
-              dragAndDrop.dragging.set(true)
-              event.consume()
-            }
-          })
-          setOnMouseReleased(new EventHandler[MouseEvent] {
-            def handle(event:MouseEvent) {
-              dragAndDrop.fieldBeingDragged.set(None)
-              dragAndDrop.dragging.set(false)
-              event.consume()
-            }
-          })
-          setOnMouseDragged(new EventHandler[MouseEvent] {
-            def handle(event:MouseEvent) {
-              println("Mouse dragged " + (event.getSceneX, event.getSceneY))
-              event.consume()
-            }
-          })
+          fields0 = List(field)
         }
       }
     }
