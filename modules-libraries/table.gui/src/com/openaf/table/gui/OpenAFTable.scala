@@ -15,9 +15,9 @@ class OpenAFTable extends GridPane {
   private val dragAndDrop = new DragAndDrop
 
   private val configArea = new ConfigArea(tableData, dragAndDrop)
-  private val filterFieldsArea = new FilterFieldsArea
+  private val filterFieldsArea = new FilterFieldsArea(dragAndDrop)
   private val rowHeaderFieldsArea = new RowHeaderFieldsArea(dragAndDrop)
-  private val measureFieldsArea = new MeasureFieldsArea
+  private val measureFieldsArea = new MeasureFieldsArea(dragAndDrop)
   private val tableView = new OpenAFTableView(tableData)
 
   {

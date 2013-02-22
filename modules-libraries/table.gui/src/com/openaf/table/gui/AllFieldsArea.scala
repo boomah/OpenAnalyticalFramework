@@ -15,7 +15,7 @@ case class TreeGroup(fieldGroup:String, allChildFields:List[Field])
 
 import AllFieldsArea._
 
-class AllFieldsArea(tableDataProperty:Property[TableData], dragAndDrop:DragAndDrop) extends StackPane {
+class AllFieldsArea(tableDataProperty:Property[TableData], dragAndDrop:DragAndDrop) extends StackPane with DropTargetContainer {
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
       updateTreeView(newTableData)
@@ -49,6 +49,9 @@ class AllFieldsArea(tableDataProperty:Property[TableData], dragAndDrop:DragAndDr
   }
 
   getChildren.addAll(treeView)
+
+  def dropTargets(draggedFields:List[Field]) = Nil
+  dragAndDrop.register(this)
 }
 
 class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop) extends TreeCell[TreeItemType] with Draggable {
