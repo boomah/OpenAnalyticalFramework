@@ -1,29 +1,23 @@
 package com.openaf.table.gui
 
 import javafx.beans.property.SimpleObjectProperty
-import com.openaf.table.api.Field
+import com.openaf.table.api.{TableData, Field}
 import javafx.scene.Node
 import javafx.event.EventHandler
-import javafx.scene.input.MouseEvent
+import javafx.scene.input.{MouseButton, MouseEvent}
 import collection.mutable
-import javafx.beans.value.{ObservableValue, ChangeListener}
 
 class DragAndDrop {
-  val fieldsBeingDragged = new SimpleObjectProperty[List[Field]](Nil)
+  val fieldsBeingDraggedInfo = new SimpleObjectProperty[Option[DraggableFieldsInfo]](None)
+  val closestDropTarget = new SimpleObjectProperty[Option[DropTarget]](None)
   private val dropTargetContainers = new mutable.HashSet[DropTargetContainer]
   def register(dropTargetContainer:DropTargetContainer) {dropTargetContainers += dropTargetContainer}
-
-  fieldsBeingDragged.addListener(new ChangeListener[List[Field]] {
-    def changed(observable:ObservableValue[_<:List[Field]], oldValue:List[Field], newValue:List[Field]) {
-      println("Dragging Changed - " + (oldValue, newValue, fieldsBeingDragged.get))
-    }
-  })
 
   private def hypot(x1:Double, y1:Double, x2:Double, y2:Double) = math.hypot(x2 - x1, y2 - y1)
 
   private def closestDropTarget(mouseSceneX:Double, mouseSceneY:Double) = {
-    val fields = fieldsBeingDragged.get
-    val dropTargets = dropTargetContainers.flatMap(_.dropTargets(fields))
+    val draggableFieldsInfo = fieldsBeingDraggedInfo.get.get
+    val dropTargets = dropTargetContainers.flatMap(_.dropTargets(draggableFieldsInfo))
     dropTargets.minBy(dropTarget => {
       val sceneBounds = dropTarget.localToScene(dropTarget.getBoundsInLocal)
 
@@ -60,41 +54,69 @@ class DragAndDrop {
 
   def updateClosestDropTarget(mouseSceneX:Double, mouseSceneY:Double) {
     val dropTarget = closestDropTarget(mouseSceneX, mouseSceneY)
-    println("Closest Drop Target : " + dropTarget)
+    closestDropTarget.set(Some(dropTarget))
   }
 }
 
-case class FieldDragInfo(field:Field)
-
 trait Draggable extends Node {
   def dragAndDrop:DragAndDrop
-  def fields:List[Field]
+  def draggableFieldsInfo:DraggableFieldsInfo
+  // When dropped here, nothing will happen. Usually just the Draggable itself, but in the case of a Draggable being
+  // dragged from the AllFieldsArea, the AllFieldsArea scene bounds are used.
+  def noOpSceneBounds = localToScene(getBoundsInLocal)
+  val tableData:SimpleObjectProperty[TableData]
+
+  private def updateClosestDropTarget(mouseSceneX:Double, mouseSceneY:Double) {
+    if (!noOpSceneBounds.contains(mouseSceneX, mouseSceneY)) {
+      dragAndDrop.updateClosestDropTarget(mouseSceneX, mouseSceneY)
+    } else {
+      dragAndDrop.closestDropTarget.set(None)
+    }
+  }
 
   setOnDragDetected(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
-      dragAndDrop.fieldsBeingDragged.set(fields)
-      dragAndDrop.updateClosestDropTarget(event.getSceneX, event.getSceneY)
+      if (event.getButton == MouseButton.PRIMARY) {
+        dragAndDrop.fieldsBeingDraggedInfo.set(Some(draggableFieldsInfo))
+        updateClosestDropTarget(event.getSceneX, event.getSceneY)
+      }
       event.consume()
     }
   })
 
   setOnMouseDragged(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
-      dragAndDrop.updateClosestDropTarget(event.getSceneX, event.getSceneY)
+      dragAndDrop.fieldsBeingDraggedInfo.get.foreach(_ => updateClosestDropTarget(event.getSceneX, event.getSceneY))
       event.consume()
     }
   })
 
   setOnMouseReleased(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
-      dragAndDrop.fieldsBeingDragged.set(Nil)
+      val newTableDataOption = dragAndDrop.fieldsBeingDraggedInfo.get.flatMap(draggableFieldsInfo => {
+        updateClosestDropTarget(event.getSceneX, event.getSceneY)
+        dragAndDrop.closestDropTarget.get.map(dropTarget => {
+          val tableDataWithFieldsRemoved = draggableFieldsInfo.draggableParent.removeFields(draggableFieldsInfo, tableData.get)
+          dropTarget.fieldsDropped(draggableFieldsInfo, tableDataWithFieldsRemoved)
+        })
+      })
+      dragAndDrop.fieldsBeingDraggedInfo.set(None)
       event.consume()
+      newTableDataOption.foreach(newTableData => tableData.set(newTableData))
     }
   })
 }
 
-trait DropTarget extends Node
+trait DropTarget extends Node {
+  def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
+}
 
 trait DropTargetContainer {
-  def dropTargets(draggedFields:List[Field]):List[DropTarget]
+  def dropTargets(draggableFieldsInfo:DraggableFieldsInfo):List[DropTarget]
 }
+
+trait DraggableParent {
+  def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
+}
+
+case class DraggableFieldsInfo(fields:List[Field], draggableParent:DraggableParent)

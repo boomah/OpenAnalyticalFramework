@@ -7,10 +7,10 @@ trait TravelPage extends Page {
   def pageDataFacility(serverContext:ServerContext) = serverContext.facility(classOf[TravelPageDataFacility])
 }
 object TravelPage {
-  val HotelNameField = new Field("hotelName")
-  val PeriodField = new Field("period")
-  val CostField = new Field("cost")
-  val StarRatingField = new Field("starRating")
+  val HotelNameField = Field("hotelName")
+  val PeriodField = Field("period")
+  val CostField = Field("cost")
+  val StarRatingField = Field("starRating")
 }
 
 case class HotelsPage(tableState:TableState) extends TravelPage

@@ -13,7 +13,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView {
   private def setUpTableView(tableData:TableData) {
     val rowHeaders = tableData.tableState.tableLayout.rowHeaderFields
     val rowHeaderTableColumns = rowHeaders.map(field => new TableColumn(field.displayName))
-
+    getColumns.clear()
     getColumns.addAll(rowHeaderTableColumns :_*)
   }
 }
