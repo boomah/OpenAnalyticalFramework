@@ -6,7 +6,9 @@ import com.openaf.table.api.{AllSelection, FieldWithSelection, TableData}
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.{ObservableValue, ChangeListener}
 
-class FilterFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:DragAndDrop) extends FlowPane with DropTargetContainer with DropTarget with DraggableParent {
+class FilterFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:DragAndDrop)
+  extends FlowPane with DropTargetContainer with DropTarget with DraggableParent {
+
   private val descriptionLabel = new Label("Drop Filter Fields Here")
 
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = List(this)
@@ -14,7 +16,7 @@ class FilterFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], dragAn
 
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     val currentTableState = tableData.tableState
-    val newFilterFields = currentTableState.tableLayout.filterFields ++ draggableFieldsInfo.fields.map(field => FieldWithSelection(field, AllSelection))
+    val newFilterFields = currentTableState.tableLayout.filterFields ++ draggableFieldsInfo.draggable.fields.map(field => FieldWithSelection(field, AllSelection))
     tableData.withTableState(currentTableState.withFilterFields(newFilterFields))
   }
 
@@ -30,14 +32,12 @@ class FilterFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], dragAn
   }
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
-    def changed(observable:ObservableValue[_<:TableData], oldValue:TableData, newValue:TableData) {
-      println("Filter area - setting up table state")
-      setup()
-    }
+    def changed(observable:ObservableValue[_<:TableData], oldValue:TableData, newValue:TableData) {setup()}
   })
 
   def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
-    val updatedFields = tableData.tableState.tableLayout.filterFields.filterNot(fieldWithSelection => draggableFieldsInfo.fields.contains(fieldWithSelection.field))
+    val updatedFields = getChildren.toArray.flatMap(child => if (child == draggableFieldsInfo.draggable) None else Some(child))
+      .collect{case (draggable:Draggable) => draggable.fields}.flatten.toList.map(FieldWithSelection(_, AllSelection))
     tableData.withTableState(tableData.tableState.withFilterFields(updatedFields))
   }
 }

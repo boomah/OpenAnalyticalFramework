@@ -60,7 +60,8 @@ class DragAndDrop {
 
 trait Draggable extends Node {
   def dragAndDrop:DragAndDrop
-  def draggableFieldsInfo:DraggableFieldsInfo
+  def draggableParent:DraggableParent
+  def fields:List[Field]
   // When dropped here, nothing will happen. Usually just the Draggable itself, but in the case of a Draggable being
   // dragged from the AllFieldsArea, the AllFieldsArea scene bounds are used.
   def noOpSceneBounds = localToScene(getBoundsInLocal)
@@ -77,7 +78,7 @@ trait Draggable extends Node {
   setOnDragDetected(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
       if (event.getButton == MouseButton.PRIMARY) {
-        dragAndDrop.fieldsBeingDraggedInfo.set(Some(draggableFieldsInfo))
+        dragAndDrop.fieldsBeingDraggedInfo.set(Some(DraggableFieldsInfo(Draggable.this, draggableParent)))
         updateClosestDropTarget(event.getSceneX, event.getSceneY)
       }
       event.consume()
@@ -119,4 +120,4 @@ trait DraggableParent {
   def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
 }
 
-case class DraggableFieldsInfo(fields:List[Field], draggableParent:DraggableParent)
+case class DraggableFieldsInfo(draggable:Draggable, draggableParent:DraggableParent)

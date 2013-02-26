@@ -62,7 +62,6 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDr
 class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsArea,
                            val tableData:SimpleObjectProperty[TableData]) extends TreeCell[TreeItemType] with Draggable {
   private var fields0:List[Field] = Nil
-  def draggableFieldsInfo = DraggableFieldsInfo(fields0, allFieldsArea)
   override def updateItem(treeItemType:TreeItemType, empty:Boolean) {
     super.updateItem(treeItemType, empty)
     if (empty) {
@@ -82,4 +81,6 @@ class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsA
     }
   }
   override def noOpSceneBounds = allFieldsArea.localToScene(allFieldsArea.getBoundsInLocal)
+  def draggableParent = allFieldsArea
+  def fields = fields0
 }
