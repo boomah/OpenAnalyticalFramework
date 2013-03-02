@@ -13,4 +13,8 @@ class MeasureFieldsArea(tableData:SimpleObjectProperty[TableData], dragAndDrop:D
   dragAndDrop.register(this)
 
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
+
+  def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
+    tableData
+  }
 }

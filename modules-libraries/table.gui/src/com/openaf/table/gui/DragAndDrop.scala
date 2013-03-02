@@ -114,6 +114,7 @@ trait DropTarget extends Node {
 
 trait DropTargetContainer {
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo):List[DropTarget]
+  def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
 }
 
 trait DraggableParent {

@@ -11,13 +11,23 @@ class FilterFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], dragAn
 
   private val descriptionLabel = new Label("Drop Filter Fields Here")
 
-  def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = List(this)
+  def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = {
+    if (tableDataProperty.get.tableState.tableLayout.filterFields.isEmpty) {
+      List(this)
+    } else {
+      Nil
+    }
+  }
   dragAndDrop.register(this)
 
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     val currentTableState = tableData.tableState
     val newFilterFields = currentTableState.tableLayout.filterFields ++ draggableFieldsInfo.draggable.fields.map(field => FieldWithSelection(field, AllSelection))
     tableData.withTableState(currentTableState.withFilterFields(newFilterFields))
+  }
+
+  def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
+    tableData
   }
 
   private def setup() {
