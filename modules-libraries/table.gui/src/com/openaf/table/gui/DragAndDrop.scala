@@ -1,11 +1,12 @@
 package com.openaf.table.gui
 
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.{ReadOnlyStringProperty, SimpleObjectProperty}
 import com.openaf.table.api.{TableData, Field}
 import javafx.scene.Node
 import javafx.event.EventHandler
 import javafx.scene.input.{MouseButton, MouseEvent}
 import collection.mutable
+import javafx.beans.value.{ObservableValue, ChangeListener}
 
 class DragAndDrop {
   val fieldsBeingDraggedInfo = new SimpleObjectProperty[Option[DraggableFieldsInfo]](None)
@@ -113,8 +114,22 @@ trait DropTarget extends Node {
 }
 
 trait DropTargetContainer {
+  val dragAndDrop:DragAndDrop
+  dragAndDrop.register(this)
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo):List[DropTarget]
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
+  def addDropTargets(draggableFieldsInfo:DraggableFieldsInfo)
+  def removeDropTargets()
+
+  dragAndDrop.fieldsBeingDraggedInfo.addListener(new ChangeListener[Option[DraggableFieldsInfo]] {
+    def changed(observableValue:ObservableValue[_<:Option[DraggableFieldsInfo]],
+                oldDraggableFieldsInfo:Option[DraggableFieldsInfo], newDraggableFieldsInfo:Option[DraggableFieldsInfo]) {
+      newDraggableFieldsInfo match {
+        case Some(draggableFieldsInfo) => addDropTargets(draggableFieldsInfo)
+        case _ => removeDropTargets()
+      }
+    }
+  })
 }
 
 trait DraggableParent {
@@ -122,3 +137,13 @@ trait DraggableParent {
 }
 
 case class DraggableFieldsInfo(draggable:Draggable, draggableParent:DraggableParent)
+
+trait DragAndDropNode extends Node {
+  val tableDataProperty:SimpleObjectProperty[TableData]
+  def setup()
+  def description:ReadOnlyStringProperty
+
+  tableDataProperty.addListener(new ChangeListener[TableData] {
+    def changed(observable:ObservableValue[_<:TableData], oldValue:TableData, newValue:TableData) {setup()}
+  })
+}

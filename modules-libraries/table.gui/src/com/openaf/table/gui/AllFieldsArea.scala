@@ -15,7 +15,7 @@ case class TreeGroup(fieldGroup:String, allChildFields:List[Field])
 
 import AllFieldsArea._
 
-class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:DragAndDrop)
+class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragAndDrop:DragAndDrop)
   extends StackPane with DropTargetContainer with DropTarget with DraggableParent {
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
@@ -52,9 +52,9 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDr
 
   getChildren.addAll(treeView)
 
+  def addDropTargets(draggableFieldsInfo:DraggableFieldsInfo) {}
+  def removeDropTargets() {}
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = List(this)
-  dragAndDrop.register(this)
-
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
   def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
