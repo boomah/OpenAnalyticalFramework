@@ -35,7 +35,7 @@ class BrowserBundleActivator extends OpenAFBundleActivator {
 
   def stop(context:BundleContext) {
     println("Can't restart the browser at the moment - will have to exit")
-    Thread.sleep(3000)
+//    Thread.sleep(3000)
     System.exit(1)
   }
 }

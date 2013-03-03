@@ -6,6 +6,7 @@
       <w>dname</w>
       <w>dragboard</w>
       <w>draggables</w>
+      <w>fontawesome</w>
       <w>genkey</w>
       <w>hypot</w>
       <w>infos</w>
@@ -21,6 +22,7 @@
       <w>storepass</w>
       <w>timeline</w>
       <w>tmpdir</w>
+      <w>webfont</w>
       <w>yyyy</w>
     </words>
   </dictionary>

@@ -20,13 +20,14 @@ object BrowserUtils {
   }
   def storeFrameLocation(stage:Stage) {Prefs.put(FrameLocationName, FrameLocation(stage).asString)}
   def deletePreferences() {Prefs.remove(FrameLocationName)}
-  private val ImageMap = new mutable.WeakHashMap[String,Image]()
+  private val ImageMap = new mutable.WeakHashMap[String,Image]
   def icon(iconName:String) = {
     val name = "/com/openaf/browser/gui/resources/" + iconName
     val image = ImageMap.getOrElseUpdate(name, new Image(resourceAsInputStream(name)))
     new ImageView(image)
   }
   private def resourceAsInputStream(name:String) = getClass.getResourceAsStream(name)
+  def resource(resource:String) = getClass.getResource(resource).toExternalForm
 
   lazy val OS = {
     val osName = System.getProperty("os.name").toLowerCase
