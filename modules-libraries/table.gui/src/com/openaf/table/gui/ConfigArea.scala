@@ -10,6 +10,7 @@ import com.openaf.table.api.TableData
 
 class ConfigArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:DragAndDrop) extends HBox {
   private val fieldsButton = new ToggleButton("Fields")
+  fieldsButton.setFocusTraversable(false)
 
   private val fieldsToConfigComponent = Map[Toggle,Node](fieldsButton -> new AllFieldsArea(tableDataProperty, dragAndDrop))
 

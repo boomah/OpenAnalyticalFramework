@@ -13,7 +13,7 @@ import java.lang.{Boolean => JBoolean}
 import utils.{FontAwesomeLabel, FontAwesome}, FontAwesome._
 
 class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage) extends ToolBar {
-  setStyle("-fx-background-color: #336699")
+  getStyleClass.add("browser-bar")
 
   private val backButton = new SingleActionToolBarButton(ArrowLeft, browser.back, browser.backDisabledProperty)
   private val forwardButton = new SingleActionToolBarButton(ArrowRight, browser.forward, browser.forwardDisabledProperty)
@@ -50,7 +50,13 @@ class AddressBar(text:StringBinding) extends TextField {
 }
 
 class ToolBarButton(fontAwesome:FontAwesome, disabled:BooleanBinding) extends Button {
+  getStyleClass.add("tool-bar-button")
   private val iconLabel = new FontAwesomeLabel(fontAwesome)
+  iconLabel.setStyle("-fx-border-color: red")
+
+
+
+
   setGraphic(iconLabel)
   setFocusTraversable(false)
   disableProperty.bind(disabled)
