@@ -38,11 +38,15 @@ object GUI {
 }
 
 object StartUtils {
-  val MinimumJavaVersion = JavaVersion(7, 6)
+  val MinimumJavaVersion = JavaVersion(8, 0)
   val ActualJavaVersion = {
     val javaVersion = System.getProperty("java.version")
     val (_ :: major :: update :: Nil) = javaVersion.split("\\.").toList
-    JavaVersion(major.toInt, update.takeRight(2).toInt)
+    val updateNumber = update.takeRight(2) match {
+      case "ea" => 0
+      case other => other.toInt
+    }
+    JavaVersion(major.toInt, updateNumber)
   }
   def javaVersionValid(minimumJavaVersion:JavaVersion) = {
     ((ActualJavaVersion.major >= minimumJavaVersion.major) && (ActualJavaVersion.update >= minimumJavaVersion.update))

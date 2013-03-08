@@ -76,17 +76,29 @@ class BrowserStageManager extends javafx.application.Application {
     }
   }
 
+  private def addStyleSheetsToAllScenes(styleSheets:List[String]) {
+    println("Add style sheets")
+  }
+
+  private def removeStyleSheetsFromAllScenes(styleSheets:List[String]) {
+    println("Remove style sheets")
+  }
+
   @Subscribe def openAFApplicationAdded(openAFApplication:OpenAFApplicationAdded) {
     BrowserUtils.runLater({
+      val newOpenAFApplication = openAFApplication.openAFApplication
+      addStyleSheetsToAllScenes(newOpenAFApplication.styleSheets)
       val currentApplications = cache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
-      currentApplications.add(openAFApplication.openAFApplication)
+      currentApplications.add(newOpenAFApplication)
     })
   }
 
   @Subscribe def openAFApplicationRemoved(openAFApplication:OpenAFApplicationRemoved) {
     BrowserUtils.runLater({
+      val removedOpenAFApplication = openAFApplication.openAFApplication
+      removeStyleSheetsFromAllScenes(removedOpenAFApplication.styleSheets)
       val currentApplications = cache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
-      currentApplications.remove(openAFApplication.openAFApplication)
+      currentApplications.remove(removedOpenAFApplication)
     })
   }
 

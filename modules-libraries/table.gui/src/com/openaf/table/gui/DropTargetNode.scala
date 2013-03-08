@@ -11,4 +11,5 @@ class DropTargetNode(dropTargetContainer:DropTargetContainer) extends FlowPane w
   setPrefWidth(15)
 
   setStyle("-fx-background-color: #CCFF99AA;")
+//  getStyleClass.add("drop-target-node")
 }

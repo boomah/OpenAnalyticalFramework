@@ -96,7 +96,18 @@ class OSGIInstance(name:String, bundleDefinitions:BundleDefinitions, openAFFrame
 }
 
 object OSGIInstance {
-  def commonSystemPackages = List("sun.misc")
+  def commonSystemPackages = List("sun.misc") ::: jdk8EASystemPackages
+  private def jdk8EASystemPackages = List("javax.crypto",
+    "javax.imageio", "javax.imageio.metadata", "javax.management",
+    "javax.management.modelmbean",
+    "javax.management.remote", "javax.naming",
+    "javax.naming.directory", "javax.naming.spi", "javax.net",
+    "javax.security.auth",
+    "javax.security.auth.callback", "javax.security.auth.login",
+    "javax.security.auth.spi", "javax.security.auth.x500",
+    "javax.security.sasl", "javax.sql", "javax.transaction",
+    "javax.xml.parsers", "org.ietf.jgss", "org.w3c.dom", "org.xml.sax",
+    "org.xml.sax.helpers", "org.xml.sax.ext")
 }
 
 case class OSGIInstanceConfig(name:String, properties:()=>Map[String,String], bundles:BundleDefinitions)
@@ -283,7 +294,7 @@ class GUIUpdater(baseURL:URL, instanceName:String) {
     })
   }
   private val javaFXPackages = {
-    val javaFXJarFile = new JarFile(System.getProperty("java.home") + "/lib/jfxrt.jar")
+    val javaFXJarFile = new JarFile(System.getProperty("java.home") + "/lib/ext/jfxrt.jar")
     val entries = javaFXJarFile.entries
     val packageBuffer = new ListBuffer[String]
     while (entries.hasMoreElements) {

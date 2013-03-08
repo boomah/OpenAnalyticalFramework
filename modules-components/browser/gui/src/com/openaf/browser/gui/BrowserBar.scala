@@ -52,10 +52,6 @@ class AddressBar(text:StringBinding) extends TextField {
 class ToolBarButton(fontAwesome:FontAwesome, disabled:BooleanBinding) extends Button {
   getStyleClass.add("tool-bar-button")
   private val iconLabel = new FontAwesomeLabel(fontAwesome)
-  iconLabel.setStyle("-fx-border-color: red")
-
-
-
 
   setGraphic(iconLabel)
   setFocusTraversable(false)

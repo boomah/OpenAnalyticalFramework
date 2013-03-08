@@ -5,7 +5,7 @@
 
 .font-awesome{
     -fx-font-family: FontAwesome;
-    -fx-font-size: 16px;
+    -fx-font-size: 20px;
     -fx-effect: innershadow( three-pass-box , derive(-font-awesome-color,-70%) , 0.1em, 0.0 , 0.07em, 0.07em );
     -fx-text-fill: linear-gradient(to bottom, derive(-font-awesome-color,20%) 10%, derive(-font-awesome-color,-40%) 80%);
 }
@@ -16,13 +16,16 @@
 
 .tool-bar-button{
     -fx-background-color: transparent;
-    -fx-label-padding: 0;
-    -fx-graphic-text-gap: 0;
-    -fx-content-display: graphic-only;
+    -fx-padding: 2;
 }
 
 .tool-bar-button:hover{
     -fx-border-color: -font-awesome-color;
     -fx-border-radius: 4;
     -fx-border-width: 1.5px;
+}
+
+.tab-pane {
+    -fx-open-tab-animation: none;
+    -fx-close-tab-animation: none;
 }
