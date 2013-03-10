@@ -4,6 +4,7 @@ import components.HotelsPageComponentFactory
 import org.osgi.framework.{BundleActivator, BundleContext}
 import com.openaf.browser.gui.{BrowserActionButton, PageContext, OpenAFApplication}
 import com.openaf.travel.api.{HotelsPage, FlightsAndHotelsPageFactory, HotelsPageFactory}
+import com.openaf.table.gui.OpenAFTable
 
 class TravelBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
@@ -24,4 +25,5 @@ object TravelBrowserApplication extends OpenAFApplication {
     )
   }
   override def componentFactoryMap = Map(classOf[HotelsPage].getName -> HotelsPageComponentFactory)
+  override def styleSheets = OpenAFTable.styleSheets
 }

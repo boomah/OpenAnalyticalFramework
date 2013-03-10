@@ -7,9 +7,6 @@ class DropTargetNode(dropTargetContainer:DropTargetContainer) extends FlowPane w
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     dropTargetContainer.childFieldsDropped(this, draggableFieldsInfo, tableData)
   }
-
+  getStyleClass.add("drop-target-node")
   setPrefWidth(15)
-
-  setStyle("-fx-background-color: #CCFF99AA;")
-//  getStyleClass.add("drop-target-node")
 }

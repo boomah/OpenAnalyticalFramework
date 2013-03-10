@@ -14,6 +14,19 @@ class DragAndDrop {
   private val dropTargetContainers = new mutable.HashSet[DropTargetContainer]
   def register(dropTargetContainer:DropTargetContainer) {dropTargetContainers += dropTargetContainer}
 
+  closestDropTarget.addListener(new ChangeListener[Option[DropTarget]] {
+    def changed(observableValue:ObservableValue[_<:Option[DropTarget]], oldDropTarget:Option[DropTarget], newDropTarget:Option[DropTarget]) {
+      oldDropTarget match {
+        case Some(dropTarget) => dropTarget.setId(null)
+        case _ =>
+      }
+      newDropTarget match {
+        case Some(dropTarget) => dropTarget.setId("closest-drop-target-node")
+        case _ =>
+      }
+    }
+  })
+
   private def hypot(x1:Double, y1:Double, x2:Double, y2:Double) = math.hypot(x2 - x1, y2 - y1)
 
   private def closestDropTarget(mouseSceneX:Double, mouseSceneY:Double) = {

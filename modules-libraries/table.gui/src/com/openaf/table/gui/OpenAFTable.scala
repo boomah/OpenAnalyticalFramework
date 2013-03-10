@@ -4,6 +4,10 @@ import javafx.scene.layout.{RowConstraints, Priority, ColumnConstraints, GridPan
 import javafx.beans.property.SimpleObjectProperty
 import com.openaf.table.api.TableData
 
+object OpenAFTable {
+  def styleSheets = List(getClass.getResource("/com/openaf/table/gui/resources/table.css").toExternalForm)
+}
+
 class OpenAFTable extends GridPane {
   setGridLinesVisible(true)
 

@@ -31,6 +31,7 @@ class BrowserStageManager extends javafx.application.Application {
   private var lastFocusedStage:Stage = _
   val cache = new BrowserCache
   var pageBuilder:PageBuilder = _
+  addStyleSheetsToAllScenes(List(BrowserUtils.resource("/com/openaf/browser/gui/resources/openaf.css")))
 
   private def frameTitle = "OpenAF - " + getParameters.getUnnamed.get(0)
 
@@ -77,11 +78,16 @@ class BrowserStageManager extends javafx.application.Application {
   }
 
   private def addStyleSheetsToAllScenes(styleSheets:List[String]) {
-    println("Add style sheets")
+    println("Add style sheets : " + styleSheets)
+    styleSheets.foreach(styleSheet => {
+      // TODO - this is private api - move to new package when it is changed to public
+      com.sun.javafx.css.StyleManager.getInstance.addUserAgentStylesheet(styleSheet)
+    })
   }
 
   private def removeStyleSheetsFromAllScenes(styleSheets:List[String]) {
-    println("Remove style sheets")
+    println("Remove style sheets : " + styleSheets)
+    // TODO - put this in
   }
 
   @Subscribe def openAFApplicationAdded(openAFApplication:OpenAFApplicationAdded) {

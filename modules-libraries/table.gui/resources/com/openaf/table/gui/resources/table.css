@@ -1,4 +1,23 @@
+.root{
+    -table-view-background-colour: transparent;
+}
 
 .drop-target-node{
-    -fx-background-color: green;
+    -fx-background-color: #CCFF99AA;
+}
+
+#closest-drop-target-node{
+    -fx-background-color: #87ceebAA;
+}
+
+.filter-fields-area{
+    -fx-background-color: -table-view-background-colour;
+}
+
+.row-header-fields-area{
+    -fx-background-color: -table-view-background-colour;
+}
+
+.measure-fields-area{
+    -fx-background-color: -table-view-background-colour;
 }
