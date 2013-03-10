@@ -49,7 +49,11 @@ object StartUtils {
     JavaVersion(major.toInt, updateNumber)
   }
   def javaVersionValid(minimumJavaVersion:JavaVersion) = {
-    ((ActualJavaVersion.major >= minimumJavaVersion.major) && (ActualJavaVersion.update >= minimumJavaVersion.update))
+    if (ActualJavaVersion.major == minimumJavaVersion.major) {
+      ActualJavaVersion.update >= minimumJavaVersion.update
+    } else {
+      ActualJavaVersion.major >= minimumJavaVersion.major
+    }
   }
 }
 case class JavaVersion(major:Int, update:Int)
