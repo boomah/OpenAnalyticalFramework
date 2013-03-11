@@ -115,6 +115,7 @@ trait Draggable extends Node {
           dropTarget.fieldsDropped(draggableFieldsInfo, tableDataWithFieldsRemoved)
         })
       })
+      dragAndDrop.closestDropTarget.set(None)
       dragAndDrop.fieldsBeingDraggedInfo.set(None)
       event.consume()
       newTableDataOption.foreach(newTableData => tableData.set(newTableData))
