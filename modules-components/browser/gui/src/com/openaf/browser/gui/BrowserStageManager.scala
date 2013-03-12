@@ -102,7 +102,7 @@ class BrowserStageManager extends javafx.application.Application {
   @Subscribe def openAFApplicationRemoved(openAFApplication:OpenAFApplicationRemoved) {
     BrowserUtils.runLater({
       val removedOpenAFApplication = openAFApplication.openAFApplication
-      removeStyleSheetsFromAllScenes(removedOpenAFApplication.styleSheets)
+//      removeStyleSheetsFromAllScenes(removedOpenAFApplication.styleSheets)
       val currentApplications = cache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
       currentApplications.remove(removedOpenAFApplication)
     })
