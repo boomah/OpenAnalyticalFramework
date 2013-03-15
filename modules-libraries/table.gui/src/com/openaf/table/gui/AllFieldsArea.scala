@@ -58,6 +58,8 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragA
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
   def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
+
+  dragAndDrop.setRemoveDropTarget(this)
 }
 
 class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsArea,

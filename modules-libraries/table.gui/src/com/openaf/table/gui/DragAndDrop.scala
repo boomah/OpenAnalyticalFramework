@@ -11,8 +11,12 @@ import javafx.beans.value.{ObservableValue, ChangeListener}
 class DragAndDrop {
   val fieldsBeingDraggedInfo = new SimpleObjectProperty[Option[DraggableFieldsInfo]](None)
   val closestDropTarget = new SimpleObjectProperty[Option[DropTarget]](None)
+
   private val dropTargetContainers = new mutable.HashSet[DropTargetContainer]
+  private var removeDropTargetOption:Option[DropTarget] = None
+
   def register(dropTargetContainer:DropTargetContainer) {dropTargetContainers += dropTargetContainer}
+  def setRemoveDropTarget(removeDropTarget:DropTarget) {removeDropTargetOption = Some(removeDropTarget)}
 
   closestDropTarget.addListener(new ChangeListener[Option[DropTarget]] {
     def changed(observableValue:ObservableValue[_<:Option[DropTarget]], oldDropTarget:Option[DropTarget], newDropTarget:Option[DropTarget]) {
@@ -66,8 +70,16 @@ class DragAndDrop {
     })
   }
 
+  private def shouldRemove(mouseSceneX:Double, mouseSceneY:Double) = {
+    val removeDistance = -30
+    ((mouseSceneX < removeDistance) || (mouseSceneY < removeDistance))
+  }
+
   def updateClosestDropTarget(mouseSceneX:Double, mouseSceneY:Double) {
-    val dropTarget = closestDropTarget(mouseSceneX, mouseSceneY)
+    val dropTarget = (shouldRemove(mouseSceneX, mouseSceneY), removeDropTargetOption) match {
+      case (true, Some(removeDropTarget)) => removeDropTarget
+      case _ => closestDropTarget(mouseSceneX, mouseSceneY)
+    }
     closestDropTarget.set(Some(dropTarget))
   }
 }
