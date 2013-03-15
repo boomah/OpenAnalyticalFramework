@@ -10,6 +10,7 @@ import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.util.concurrent.CountDownLatch
 import com.google.common.eventbus.Subscribe
 import com.openaf.pagemanager.api.Page
+import javafx.application.{Application => JApplication}
 
 object BrowserStageManager {
   private val browserCountDownLatch = new CountDownLatch(1)
@@ -26,7 +27,7 @@ object BrowserStageManager {
   }
 }
 
-class BrowserStageManager extends javafx.application.Application {
+class BrowserStageManager extends JApplication {
   private val stages = ListBuffer[Stage]()
   private var lastFocusedStage:Stage = _
   val cache = new BrowserCache
@@ -35,7 +36,9 @@ class BrowserStageManager extends javafx.application.Application {
 
   private def frameTitle = "OpenAF - " + getParameters.getUnnamed.get(0)
 
-  def start(stage:Stage) {}
+  def start(stage:Stage) {
+    JApplication.setUserAgentStylesheet(JApplication.STYLESHEET_MODENA)
+  }
 
   def start(pageBuilder0:PageBuilder) {
     pageBuilder = pageBuilder0
