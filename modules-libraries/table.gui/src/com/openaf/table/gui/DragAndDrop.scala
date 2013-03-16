@@ -7,6 +7,8 @@ import javafx.event.EventHandler
 import javafx.scene.input.{MouseButton, MouseEvent}
 import collection.mutable
 import javafx.beans.value.{ObservableValue, ChangeListener}
+import javafx.scene.layout.{Pane, FlowPane, StackPane}
+import javafx.scene.control.Label
 
 class DragAndDrop {
   val fieldsBeingDraggedInfo = new SimpleObjectProperty[Option[DraggableFieldsInfo]](None)
@@ -164,12 +166,35 @@ trait DraggableParent {
 
 case class DraggableFieldsInfo(draggable:Draggable, draggableParent:DraggableParent)
 
-trait DragAndDropNode extends Node {
+trait DragAndDropNode extends StackPane with DropTargetContainer with DropTarget with DraggableParent {
   val tableDataProperty:SimpleObjectProperty[TableData]
-  def setup()
   def description:ReadOnlyStringProperty
+  def fields(tableDataOption:Option[TableData]):List[Field]
+  protected def fields:List[Field] = fields(None)
+  def nodes:List[Node]
+  def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = if (fields.isEmpty) List(this) else dropTargetMap.keySet.toList
+  def removeDropTargets() {
+    dropTargetPane.getChildren.clear()
+    dropTargetMap = Map.empty
+  }
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observable:ObservableValue[_<:TableData], oldValue:TableData, newValue:TableData) {setup()}
   })
+
+  protected var dropTargetMap = Map.empty[DropTarget,Option[Draggable]]
+
+  protected val descriptionLabel = new Label
+  descriptionLabel.textProperty.bind(description)
+
+  protected val mainContent = new FlowPane
+  protected val dropTargetPane = new Pane
+  dropTargetPane.setMouseTransparent(true)
+  getChildren.addAll(mainContent, dropTargetPane)
+
+  def setup() {
+    mainContent.getChildren.clear()
+    val nodesToAdd = if (fields.isEmpty) Array(descriptionLabel) else nodes.toArray
+    mainContent.getChildren.addAll(nodesToAdd :_*)
+  }
 }

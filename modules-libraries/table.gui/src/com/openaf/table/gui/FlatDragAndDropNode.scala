@@ -1,23 +1,9 @@
 package com.openaf.table.gui
 
-import javafx.scene.layout.{Pane, FlowPane, StackPane}
 import com.openaf.table.api.{TableData, Field}
-import javafx.scene.control.Label
 
-trait FlatDragAndDropNode extends StackPane with DragAndDropNode with DropTarget with DropTargetContainer with DraggableParent {
-  def fields(tableDataOption:Option[TableData]):List[Field]
+trait FlatDragAndDropNode extends DragAndDropNode {
   def withNewFields(fields:List[Field], tableData:TableData):TableData
-  def fields:List[Field] = fields(None)
-
-  private var dropTargetMap = Map.empty[DropTarget,Option[Draggable]]
-
-  private val descriptionLabel = new Label
-  descriptionLabel.textProperty.bind(description)
-
-  private val mainContent = new FlowPane
-  private val dropTargetPane = new Pane
-  dropTargetPane.setMouseTransparent(true)
-  getChildren.addAll(mainContent, dropTargetPane)
 
   def addDropTargets(draggableFieldsInfo:DraggableFieldsInfo) {
     if (fields.nonEmpty) {
@@ -60,16 +46,7 @@ trait FlatDragAndDropNode extends StackPane with DragAndDropNode with DropTarget
     }
   }
 
-  def setup() {
-    val currentFields = fields
-    mainContent.getChildren.clear()
-    if (currentFields.isEmpty) {
-      mainContent.getChildren.add(descriptionLabel)
-    } else {
-      val fieldNodes = currentFields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty))
-      mainContent.getChildren.addAll(fieldNodes.toArray :_*)
-    }
-  }
+  def nodes = fields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty))
 
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     val currentFields = fields(Some(tableData))
@@ -104,14 +81,7 @@ trait FlatDragAndDropNode extends StackPane with DragAndDropNode with DropTarget
     withNewFields(updatedFields, tableData)
   }
 
-  def removeDropTargets() {
-    dropTargetPane.getChildren.clear()
-    dropTargetMap = Map.empty
-  }
-
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     withNewFields(draggableFieldsInfo.draggable.fields, tableData)
   }
-
-  def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = if (fields.isEmpty) List(this) else dropTargetMap.keySet.toList
 }

@@ -1,7 +1,7 @@
 package com.openaf.travel.api
 
 import com.openaf.pagemanager.api.{PageData, PageFactory, ServerContext, Page}
-import com.openaf.table.api.{TableData, Field, TableState}
+import com.openaf.table.api.{MeasureAreaLayout, TableData, Field, TableState}
 
 trait TravelPage extends Page {
   def pageDataFacility(serverContext:ServerContext) = serverContext.facility(classOf[TravelPageDataFacility])
@@ -17,7 +17,9 @@ case class HotelsPage(tableState:TableState) extends TravelPage
 case class FlightsAndHotelsPage() extends TravelPage
 
 object HotelsPageFactory extends PageFactory {
-  def page = HotelsPage(TableState.Blank.withRowHeaderFields(List(TravelPage.HotelNameField, TravelPage.PeriodField)))
+  def page = HotelsPage(TableState.Blank
+    .withRowHeaderFields(List(TravelPage.HotelNameField, TravelPage.PeriodField))
+    .withMeasureAreaLayout(MeasureAreaLayout(TravelPage.CostField, List(TravelPage.HotelNameField, TravelPage.PeriodField))))
 }
 
 object FlightsAndHotelsPageFactory extends PageFactory {
