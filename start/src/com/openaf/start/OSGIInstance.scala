@@ -216,15 +216,7 @@ object ServerOSGIInstanceStarter {
     }
   }
 
-  def excludedPackages(jarFile:File) = {
-    val name = jarFile.getName.toLowerCase
-    if (name.startsWith("log4j")) {
-      List("com.ibm.uvm.tools", "com.sun.jdmk.comm", "javax.jmdns", "javax.jms", "javax.mail", "javax.mail.internet")
-    } else {
-      Nil
-    }
-  }
-
+  def excludedPackages(jarFile:File) = Nil
   def formattedSubNames(file:File) = file.listFiles().toList.map(_.getName.trim()).filterNot(_.toLowerCase == ".ds_store")
   def componentsModulesDir = new File("modules-components")
   def librariesModulesDir = new File("modules-libraries")
