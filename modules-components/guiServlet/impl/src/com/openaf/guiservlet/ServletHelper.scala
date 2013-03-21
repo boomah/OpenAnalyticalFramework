@@ -57,7 +57,9 @@ object ServletHelper {
     val fromClassesPathLength = fromClassesDir.getPath.length + 1
     allFiles(fromClassesDir).foreach(file => {
       val path = file.getPath
-      jarOutputStream.putNextEntry(new JarEntry(path.substring(fromClassesPathLength)))
+      val jarEntry = new JarEntry(path.substring(fromClassesPathLength))
+      jarEntry.setTime(0)
+      jarOutputStream.putNextEntry(jarEntry)
       val inputStream = new BufferedInputStream(new FileInputStream(file))
       IO.copy(inputStream, jarOutputStream)
       inputStream.close()
