@@ -79,7 +79,7 @@ class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], v
     val nodeSceneBounds = measureAreaTreeNode.localToScene(measureAreaTreeNode.getBoundsInLocal)
     val boundsForDropTarget = dropTargetPane.sceneToLocal(nodeSceneBounds)
 
-    val shouldCreateDropTargetNodes = measureAreaTreeNode.getChildren.size > 1
+    val shouldCreateDropTargetNodes = (measureAreaTreeNode.getChildren.size > 1)
 
     val leftDropTargetNodeOption = if (shouldCreateDropTargetNodes) {
       val leftDropTargetNode = new DropTargetNode(this)
@@ -93,11 +93,13 @@ class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], v
       None
     }
 
-    val shouldCreateRightDropTargetNode = measureAreaTreeNode.getParent match {
-      case measureAreaLayoutNode:MeasureAreaLayoutNode => {
-        (shouldCreateDropTargetNodes && (measureAreaLayoutNode.getChildren.size == 1))
-      }
-      case _ => false
+    val shouldCreateRightDropTargetNode = {
+      shouldCreateDropTargetNodes && (measureAreaTreeNode.getParent match {
+        case measureAreaLayoutNode:MeasureAreaLayoutNode => {
+          (measureAreaLayoutNode.getChildren.get(measureAreaLayoutNode.getChildren.size - 1) == measureAreaTreeNode)
+        }
+        case _ => false
+      })
     }
 
     val rightDropTargetNodeOption = if (shouldCreateRightDropTargetNode) {
@@ -119,7 +121,7 @@ class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], v
     val nodeSceneBounds = measureAreaLayoutNode.localToScene(measureAreaLayoutNode.getBoundsInLocal)
     val boundsForDropTarget = dropTargetPane.sceneToLocal(nodeSceneBounds)
 
-    val shouldCreateDropTargetNodes = measureAreaLayoutNode.getChildren.size > 1
+    val shouldCreateDropTargetNodes = (measureAreaLayoutNode.getChildren.size > 1)
 
     val topDropTargetNodeOption = if (shouldCreateDropTargetNodes) {
       val topDropTargetNode = new DropTargetNode(this)
@@ -134,13 +136,15 @@ class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], v
     }
 
     val shouldCreateBottomDropTargetNode = {
-      shouldCreateDropTargetNodes && (measureAreaLayoutNode.getParent match {
-        case measureAreaTreeNode:MeasureAreaTreeNode => {
-          val measureAreaTreeNodeChildren = measureAreaTreeNode.getChildren
-          ((measureAreaTreeNodeChildren.size == 2) && (measureAreaTreeNodeChildren.get(1) == measureAreaLayoutNode))
-        }
-        case _ => false
-      })
+      shouldCreateDropTargetNodes && {
+        val topMeasureAreaLayoutNode = mainContent.getChildren.get(0).asInstanceOf[MeasureAreaLayoutNode]
+        val measureAreaTreeNodes = topMeasureAreaLayoutNode.getChildren.toArray.collect{case (measureAreaTreeNode:MeasureAreaTreeNode) => measureAreaTreeNode}
+        (measureAreaLayoutNode == topMeasureAreaLayoutNode) ||
+          measureAreaTreeNodes.exists(measureAreaTreeNode => {
+            val measureAreaTreeNodeChildren = measureAreaTreeNode.getChildren
+            ((measureAreaTreeNodeChildren.size == 2) && (measureAreaTreeNodeChildren.get(1) == measureAreaLayoutNode))
+          })
+      }
     }
 
     val bottomDropTargetNodeOption = if (shouldCreateBottomDropTargetNode) {
