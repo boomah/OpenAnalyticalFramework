@@ -10,6 +10,7 @@ import java.io._
 import java.util.concurrent.CopyOnWriteArraySet
 import java.util.jar.JarFile
 import java.util
+import OSGIInstance._
 
 class OSGIInstance(name:String, bundleDefinitions:BundleDefinitions, openAFFrameworkProperties:Map[String,String]=Map.empty) {
   private val framework = {
@@ -40,49 +41,61 @@ class OSGIInstance(name:String, bundleDefinitions:BundleDefinitions, openAFFrame
 
     val bundles = bundleDefinitions.bundles
     val newBundles = bundles.map(definition => definition.name -> definition).toMap
-    val ignoredBundles:Map[String, List[BundleDefinition]] = bundles.groupBy(_.name.name).filter(_._2.size > 1).mapValues(_.init)
+//    val ignoredBundles = bundles.groupBy(_.name.name).filter(_._2.size > 1).mapValues(_.init)
 
-    println("Ignored bundles: " + ignoredBundles.flatMap(_._2.map(_.name)).mkString(", "))
-
-    val unInstalled = (currentBundles.keySet -- newBundles.keySet).toList.map(bundleToRemove => {
+    val uninstalled = (currentBundles.keySet -- newBundles.keySet).toList.map(bundleToRemove => {
       currentBundles(bundleToRemove).uninstall()
       currentBundles(bundleToRemove)
     })
-
-    println("Uninstalled bundles: " + unInstalled.map(r => (r.getSymbolicName + " : " + r.getVersion)).mkString(", "))
 
     val updated = (newBundles.keySet & currentBundles.keySet).toList.flatMap(commonBundle => {
       val newBundleDef = newBundles(commonBundle)
       val currentBundle = currentBundles(commonBundle)
       if (newBundleDef.lastModified > currentBundle.getLastModified) {
-        println(s"Updating: ${currentBundle.getSymbolicName}...")
         currentBundle.update(newBundleDef.inputStream)
-        println(s"Updated: ${currentBundle.getSymbolicName} (state: ${currentBundle.getState})")
         Some(currentBundle)
       } else {
         None
       }
     })
 
-    println("Updated bundles: " + updated.map(_.getSymbolicName).mkString(", "))
-
     def realBundle(bundle:Bundle) = (bundle.getHeaders.get("Fragment-Host") == null)
 
     val installed = (newBundles.keySet -- currentBundles.keySet).toList.map(newBundleName => {
-      println("Installing: " + newBundleName + " : " + newBundleName.version + "...")
       val newBundleDef = newBundles(newBundleName)
-      val res = context.installBundle("from-bnd:" + newBundleDef.name, newBundleDef.inputStream)
-      println(s"Installed: $newBundleName (state: ${res.getState})")
-      res
+      context.installBundle("from-bnd:" + newBundleDef.name, newBundleDef.inputStream)
     }).filter(realBundle(_))
 
-    println("Installed bundles: " + installed.map(_.getSymbolicName).mkString(", "))
-
-    if (unInstalled.nonEmpty || updated.nonEmpty) {
+    if (uninstalled.nonEmpty || updated.nonEmpty) {
       val packageAdmin = context.getBundle.adapt(classOf[FrameworkWiring])
       packageAdmin.refreshBundles(null, Array())
     }
     installed.foreach(_.start())
+
+    def printBundleInfo(text:String, bundles:List[Bundle]) {
+      if (bundles.isEmpty) {
+        println(text + "n/a")
+      } else {
+        val textSpace = "\n" + emptyString(text.length)
+        val bundleNames = bundles.map(_.getSymbolicName)
+        val maxLengthOfBundleName = bundleNames.map(_.length).max + 1
+        val bundleString = bundles.sortBy(_.getSymbolicName).map(bundle => {
+          val bundleSymbolicName = bundle.getSymbolicName
+          val nameSpace = emptyString(maxLengthOfBundleName - bundleSymbolicName.length)
+          (bundleSymbolicName + ":" + nameSpace + bundle.getVersion)
+        }).mkString(textSpace)
+        println(text + bundleString)
+      }
+    }
+
+    println(Dashes)
+    println("Server Bundles Info")
+    println("")
+//      println("Ignored bundles:    " + ignoredBundles.flatMap(_._2.map(_.name)).mkString(", "))
+    printBundleInfo("Uninstalled bundles: ", uninstalled)
+    printBundleInfo("Installed bundles:   ", installed)
+    printBundleInfo("Updated bundles:     ", updated)
+    println(Dashes)
   }
 
   def start() {
@@ -108,6 +121,9 @@ object OSGIInstance {
     "javax.security.sasl", "javax.sql", "javax.transaction",
     "javax.xml.parsers", "org.ietf.jgss", "org.w3c.dom", "org.xml.sax",
     "org.xml.sax.helpers", "org.xml.sax.ext")
+
+  val Dashes = List.fill(80)("-").mkString
+  def emptyString(n:Int) = List.fill(n)(" ").mkString
 }
 
 case class OSGIInstanceConfig(name:String, properties:()=>Map[String,String], bundles:BundleDefinitions)
@@ -140,13 +156,23 @@ object ServerOSGIInstanceStarter {
       file.delete
     })
 
-    val missingOrOutOfDateMap = configVersions.flatMap{case (configName, configVersion) => {
-      if (!currentVersions.contains(configName) || (configVersion != currentVersions(configName))) {
+    val missingMap = configVersions.flatMap{case (configName, configVersion) => {
+      if (!currentVersions.contains(configName)) {
         Some((configName -> configVersion))
       } else {
         None
       }
     }}
+
+    val outOfDataMap = configVersions.flatMap{case (configName, configVersion) => {
+      if (currentVersions.contains(configName) && (configVersion != currentVersions(configName))) {
+        Some((configName -> configVersion))
+      } else {
+        None
+      }
+    }}
+
+    val missingOrOutOfDateMap = missingMap ++ outOfDataMap
 
     missingOrOutOfDateMap.foreach{case (name,version) => {
       if (currentVersions.contains(name)) {
@@ -158,6 +184,24 @@ object ServerOSGIInstanceStarter {
       val bundleInputStream = configNameToDef(name).inputStream
       FileUtils.copyStreams(bundleInputStream, outputStream)
     }}
+
+    def printInfo(text:String, names:List[String]) {
+      if (names.isEmpty) {
+        println(text + "n/a")
+      } else {
+        val textSpace = "\n" + emptyString(text.length)
+        val nameString = names.sorted.mkString(textSpace)
+        println(text + nameString)
+      }
+    }
+
+    println(Dashes)
+    println("GUI Bundles Info")
+    println("")
+    printInfo("Deleted Files: ", unnecessaryNames.toList)
+    printInfo("New Files:     ", missingMap.keys.toList)
+    printInfo("Updated Files: ", outOfDataMap.keys.toList)
+    println(Dashes)
 
     unnecessaryNames.nonEmpty || missingOrOutOfDateMap.nonEmpty
   }
