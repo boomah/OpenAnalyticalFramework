@@ -5,14 +5,15 @@ import com.openaf.table.api.{TableData, Field}
 trait FlatDragAndDropNode extends DragAndDropNode {
   def withNewFields(fields:List[Field], tableData:TableData):TableData
 
-  def addDropTargets(draggableFieldsInfo:DraggableFieldsInfo) {
-    if (fields.nonEmpty) {
-      val currentDraggables = mainContent.getChildren.toArray
-      def nextDraggableOption(i:Int) = if (i < currentDraggables.length) Some(currentDraggables(i)) else None
-      dropTargetMap = currentDraggables.zipWithIndex.flatMap{case (currentDraggableAny,i) => {
-        val currentDraggable = currentDraggableAny.asInstanceOf[Draggable]
-        val draggablesMatch = (currentDraggable == draggableFieldsInfo.draggable)
-        if (!draggablesMatch && (i == 0)) {
+  def dropTargetsToDraggable(draggableFieldsInfo:DraggableFieldsInfo) = {
+    val currentDraggables = mainContent.getChildren.toArray
+    def nextDraggableOption(i:Int) = if (i < currentDraggables.length) Some(currentDraggables(i)) else None
+    currentDraggables.zipWithIndex.flatMap{case (currentDraggableAny,i) => {
+      val currentDraggable = currentDraggableAny.asInstanceOf[Draggable]
+      if (currentDraggable == draggableFieldsInfo.draggable) {
+        Nil
+      } else {
+        if (i == 0) {
           val leftDropTarget = new DropTargetNode(this)
           leftDropTarget.setPrefHeight(currentDraggable.getLayoutBounds.getHeight)
           leftDropTarget.layoutXProperty.bind(currentDraggable.layoutXProperty.subtract(leftDropTarget.widthProperty.divide(2)))
@@ -27,7 +28,7 @@ trait FlatDragAndDropNode extends DragAndDropNode {
               List(leftDropTargetEntry, rightDropTarget -> Some(currentDraggable))
             }
           }
-        } else if (!draggablesMatch) {
+        } else {
           nextDraggableOption(i + 1) match {
             case Some(nextChild) if nextChild == draggableFieldsInfo.draggable => Nil
             case _ => {
@@ -38,12 +39,9 @@ trait FlatDragAndDropNode extends DragAndDropNode {
               List(rightDropTarget -> Some(currentDraggable))
             }
           }
-        } else {
-          Nil
         }
-      }}.toMap
-      dropTargetPane.getChildren.addAll(dropTargetMap.keySet.toArray :_*)
-    }
+      }
+    }}.toMap
   }
 
   def nodes = fields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty))

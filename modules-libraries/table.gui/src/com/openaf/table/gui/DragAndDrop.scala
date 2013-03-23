@@ -171,11 +171,19 @@ trait DragAndDropNode extends StackPane with DropTargetContainer with DropTarget
   def description:ReadOnlyStringProperty
   def fields(tableDataOption:Option[TableData]):List[Field]
   protected def fields:List[Field] = fields(None)
+  protected def hasFields = fields.nonEmpty
   def nodes:List[Node]
-  def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = if (fields.isEmpty) List(this) else dropTargetMap.keySet.toList
+  def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = if (hasFields) dropTargetMap.keySet.toList else List(this)
   def removeDropTargets() {
     dropTargetPane.getChildren.clear()
     dropTargetMap = Map.empty
+  }
+  def dropTargetsToDraggable(draggableFieldsInfo:DraggableFieldsInfo):Map[DropTarget,Option[Draggable]]
+  def addDropTargets(draggableFieldsInfo:DraggableFieldsInfo) {
+    if (hasFields) {
+      dropTargetMap = dropTargetsToDraggable(draggableFieldsInfo)
+      dropTargetPane.getChildren.addAll(dropTargetMap.keySet.toArray :_*)
+    }
   }
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
