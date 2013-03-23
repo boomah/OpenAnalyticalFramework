@@ -102,22 +102,23 @@ case class ModuleBundleDefinition(topLevelModuleName:String, moduleType:ModuleTy
       case ModuleType.GUI => builder.setProperty(BUNDLE_ACTIVATOR, "com.openaf." + topLevelModuleName.toLowerCase + ".gui." + topLevelModuleName.capitalize + "BundleActivator")
       case _ =>
     }
-    //if (module.moduleType != ModuleType.IMPL) {
+    if (moduleType != ModuleType.IMPL) {
       builder.setProperty(EXPORT_PACKAGE, "*")
-    //}
-    val allIncludes = List[String]()
-    val allExcludes = List[String]()
-    builder.setProperty(IMPORT_PACKAGE, (allExcludes.map(p => "!"+p) ::: allIncludes.toList ::: List("*")).mkString(","))
+    } else {
+      builder.setProperty(PRIVATE_PACKAGE, "*")
+    }
+    val includedPackages = List[String]()
+    val excludedPackages = List[String]()
+    builder.setProperty(IMPORT_PACKAGE, (excludedPackages.map(excludedPackage => "!"+excludedPackage) ::: includedPackages.toList ::: List("*")).mkString(","))
     val jar = builder.build()
-    val out = new ByteArrayOutputStream()
 
     /*println("--------------------")
     println(topLevelModuleName)
     jar.writeManifest(System.out)
-    println("^^")
-
     println("--------------------")
     println("")*/
+
+    val out = new ByteArrayOutputStream()
     jar.write(out)
     new ByteArrayInputStream(out.toByteArray)
   }
