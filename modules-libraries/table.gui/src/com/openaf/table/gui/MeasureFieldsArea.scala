@@ -174,7 +174,7 @@ class MeasureAreaLayoutNode(measureAreaLayout:MeasureAreaLayout, tableDataProper
 class MeasureAreaTreeNode(measureAreaTree:MeasureAreaTree, tableDataProperty:SimpleObjectProperty[TableData],
                           dragAndDrop:DragAndDrop, draggableParent:DraggableParent) extends VBox {
   private val topNode = measureAreaTree.measureAreaTreeType match {
-    case Left(measureAreaField) => new FieldNode(measureAreaField.field, dragAndDrop, draggableParent, tableDataProperty)
+    case Left(field) => new FieldNode(field, dragAndDrop, draggableParent, tableDataProperty)
     case Right(measureAreaLayout) => new MeasureAreaLayoutNode(measureAreaLayout, tableDataProperty, dragAndDrop, draggableParent)
   }
   getChildren.add(topNode)
