@@ -11,6 +11,7 @@ import java.lang.Boolean
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.{Boolean => JBoolean}
 import utils.{FontAwesomeLabel, FontAwesome}, FontAwesome._
+import javafx.beans.{Observable, InvalidationListener}
 
 class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage) extends ToolBar {
   getStyleClass.add("browser-bar")
@@ -20,11 +21,28 @@ class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage) ex
   private val stopOrRefreshButton = new StopOrRefreshToolBarButton(Remove, (isStop) => browser.stopOrRefresh(isStop),
                                                                    browser.stopOrRefreshDisabledProperty, browser.working)
   private val homeButton = new SingleActionToolBarButton(Home, browser.home, browser.homeDisabledProperty)
+  private val navigationButtons = List(backButton, forwardButton, stopOrRefreshButton, homeButton)
+  private val buttonResizeListener = new InvalidationListener {
+    def invalidated(observable:Observable) {
+      val maxSideSize = navigationButtons.flatMap(button => {
+        List(button.prefWidth(Integer.MAX_VALUE), button.prefHeight(Integer.MAX_VALUE))
+      }).max
+      navigationButtons.foreach(button => {
+        button.setPrefWidth(maxSideSize)
+        button.setPrefHeight(maxSideSize)
+      })
+    }
+  }
+  navigationButtons.foreach(button => {
+    button.widthProperty.addListener(buttonResizeListener)
+    button.heightProperty.addListener(buttonResizeListener)
+  })
   private val addressBar = new AddressBar(browser.pageLongText)
   HBox.setHgrow(addressBar, Priority.ALWAYS)
   private val settingsButton = new SettingsMenuButton(tabPane, stage)
 
-  getItems.addAll(backButton, forwardButton, stopOrRefreshButton, homeButton, addressBar, settingsButton)
+  getItems.addAll(navigationButtons.toArray :_*)
+  getItems.addAll(addressBar, settingsButton)
 }
 
 class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage) extends MenuButton {
