@@ -1,7 +1,6 @@
 package com.openaf.browser.gui.utils
 
-import javafx.scene.text.Font
-import javafx.scene.control.Label
+import javafx.scene.text.{TextBoundsType, Text, Font}
 
 object FontAwesome extends Enumeration {
   type classOf[FontAwesome] = Value
@@ -18,6 +17,7 @@ object FontAwesome extends Enumeration {
 
 case class FontAwesome(text:String)
 
-class FontAwesomeLabel(fontAwesome:FontAwesome) extends Label(fontAwesome.text) {
+class FontAwesomeText(fontAwesome:FontAwesome) extends Text(fontAwesome.text) {
   getStyleClass.add("font-awesome")
+  setBoundsType(TextBoundsType.VISUAL)
 }

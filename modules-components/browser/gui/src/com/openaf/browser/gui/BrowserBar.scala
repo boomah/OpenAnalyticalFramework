@@ -3,14 +3,14 @@ package com.openaf.browser.gui
 import javafx.event.{ActionEvent, EventHandler}
 import pages.{HomePage, UtilsPage}
 import javafx.scene.control._
-import javafx.scene.layout.{Priority, HBox}
+import javafx.scene.layout.{StackPane, Priority, HBox}
 import javafx.beans.binding.{StringBinding, BooleanBinding}
 import utils.BrowserUtils._
 import javafx.beans.property.SimpleBooleanProperty
 import java.lang.Boolean
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.{Boolean => JBoolean}
-import utils.{FontAwesomeLabel, FontAwesome}, FontAwesome._
+import utils.{FontAwesomeText, FontAwesome}, FontAwesome._
 import javafx.beans.{Observable, InvalidationListener}
 
 class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage) extends ToolBar {
@@ -46,7 +46,7 @@ class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage) ex
 }
 
 class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage) extends MenuButton {
-  setGraphic(new FontAwesomeLabel(Cog))
+  setGraphic(new StackPane(new FontAwesomeText(Cog)))
 
   private val newTabMenuItem = new MenuItem("New Tab")
   newTabMenuItem.setAccelerator(keyMap.newTab.accelerator)
@@ -69,12 +69,13 @@ class AddressBar(text:StringBinding) extends TextField {
 
 class ToolBarButton(fontAwesome:FontAwesome, disabled:BooleanBinding) extends Button {
   getStyleClass.add("tool-bar-button")
-  private val iconLabel = new FontAwesomeLabel(fontAwesome)
+  private val fontAwesomeText = new FontAwesomeText(fontAwesome)
+  private val stackPane = new StackPane(fontAwesomeText)
 
-  setGraphic(iconLabel)
+  setGraphic(stackPane)
   setFocusTraversable(false)
   disableProperty.bind(disabled)
-  def updateIcon(fontAwesome:FontAwesome) {iconLabel.setText(fontAwesome.text)}
+  def updateIcon(fontAwesome:FontAwesome) {fontAwesomeText.setText(fontAwesome.text)}
 }
 
 class SingleActionToolBarButton(fontAwesome:FontAwesome, action: ()=>Unit, disabled:BooleanBinding) extends ToolBarButton(fontAwesome, disabled) {
