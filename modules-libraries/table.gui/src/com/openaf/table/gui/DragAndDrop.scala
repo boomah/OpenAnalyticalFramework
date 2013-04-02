@@ -7,8 +7,9 @@ import javafx.event.EventHandler
 import javafx.scene.input.{MouseButton, MouseEvent}
 import collection.mutable
 import javafx.beans.value.{ObservableValue, ChangeListener}
-import javafx.scene.layout.{Pane, FlowPane, StackPane}
+import javafx.scene.layout.{Region, Pane, FlowPane, StackPane}
 import javafx.scene.control.Label
+import javafx.geometry.Side
 
 class DragAndDrop {
   val fieldsBeingDraggedInfo = new SimpleObjectProperty[Option[DraggableFieldsInfo]](None)
@@ -86,7 +87,7 @@ class DragAndDrop {
   }
 }
 
-trait Draggable extends Node {
+trait Draggable extends Region {
   def dragAndDrop:DragAndDrop
   def draggableParent:DraggableParent
   def fields:List[Field]
@@ -178,10 +179,10 @@ trait DragAndDropNode extends StackPane with DropTargetContainer with DropTarget
     dropTargetPane.getChildren.clear()
     dropTargetMap = Map.empty
   }
-  def dropTargetsToDraggable(draggableFieldsInfo:DraggableFieldsInfo):Map[DropTarget,Option[Draggable]]
+  def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo):Map[DropTarget,NodeSide]
   def addDropTargets(draggableFieldsInfo:DraggableFieldsInfo) {
     if (hasFields) {
-      dropTargetMap = dropTargetsToDraggable(draggableFieldsInfo)
+      dropTargetMap = dropTargetsToNodeSide(draggableFieldsInfo)
       dropTargetPane.getChildren.addAll(dropTargetMap.keySet.toArray :_*)
     }
   }
@@ -190,7 +191,7 @@ trait DragAndDropNode extends StackPane with DropTargetContainer with DropTarget
     def changed(observable:ObservableValue[_<:TableData], oldValue:TableData, newValue:TableData) {setup()}
   })
 
-  protected var dropTargetMap = Map.empty[DropTarget,Option[Draggable]]
+  protected var dropTargetMap = Map.empty[DropTarget,NodeSide]
 
   protected val descriptionLabel = new Label
   descriptionLabel.textProperty.bind(description)
@@ -206,3 +207,5 @@ trait DragAndDropNode extends StackPane with DropTargetContainer with DropTarget
     mainContent.getChildren.addAll(nodesToAdd :_*)
   }
 }
+
+case class NodeSide(node:Node, side:Side)

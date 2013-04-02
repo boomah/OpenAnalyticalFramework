@@ -2,6 +2,7 @@ package com.openaf.table.api
 
 case class MeasureAreaLayout(measureAreaTrees:List[MeasureAreaTree]) {
   def allFields = measureAreaTrees.flatMap(_.allFields).toSet
+  def normalise:MeasureAreaLayout = MeasureAreaLayout(measureAreaTrees.flatMap(_.normalise))
 }
 
 object MeasureAreaLayout {
@@ -32,6 +33,59 @@ case class MeasureAreaTree(measureAreaTreeType:MeasureAreaTreeType, childMeasure
     }) ++ childMeasureAreaLayout.allFields
   }
   def hasChildren = childMeasureAreaLayout.measureAreaTrees.nonEmpty
+
+  def normalise:List[MeasureAreaTree] = {
+    println("000 " + (measureAreaTreeType,"---", childMeasureAreaLayout))
+    val normalisedChildMeasureAreaLayout = childMeasureAreaLayout.normalise
+    println("111 " + normalisedChildMeasureAreaLayout)
+    if (normalisedChildMeasureAreaLayout.allFields.isEmpty) {
+      measureAreaTreeType match {
+        case field@Left(_) => {
+          println("222 " + field)
+          List(MeasureAreaTree(field))
+        }
+        case right@Right(measureAreaLayout) => {
+          val normalisedMeasureAreaLayout = measureAreaLayout.normalise
+          println("xxx " + normalisedMeasureAreaLayout)
+          if (normalisedMeasureAreaLayout.measureAreaTrees.forall(_.allFields.size == 1)) {
+            println("333 ")
+            val r = normalisedMeasureAreaLayout.measureAreaTrees.flatMap(_.allFields).map(field => MeasureAreaTree(field))
+            println("xxx1 " + r)
+            r
+          } else {
+            println("444")
+            List(MeasureAreaTree(right))
+          }
+        }
+      }
+    } else {
+      val newMeasureAreaTreeTypeOption = measureAreaTreeType match {
+        case field@Left(_) => Some(field)
+        case right@Right(measureAreaLayout) => {
+          println("aaa")
+          val normalisedMeasureAreaLayout = measureAreaLayout.normalise
+          val allFields = normalisedMeasureAreaLayout.allFields
+          if (allFields.isEmpty) {
+            println("bbb")
+            None
+          } else if (allFields.size == 1) {
+            println("ccc")
+            Some(Left(measureAreaLayout.allFields.head))
+          } else {
+            println("ddd " + (normalisedMeasureAreaLayout, "---", normalisedChildMeasureAreaLayout))
+            Some(Right(normalisedMeasureAreaLayout))
+          }
+        }
+      }
+      newMeasureAreaTreeTypeOption match {
+        case Some(newMeasureAreaTreeType) => {
+          println("eee " + (newMeasureAreaTreeType, "---", normalisedChildMeasureAreaLayout))
+          List(MeasureAreaTree(newMeasureAreaTreeType, normalisedChildMeasureAreaLayout))
+        }
+        case _ => normalisedChildMeasureAreaLayout.measureAreaTrees
+      }
+    }
+  }
 }
 
 object MeasureAreaTree {

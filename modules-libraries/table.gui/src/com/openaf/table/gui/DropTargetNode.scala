@@ -8,5 +8,10 @@ class DropTargetNode(dropTargetContainer:DropTargetContainer) extends FlowPane w
     dropTargetContainer.childFieldsDropped(this, draggableFieldsInfo, tableData)
   }
   getStyleClass.add("drop-target-node")
-  setPrefWidth(15)
+  setPrefWidth(DropTargetNode.size)
+  setPrefHeight(DropTargetNode.size)
+}
+
+object DropTargetNode {
+  val size = 3
 }

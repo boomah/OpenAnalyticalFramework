@@ -4,7 +4,8 @@
 }
 
 .drop-target-node{
-    -fx-background-color: #CCFF99AA;
+    #-fx-background-color: #CCFF99AA;
+    -fx-background-color: red;
 }
 
 #closest-drop-target-node{
