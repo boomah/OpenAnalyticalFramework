@@ -2,8 +2,6 @@ package com.openaf.travel.api
 
 import com.openaf.pagemanager.api.{PageData, PageFactory, ServerContext, Page}
 import com.openaf.table.api._
-import com.openaf.travel.api.HotelsPage
-import com.openaf.travel.api.FlightsAndHotelsPage
 import com.openaf.table.api.Field
 
 trait TravelPage extends Page {

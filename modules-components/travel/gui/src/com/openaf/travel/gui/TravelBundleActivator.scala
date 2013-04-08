@@ -2,9 +2,9 @@ package com.openaf.travel.gui
 
 import components.HotelsPageComponentFactory
 import org.osgi.framework.{BundleActivator, BundleContext}
-import com.openaf.browser.gui.{BrowserActionButton, PageContext, OpenAFApplication}
 import com.openaf.travel.api.{HotelsPage, FlightsAndHotelsPageFactory, HotelsPageFactory}
 import com.openaf.table.gui.OpenAFTable
+import com.openaf.browser.gui.api.{PageContext, BrowserActionButton, OpenAFApplication}
 
 class TravelBundleActivator extends BundleActivator {
   def start(context:BundleContext) {

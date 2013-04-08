@@ -32,10 +32,11 @@ class RmiClientConnectorBundleActivator extends OpenAFBundleActivator {
 
   private def packagesToBundle(context:BundleContext) = {
     val bundles = context.getBundles
-    bundles.map(bundle => {
-      val exportPackageString = bundle.getHeaders.get("Export-Package")
-      val withoutUses = exportPackageString.replaceAll("""uses:=\"(\\.|[^\"])*\"""", "")
-      (withoutUses -> bundle)
+    bundles.flatMap(bundle => {
+      val exportPackageStringOption = Option(bundle.getHeaders.get("Export-Package"))
+      exportPackageStringOption.map(exportPackageString => {
+        exportPackageString.replaceAll("""uses:=\"(\\.|[^\"])*\"""", "")
+      }).map(_ -> bundle)
     }).toMap
   }
 

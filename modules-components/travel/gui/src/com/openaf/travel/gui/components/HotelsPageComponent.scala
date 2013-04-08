@@ -1,11 +1,11 @@
 package com.openaf.travel.gui.components
 
-import com.openaf.browser.gui.components.{PageComponentFactory, PageComponent}
+import com.openaf.browser.gui.api.components.{PageComponentFactory, PageComponent}
 import com.openaf.travel.api.{HotelsPageData, HotelsPage}
-import com.openaf.browser.gui.PageContext
 import com.openaf.table.gui.OpenAFTable
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import com.openaf.table.api.TableData
+import com.openaf.browser.gui.api.PageContext
 
 class HotelsPageComponent extends OpenAFTable with PageComponent {
   type P = HotelsPage
