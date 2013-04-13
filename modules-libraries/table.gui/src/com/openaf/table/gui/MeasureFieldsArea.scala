@@ -24,7 +24,6 @@ class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], v
   def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     val newMeasureAreaLayout = parentMeasureAreaLayoutNode.generateMeasureAreaLayoutWithRemoval(draggableToRemove = draggableFieldsInfo.draggable)
     val normalisedNewMeasureAreaLayout = newMeasureAreaLayout.normalise
-    println("RR " + normalisedNewMeasureAreaLayout)
     tableData.withMeasureAreaLayout(normalisedNewMeasureAreaLayout)
   }
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
@@ -65,7 +64,10 @@ class MeasureAreaLayoutNode(measureAreaLayout:MeasureAreaLayout, tableDataProper
           MeasureAreaLayout(newMeasureAreaTree)
         }
         case Side.BOTTOM => {
-          MeasureAreaLayout(measureAreaTrees)
+          val newMeasureAreaTreeType = Right(MeasureAreaLayout(measureAreaTrees))
+          val newChildMeasureAreaLayout = MeasureAreaLayout.fromFields(draggableFieldsInfo.draggable.fields)
+          val newMeasureAreaTree = MeasureAreaTree(newMeasureAreaTreeType, newChildMeasureAreaLayout)
+          MeasureAreaLayout(newMeasureAreaTree)
         }
         case unexpected => throw new IllegalStateException(s"A MeasureAreaLayoutNode should never have this side $unexpected")
       }

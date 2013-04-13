@@ -30,6 +30,8 @@ object HotelsPageFactory extends PageFactory {
 
   val topHeavy = MeasureAreaLayout(MeasureAreaTree(Right(MeasureAreaLayout.fromFields(List(CostField, StarRatingField))), MeasureAreaLayout(HotelNameField))).normalise
 
+  val twoTopTwoBottom = MeasureAreaLayout(MeasureAreaTree(Right(MeasureAreaLayout.fromFields(List(CostField, StarRatingField))),
+    MeasureAreaLayout.fromFields(List(HotelNameField, PeriodField)))).normalise
 
 
   def page = HotelsPage(TableState.Blank
@@ -39,7 +41,8 @@ object HotelsPageFactory extends PageFactory {
 //    .withMeasureAreaLayout(maaa)
 //    .withMeasureAreaLayout(MeasureAreaLayout(mat))
 //    .withMeasureAreaLayout(MeasureAreaLayout(mat2))
-    .withMeasureAreaLayout(topHeavy)
+//    .withMeasureAreaLayout(topHeavy)
+    .withMeasureAreaLayout(twoTopTwoBottom)
   )
 }
 
