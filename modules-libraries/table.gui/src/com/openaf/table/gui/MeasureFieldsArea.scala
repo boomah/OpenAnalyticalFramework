@@ -7,7 +7,7 @@ import javafx.geometry.Side
 
 class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], val dragAndDrop:DragAndDrop) extends DragAndDropNode {
   getStyleClass.add("measure-fields-area")
-  private val dropTargetsHelper = new MeasureFieldsAreaDropTargetsHelper(mainContent, dropTargetPane, this)
+  private val dropTargetsHelper = new MeasureFieldsAreaDropTargetsHelper(mainContent, dropTargetPane, this, this)
 
   def description = new SimpleStringProperty("Drop Measure and Column Fields Here")
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
@@ -30,6 +30,10 @@ class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], v
     val nodeSide = dropTargetMap(dropTarget)
     val newMeasureAreaLayout = parentMeasureAreaLayoutNode.generateWithAddition(nodeSide, draggableFieldsInfo)
     tableData.withMeasureAreaLayout(newMeasureAreaLayout)
+  }
+  override def moveFields(draggableFieldsInfo:DraggableFieldsInfo, dropTarget:DropTarget, tableData:TableData) = {
+    // TODO - this needs to be implemented for the measure fields area
+    super.moveFields(draggableFieldsInfo, dropTarget, tableData)
   }
 }
 
@@ -132,11 +136,22 @@ class MeasureAreaTreeNode(measureAreaTree:MeasureAreaTree, tableDataProperty:Sim
       case fieldNode:FieldNode => Left(fieldNode.field)
       case measureAreaLayoutNode:MeasureAreaLayoutNode => Right(measureAreaLayoutNode.generateWithAddition(nodeSide, draggableFieldsInfo))
     }
-    if (getChildren.size == 2) {
+    val newMeasureAreaTree = if (getChildren.size == 2) {
       val childMeasureAreaLayout = getChildren.get(1).asInstanceOf[MeasureAreaLayoutNode].generateWithAddition(nodeSide, draggableFieldsInfo)
       MeasureAreaTree(measureAreaTreeType, childMeasureAreaLayout)
     } else {
       MeasureAreaTree(measureAreaTreeType)
+    }
+    if (nodeSide.node == this) {
+      val addedMeasureAreaTree =  MeasureAreaTree(draggableFieldsInfo.draggable.fields :_*)
+      val newMeasureAreaLayout = nodeSide.side match {
+        case Side.LEFT => MeasureAreaLayout(addedMeasureAreaTree :: newMeasureAreaTree :: Nil)
+        case Side.RIGHT => MeasureAreaLayout(newMeasureAreaTree :: addedMeasureAreaTree :: Nil)
+        case unexpected => throw new IllegalStateException(s"A MeasureAreaTreeNode should never have this side $unexpected")
+      }
+      MeasureAreaTree(Right(newMeasureAreaLayout))
+    } else {
+      newMeasureAreaTree
     }
   }
 }

@@ -221,6 +221,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   }
 
   def goToPage(page:Page) {
+    println("Going to page: " + page)
     checkFXThread()
     if (goingToPage.get != Some(page)) {
       val fromPagePosition = currentPagePosition.get

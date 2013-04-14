@@ -17,9 +17,10 @@ case class TableLayout(rowHeaderFields:List[Field], measureAreaLayout:MeasureAre
     copy(filterFields = newFilterFields, filters = newFilters(newFilterFields, newAllFields))
   }
   def withMeasureAreaLayout(newMeasureAreaLayout:MeasureAreaLayout) = {
-    val newMeasureAreaLayoutFields = newMeasureAreaLayout.allFields
+    val normalisedNewMeasureAreaLayout = newMeasureAreaLayout.normalise
+    val newMeasureAreaLayoutFields = normalisedNewMeasureAreaLayout.allFields
     val newAllFields = rowHeaderFields.toSet ++ newMeasureAreaLayoutFields ++ filterFields.toSet
-    copy(measureAreaLayout = newMeasureAreaLayout, filters = newFilters(newMeasureAreaLayoutFields, newAllFields))
+    copy(measureAreaLayout = normalisedNewMeasureAreaLayout, filters = newFilters(newMeasureAreaLayoutFields, newAllFields))
   }
 }
 object TableLayout {

@@ -2,7 +2,12 @@ package com.openaf.table.api
 
 case class MeasureAreaLayout(measureAreaTrees:List[MeasureAreaTree]) {
   def allFields = measureAreaTrees.flatMap(_.allFields).toSet
-  def normalise:MeasureAreaLayout = MeasureAreaLayout(measureAreaTrees.flatMap(_.normalise))
+  def normalise:MeasureAreaLayout = MeasureAreaLayout(measureAreaTrees.flatMap(measureAreaTree => {
+    measureAreaTree.measureAreaTreeType match {
+      case Right(measureLayoutArea) if !measureAreaTree.hasChildren => measureLayoutArea.measureAreaTrees
+      case _ => List(measureAreaTree)
+    }
+  }).flatMap(_.normalise))
 }
 
 object MeasureAreaLayout {
@@ -35,25 +40,15 @@ case class MeasureAreaTree(measureAreaTreeType:MeasureAreaTreeType, childMeasure
   def hasChildren = childMeasureAreaLayout.measureAreaTrees.nonEmpty
 
   def normalise:List[MeasureAreaTree] = {
-    println("000 " + (measureAreaTreeType,"---", childMeasureAreaLayout))
     val normalisedChildMeasureAreaLayout = childMeasureAreaLayout.normalise
-    println("111 " + normalisedChildMeasureAreaLayout)
     if (normalisedChildMeasureAreaLayout.allFields.isEmpty) {
       measureAreaTreeType match {
-        case field@Left(_) => {
-          println("222 " + field)
-          List(MeasureAreaTree(field))
-        }
+        case field@Left(_) => List(MeasureAreaTree(field))
         case right@Right(measureAreaLayout) => {
           val normalisedMeasureAreaLayout = measureAreaLayout.normalise
-          println("xxx " + normalisedMeasureAreaLayout)
           if (normalisedMeasureAreaLayout.measureAreaTrees.forall(_.allFields.size == 1)) {
-            println("333 ")
-            val r = normalisedMeasureAreaLayout.measureAreaTrees.flatMap(_.allFields).map(field => MeasureAreaTree(field))
-            println("xxx1 " + r)
-            r
+            normalisedMeasureAreaLayout.measureAreaTrees.flatMap(_.allFields).map(field => MeasureAreaTree(field))
           } else {
-            println("444")
             List(MeasureAreaTree(right))
           }
         }
@@ -62,24 +57,19 @@ case class MeasureAreaTree(measureAreaTreeType:MeasureAreaTreeType, childMeasure
       val newMeasureAreaTreeTypeOption = measureAreaTreeType match {
         case field@Left(_) => Some(field)
         case right@Right(measureAreaLayout) => {
-          println("aaa")
           val normalisedMeasureAreaLayout = measureAreaLayout.normalise
           val allFields = normalisedMeasureAreaLayout.allFields
           if (allFields.isEmpty) {
-            println("bbb")
             None
           } else if (allFields.size == 1) {
-            println("ccc")
             Some(Left(measureAreaLayout.allFields.head))
           } else {
-            println("ddd " + (normalisedMeasureAreaLayout, "---", normalisedChildMeasureAreaLayout))
             Some(Right(normalisedMeasureAreaLayout))
           }
         }
       }
       newMeasureAreaTreeTypeOption match {
         case Some(newMeasureAreaTreeType) => {
-          println("eee " + (newMeasureAreaTreeType, "---", normalisedChildMeasureAreaLayout))
           List(MeasureAreaTree(newMeasureAreaTreeType, normalisedChildMeasureAreaLayout))
         }
         case _ => normalisedChildMeasureAreaLayout.measureAreaTrees
@@ -92,5 +82,15 @@ object MeasureAreaTree {
   def apply(field:Field):MeasureAreaTree = MeasureAreaTree(Left(field))
   def apply(field:Field, childMeasureAreaLayout:MeasureAreaLayout):MeasureAreaTree = {
     MeasureAreaTree(Left(field), childMeasureAreaLayout)
+  }
+  def apply(fields:Field*):MeasureAreaTree = {
+    if (fields.size == 1) {
+      MeasureAreaTree(fields.head)
+    } else {
+      val measureAreaLayout = MeasureAreaLayout.fromFields(fields.toList)
+      MeasureAreaTree(Right(measureAreaLayout))
+    }
+    val measureAreaLayout = MeasureAreaLayout.fromFields(fields.toList)
+    MeasureAreaTree(Right(measureAreaLayout))
   }
 }

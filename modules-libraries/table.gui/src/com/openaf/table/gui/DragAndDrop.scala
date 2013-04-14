@@ -126,8 +126,12 @@ trait Draggable extends Region {
       val newTableDataOption = dragAndDrop.fieldsBeingDraggedInfo.get.flatMap(draggableFieldsInfo => {
         updateClosestDropTarget(event.getSceneX, event.getSceneY)
         dragAndDrop.closestDropTarget.get.map(dropTarget => {
-          val tableDataWithFieldsRemoved = draggableFieldsInfo.draggableParent.removeFields(draggableFieldsInfo, tableData.get)
-          dropTarget.fieldsDropped(draggableFieldsInfo, tableDataWithFieldsRemoved)
+          if (draggableFieldsInfo.draggableParent == dropTarget.draggableParent) {
+            draggableFieldsInfo.draggableParent.moveFields(draggableFieldsInfo, dropTarget, tableData.get)
+          } else {
+            val tableDataWithFieldsRemoved = draggableFieldsInfo.draggableParent.removeFields(draggableFieldsInfo, tableData.get)
+            dropTarget.fieldsDropped(draggableFieldsInfo, tableDataWithFieldsRemoved)
+          }
         })
       })
       dragAndDrop.closestDropTarget.set(None)
@@ -140,6 +144,7 @@ trait Draggable extends Region {
 
 trait DropTarget extends Node {
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
+  def draggableParent:DraggableParent
 }
 
 trait DropTargetContainer {
@@ -163,6 +168,10 @@ trait DropTargetContainer {
 
 trait DraggableParent {
   def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
+  def moveFields(draggableFieldsInfo:DraggableFieldsInfo, dropTarget:DropTarget, tableData:TableData) = {
+    val tableDataWithFieldsRemoved = draggableFieldsInfo.draggableParent.removeFields(draggableFieldsInfo, tableData)
+    dropTarget.fieldsDropped(draggableFieldsInfo, tableDataWithFieldsRemoved)
+  }
 }
 
 case class DraggableFieldsInfo(draggable:Draggable, draggableParent:DraggableParent)
@@ -186,6 +195,7 @@ trait DragAndDropNode extends StackPane with DropTargetContainer with DropTarget
       dropTargetPane.getChildren.addAll(dropTargetMap.keySet.toArray :_*)
     }
   }
+  def draggableParent = this
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observable:ObservableValue[_<:TableData], oldValue:TableData, newValue:TableData) {setup()}

@@ -70,4 +70,70 @@ class MeasureAreaLayoutTest extends FunSuite {
     val expectedLayout = MeasureAreaLayout(MeasureAreaTree(Right(MeasureAreaLayout.fromFields(List(splitField1, splitField2))), MeasureAreaLayout(splitField3)))
     assert(normalisedLayout === expectedLayout)
   }
+
+  test("normalise 8") {
+    val layoutToBeNormalised = MeasureAreaLayout(
+      MeasureAreaTree(
+        Right(MeasureAreaLayout(List(
+          MeasureAreaTree(splitField1), MeasureAreaTree(splitField2, MeasureAreaLayout(splitField3))
+        )))
+      )
+    )
+    val normalisedLayout = layoutToBeNormalised.normalise
+    val expectedLayout = MeasureAreaLayout(List(
+      MeasureAreaTree(splitField1), MeasureAreaTree(splitField2, MeasureAreaLayout(splitField3))
+    ))
+    assert(normalisedLayout === expectedLayout)
+  }
+
+  test("normalise 9") {
+    val layoutToBeNormalised = MeasureAreaLayout(
+      MeasureAreaTree(Right(
+        MeasureAreaLayout(splitField1)
+      ))
+    )
+    val normalisedLayout = layoutToBeNormalised.normalise
+    val expectedLayout = MeasureAreaLayout(List(MeasureAreaTree(splitField1)))
+    assert(normalisedLayout === expectedLayout)
+  }
+
+  test("normalise 10") {
+    val layoutToBeNormalised = MeasureAreaLayout(List(
+      MeasureAreaTree(Right(MeasureAreaLayout(List(MeasureAreaTree(Left(splitField1),MeasureAreaLayout(Nil))))),MeasureAreaLayout(Nil)),
+      MeasureAreaTree(Left(splitField2),MeasureAreaLayout(List(MeasureAreaTree(Left(splitField3),MeasureAreaLayout(Nil)))))))
+    val normalisedLayout = layoutToBeNormalised.normalise
+    val expectedLayout = MeasureAreaLayout(List(
+      MeasureAreaTree(splitField1), MeasureAreaTree(splitField2, MeasureAreaLayout(splitField3))
+    ))
+    assert(normalisedLayout === expectedLayout)
+  }
+
+  test("normalise doesn't change when called more than once") {
+    val layoutToBeNormalised = MeasureAreaLayout(List(
+      MeasureAreaTree(Right(MeasureAreaLayout(List(MeasureAreaTree(Left(splitField1),MeasureAreaLayout(Nil))))),MeasureAreaLayout(Nil)),
+      MeasureAreaTree(Left(splitField2),MeasureAreaLayout(List(MeasureAreaTree(Left(splitField3),MeasureAreaLayout(Nil)))))))
+    val normalisedLayout = layoutToBeNormalised.normalise.normalise
+    val expectedLayout = MeasureAreaLayout(List(
+      MeasureAreaTree(splitField1), MeasureAreaTree(splitField2, MeasureAreaLayout(splitField3))
+    ))
+    assert(normalisedLayout === expectedLayout)
+  }
+
+  test("normalise 11") {
+    val layoutToBeNormalised = MeasureAreaLayout(List(
+      MeasureAreaTree(Right(
+        MeasureAreaLayout(List(
+          MeasureAreaTree(Right(
+            MeasureAreaLayout(List(MeasureAreaTree(Left(splitField1),MeasureAreaLayout(Nil))))
+          ), MeasureAreaLayout(Nil)),
+          MeasureAreaTree(Left(splitField2),
+            MeasureAreaLayout(List(MeasureAreaTree(Left(splitField3),MeasureAreaLayout(Nil)))))))),
+        MeasureAreaLayout(Nil))
+    ))
+    val normalisedLayout = layoutToBeNormalised.normalise
+    val expectedLayout = MeasureAreaLayout(List(
+      MeasureAreaTree(splitField1), MeasureAreaTree(splitField2, MeasureAreaLayout(splitField3))
+    ))
+    assert(normalisedLayout === expectedLayout)
+  }
 }

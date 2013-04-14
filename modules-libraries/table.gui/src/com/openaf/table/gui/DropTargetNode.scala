@@ -3,7 +3,7 @@ package com.openaf.table.gui
 import javafx.scene.layout.FlowPane
 import com.openaf.table.api.TableData
 
-class DropTargetNode(dropTargetContainer:DropTargetContainer) extends FlowPane with DropTarget {
+class DropTargetNode(dropTargetContainer:DropTargetContainer, val draggableParent:DraggableParent) extends FlowPane with DropTarget {
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     dropTargetContainer.childFieldsDropped(this, draggableFieldsInfo, tableData)
   }
