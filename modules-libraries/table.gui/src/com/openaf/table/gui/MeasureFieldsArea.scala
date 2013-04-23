@@ -22,13 +22,13 @@ class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], v
   private def measureAreaLayout:MeasureAreaLayout = measureAreaLayout(None)
   private def parentMeasureAreaLayoutNode = mainContent.getChildren.get(0).asInstanceOf[MeasureAreaLayoutNode]
   def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
-    val newMeasureAreaLayout = parentMeasureAreaLayoutNode.generateMeasureAreaLayoutWithRemoval(draggableToRemove = draggableFieldsInfo.draggable)
+    val newMeasureAreaLayout = parentMeasureAreaLayoutNode.generateMeasureAreaLayoutWithRemoval(draggableFieldsInfo.draggable)
     val normalisedNewMeasureAreaLayout = newMeasureAreaLayout.normalise
     tableData.withMeasureAreaLayout(normalisedNewMeasureAreaLayout)
   }
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     val nodeSide = dropTargetMap(dropTarget)
-    val newMeasureAreaLayout = parentMeasureAreaLayoutNode.generateWithAddition(nodeSide, draggableFieldsInfo)
+    val newMeasureAreaLayout = parentMeasureAreaLayoutNode.generateMeasureAreaLayoutWithAddition(nodeSide, draggableFieldsInfo)
     tableData.withMeasureAreaLayout(newMeasureAreaLayout)
   }
   override def moveFields(draggableFieldsInfo:DraggableFieldsInfo, dropTarget:DropTarget, tableData:TableData) = {
@@ -54,7 +54,7 @@ class MeasureAreaLayoutNode(measureAreaLayout:MeasureAreaLayout, tableDataProper
     MeasureAreaLayout(measureAreaTrees)
   }
 
-  def generateWithAddition(nodeSide:NodeSide, draggableFieldsInfo:DraggableFieldsInfo) = {
+  def generateMeasureAreaLayoutWithAddition(nodeSide:NodeSide, draggableFieldsInfo:DraggableFieldsInfo) = {
     val measureAreaTrees = measureAreaTreeNodes.map(_.generateWithAddition(nodeSide, draggableFieldsInfo))
     if (nodeSide.node == this) {
       nodeSide.side match {
@@ -134,10 +134,10 @@ class MeasureAreaTreeNode(measureAreaTree:MeasureAreaTree, tableDataProperty:Sim
   def generateWithAddition(nodeSide:NodeSide, draggableFieldsInfo:DraggableFieldsInfo):MeasureAreaTree = {
     val measureAreaTreeType = topNode match {
       case fieldNode:FieldNode => Left(fieldNode.field)
-      case measureAreaLayoutNode:MeasureAreaLayoutNode => Right(measureAreaLayoutNode.generateWithAddition(nodeSide, draggableFieldsInfo))
+      case measureAreaLayoutNode:MeasureAreaLayoutNode => Right(measureAreaLayoutNode.generateMeasureAreaLayoutWithAddition(nodeSide, draggableFieldsInfo))
     }
     val newMeasureAreaTree = if (getChildren.size == 2) {
-      val childMeasureAreaLayout = getChildren.get(1).asInstanceOf[MeasureAreaLayoutNode].generateWithAddition(nodeSide, draggableFieldsInfo)
+      val childMeasureAreaLayout = getChildren.get(1).asInstanceOf[MeasureAreaLayoutNode].generateMeasureAreaLayoutWithAddition(nodeSide, draggableFieldsInfo)
       MeasureAreaTree(measureAreaTreeType, childMeasureAreaLayout)
     } else {
       MeasureAreaTree(measureAreaTreeType)

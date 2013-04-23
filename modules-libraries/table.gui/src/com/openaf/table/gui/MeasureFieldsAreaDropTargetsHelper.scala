@@ -17,8 +17,10 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
     pane :: deepChildNodes
   }
 
+  private def parentMeasureAreaLayoutNode = mainContent.getChildren.get(0).asInstanceOf[MeasureAreaLayoutNode]
+
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo):Map[DropTarget,NodeSide] = {
-    val currentMeasureAreaLayoutNode = mainContent.getChildren.get(0).asInstanceOf[MeasureAreaLayoutNode]
+    val currentMeasureAreaLayoutNode = parentMeasureAreaLayoutNode
     allNodes(currentMeasureAreaLayoutNode).filterNot(_ == draggableFieldsInfo.draggable).flatMap(node => {
       node match {
         case fieldNode:FieldNode => dropTargetsForFieldNode(fieldNode)
@@ -146,7 +148,7 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
 
     val shouldCreateBottomDropTargetNode = {
       multipleChildren && {
-        val topMeasureAreaLayoutNode = mainContent.getChildren.get(0).asInstanceOf[MeasureAreaLayoutNode]
+        val topMeasureAreaLayoutNode = parentMeasureAreaLayoutNode
         val measureAreaTreeNodes = topMeasureAreaLayoutNode.getChildren.toArray.collect{case (measureAreaTreeNode:MeasureAreaTreeNode) => measureAreaTreeNode}
         (measureAreaLayoutNode == topMeasureAreaLayoutNode) ||
           measureAreaTreeNodes.exists(measureAreaTreeNode => {
