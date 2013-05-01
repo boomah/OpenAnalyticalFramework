@@ -51,7 +51,7 @@ class MeasureAreaLayoutNode(measureAreaLayout:MeasureAreaLayout, tableDataProper
   }
 
   def generateMeasureAreaLayoutWithAddition(nodeSide:NodeSide, draggableFieldsInfo:DraggableFieldsInfo) = {
-    val measureAreaTrees = measureAreaTreeNodes.map(_.generateWithAddition(nodeSide, draggableFieldsInfo))
+    val measureAreaTrees = measureAreaTreeNodes.flatMap(_.generateWithAdditionOption(nodeSide, draggableFieldsInfo))
     if (nodeSide.node == this) {
       nodeSide.side match {
         case Side.TOP => {
@@ -127,27 +127,32 @@ class MeasureAreaTreeNode(measureAreaTree:MeasureAreaTree, tableDataProperty:Sim
     }
   }
 
-  def generateWithAddition(nodeSide:NodeSide, draggableFieldsInfo:DraggableFieldsInfo):MeasureAreaTree = {
-    val measureAreaTreeType = topNode match {
-      case fieldNode:FieldNode => Left(fieldNode.field)
-      case measureAreaLayoutNode:MeasureAreaLayoutNode => Right(measureAreaLayoutNode.generateMeasureAreaLayoutWithAddition(nodeSide, draggableFieldsInfo))
+  def generateWithAdditionOption(nodeSide:NodeSide, draggableFieldsInfo:DraggableFieldsInfo):Option[MeasureAreaTree] = {
+    // If we're adding a node that has been moved from this MeasureAreaTreeNode, exclude it from the generation.
+    val measureAreaTreeTypeOption = topNode match {
+      case fieldNode:FieldNode if fieldNode != draggableFieldsInfo.draggable => Some(Left(fieldNode.field))
+      case measureAreaLayoutNode:MeasureAreaLayoutNode => Some(Right(measureAreaLayoutNode.generateMeasureAreaLayoutWithAddition(nodeSide, draggableFieldsInfo)))
+      case _ => None
     }
-    val newMeasureAreaTree = if (getChildren.size == 2) {
+    val newMeasureAreaTreeOption = if (getChildren.size == 2) {
       val childMeasureAreaLayout = getChildren.get(1).asInstanceOf[MeasureAreaLayoutNode].generateMeasureAreaLayoutWithAddition(nodeSide, draggableFieldsInfo)
-      MeasureAreaTree(measureAreaTreeType, childMeasureAreaLayout)
+      measureAreaTreeTypeOption match {
+        case Some(measureAreaTreeType) => Some(MeasureAreaTree(measureAreaTreeType, childMeasureAreaLayout))
+        case _ => Some(MeasureAreaTree(Right(childMeasureAreaLayout)))
+      }
     } else {
-      MeasureAreaTree(measureAreaTreeType)
+      measureAreaTreeTypeOption.map(measureAreaTreeType => MeasureAreaTree(measureAreaTreeType))
     }
     if (nodeSide.node == this) {
       val addedMeasureAreaTree =  MeasureAreaTree(draggableFieldsInfo.draggable.fields :_*)
       val newMeasureAreaLayout = nodeSide.side match {
-        case Side.LEFT => MeasureAreaLayout(addedMeasureAreaTree :: newMeasureAreaTree :: Nil)
-        case Side.RIGHT => MeasureAreaLayout(newMeasureAreaTree :: addedMeasureAreaTree :: Nil)
+        case Side.LEFT => MeasureAreaLayout(addedMeasureAreaTree :: newMeasureAreaTreeOption.toList ::: Nil)
+        case Side.RIGHT => MeasureAreaLayout(newMeasureAreaTreeOption.toList ::: addedMeasureAreaTree :: Nil)
         case unexpected => throw new IllegalStateException(s"A MeasureAreaTreeNode should never have this side $unexpected")
       }
-      MeasureAreaTree(Right(newMeasureAreaLayout))
+      Some(MeasureAreaTree(Right(newMeasureAreaLayout)))
     } else {
-      newMeasureAreaTree
+      newMeasureAreaTreeOption
     }
   }
 }
