@@ -16,14 +16,14 @@ trait FlatDragAndDropNode extends DragAndDropNode {
       } else {
         val xDelta = if (i == (currentDraggables.length - 1)) 1 else 2
         if (i == 0) {
-          val leftDropTarget = new DropTargetNode(this, this)
+          val leftDropTarget = new DropTargetNode(this)
           leftDropTarget.layoutYProperty.bind(currentDraggable.heightProperty.divide(2).subtract(leftDropTarget.heightProperty.divide(2)))
           leftDropTarget.layoutXProperty.bind(currentDraggable.layoutXProperty)
           val leftDropTargetEntry = leftDropTarget -> NodeSide(currentDraggable, Side.LEFT)
           nextDraggableOption(1) match {
             case Some(nextChild) if nextChild == draggableFieldsInfo.draggable => List(leftDropTargetEntry)
             case _ => {
-              val rightDropTarget = new DropTargetNode(this, this)
+              val rightDropTarget = new DropTargetNode(this)
               rightDropTarget.layoutYProperty.bind(currentDraggable.heightProperty.divide(2).subtract(rightDropTarget.heightProperty.divide(2)))
               rightDropTarget.layoutXProperty.bind(currentDraggable.layoutXProperty
                 .add(currentDraggable.layoutBoundsProperty.get.getWidth).subtract(rightDropTarget.widthProperty.divide(xDelta)))
@@ -34,7 +34,7 @@ trait FlatDragAndDropNode extends DragAndDropNode {
           nextDraggableOption(i + 1) match {
             case Some(nextChild) if nextChild == draggableFieldsInfo.draggable => Nil
             case _ => {
-              val rightDropTarget = new DropTargetNode(this, this)
+              val rightDropTarget = new DropTargetNode(this)
               rightDropTarget.layoutYProperty.bind(currentDraggable.heightProperty.divide(2).subtract(rightDropTarget.heightProperty.divide(2)))
               rightDropTarget.layoutXProperty.bind(currentDraggable.layoutXProperty
                 .add(currentDraggable.layoutBoundsProperty.get.getWidth).subtract(rightDropTarget.widthProperty.divide(xDelta)))

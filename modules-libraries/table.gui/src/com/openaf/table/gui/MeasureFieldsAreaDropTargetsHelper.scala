@@ -4,8 +4,7 @@ import javafx.scene.layout.Pane
 import javafx.scene.Node
 import javafx.geometry.Side
 
-class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, dropTargetContainer:DropTargetContainer,
-                                         draggableParent:DraggableParent) {
+class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, dropTargetContainer:DropTargetContainer) {
   private def allNodes(pane:Pane):List[Node] = {
     val paneChildNodes = pane.getChildren.toArray.toList
     val deepChildNodes = paneChildNodes.flatMap(nodeAny => {
@@ -38,28 +37,28 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
     val fieldNodeSceneBounds = fieldNode.localToScene(fieldNode.getBoundsInLocal)
     val boundsForDropTarget = dropTargetPane.sceneToLocal(fieldNodeSceneBounds)
 
-    val topDropTargetNode = new DropTargetNode(dropTargetContainer, draggableParent)
+    val topDropTargetNode = new DropTargetNode(dropTargetContainer)
     val topX = boundsForDropTarget.getMinX + ((fieldNodeWidth / 2) - (topDropTargetNode.prefWidth(0) / 2))
     val topY = boundsForDropTarget.getMinY + (fieldNodeHeight / 4)
     topDropTargetNode.setLayoutX(topX)
     topDropTargetNode.setLayoutY(topY)
     val topDropTargetElement = (topDropTargetNode -> NodeSide(fieldNode, Side.TOP))
 
-    val bottomDropTargetNode = new DropTargetNode(dropTargetContainer, draggableParent)
+    val bottomDropTargetNode = new DropTargetNode(dropTargetContainer)
     val bottomX = boundsForDropTarget.getMinX + ((fieldNodeWidth / 2) - (bottomDropTargetNode.prefWidth(0) / 2))
     val bottomY = boundsForDropTarget.getMinY + (((fieldNodeHeight / 4) * 3) - bottomDropTargetNode.prefHeight(0))
     bottomDropTargetNode.setLayoutX(bottomX)
     bottomDropTargetNode.setLayoutY(bottomY)
     val bottomDropTargetElement = (bottomDropTargetNode -> NodeSide(fieldNode, Side.BOTTOM))
 
-    val leftDropTargetNode = new DropTargetNode(dropTargetContainer, draggableParent)
+    val leftDropTargetNode = new DropTargetNode(dropTargetContainer)
     val leftX = boundsForDropTarget.getMinX + (fieldNodeWidth / 4)
     val leftY = boundsForDropTarget.getMinY + ((fieldNodeHeight / 2) - (leftDropTargetNode.prefHeight(0) / 2))
     leftDropTargetNode.setLayoutX(leftX)
     leftDropTargetNode.setLayoutY(leftY)
     val leftDropTargetElement = (leftDropTargetNode -> NodeSide(fieldNode, Side.LEFT))
 
-    val rightDropTargetNode = new DropTargetNode(dropTargetContainer, draggableParent)
+    val rightDropTargetNode = new DropTargetNode(dropTargetContainer)
     val rightX = boundsForDropTarget.getMinX + (((fieldNodeWidth / 4) * 3) - rightDropTargetNode.prefWidth(0))
     val rightY = boundsForDropTarget.getMinY + ((fieldNodeHeight / 2) - (rightDropTargetNode.prefHeight(0) / 2))
     rightDropTargetNode.setLayoutX(rightX)
@@ -78,7 +77,7 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
     val parentMeasureAreaLayoutNode = measureAreaTreeNode.getParent.asInstanceOf[MeasureAreaLayoutNode]
 
     val leftDropTargetNodeOption = if (shouldCreateDropTargetNodes) {
-      val leftDropTargetNode = new DropTargetNode(dropTargetContainer, draggableParent)
+      val leftDropTargetNode = new DropTargetNode(dropTargetContainer)
       val isFirstMeasureAreaTreeNodeInParent = (parentMeasureAreaLayoutNode.getChildren.get(0) == measureAreaTreeNode)
       val xDelta = if (isFirstMeasureAreaTreeNodeInParent) 0 else (leftDropTargetNode.prefWidth(0) / 2)
       leftDropTargetNode.setLayoutX(boundsForDropTarget.getMinX - xDelta)
@@ -92,7 +91,7 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
       (parentMeasureAreaLayoutNode.getChildren.get(parentMeasureAreaLayoutNode.getChildren.size - 1) == measureAreaTreeNode)
 
     val rightDropTargetNodeOption = if (shouldCreateRightDropTargetNode) {
-      val rightDropTargetNode = new DropTargetNode(dropTargetContainer, draggableParent)
+      val rightDropTargetNode = new DropTargetNode(dropTargetContainer)
       rightDropTargetNode.setLayoutX(boundsForDropTarget.getMaxX - rightDropTargetNode.prefWidth(0))
       rightDropTargetNode.setLayoutY(boundsForDropTarget.getMinY + ((nodeHeight / 2) - (rightDropTargetNode.prefHeight(0) / 2)))
       Some(rightDropTargetNode -> NodeSide(measureAreaTreeNode, Side.RIGHT))
@@ -136,7 +135,7 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
     val shouldCreateTopDropTargetNode = (multipleChildren && (isTopLevelParent || multipleChildrenAbove))
 
     val topDropTargetNodeOption = if (shouldCreateTopDropTargetNode) {
-      val topDropTargetNode = new DropTargetNode(dropTargetContainer, draggableParent)
+      val topDropTargetNode = new DropTargetNode(dropTargetContainer)
       topDropTargetNode.setLayoutX(boundsForDropTarget.getMinX + ((nodeWidth / 2) - (topDropTargetNode.prefWidth(0) / 2)))
       val yDelta = if (multipleChildrenAbove) (topDropTargetNode.prefHeight(0) / 2) else 0
       topDropTargetNode.setLayoutY(boundsForDropTarget.getMinY - yDelta)
@@ -159,7 +158,7 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
     }
 
     val bottomDropTargetNodeOption = if (shouldCreateBottomDropTargetNode) {
-      val bottomDropTargetNode = new DropTargetNode(dropTargetContainer, draggableParent)
+      val bottomDropTargetNode = new DropTargetNode(dropTargetContainer)
       bottomDropTargetNode.setLayoutX(boundsForDropTarget.getMinX + ((nodeWidth / 2) - (bottomDropTargetNode.prefWidth(0) / 2)))
       bottomDropTargetNode.setLayoutY(boundsForDropTarget.getMaxY - bottomDropTargetNode.prefHeight(0))
       println("BOTTOM")

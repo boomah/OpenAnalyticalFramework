@@ -7,7 +7,7 @@ import javafx.geometry.Side
 
 class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], val dragAndDrop:DragAndDrop) extends DragAndDropNode {
   getStyleClass.add("measure-fields-area")
-  private val dropTargetsHelper = new MeasureFieldsAreaDropTargetsHelper(mainContent, dropTargetPane, this, this)
+  private val dropTargetsHelper = new MeasureFieldsAreaDropTargetsHelper(mainContent, dropTargetPane, this)
 
   def description = new SimpleStringProperty("Drop Measure and Column Fields Here")
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
@@ -30,10 +30,6 @@ class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], v
     val nodeSide = dropTargetMap(dropTarget)
     val newMeasureAreaLayout = parentMeasureAreaLayoutNode.generateMeasureAreaLayoutWithAddition(nodeSide, draggableFieldsInfo)
     tableData.withMeasureAreaLayout(newMeasureAreaLayout)
-  }
-  override def moveFields(draggableFieldsInfo:DraggableFieldsInfo, dropTarget:DropTarget, tableData:TableData) = {
-    // TODO - this needs to be implemented for the measure fields area
-    super.moveFields(draggableFieldsInfo, dropTarget, tableData)
   }
 }
 
