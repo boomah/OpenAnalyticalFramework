@@ -10,6 +10,8 @@ import com.openaf.pagemanager.api.Page
 import javafx.application.{Application => JApplication}
 import com.openaf.browser.gui.api.utils.BrowserUtils,BrowserUtils._
 import com.openaf.browser.gui.api.pages.HomePage
+import javafx.scene.Scene
+import scala.collection.JavaConversions._
 
 object BrowserStageManager {
   private val browserCountDownLatch = new CountDownLatch(1)
@@ -31,7 +33,6 @@ class BrowserStageManager extends JApplication {
   private var lastFocusedStage:Stage = _
   val cache = new BrowserCache
   var pageBuilder:PageBuilder = _
-  addStyleSheetsToAllScenes(List(resource("/com/openaf/browser/gui/api/resources/openaf.css")))
 
   private def frameTitle = "OpenAF - " + getParameters.getUnnamed.get(0)
 
@@ -51,6 +52,8 @@ class BrowserStageManager extends JApplication {
 
   private def createStage(frameLocation:FrameLocation, initialPage:Page) {
     val stage = new BrowserStage(HomePage, initialPage, this)
+    val styleSheets = applications.flatMap(_.styleSheets)
+    addStyleSheetsToScenes(styleSheets, stage.getScene)
     stages += stage
     stage.setTitle(frameTitle)
     stage.focusedProperty.addListener(new ChangeListener[JBoolean] {
@@ -79,32 +82,29 @@ class BrowserStageManager extends JApplication {
     }
   }
 
-  private def addStyleSheetsToAllScenes(styleSheets:List[String]) {
-    println("Add style sheets : " + styleSheets)
-    styleSheets.foreach(styleSheet => {
-      // TODO - this is private api - move to new package when it is changed to public
-      com.sun.javafx.css.StyleManager.getInstance.addUserAgentStylesheet(styleSheet)
-    })
+  private def scenes = stages.map(_.getScene)
+  private def applications = cache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
+
+  private def addStyleSheetsToScenes(styleSheets:Seq[String], scenes:Scene*) {
+    scenes.foreach(_.getStylesheets.addAll(styleSheets :_*))
   }
 
-  private def removeStyleSheetsFromAllScenes(styleSheets:List[String]) {
-    println("Remove style sheets : " + styleSheets)
-    // TODO - put this in
+  private def removeStyleSheetsFromScenes(styleSheets:Seq[String], scenes:Scene*) {
+    scenes.foreach(_.getStylesheets.removeAll(styleSheets :_*))
   }
 
   @Subscribe def openAFApplicationAdded(openAFApplication:OpenAFApplicationAdded) {
     runLater({
       val newOpenAFApplication = openAFApplication.openAFApplication
-      addStyleSheetsToAllScenes(newOpenAFApplication.styleSheets)
-      val currentApplications = cache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
-      currentApplications.add(newOpenAFApplication)
+      addStyleSheetsToScenes(newOpenAFApplication.styleSheets, scenes :_*)
+      applications.add(newOpenAFApplication)
     })
   }
 
   @Subscribe def openAFApplicationRemoved(openAFApplication:OpenAFApplicationRemoved) {
     runLater({
       val removedOpenAFApplication = openAFApplication.openAFApplication
-//      removeStyleSheetsFromAllScenes(removedOpenAFApplication.styleSheets)
+      removeStyleSheetsFromScenes(removedOpenAFApplication.styleSheets, scenes :_*)
       val currentApplications = cache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
       currentApplications.remove(removedOpenAFApplication)
     })
