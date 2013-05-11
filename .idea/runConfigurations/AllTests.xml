@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="AllTests" type="ScalaTestRunConfiguration" factoryName="ScalaTest">
-    <module name="browser.gui" />
+    <module name="browser.gui.api" />
     <setting name="path" value="" />
     <setting name="package" value="com.openaf" />
     <setting name="vmparams" value="" />
