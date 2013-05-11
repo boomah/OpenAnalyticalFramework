@@ -78,6 +78,14 @@ class MeasureAreaTreeNode(measureAreaTree:MeasureAreaTree, tableDataProperty:Sim
   def generateWithAdditionOption(nodeSide:NodeSide, draggableFieldsInfo:DraggableFieldsInfo):Option[MeasureAreaTree] = {
     // If we're adding a node that has been moved from this MeasureAreaTreeNode, exclude it from the generation.
     val measureAreaTreeTypeOption = topNode match {
+      case fieldNode:FieldNode if fieldNode == nodeSide.node => {
+        nodeSide.side match {
+          case Side.LEFT => Some(Right(MeasureAreaLayout.fromFields(draggableFieldsInfo.draggable.fields ::: fieldNode.fields)))
+          case Side.RIGHT => Some(Right(MeasureAreaLayout.fromFields(fieldNode.fields ::: draggableFieldsInfo.draggable.fields)))
+          case Side.TOP => Some(Right(MeasureAreaLayout(draggableFieldsInfo.draggable.fields, fieldNode.fields)))
+          case Side.BOTTOM => Some(Right(MeasureAreaLayout(fieldNode.field, draggableFieldsInfo.draggable.fields)))
+        }
+      }
       case fieldNode:FieldNode if fieldNode != draggableFieldsInfo.draggable => Some(Left(fieldNode.field))
       case measureAreaLayoutNode:MeasureAreaLayoutNode => Some(Right(measureAreaLayoutNode.generateMeasureAreaLayoutWithAddition(nodeSide, draggableFieldsInfo)))
       case _ => None

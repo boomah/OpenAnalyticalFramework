@@ -21,9 +21,13 @@ object MeasureAreaLayout {
     MeasureAreaLayout(measureAreaTrees)
   }
 
-  def apply(topField:Field, bottomFields:List[Field]=Nil):MeasureAreaLayout = {
-    val childMeasureAreaLayout = fromFields(bottomFields)
+  def apply(topField:Field, childFields:List[Field]=Nil):MeasureAreaLayout = {
+    val childMeasureAreaLayout = fromFields(childFields)
     val measureAreaTree = MeasureAreaTree(topField, childMeasureAreaLayout)
     MeasureAreaLayout(measureAreaTree)
+  }
+
+  def apply(topFields:List[Field], childFields:List[Field]):MeasureAreaLayout = {
+    MeasureAreaLayout(MeasureAreaTree(topFields, childFields))
   }
 }

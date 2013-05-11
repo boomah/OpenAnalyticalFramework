@@ -104,7 +104,7 @@ class BrowserStageManager extends JApplication {
   @Subscribe def openAFApplicationRemoved(openAFApplication:OpenAFApplicationRemoved) {
     runLater({
       val removedOpenAFApplication = openAFApplication.openAFApplication
-      removeStyleSheetsFromScenes(removedOpenAFApplication.styleSheets, scenes :_*)
+//      removeStyleSheetsFromScenes(removedOpenAFApplication.styleSheets, scenes :_*) // Causes null pointer - figure out what to do with this
       val currentApplications = cache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
       currentApplications.remove(removedOpenAFApplication)
     })

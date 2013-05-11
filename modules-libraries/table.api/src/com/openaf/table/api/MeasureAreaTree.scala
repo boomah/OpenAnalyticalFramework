@@ -65,4 +65,7 @@ object MeasureAreaTree {
     val measureAreaLayout = MeasureAreaLayout.fromFields(fields.toList)
     MeasureAreaTree(Right(measureAreaLayout))
   }
+  def apply(topFields:List[Field], childFields:List[Field]):MeasureAreaTree = {
+    MeasureAreaTree(Right(MeasureAreaLayout.fromFields(topFields)), MeasureAreaLayout.fromFields(childFields))
+  }
 }
