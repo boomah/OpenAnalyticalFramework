@@ -17,11 +17,11 @@ import com.openaf.browser.gui.api.pages.{UtilsPage, HomePage}
 class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage) extends ToolBar {
   getStyleClass.add("browser-bar")
 
-  private val backButton = new SingleActionToolBarButton(ArrowLeft, browser.back, browser.backDisabledProperty)
-  private val forwardButton = new SingleActionToolBarButton(ArrowRight, browser.forward, browser.forwardDisabledProperty)
+  private val backButton = new SingleActionToolBarButton(ArrowLeft, browser.back, browser.backDisableProperty)
+  private val forwardButton = new SingleActionToolBarButton(ArrowRight, browser.forward, browser.forwardDisableProperty)
   private val stopOrRefreshButton = new StopOrRefreshToolBarButton(Remove, (isStop) => browser.stopOrRefresh(isStop),
-                                                                   browser.stopOrRefreshDisabledProperty, browser.working)
-  private val homeButton = new SingleActionToolBarButton(Home, browser.home, browser.homeDisabledProperty)
+                                                                   browser.stopOrRefreshDisableProperty, browser.working)
+  private val homeButton = new SingleActionToolBarButton(Home, browser.home, browser.homeDisableProperty)
   private val navigationButtons = List(backButton, forwardButton, stopOrRefreshButton, homeButton)
   private val buttonResizeListener = new InvalidationListener {
     def invalidated(observable:Observable) {
@@ -68,23 +68,23 @@ class AddressBar(text:StringBinding) extends TextField {
   textProperty.bind(text)
 }
 
-class ToolBarButton(fontAwesome:FontAwesome, disabled:BooleanBinding) extends Button {
+class ToolBarButton(fontAwesome:FontAwesome, disable:BooleanBinding) extends Button {
   getStyleClass.add("tool-bar-button")
   private val fontAwesomeText = new FontAwesomeText(fontAwesome)
   private val stackPane = new StackPane(fontAwesomeText)
 
   setGraphic(stackPane)
   setFocusTraversable(false)
-  disableProperty.bind(disabled)
+  disableProperty.bind(disable)
   def updateIcon(fontAwesome:FontAwesome) {fontAwesomeText.setText(fontAwesome.text)}
 }
 
-class SingleActionToolBarButton(fontAwesome:FontAwesome, action: ()=>Unit, disabled:BooleanBinding) extends ToolBarButton(fontAwesome, disabled) {
+class SingleActionToolBarButton(fontAwesome:FontAwesome, action: ()=>Unit, disable:BooleanBinding) extends ToolBarButton(fontAwesome, disable) {
   setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {action()}})
 }
 
-class StopOrRefreshToolBarButton(fontAwesome:FontAwesome, action: (Boolean)=>Unit, disabled:BooleanBinding,
-                                 working:SimpleBooleanProperty) extends ToolBarButton(fontAwesome, disabled) {
+class StopOrRefreshToolBarButton(fontAwesome:FontAwesome, action: (Boolean)=>Unit, disable:BooleanBinding,
+                                 working:SimpleBooleanProperty) extends ToolBarButton(fontAwesome, disable) {
   setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {action(working.get)}})
   working.addListener(new ChangeListener[JBoolean] {
     def changed(observable:ObservableValue[_<:JBoolean], oldValue:JBoolean, newValue:JBoolean) {

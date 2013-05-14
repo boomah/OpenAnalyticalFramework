@@ -24,20 +24,20 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   private val pages = FXCollections.observableArrayList[PageInfo]
   val working = new SimpleBooleanProperty(true)
   private val animating = new SimpleBooleanProperty(false)
-  val backDisabledProperty = new BooleanBinding {
+  val backDisableProperty = new BooleanBinding {
     bind(currentPagePosition, working)
     def computeValue = !(!working.get && (currentPagePosition.get > 0))
   }
-  val forwardDisabledProperty = new BooleanBinding {
+  val forwardDisableProperty = new BooleanBinding {
     bind(currentPagePosition, pages, working)
     def computeValue = !(!working.get && (currentPagePosition.get < (pages.size - 1)))
   }
   private val refreshable = new SimpleBooleanProperty(false)
-  val stopOrRefreshDisabledProperty = new BooleanBinding {
+  val stopOrRefreshDisableProperty = new BooleanBinding {
     bind(refreshable, working, animating)
     def computeValue = !((!animating.get && working.get && (currentPagePosition.get >= 0)) || (!working.get && refreshable.get))
   }
-  val homeDisabledProperty = new BooleanBinding {
+  val homeDisableProperty = new BooleanBinding {
     bind(working, currentPagePosition, pages)
     def computeValue = working.get || (page(currentPagePosition.get) == homePage)
   }
@@ -79,7 +79,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   setTop(browserBar)
 
   def backBack() {
-    if (!backDisabledProperty.get) {
+    if (!backDisableProperty.get) {
       val fromPagePosition = currentPagePosition.get
       val pagesToMoveBack = ((fromPagePosition - 1) to 0 by -1)
         .indexWhere(index => pageID(page(index)) != pageID(page(fromPagePosition)))
@@ -92,11 +92,11 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     }
   }
 
-  def back() {if (!backDisabledProperty.get) goBackOnePage()}
-  def forward() {if (!forwardDisabledProperty.get) goForwardOnePage()}
+  def back() {if (!backDisableProperty.get) goBackOnePage()}
+  def forward() {if (!forwardDisableProperty.get) goForwardOnePage()}
 
   def forwardForward() {
-    if (!forwardDisabledProperty.get) {
+    if (!forwardDisableProperty.get) {
       val fromPagePosition = currentPagePosition.get
       val indexOfDifferentPage = pages.listIterator.toList
         .indexWhere(pageInfo => pageID(pageInfo.page) != pageID(page(fromPagePosition)), fromPagePosition + 1)
@@ -106,13 +106,13 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   }
 
   def refresh() {
-    if (!stopOrRefreshDisabledProperty.get) {
+    if (!stopOrRefreshDisableProperty.get) {
       println("refresh")
     }
   }
 
   def stop() {
-    if (!stopOrRefreshDisabledProperty.get) {
+    if (!stopOrRefreshDisableProperty.get) {
       forceStop()
     }
   }
@@ -126,7 +126,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     if (isStop) stop() else refresh()
   }
 
-  def home() {if (!homeDisabledProperty.get) goToPage(homePage)}
+  def home() {if (!homeDisableProperty.get) goToPage(homePage)}
 
   private def goBackOnePage() {
     val fromPagePosition = currentPagePosition.get
