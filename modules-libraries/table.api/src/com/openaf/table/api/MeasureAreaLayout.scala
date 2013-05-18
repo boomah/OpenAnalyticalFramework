@@ -2,12 +2,18 @@ package com.openaf.table.api
 
 case class MeasureAreaLayout(measureAreaTrees:List[MeasureAreaTree]) {
   def allFields = measureAreaTrees.flatMap(_.allFields).toSet
-  def normalise:MeasureAreaLayout = MeasureAreaLayout(measureAreaTrees.flatMap(measureAreaTree => {
-    measureAreaTree.measureAreaTreeType match {
-      case Right(measureLayoutArea) if !measureAreaTree.hasChildren => measureLayoutArea.measureAreaTrees
-      case _ => List(measureAreaTree)
+  def normalise:MeasureAreaLayout = {
+    val normalisedTrees = measureAreaTrees.flatMap(measureAreaTree => {
+      measureAreaTree.measureAreaTreeType match {
+        case Right(measureLayoutArea) if !measureAreaTree.hasChildren => measureLayoutArea.measureAreaTrees
+        case _ => List(measureAreaTree)
+      }
+    }).flatMap(_.normalise)
+    normalisedTrees match {
+      case tree :: Nil if !tree.hasChildren && tree.measureAreaTreeType.isRight => tree.measureAreaTreeType.right.get.normalise
+      case manyTrees => MeasureAreaLayout(manyTrees)
     }
-  }).flatMap(_.normalise))
+  }
 }
 
 object MeasureAreaLayout {
