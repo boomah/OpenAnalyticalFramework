@@ -10,7 +10,7 @@ class MeasureAreaLayoutTest extends FunSuite {
   val layout1 = MeasureAreaLayout(measureField1, List(dimensionField1, dimensionField2))
 
   test("allFields") {
-    assert(layout1.allFields === Set(measureField1, dimensionField1, dimensionField2))
+    assert(layout1.allFields === List(measureField1, dimensionField1, dimensionField2))
   }
 
   test("normalise 1") {
@@ -158,5 +158,15 @@ class MeasureAreaLayoutTest extends FunSuite {
       MeasureAreaTree(dimensionField1, MeasureAreaLayout(dimensionField2))
     ))
     assert(normalisedLayout === expectedLayout)
+  }
+
+  test("normalise doesn't remove fields it shouldn't") {
+    val layoutThatShouldStayTheSame = MeasureAreaLayout(
+      MeasureAreaTree(Right(MeasureAreaLayout.fromFields(List(dimensionField1, dimensionField1))),
+        MeasureAreaLayout.fromFields(List(dimensionField2))
+      )
+    )
+    val normalisedLayout = layoutThatShouldStayTheSame.normalise
+    assert(normalisedLayout === layoutThatShouldStayTheSame)
   }
 }

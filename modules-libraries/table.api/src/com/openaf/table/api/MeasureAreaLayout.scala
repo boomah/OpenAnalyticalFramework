@@ -1,7 +1,7 @@
 package com.openaf.table.api
 
 case class MeasureAreaLayout(measureAreaTrees:List[MeasureAreaTree]) {
-  def allFields = measureAreaTrees.flatMap(_.allFields).toSet
+  def allFields = measureAreaTrees.flatMap(_.allFields)
   def normalise:MeasureAreaLayout = {
     val normalisedTrees = measureAreaTrees.flatMap(measureAreaTree => {
       measureAreaTree.measureAreaTreeType match {

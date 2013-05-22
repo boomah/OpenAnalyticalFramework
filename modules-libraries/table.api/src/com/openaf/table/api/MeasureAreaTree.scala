@@ -3,9 +3,9 @@ package com.openaf.table.api
 import MeasureAreaLayout._
 
 case class MeasureAreaTree(measureAreaTreeType:MeasureAreaTreeType, childMeasureAreaLayout:MeasureAreaLayout=MeasureAreaLayout.Blank) {
-  def allFields:Set[Field] = {
+  def allFields:List[Field] = {
     (measureAreaTreeType match {
-      case Left(field) => Set(field)
+      case Left(field) => List(field)
       case Right(measureAreaLayout) => measureAreaLayout.allFields
     }) ++ childMeasureAreaLayout.allFields
   }

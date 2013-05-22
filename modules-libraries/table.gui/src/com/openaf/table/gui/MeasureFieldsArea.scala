@@ -12,7 +12,7 @@ class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], v
     tableData.withMeasureAreaLayout(MeasureAreaLayout.fromFields(draggableFieldsInfo.draggable.fields))
   }
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo) = dropTargetsHelper.dropTargetsToNodeSide(draggableFieldsInfo)
-  def fields(tableDataOption:Option[TableData]) = measureAreaLayout(tableDataOption).allFields.toList
+  def fields(tableDataOption:Option[TableData]) = measureAreaLayout(tableDataOption).allFields
   def nodes = List(new MeasureAreaLayoutNode(measureAreaLayout, tableDataProperty, dragAndDrop, this))
   private def measureAreaLayout(tableDataOption:Option[TableData]) = {
     tableDataOption.getOrElse(tableDataProperty.get).tableState.tableLayout.measureAreaLayout
