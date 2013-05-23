@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.layout.VBox
 import javafx.geometry.Side
 
-class MeasureAreaTreeNode(measureAreaTree:MeasureAreaTree, tableDataProperty:SimpleObjectProperty[TableData],
+class MeasureAreaTreeNode(val measureAreaTree:MeasureAreaTree, tableDataProperty:SimpleObjectProperty[TableData],
                           dragAndDrop:DragAndDrop, draggableParent:DraggableParent) extends VBox {
   setStyle("-fx-border-color: green;")
   private val topNode = measureAreaTree.measureAreaTreeType match {
