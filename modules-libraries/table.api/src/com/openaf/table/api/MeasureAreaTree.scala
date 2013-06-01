@@ -26,25 +26,26 @@ case class MeasureAreaTree(measureAreaTreeType:MeasureAreaTreeType, childMeasure
         }
       }
     } else {
-      val newMeasureAreaTreeTypeOption = measureAreaTreeType match {
-        case field@Left(_) => Some(field)
-        case right@Right(measureAreaLayout) => {
+      measureAreaTreeType match {
+        case field@Left(_) => List(MeasureAreaTree(field, normalisedChildMeasureAreaLayout))
+        case Right(measureAreaLayout) => {
           val normalisedMeasureAreaLayout = measureAreaLayout.normalise
           val allFields = normalisedMeasureAreaLayout.allFields
           if (allFields.isEmpty) {
-            None
+            normalisedChildMeasureAreaLayout.measureAreaTrees
           } else if (allFields.size == 1) {
-            Some(Left(measureAreaLayout.allFields.head))
+            List(MeasureAreaTree(Left(measureAreaLayout.allFields.head), normalisedChildMeasureAreaLayout))
           } else {
-            Some(Right(normalisedMeasureAreaLayout))
+            normalisedMeasureAreaLayout.measureAreaTrees match {
+              case measureAreaTree :: Nil if measureAreaTree.measureAreaTreeType.isLeft && measureAreaTree.childMeasureAreaLayout.allFields.nonEmpty => {
+                val newChildMeasureAreaTree = MeasureAreaTree(Right(measureAreaTree.childMeasureAreaLayout), normalisedChildMeasureAreaLayout).normalise
+                val newChildMeasureAreaLayout = MeasureAreaLayout(newChildMeasureAreaTree)
+                List(MeasureAreaTree(measureAreaTree.measureAreaTreeType, newChildMeasureAreaLayout))
+              }
+              case _ => List(MeasureAreaTree(Right(normalisedMeasureAreaLayout), normalisedChildMeasureAreaLayout))
+            }
           }
         }
-      }
-      newMeasureAreaTreeTypeOption match {
-        case Some(newMeasureAreaTreeType) => {
-          List(MeasureAreaTree(newMeasureAreaTreeType, normalisedChildMeasureAreaLayout))
-        }
-        case _ => normalisedChildMeasureAreaLayout.measureAreaTrees
       }
     }
   }
