@@ -26,7 +26,8 @@ class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dropTargetContainer:DropTa
     val moveTopDropTargetNode = showTopDropTargetNode && (outerNode match {
       case outerMeasureAreaTreeNode:MeasureAreaTreeNode => {
         val indexInOuterMeasureAreaTreeNode = outerMeasureAreaTreeNode.getChildren.indexOf(parentMeasureAreaLayoutNode)
-        (indexInOuterMeasureAreaTreeNode == 1)
+        val bottomInTree = (indexInOuterMeasureAreaTreeNode == 1)
+        bottomInTree && (outerMeasureAreaTreeNode.topFieldNodes.size == 1) && (parentMeasureAreaLayoutNode.childMeasureAreaTreeNodes.size == 1)
       }
       case _ => false
     })
