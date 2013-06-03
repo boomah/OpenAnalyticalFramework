@@ -1,10 +1,10 @@
 .root{
-    #-table-view-background-colour: transparent;
+    /*-table-view-background-colour: transparent;*/
     -table-view-background-colour: rgb(190,214,248);
 }
 
 .drop-target-node{
-    #-fx-background-color: #CCFF99AA;
+    /*-fx-background-color: #CCFF99AA;*/
     -fx-background-color: red;
 }
 

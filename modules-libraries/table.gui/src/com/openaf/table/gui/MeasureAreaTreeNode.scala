@@ -2,7 +2,7 @@ package com.openaf.table.gui
 
 import com.openaf.table.api.{MeasureAreaLayout, TableData, MeasureAreaTree}
 import javafx.beans.property.SimpleObjectProperty
-import javafx.scene.layout.VBox
+import javafx.scene.layout.{Priority, VBox}
 import javafx.geometry.Side
 
 class MeasureAreaTreeNode(val measureAreaTree:MeasureAreaTree, tableDataProperty:SimpleObjectProperty[TableData],
@@ -12,9 +12,11 @@ class MeasureAreaTreeNode(val measureAreaTree:MeasureAreaTree, tableDataProperty
     case Left(field) => new FieldNode(field, dragAndDrop, draggableParent, tableDataProperty)
     case Right(measureAreaLayout) => new MeasureAreaLayoutNode(measureAreaLayout, tableDataProperty, dragAndDrop, draggableParent)
   }
+  VBox.setVgrow(topNode, Priority.ALWAYS)
   getChildren.add(topNode)
   if (measureAreaTree.hasChildren) {
     val childMeasureLayoutNode = new MeasureAreaLayoutNode(measureAreaTree.childMeasureAreaLayout, tableDataProperty, dragAndDrop, draggableParent)
+    VBox.setVgrow(childMeasureLayoutNode, Priority.ALWAYS)
     getChildren.add(childMeasureLayoutNode)
   }
 
