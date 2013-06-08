@@ -4,6 +4,7 @@ import javafx.scene.layout.Pane
 import javafx.scene.Node
 import javafx.geometry.Side
 import scala.collection.JavaConversions._
+import javafx.scene.control.Label
 
 class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, dropTargetContainer:DropTargetContainer) {
   private val fieldNodeDropTargetsHelper = new FieldNodeDropTargetsHelper(dropTargetPane, dropTargetContainer)
@@ -19,18 +20,23 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
     pane :: deepChildNodes
   }
 
-  private def parentMeasureAreaLayoutNode = mainContent.getChildren.get(0).asInstanceOf[MeasureAreaLayoutNode]
-
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo):Map[DropTarget,NodeSide] = {
-    val currentMeasureAreaLayoutNode = parentMeasureAreaLayoutNode
-    allNodes(currentMeasureAreaLayoutNode).flatMap(node => {
-      node match {
-        case fieldNode:FieldNode if fieldNode != draggableFieldsInfo.draggable => fieldNodeDropTargetsHelper.dropTargetsForFieldNode(fieldNode, draggableFieldsInfo)
-        case measureAreaTreeNode:MeasureAreaTreeNode => dropTargetsForMeasureAreaTreeNode(measureAreaTreeNode, draggableFieldsInfo)
-        case measureAreaLayoutNode:MeasureAreaLayoutNode => dropTargetsForMeasureAreaLayoutNode(measureAreaLayoutNode, draggableFieldsInfo)
-        case _ => Nil
+    mainContent.getChildren.get(0) match {
+      case label:Label => {
+        val (dropTarget1, dropTarget2) = DropTargetNode.createDropTargetNodesForLabel(label, dropTargetContainer)
+        Map(dropTarget1 -> NodeSide(label, Side.LEFT), dropTarget2 -> NodeSide(label, Side.LEFT))
       }
-    }).toMap
+      case currentMeasureAreaLayoutNode:MeasureAreaLayoutNode => {
+        allNodes(currentMeasureAreaLayoutNode).flatMap(node => {
+          node match {
+            case fieldNode:FieldNode if fieldNode != draggableFieldsInfo.draggable => fieldNodeDropTargetsHelper.dropTargetsForFieldNode(fieldNode, draggableFieldsInfo)
+            case measureAreaTreeNode:MeasureAreaTreeNode => dropTargetsForMeasureAreaTreeNode(measureAreaTreeNode, draggableFieldsInfo)
+            case measureAreaLayoutNode:MeasureAreaLayoutNode => dropTargetsForMeasureAreaLayoutNode(measureAreaLayoutNode, draggableFieldsInfo, currentMeasureAreaLayoutNode)
+            case _ => Nil
+          }
+        }).toMap
+      }
+    }
   }
 
   private def nodeWidthAndHeight(node:Node) = (node.getLayoutBounds.getWidth, node.getLayoutBounds.getHeight)
@@ -93,7 +99,8 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
     }
   }
 
-  private def dropTargetsForMeasureAreaLayoutNode(measureAreaLayoutNode:MeasureAreaLayoutNode, draggableFieldsInfo:DraggableFieldsInfo) = {
+  private def dropTargetsForMeasureAreaLayoutNode(measureAreaLayoutNode:MeasureAreaLayoutNode, draggableFieldsInfo:DraggableFieldsInfo,
+                                                  topMeasureAreaLayoutNode:MeasureAreaLayoutNode) = {
     val (nodeWidth, _) = nodeWidthAndHeight(measureAreaLayoutNode)
     val nodeSceneBounds = measureAreaLayoutNode.localToScene(measureAreaLayoutNode.getBoundsInLocal)
     val boundsForDropTarget = dropTargetPane.sceneToLocal(nodeSceneBounds)
@@ -121,7 +128,6 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
 
     val shouldCreateBottomDropTargetNode = {
       multipleChildren && {
-        val topMeasureAreaLayoutNode = parentMeasureAreaLayoutNode
         val measureAreaTreeNodes = topMeasureAreaLayoutNode.getChildren.collect{case (measureAreaTreeNode:MeasureAreaTreeNode) => measureAreaTreeNode}
         (measureAreaLayoutNode == topMeasureAreaLayoutNode) ||
           measureAreaTreeNodes.exists(measureAreaTreeNode => {

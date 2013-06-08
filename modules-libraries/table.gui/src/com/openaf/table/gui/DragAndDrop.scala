@@ -167,24 +167,22 @@ trait DraggableParent {
 
 case class DraggableFieldsInfo(draggable:Draggable, draggableParent:DraggableParent)
 
-trait DragAndDropNode extends StackPane with DropTargetContainer with DropTarget with DraggableParent {
+trait DragAndDropNode extends StackPane with DropTargetContainer with DraggableParent {
   val tableDataProperty:SimpleObjectProperty[TableData]
   def description:ReadOnlyStringProperty
   def fields(tableDataOption:Option[TableData]):List[Field]
   protected def fields:List[Field] = fields(None)
   protected def hasFields = fields.nonEmpty
   def nodes:List[Node]
-  def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = if (hasFields) dropTargetMap.keySet.toList else List(this)
+  def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = dropTargetMap.keySet.toList
   def removeDropTargets() {
     dropTargetPane.getChildren.clear()
     dropTargetMap = Map.empty
   }
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo):Map[DropTarget,NodeSide]
   def addDropTargets(draggableFieldsInfo:DraggableFieldsInfo) {
-    if (hasFields) {
-      dropTargetMap = dropTargetsToNodeSide(draggableFieldsInfo)
-      dropTargetPane.getChildren.addAll(dropTargetMap.keySet.toArray :_*)
-    }
+    dropTargetMap = dropTargetsToNodeSide(draggableFieldsInfo)
+    dropTargetPane.getChildren.addAll(dropTargetMap.keySet.toArray :_*)
   }
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
@@ -193,7 +191,7 @@ trait DragAndDropNode extends StackPane with DropTargetContainer with DropTarget
 
   protected var dropTargetMap = Map.empty[DropTarget,NodeSide]
 
-  protected val descriptionLabel = new Label
+  private val descriptionLabel = new Label
   descriptionLabel.textProperty.bind(description)
 
   protected val mainContent = new FlowPane

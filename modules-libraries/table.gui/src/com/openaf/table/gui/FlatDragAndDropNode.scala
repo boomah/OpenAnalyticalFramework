@@ -2,48 +2,56 @@ package com.openaf.table.gui
 
 import com.openaf.table.api.{TableData, Field}
 import javafx.geometry.Side
+import scala.collection.JavaConversions._
+import javafx.scene.control.Label
 
 trait FlatDragAndDropNode extends DragAndDropNode {
   def withNewFields(fields:List[Field], tableData:TableData):TableData
 
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo) = {
-    val currentDraggables = mainContent.getChildren.toArray
-    def nextDraggableOption(i:Int) = if (i < currentDraggables.length) Some(currentDraggables(i)) else None
-    currentDraggables.zipWithIndex.flatMap{case (currentDraggableAny,i) => {
-      val currentDraggable = currentDraggableAny.asInstanceOf[Draggable]
-      if (currentDraggable == draggableFieldsInfo.draggable) {
-        Nil
-      } else {
-        val xDelta = if (i == (currentDraggables.length - 1)) 1 else 2
-        if (i == 0) {
-          val leftDropTarget = new DropTargetNode(this)
-          leftDropTarget.layoutYProperty.bind(currentDraggable.heightProperty.divide(2).subtract(leftDropTarget.heightProperty.divide(2)))
-          leftDropTarget.layoutXProperty.bind(currentDraggable.layoutXProperty)
-          val leftDropTargetEntry = leftDropTarget -> NodeSide(currentDraggable, Side.LEFT)
-          nextDraggableOption(1) match {
-            case Some(nextChild) if nextChild == draggableFieldsInfo.draggable => List(leftDropTargetEntry)
-            case _ => {
-              val rightDropTarget = new DropTargetNode(this)
-              rightDropTarget.layoutYProperty.bind(currentDraggable.heightProperty.divide(2).subtract(rightDropTarget.heightProperty.divide(2)))
-              rightDropTarget.layoutXProperty.bind(currentDraggable.layoutXProperty
-                .add(currentDraggable.layoutBoundsProperty.get.getWidth).subtract(rightDropTarget.widthProperty.divide(xDelta)))
-              List(leftDropTargetEntry, rightDropTarget -> NodeSide(currentDraggable, Side.RIGHT))
-            }
-          }
+    val currentChildren = mainContent.getChildren
+    if (fields.isEmpty) {
+      val label = currentChildren.head.asInstanceOf[Label]
+      val (dropTarget1, dropTarget2) = DropTargetNode.createDropTargetNodesForLabel(label, this)
+      Map(dropTarget1 -> NodeSide(label, Side.LEFT), dropTarget2 -> NodeSide(label, Side.LEFT))
+    } else {
+      def nextDraggableOption(i:Int) = if (i < currentChildren.length) Some(currentChildren(i)) else None
+      currentChildren.zipWithIndex.flatMap{case (currentDraggableNode,i) => {
+        val currentDraggable = currentDraggableNode.asInstanceOf[Draggable]
+        if (currentDraggable == draggableFieldsInfo.draggable) {
+          Nil
         } else {
-          nextDraggableOption(i + 1) match {
-            case Some(nextChild) if nextChild == draggableFieldsInfo.draggable => Nil
-            case _ => {
-              val rightDropTarget = new DropTargetNode(this)
-              rightDropTarget.layoutYProperty.bind(currentDraggable.heightProperty.divide(2).subtract(rightDropTarget.heightProperty.divide(2)))
-              rightDropTarget.layoutXProperty.bind(currentDraggable.layoutXProperty
-                .add(currentDraggable.layoutBoundsProperty.get.getWidth).subtract(rightDropTarget.widthProperty.divide(xDelta)))
-              List(rightDropTarget -> NodeSide(currentDraggable, Side.RIGHT))
+          val xDelta = if (i == (currentChildren.length - 1)) 1 else 2
+          if (i == 0) {
+            val leftDropTarget = new DropTargetNode(this)
+            leftDropTarget.layoutYProperty.bind(currentDraggable.heightProperty.divide(2).subtract(leftDropTarget.heightProperty.divide(2)))
+            leftDropTarget.layoutXProperty.bind(currentDraggable.layoutXProperty)
+            val leftDropTargetEntry = leftDropTarget -> NodeSide(currentDraggable, Side.LEFT)
+            nextDraggableOption(1) match {
+              case Some(nextChild) if nextChild == draggableFieldsInfo.draggable => List(leftDropTargetEntry)
+              case _ => {
+                val rightDropTarget = new DropTargetNode(this)
+                rightDropTarget.layoutYProperty.bind(currentDraggable.heightProperty.divide(2).subtract(rightDropTarget.heightProperty.divide(2)))
+                rightDropTarget.layoutXProperty.bind(currentDraggable.layoutXProperty
+                  .add(currentDraggable.layoutBoundsProperty.get.getWidth).subtract(rightDropTarget.widthProperty.divide(xDelta)))
+                List(leftDropTargetEntry, rightDropTarget -> NodeSide(currentDraggable, Side.RIGHT))
+              }
+            }
+          } else {
+            nextDraggableOption(i + 1) match {
+              case Some(nextChild) if nextChild == draggableFieldsInfo.draggable => Nil
+              case _ => {
+                val rightDropTarget = new DropTargetNode(this)
+                rightDropTarget.layoutYProperty.bind(currentDraggable.heightProperty.divide(2).subtract(rightDropTarget.heightProperty.divide(2)))
+                rightDropTarget.layoutXProperty.bind(currentDraggable.layoutXProperty
+                  .add(currentDraggable.layoutBoundsProperty.get.getWidth).subtract(rightDropTarget.widthProperty.divide(xDelta)))
+                List(rightDropTarget -> NodeSide(currentDraggable, Side.RIGHT))
+              }
             }
           }
         }
-      }
-    }}.toMap
+      }}.toMap
+    }
   }
 
   def nodes = fields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty))
