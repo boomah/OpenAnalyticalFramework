@@ -75,7 +75,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
 
   private def pageID(page:Page) = page.getClass.getName
 
-  private val browserBar = new BrowserBar(this, tabPane, stage)
+  private val browserBar = new BrowserBar(this, tabPane, stage, manager.cache)
   setTop(browserBar)
 
   def backBack() {

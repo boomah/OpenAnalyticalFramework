@@ -3,6 +3,8 @@ package com.openaf.browser.gui.api
 import collection.mutable
 import javafx.collections.{FXCollections, ObservableList}
 import com.openaf.browser.gui.api.utils.BrowserUtils
+import javafx.beans.property.SimpleObjectProperty
+import java.util.Locale
 
 class BrowserCache {
   private val cache = new mutable.HashMap[BrowserCacheKey[_],Any]
@@ -28,18 +30,15 @@ case class BrowserCacheKey[T](description:String)
 abstract class BrowserCacheKeyWithDefault[T](val browserCacheKey:BrowserCacheKey[T]) {
   def default:T
 }
+class SimpleBrowserCacheKeyWithDefault[T](browserCacheKey0:BrowserCacheKey[T], val default:T) extends BrowserCacheKeyWithDefault(browserCacheKey0)
 
 object BrowserCacheKey {
-  val BrowserApplicationsKeyWithDefault = {
+  val ApplicationsKey = {
     val key = BrowserCacheKey[ObservableList[OpenAFApplication]]("Browser Applications")
-    BrowserCacheKeyWithDefault.create(key, FXCollections.observableArrayList[OpenAFApplication])
+    new SimpleBrowserCacheKeyWithDefault(key, FXCollections.observableArrayList[OpenAFApplication])
   }
-}
-
-object BrowserCacheKeyWithDefault {
-  def create[T](browserCacheKey:BrowserCacheKey[T], default0:T) = {
-    new BrowserCacheKeyWithDefault[T](browserCacheKey) {
-      def default = default0
-    }
+  val LocaleKey = {
+    val key = BrowserCacheKey[SimpleObjectProperty[Locale]]("Locale")
+    new SimpleBrowserCacheKeyWithDefault(key, new SimpleObjectProperty[Locale](Locale.getDefault))
   }
 }

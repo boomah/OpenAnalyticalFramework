@@ -83,7 +83,7 @@ class BrowserStageManager extends JApplication {
   }
 
   private def scenes = stages.map(_.getScene)
-  private def applications = cache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
+  private def applications = cache(BrowserCacheKey.ApplicationsKey)
 
   private def addStyleSheetsToScenes(styleSheets:Seq[String], scenes:Scene*) {
     scenes.foreach(_.getStylesheets.addAll(styleSheets :_*))
@@ -105,7 +105,7 @@ class BrowserStageManager extends JApplication {
     runLater({
       val removedOpenAFApplication = openAFApplication.openAFApplication
 //      removeStyleSheetsFromScenes(removedOpenAFApplication.styleSheets, scenes :_*) // Causes null pointer - figure out what to do with this
-      val currentApplications = cache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
+      val currentApplications = cache(BrowserCacheKey.ApplicationsKey)
       currentApplications.remove(removedOpenAFApplication)
     })
   }

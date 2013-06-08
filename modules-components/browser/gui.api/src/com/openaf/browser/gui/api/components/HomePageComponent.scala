@@ -17,7 +17,7 @@ class HomePageComponent(pageContext:PageContext) extends BorderPane with PageCom
   def name = "OpenAF"
   override val image = Some(BrowserUtils.icon("16x16_home.png"))
 
-  private val browserApplications = pageContext.browserCache(BrowserCacheKey.BrowserApplicationsKeyWithDefault)
+  private val browserApplications = pageContext.browserCache(BrowserCacheKey.ApplicationsKey)
   browserApplications.addListener(new ListChangeListener[OpenAFApplication] {
     def onChanged(change:Change[_<:OpenAFApplication]) {updateBrowserApplications()}
   })

@@ -13,8 +13,9 @@ import com.openaf.browser.gui.api.utils.{FontAwesomeText, FontAwesome}
 import com.openaf.browser.gui.api.utils.FontAwesome._
 import com.openaf.browser.gui.api.utils.BrowserUtils._
 import com.openaf.browser.gui.api.pages.{UtilsPage, HomePage}
+import com.openaf.browser.gui.api.binding.BrowserLocaleStringBinding
 
-class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage) extends ToolBar {
+class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage, cache:BrowserCache) extends ToolBar {
   getStyleClass.add("browser-bar")
 
   private val backButton = new SingleActionToolBarButton(ArrowLeft, browser.back, browser.backDisableProperty)
@@ -40,24 +41,26 @@ class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage) ex
   })
   private val addressBar = new AddressBar(browser.pageLongText)
   HBox.setHgrow(addressBar, Priority.ALWAYS)
-  private val settingsButton = new SettingsMenuButton(tabPane, stage)
+  private val settingsButton = new SettingsMenuButton(tabPane, stage, cache)
 
   getItems.addAll(navigationButtons.toArray :_*)
   getItems.addAll(addressBar, settingsButton)
 }
 
-class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage) extends MenuButton {
+class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage, cache:BrowserCache) extends MenuButton {
   setGraphic(new StackPane(new FontAwesomeText(Cog)))
-
-  private val newTabMenuItem = new MenuItem("New Tab")
+  private val newTabMenuItem = new MenuItem
+  newTabMenuItem.textProperty.bind(new BrowserLocaleStringBinding(cache(BrowserCacheKey.LocaleKey), "newTab"))
   newTabMenuItem.setAccelerator(keyMap.newTab.accelerator)
   newTabMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.createTab(HomePage)}})
 
-  private val newWindowMenuItem = new MenuItem("New Window")
+  private val newWindowMenuItem = new MenuItem
+  newWindowMenuItem.textProperty.bind(new BrowserLocaleStringBinding(cache(BrowserCacheKey.LocaleKey), "newWindow"))
   newWindowMenuItem.setAccelerator(keyMap.newWindow.accelerator)
   newWindowMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {stage.createStage(HomePage)}})
 
-  private val utilsMenuItem = new MenuItem("Utils")
+  private val utilsMenuItem = new MenuItem
+  utilsMenuItem.textProperty.bind(new BrowserLocaleStringBinding(cache(BrowserCacheKey.LocaleKey), "utils"))
   utilsMenuItem.setAccelerator(keyMap.utilsPage.accelerator)
   utilsMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.createTab(UtilsPage)}})
 
