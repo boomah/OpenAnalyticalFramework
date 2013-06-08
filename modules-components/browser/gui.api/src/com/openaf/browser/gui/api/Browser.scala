@@ -171,10 +171,9 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
         (pageComponentCache.exceptionComponent(pageContext), exceptionPageData)
       }
     }
-    pageComponentToGoTo.initialise(
+    pageComponentToGoTo.setup(
       pageInfoWithResponseToGoTo.page.asInstanceOf[pageComponentToGoTo.P],
-      pageDataToUse.asInstanceOf[pageComponentToGoTo.PD],
-      pageContext
+      pageDataToUse.asInstanceOf[pageComponentToGoTo.PD]
     )
 
     def tidyUp() {

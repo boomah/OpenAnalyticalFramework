@@ -17,12 +17,16 @@ trait PageComponent extends Region {
   def shortText = name
   def longText = name
 
-  def initialise(page:P, pageData:PD, pageContext0:PageContext) {
+  def initialise(pageContext0:PageContext) {
+    pageContext = pageContext0
+    initialise()
+  }
+  def initialise() {}
+
+  def setup(page:P, pageData:PD) {
     this.page = page
     this.pageData = pageData
-    pageContext = pageContext0
     setup()
   }
-
   def setup()
 }

@@ -7,7 +7,6 @@ import javafx.scene.shape.Rectangle
 import javafx.scene.paint.Color
 import javafx.event.{ActionEvent, EventHandler}
 import com.openaf.viewer.api.{ViewerPage, ViewerPageData}
-import com.openaf.browser.gui.api.PageContext
 
 class ViewerPageComponent extends BorderPane with PageComponent {
   type P = ViewerPage
@@ -36,5 +35,5 @@ class ViewerPageComponent extends BorderPane with PageComponent {
 }
 
 object ViewerPageComponentFactory extends PageComponentFactory {
-  def pageComponent(pageContext:PageContext) = new ViewerPageComponent
+  def pageComponent = new ViewerPageComponent
 }

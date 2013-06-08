@@ -5,7 +5,7 @@ import com.openaf.travel.api.{HotelsPageData, HotelsPage}
 import com.openaf.table.gui.OpenAFTable
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import com.openaf.table.api.TableData
-import com.openaf.browser.gui.api.PageContext
+import com.openaf.browser.gui.api.BrowserCacheKey
 
 class HotelsPageComponent extends OpenAFTable with PageComponent {
   type P = HotelsPage
@@ -14,6 +14,10 @@ class HotelsPageComponent extends OpenAFTable with PageComponent {
   def name = "Hotels"
 
   private var doingSetup = false
+
+  override def initialise() {
+    localeProperty.bind(pageContext.browserCache(BrowserCacheKey.LocaleKey))
+  }
 
   def setup() {
     doingSetup = true
@@ -32,5 +36,5 @@ class HotelsPageComponent extends OpenAFTable with PageComponent {
 }
 
 object HotelsPageComponentFactory extends PageComponentFactory {
-  def pageComponent(pageContext:PageContext) = new HotelsPageComponent
+  def pageComponent = new HotelsPageComponent
 }

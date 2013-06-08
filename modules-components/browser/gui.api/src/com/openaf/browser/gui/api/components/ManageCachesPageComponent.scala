@@ -8,7 +8,6 @@ import com.openaf.cache.{CacheChanged, CacheFactory}
 import com.google.common.eventbus.Subscribe
 import com.openaf.pagemanager.api.NoPageData
 import com.openaf.browser.gui.api.utils.BrowserUtils
-import com.openaf.browser.gui.api.PageContext
 
 class ManageCachesPageComponent extends BorderPane with PageComponent {
   type P = ManageCachesPage.type
@@ -46,5 +45,5 @@ class ManageCachesPageComponent extends BorderPane with PageComponent {
 }
 
 object ManageCachesPageComponentFactory extends PageComponentFactory {
-  def pageComponent(pageContext:PageContext) = new ManageCachesPageComponent
+  def pageComponent = new ManageCachesPageComponent
 }

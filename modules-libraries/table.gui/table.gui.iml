@@ -21,6 +21,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="scala-library" level="project" />
     <orderEntry type="module" module-name="table.api" exported="" />
+    <orderEntry type="module" module-name="gui" />
   </component>
 </module>
 

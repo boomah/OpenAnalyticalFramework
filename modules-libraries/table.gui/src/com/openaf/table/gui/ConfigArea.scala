@@ -7,9 +7,12 @@ import javafx.collections.{ObservableList, FXCollections}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.beans.property.SimpleObjectProperty
 import com.openaf.table.api.TableData
+import java.util.Locale
+import com.openaf.table.gui.binding.TableLocaleStringBinding
 
-class ConfigArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:DragAndDrop) extends HBox {
-  private val fieldsButton = new ToggleButton("Fields")
+class ConfigArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:DragAndDrop, locale:SimpleObjectProperty[Locale]) extends HBox {
+  private val fieldsButton = new ToggleButton
+  fieldsButton.textProperty.bind(new TableLocaleStringBinding(locale, "fields"))
   fieldsButton.setFocusTraversable(false)
 
   private val fieldsToConfigComponent = Map[Toggle,Node](fieldsButton -> new AllFieldsArea(tableDataProperty, dragAndDrop))

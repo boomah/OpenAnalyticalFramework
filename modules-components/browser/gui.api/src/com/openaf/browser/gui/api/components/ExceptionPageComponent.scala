@@ -9,7 +9,6 @@ import com.openaf.browser.gui.api.utils.BrowserUtils
 import javafx.geometry.Pos
 import javafx.event.{ActionEvent, EventHandler}
 import javafx.scene.input.{ClipboardContent, Clipboard}
-import com.openaf.browser.gui.api.PageContext
 
 class ExceptionPageComponent extends BorderPane with PageComponent {
   type P = BlankPage.type
@@ -42,5 +41,5 @@ class ExceptionPageComponent extends BorderPane with PageComponent {
 }
 
 object ExceptionPageComponentFactory extends PageComponentFactory {
-  def pageComponent(pageContext:PageContext) = new ExceptionPageComponent
+  def pageComponent = new ExceptionPageComponent
 }

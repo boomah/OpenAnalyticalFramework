@@ -3,6 +3,7 @@ package com.openaf.table.gui
 import javafx.scene.layout.{RowConstraints, Priority, ColumnConstraints, GridPane}
 import javafx.beans.property.SimpleObjectProperty
 import com.openaf.table.api.TableData
+import java.util.Locale
 
 object OpenAFTable {
   def styleSheets = List(getClass.getResource("/com/openaf/table/gui/resources/table.css").toExternalForm)
@@ -11,18 +12,19 @@ object OpenAFTable {
 class OpenAFTable extends GridPane {
   setGridLinesVisible(true)
 
-  private val tableData = new SimpleObjectProperty[TableData]
-  def getTableData = tableData.get
-  def setTableData(tableData0:TableData) {tableData.set(tableData0)}
-  def tableDataProperty = tableData
+  val tableDataProperty = new SimpleObjectProperty[TableData]
+  def getTableData = tableDataProperty.get
+  def setTableData(tableData0:TableData) {tableDataProperty.set(tableData0)}
 
   private val dragAndDrop = new DragAndDrop
 
-  private val configArea = new ConfigArea(tableData, dragAndDrop)
-  private val filterFieldsArea = new FilterFieldsArea(tableData, dragAndDrop)
-  private val rowHeaderFieldsArea = new RowHeaderFieldsArea(tableData, dragAndDrop)
-  private val measureFieldsArea = new MeasureFieldsArea(tableData, dragAndDrop)
-  private val tableView = new OpenAFTableView(tableData)
+  val localeProperty = new SimpleObjectProperty[Locale](Locale.getDefault)
+
+  private val configArea = new ConfigArea(tableDataProperty, dragAndDrop, localeProperty)
+  private val filterFieldsArea = new FilterFieldsArea(tableDataProperty, dragAndDrop)
+  private val rowHeaderFieldsArea = new RowHeaderFieldsArea(tableDataProperty, dragAndDrop)
+  private val measureFieldsArea = new MeasureFieldsArea(tableDataProperty, dragAndDrop)
+  private val tableView = new OpenAFTableView(tableDataProperty)
 
   {
     add(configArea, 0, 0, 1, 3)
