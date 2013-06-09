@@ -21,9 +21,9 @@ class OpenAFTable extends GridPane {
   val localeProperty = new SimpleObjectProperty[Locale](Locale.getDefault)
 
   private val configArea = new ConfigArea(tableDataProperty, dragAndDrop, localeProperty)
-  private val filterFieldsArea = new FilterFieldsArea(tableDataProperty, dragAndDrop)
-  private val rowHeaderFieldsArea = new RowHeaderFieldsArea(tableDataProperty, dragAndDrop)
-  private val measureFieldsArea = new MeasureFieldsArea(tableDataProperty, dragAndDrop)
+  private val filterFieldsArea = new FilterFieldsArea(tableDataProperty, dragAndDrop, localeProperty)
+  private val rowHeaderFieldsArea = new RowHeaderFieldsArea(tableDataProperty, dragAndDrop, localeProperty)
+  private val measureFieldsArea = new MeasureFieldsArea(tableDataProperty, dragAndDrop, localeProperty)
   private val tableView = new OpenAFTableView(tableDataProperty)
 
   {

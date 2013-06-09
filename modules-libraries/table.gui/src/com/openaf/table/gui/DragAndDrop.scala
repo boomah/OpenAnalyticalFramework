@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.beans.property.{ReadOnlyStringProperty, SimpleObjectProperty}
+import javafx.beans.property.SimpleObjectProperty
 import com.openaf.table.api.{TableData, Field}
 import javafx.scene.Node
 import javafx.event.EventHandler
@@ -10,6 +10,8 @@ import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.scene.layout.{Region, Pane, FlowPane, StackPane}
 import javafx.scene.control.Label
 import javafx.geometry.Side
+import com.openaf.table.gui.binding.TableLocaleStringBinding
+import java.util.Locale
 
 class DragAndDrop {
   val fieldsBeingDraggedInfo = new SimpleObjectProperty[Option[DraggableFieldsInfo]](None)
@@ -169,7 +171,8 @@ case class DraggableFieldsInfo(draggable:Draggable, draggableParent:DraggablePar
 
 trait DragAndDropNode extends StackPane with DropTargetContainer with DraggableParent {
   val tableDataProperty:SimpleObjectProperty[TableData]
-  def description:ReadOnlyStringProperty
+  def descriptionID:String
+  def locale:SimpleObjectProperty[Locale]
   def fields(tableDataOption:Option[TableData]):List[Field]
   protected def fields:List[Field] = fields(None)
   protected def hasFields = fields.nonEmpty
@@ -192,7 +195,7 @@ trait DragAndDropNode extends StackPane with DropTargetContainer with DraggableP
   protected var dropTargetMap = Map.empty[DropTarget,NodeSide]
 
   private val descriptionLabel = new Label
-  descriptionLabel.textProperty.bind(description)
+  descriptionLabel.textProperty.bind(new TableLocaleStringBinding(locale, descriptionID))
 
   protected val mainContent = new FlowPane
   protected val dropTargetPane = new Pane
