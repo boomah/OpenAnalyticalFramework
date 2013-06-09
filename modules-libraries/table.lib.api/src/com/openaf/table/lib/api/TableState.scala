@@ -1,4 +1,4 @@
-package com.openaf.table.api
+package com.openaf.table.lib.api
 
 case class TableState(tableLayout:TableLayout) {
   def withRowHeaderFields(newRowHeaderFields:List[Field]) = copy(tableLayout = tableLayout.withRowHeaderFields(newRowHeaderFields))

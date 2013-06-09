@@ -20,6 +20,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="scala-library" level="project" />
     <orderEntry type="module" module-name="pageManager.api" exported="" />
+    <orderEntry type="module" module-name="table.lib.api" exported="" />
     <orderEntry type="module" module-name="table.api" exported="" />
   </component>
 </module>

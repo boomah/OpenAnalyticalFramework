@@ -6,9 +6,9 @@ import javafx.scene.{Node, Group}
 import javafx.collections.{ObservableList, FXCollections}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.beans.property.SimpleObjectProperty
-import com.openaf.table.api.TableData
 import java.util.Locale
 import com.openaf.table.gui.binding.TableLocaleStringBinding
+import com.openaf.table.lib.api.TableData
 
 class ConfigArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:DragAndDrop, locale:SimpleObjectProperty[Locale]) extends HBox {
   private val fieldsButton = new ToggleButton

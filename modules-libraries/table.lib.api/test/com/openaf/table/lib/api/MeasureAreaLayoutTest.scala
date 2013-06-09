@@ -1,4 +1,4 @@
-package com.openaf.table.api
+package com.openaf.table.lib.api
 
 import org.scalatest.FunSuite
 

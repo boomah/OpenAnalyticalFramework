@@ -2,8 +2,8 @@ package com.openaf.table.gui
 
 import javafx.scene.control.{TableColumn, TableView}
 import javafx.beans.property.Property
-import com.openaf.table.api.TableData
 import javafx.beans.value.{ObservableValue, ChangeListener}
+import com.openaf.table.lib.api.TableData
 
 class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView {
   tableDataProperty.addListener(new ChangeListener[TableData] {

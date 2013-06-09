@@ -1,10 +1,11 @@
 package com.openaf.travel.api
 
-import com.openaf.pagemanager.api.{PageData, PageFactory, ServerContext, Page}
-import com.openaf.table.api._
-import com.openaf.table.api.Field
+import com.openaf.pagemanager.api.{PageFactory, ServerContext}
+import com.openaf.table.lib.api._
+import com.openaf.table.lib.api.Field
+import com.openaf.table.api.{TablePageData, TablePage}
 
-trait TravelPage extends Page {
+trait TravelPage extends TablePage {
   def pageDataFacility(serverContext:ServerContext) = serverContext.facility(classOf[TravelPageDataFacility])
 }
 object TravelPage {
@@ -14,8 +15,12 @@ object TravelPage {
   val StarRatingField = Field("starRating")
 }
 
-case class HotelsPage(tableState:TableState) extends TravelPage
-case class FlightsAndHotelsPage() extends TravelPage
+case class HotelsPage(tableState:TableState) extends TravelPage {
+  def withTableData(tableData:TableData) = HotelsPage(tableData.tableState)
+}
+case class FlightsAndHotelsPage() extends TravelPage {
+  def withTableData(tableData:TableData) = this
+}
 
 object HotelsPageFactory extends PageFactory {
 
@@ -53,4 +58,4 @@ object FlightsAndHotelsPageFactory extends PageFactory {
   def page = FlightsAndHotelsPage()
 }
 
-case class HotelsPageData(tableData:TableData) extends PageData
+case class HotelsPageData(tableData:TableData) extends TablePageData

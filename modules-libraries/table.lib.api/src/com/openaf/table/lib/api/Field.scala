@@ -1,4 +1,4 @@
-package com.openaf.table.api
+package com.openaf.table.lib.api
 
 case class Field(id:String, fieldType:FieldType=Dimension) {
   def displayName = id

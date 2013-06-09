@@ -1,6 +1,6 @@
 package com.openaf.table.server
 
-import com.openaf.table.api.{TableData, TableState}
+import com.openaf.table.lib.api.{TableState, TableData}
 
 object TableDataGenerator {
   def tableData(tableState:TableState, tableDataSource:TableDataSource) = {

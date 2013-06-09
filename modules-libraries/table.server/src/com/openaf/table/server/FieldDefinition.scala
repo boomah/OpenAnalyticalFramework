@@ -1,6 +1,6 @@
 package com.openaf.table.server
 
-import com.openaf.table.api.{FieldGroup, Field}
+import com.openaf.table.lib.api.{FieldGroup, Field}
 
 class FieldDefinition(val field:Field)
 

@@ -1,4 +1,4 @@
-package com.openaf.table.api
+package com.openaf.table.lib.api
 
 case class TableData(fieldGroup:FieldGroup, tableState:TableState) {
   def fields = fieldGroup.fields

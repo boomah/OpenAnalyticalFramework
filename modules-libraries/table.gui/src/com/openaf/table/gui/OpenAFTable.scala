@@ -2,8 +2,8 @@ package com.openaf.table.gui
 
 import javafx.scene.layout.{RowConstraints, Priority, ColumnConstraints, GridPane}
 import javafx.beans.property.SimpleObjectProperty
-import com.openaf.table.api.TableData
 import java.util.Locale
+import com.openaf.table.lib.api.TableData
 
 object OpenAFTable {
   def styleSheets = List(getClass.getResource("/com/openaf/table/gui/resources/table.css").toExternalForm)

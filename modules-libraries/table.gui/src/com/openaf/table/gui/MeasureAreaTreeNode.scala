@@ -1,9 +1,9 @@
 package com.openaf.table.gui
 
-import com.openaf.table.api.{MeasureAreaLayout, TableData, MeasureAreaTree}
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.layout.{Priority, VBox}
 import javafx.geometry.Side
+import com.openaf.table.lib.api.{TableData, MeasureAreaTree, MeasureAreaLayout}
 
 class MeasureAreaTreeNode(val measureAreaTree:MeasureAreaTree, tableDataProperty:SimpleObjectProperty[TableData],
                           dragAndDrop:DragAndDrop, draggableParent:DraggableParent) extends VBox {

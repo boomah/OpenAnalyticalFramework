@@ -1,6 +1,6 @@
 package com.openaf.table.server
 
-import com.openaf.table.api.{Field, TableState}
+import com.openaf.table.lib.api.{TableState, Field}
 
 trait TableDataSource {
   def fieldDefinitionGroup:FieldDefinitionGroup

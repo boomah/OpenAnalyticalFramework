@@ -1,7 +1,6 @@
 package com.openaf.table.gui
 
 import javafx.beans.property.SimpleObjectProperty
-import com.openaf.table.api.{TableData, Field}
 import javafx.scene.Node
 import javafx.event.EventHandler
 import javafx.scene.input.{MouseButton, MouseEvent}
@@ -12,6 +11,7 @@ import javafx.scene.control.Label
 import javafx.geometry.Side
 import com.openaf.table.gui.binding.TableLocaleStringBinding
 import java.util.Locale
+import com.openaf.table.lib.api.{TableData, Field}
 
 class DragAndDrop {
   val fieldsBeingDraggedInfo = new SimpleObjectProperty[Option[DraggableFieldsInfo]](None)

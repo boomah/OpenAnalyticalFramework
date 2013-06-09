@@ -1,4 +1,4 @@
-package com.openaf.table.api
+package com.openaf.table.lib.api
 
 case class MeasureAreaLayout(measureAreaTrees:List[MeasureAreaTree]) {
   def allFields = measureAreaTrees.flatMap(_.allFields)

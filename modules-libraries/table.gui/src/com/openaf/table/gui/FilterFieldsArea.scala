@@ -1,8 +1,8 @@
 package com.openaf.table.gui
 
-import com.openaf.table.api.{Field, TableData}
 import javafx.beans.property.SimpleObjectProperty
 import java.util.Locale
+import com.openaf.table.lib.api.{TableData, Field}
 
 class FilterFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], val dragAndDrop:DragAndDrop,
                        val locale:SimpleObjectProperty[Locale]) extends FlatDragAndDropNode {

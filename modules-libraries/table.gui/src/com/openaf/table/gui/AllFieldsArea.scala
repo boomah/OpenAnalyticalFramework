@@ -3,9 +3,9 @@ package com.openaf.table.gui
 import javafx.scene.layout.StackPane
 import javafx.scene.control.{TreeCell, TreeItem, TreeView}
 import javafx.beans.property.SimpleObjectProperty
-import com.openaf.table.api.{Field, FieldGroup, TableData}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.util.Callback
+import com.openaf.table.lib.api.{TableData, FieldGroup, Field}
 
 object AllFieldsArea {
   type TreeItemType = Either[TreeGroup,Field]

@@ -1,10 +1,10 @@
 package com.openaf.table.gui
 
-import com.openaf.table.api.{MeasureAreaTree, TableData, MeasureAreaLayout}
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.layout.{Priority, HBox}
 import javafx.geometry.Side
 import scala.collection.JavaConversions._
+import com.openaf.table.lib.api.{TableData, MeasureAreaTree, MeasureAreaLayout}
 
 class MeasureAreaLayoutNode(measureAreaLayout:MeasureAreaLayout, tableDataProperty:SimpleObjectProperty[TableData],
                             dragAndDrop:DragAndDrop, draggableParent:DraggableParent) extends HBox {

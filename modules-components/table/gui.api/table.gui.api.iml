@@ -6,6 +6,7 @@
         <option name="compilerLibraryLevel" value="Project" />
         <option name="compilerLibraryName" value="scala-compiler" />
         <option name="deprecationWarnings" value="true" />
+        <option name="fsc" value="true" />
         <option name="uncheckedWarnings" value="true" />
       </configuration>
     </facet>
@@ -18,7 +19,10 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="scala-library" level="project" />
-    <orderEntry type="module" module-name="table.lib.api" exported="" />
+    <orderEntry type="module" module-name="browser.gui.api" />
+    <orderEntry type="module" module-name="table.lib.api" />
+    <orderEntry type="module" module-name="table.gui" />
+    <orderEntry type="module" module-name="table.api" exported="" />
   </component>
 </module>
 

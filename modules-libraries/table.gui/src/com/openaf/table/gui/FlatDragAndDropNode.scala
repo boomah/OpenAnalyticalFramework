@@ -1,9 +1,9 @@
 package com.openaf.table.gui
 
-import com.openaf.table.api.{TableData, Field}
 import javafx.geometry.Side
 import scala.collection.JavaConversions._
 import javafx.scene.control.Label
+import com.openaf.table.lib.api.{TableData, Field}
 
 trait FlatDragAndDropNode extends DragAndDropNode {
   def withNewFields(fields:List[Field], tableData:TableData):TableData

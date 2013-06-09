@@ -1,8 +1,8 @@
 package com.openaf.table.gui
 
-import com.openaf.table.api.{MeasureAreaLayout, TableData}
 import javafx.beans.property.SimpleObjectProperty
 import java.util.Locale
+import com.openaf.table.lib.api.{TableData, MeasureAreaLayout}
 
 class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], val dragAndDrop:DragAndDrop,
                         val locale:SimpleObjectProperty[Locale]) extends DragAndDropNode {

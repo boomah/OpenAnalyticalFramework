@@ -1,4 +1,4 @@
-package com.openaf.table.api
+package com.openaf.table.lib.api
 
 case class FieldGroup(groupName:String, children:List[Either[FieldGroup,Field]]) {
   def fields:List[Field] = {
