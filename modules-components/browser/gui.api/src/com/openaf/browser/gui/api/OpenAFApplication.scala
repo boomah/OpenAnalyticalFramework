@@ -1,7 +1,6 @@
 package com.openaf.browser.gui.api
 
 import com.openaf.pagemanager.api.PageFactory
-import com.openaf.browser.gui.api.components.PageComponentFactory
 
 trait OpenAFApplication {
   def applicationName:String

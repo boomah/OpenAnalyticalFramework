@@ -105,9 +105,6 @@ case class ModuleBundleDefinition(topLevelModuleName:String, moduleType:ModuleTy
       case ModuleType.GUI => {
         builder.setProperty(BUNDLE_ACTIVATOR, "com.openaf." + topLevelModuleName.toLowerCase + ".gui." + topLevelModuleName.capitalize + "BundleActivator")
       }
-      case ModuleType.GUI_API => {
-        builder.setProperty(BUNDLE_ACTIVATOR, "com.openaf." + topLevelModuleName.toLowerCase + ".gui.api." + topLevelModuleName.capitalize + "BundleActivator")
-      }
       case _ =>
     }
     if ((moduleType == ModuleType.API) || (moduleType == ModuleType.GUI_API) || (moduleType == ModuleType.Library)) {

@@ -1,7 +1,7 @@
 package com.openaf.viewer.gui.components
 
 import javafx.scene.layout.BorderPane
-import com.openaf.browser.gui.api.components.{PageComponentFactory, PageComponent}
+import com.openaf.browser.gui.api.{PageComponentFactory, PageComponent}
 import javafx.scene.control.{Button, Label}
 import javafx.scene.shape.Rectangle
 import javafx.scene.paint.Color
