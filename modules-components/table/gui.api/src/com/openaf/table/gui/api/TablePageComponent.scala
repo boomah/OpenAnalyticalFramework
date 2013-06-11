@@ -6,11 +6,9 @@ import javafx.beans.value.{ObservableValue, ChangeListener}
 import com.openaf.table.lib.api.TableData
 import com.openaf.table.api.{TablePage, TablePageData}
 
-abstract class TablePageComponent extends OpenAFTable with PageComponent {
-  type TPD <: TablePageData
-  type TP <: TablePage
-  type PD = TPD
-  type P = TP
+trait TablePageComponent extends OpenAFTable with PageComponent {
+  type PD <: TablePageData
+  type P <: TablePage
 
   override def initialise() {
     localeProperty.bind(pageContext.browserCache(BrowserCacheKey.LocaleKey))
