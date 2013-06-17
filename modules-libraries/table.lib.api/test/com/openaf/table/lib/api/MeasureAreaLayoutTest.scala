@@ -184,4 +184,24 @@ class MeasureAreaLayoutTest extends FunSuite {
     )
     assert(normalisedLayout === expectedLayout)
   }
+
+  test("normalise 14") {
+    val layoutToBeNormalised = MeasureAreaLayout(List(
+      MeasureAreaTree(Right(MeasureAreaLayout(List(
+        MeasureAreaTree(Right(MeasureAreaLayout(List(
+          MeasureAreaTree(Right(MeasureAreaLayout(List(
+            MeasureAreaTree(Left(dimensionField1))))),
+            MeasureAreaLayout(List(MeasureAreaTree(Left(dimensionField2))))
+          )
+        )))),
+        MeasureAreaTree(Left(dimensionField3)))
+      )))
+    ))
+    val normalisedLayout = layoutToBeNormalised.normalise
+    val expectedLayout = MeasureAreaLayout(List(
+      MeasureAreaTree(dimensionField1, MeasureAreaLayout(dimensionField2)),
+      MeasureAreaTree(dimensionField3)
+    ))
+    assert(normalisedLayout === expectedLayout)
+  }
 }

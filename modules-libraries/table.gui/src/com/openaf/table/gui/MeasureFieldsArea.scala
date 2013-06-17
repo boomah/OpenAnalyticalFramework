@@ -23,8 +23,7 @@ class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], v
   private def parentMeasureAreaLayoutNode = mainContent.getChildren.get(0).asInstanceOf[MeasureAreaLayoutNode]
   def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     val newMeasureAreaLayout = parentMeasureAreaLayoutNode.generateMeasureAreaLayoutWithRemoval(draggableFieldsInfo.draggable)
-    val normalisedNewMeasureAreaLayout = newMeasureAreaLayout.normalise
-    tableData.withMeasureAreaLayout(normalisedNewMeasureAreaLayout)
+    tableData.withMeasureAreaLayout(newMeasureAreaLayout)
   }
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     val newMeasureAreaLayout = if (tableData.tableState.tableLayout.measureAreaLayout.allFields.isEmpty) {
