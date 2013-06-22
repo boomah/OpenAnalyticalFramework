@@ -5,8 +5,9 @@ import com.openaf.sport.api.SportPage._
 import com.openaf.table.lib.api.TableState
 
 class GoalsTableDataSource extends TableDataSource {
-  val fieldDefinitions = List(PlayerNameField).map(field => Right(new FieldDefinition(field)))
+  val fieldDefinitions = List(PlayerField, TimeField, TeamField, OppositionTeamField, VenueField, DateField,
+    KickOffTimeField, CompetitionField).map(field => Right(new FieldDefinition(field)))
 
-  def fieldDefinitionGroup = FieldDefinitionGroup("Fields", fieldDefinitions)
+  def fieldDefinitionGroup = FieldDefinitionGroup("Goals", fieldDefinitions)
   def result(tableState:TableState) = Result.Empty
 }
