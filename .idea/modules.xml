@@ -19,6 +19,9 @@
       <module fileurl="file://$PROJECT_DIR$/modules-libraries/rmi.server/rmi.server.iml" filepath="$PROJECT_DIR$/modules-libraries/rmi.server/rmi.server.iml" group="rmi" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/rmiClientConnector/gui/rmiClientConnector.gui.iml" filepath="$PROJECT_DIR$/modules-components/rmiClientConnector/gui/rmiClientConnector.gui.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/rmiServerConnector/impl/rmiServerConnector.impl.iml" filepath="$PROJECT_DIR$/modules-components/rmiServerConnector/impl/rmiServerConnector.impl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules-components/sport/api/sport.api.iml" filepath="$PROJECT_DIR$/modules-components/sport/api/sport.api.iml" group="sport" />
+      <module fileurl="file://$PROJECT_DIR$/modules-components/sport/gui/sport.gui.iml" filepath="$PROJECT_DIR$/modules-components/sport/gui/sport.gui.iml" group="sport" />
+      <module fileurl="file://$PROJECT_DIR$/modules-components/sport/impl/sport.impl.iml" filepath="$PROJECT_DIR$/modules-components/sport/impl/sport.impl.iml" group="sport" />
       <module fileurl="file://$PROJECT_DIR$/start/start.iml" filepath="$PROJECT_DIR$/start/start.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/table/api/table.api.iml" filepath="$PROJECT_DIR$/modules-components/table/api/table.api.iml" group="table" />
       <module fileurl="file://$PROJECT_DIR$/modules-libraries/table.gui/table.gui.iml" filepath="$PROJECT_DIR$/modules-libraries/table.gui/table.gui.iml" group="table/lib" />

@@ -19,9 +19,9 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="scala-library" level="project" />
-    <orderEntry type="module" module-name="pageManager.api" exported="" />
-    <orderEntry type="module" module-name="table.lib.api" />
-    <orderEntry type="module" module-name="table.api" exported="" />
+    <orderEntry type="module" module-name="osgi" />
+    <orderEntry type="module" module-name="sport.api" />
+    <orderEntry type="module" module-name="table.server" />
   </component>
 </module>
 
