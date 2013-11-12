@@ -9,6 +9,17 @@ case class MeasureAreaTree(measureAreaTreeType:MeasureAreaTreeType, childMeasure
       case Right(measureAreaLayout) => measureAreaLayout.allFields
     }) ++ childMeasureAreaLayout.allFields
   }
+  def paths:List[MeasureAreaLayoutPath] = {
+    measureAreaTreeType match {
+      case Left(field) if childMeasureAreaLayout.measureAreaTrees.isEmpty => List(MeasureAreaLayoutPath(List(field)))
+      case Left(field) => childMeasureAreaLayout.paths.map(path => MeasureAreaLayoutPath(field :: path.fields))
+      case Right(measureAreaLayout) => {
+        val paths = measureAreaLayout.paths
+        val childPaths = childMeasureAreaLayout.paths
+        paths.flatMap(path => childPaths.map(childPath => MeasureAreaLayoutPath(path.fields ::: childPath.fields)))
+      }
+    }
+  }
   def hasChildren = childMeasureAreaLayout.measureAreaTrees.nonEmpty
 
   def normalise:List[MeasureAreaTree] = {

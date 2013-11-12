@@ -2,6 +2,7 @@ package com.openaf.table.lib.api
 
 case class MeasureAreaLayout(measureAreaTrees:List[MeasureAreaTree]) {
   def allFields = measureAreaTrees.flatMap(_.allFields)
+  def paths:List[MeasureAreaLayoutPath] = measureAreaTrees.flatMap(_.paths)
 
   def normalise:MeasureAreaLayout = {
     val normalisedTrees = measureAreaTrees.flatMap(_.normalise).flatMap(tree => {
@@ -35,4 +36,8 @@ object MeasureAreaLayout {
   def apply(topFields:List[Field], childFields:List[Field]):MeasureAreaLayout = {
     MeasureAreaLayout(MeasureAreaTree(topFields, childFields))
   }
+}
+
+case class MeasureAreaLayoutPath(fields:List[Field]) {
+  def measureFieldOption:Option[Field] = fields.find(_.fieldType == Measure)
 }

@@ -204,4 +204,39 @@ class MeasureAreaLayoutTest extends FunSuite {
     ))
     assert(normalisedLayout === expectedLayout)
   }
+
+  test("paths") {
+    val layout1 = MeasureAreaLayout(dimensionField1)
+    val expected1 = List(MeasureAreaLayoutPath(List(dimensionField1)))
+    assert(layout1.paths === expected1)
+
+    val layout2 = MeasureAreaLayout(dimensionField1, List(dimensionField2, dimensionField3))
+    val expected2 = List(
+      MeasureAreaLayoutPath(List(dimensionField1, dimensionField2)),
+      MeasureAreaLayoutPath(List(dimensionField1, dimensionField3))
+    )
+    assert(layout2.paths === expected2)
+
+    val layout3 = MeasureAreaLayout(List(
+      MeasureAreaTree(List(dimensionField1), List(dimensionField2)),
+      MeasureAreaTree(List(dimensionField3), List(dimensionField1, dimensionField2))
+    ))
+    val expected3 = List(
+      MeasureAreaLayoutPath(List(dimensionField1, dimensionField2)),
+      MeasureAreaLayoutPath(List(dimensionField3, dimensionField1)),
+      MeasureAreaLayoutPath(List(dimensionField3, dimensionField2))
+    )
+    assert(layout3.paths === expected3)
+
+    val layout4 = MeasureAreaLayout(
+      MeasureAreaTree(List(dimensionField1, dimensionField2), List(dimensionField3, measureField1))
+    )
+    val expected4 = List(
+      MeasureAreaLayoutPath(List(dimensionField1, dimensionField3)),
+      MeasureAreaLayoutPath(List(dimensionField1, measureField1)),
+      MeasureAreaLayoutPath(List(dimensionField2, dimensionField3)),
+      MeasureAreaLayoutPath(List(dimensionField2, measureField1))
+    )
+    assert(layout4.paths === expected4)
+  }
 }
