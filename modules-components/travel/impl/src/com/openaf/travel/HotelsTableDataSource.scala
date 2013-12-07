@@ -9,7 +9,7 @@ import com.openaf.table.server.datasources.{Result, TableDataSource}
 class HotelsTableDataSource extends TableDataSource {
   private val fieldDefinitions = List(
     HotelNameField, PeriodField, CostField, StarRatingField
-  ).map(field => Right(DefaultFieldDefinition(field)))
+  ).map(field => Right(AnyFieldDefinition(field)))
 
   def fieldDefinitionGroup = FieldDefinitionGroup("Hotel", fieldDefinitions)
   def result(tableState:TableState) = Result.Empty

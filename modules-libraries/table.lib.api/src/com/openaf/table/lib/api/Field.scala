@@ -1,7 +1,10 @@
 package com.openaf.table.lib.api
 
-case class Field(id:String, fieldType:FieldType=Dimension) {
+import SortOrder._
+
+case class Field(id:String, fieldType:FieldType=Dimension, sortOrder:SortOrder=Ascending) {
   def displayName = id
+  def flipSortOrder = {copy(sortOrder = if (sortOrder == Ascending) Descending else Ascending)}
 }
 
 sealed trait FieldType {

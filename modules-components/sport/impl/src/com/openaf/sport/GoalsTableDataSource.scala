@@ -8,7 +8,7 @@ import com.openaf.table.server.datasources.{Result, TableDataSource}
 class GoalsTableDataSource extends TableDataSource {
   val fieldDefinitions:List[Either[FieldDefinitionGroup,FieldDefinition]] = List(
     PlayerField, TimeField, TeamField, OppositionTeamField, VenueField, DateField, KickOffTimeField, CompetitionField
-  ).map(field => Right(DefaultFieldDefinition(field)))
+  ).map(field => Right(AnyFieldDefinition(field)))
 
   def fieldDefinitionGroup = FieldDefinitionGroup("Goals", fieldDefinitions)
   def result(tableState:TableState) = Result.Empty

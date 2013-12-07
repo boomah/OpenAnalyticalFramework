@@ -149,8 +149,13 @@ case class RawRowBasedTableDataSource(data:Array[Array[Any]], fields:Array[Field
       field -> values
     }}
 
-    // If there are no row fields there with be an empty row in the headers that isn't needed so remove it
-    val rowHeadersToUse = if (rowHeaderFields.isEmpty) Array.empty[Array[Int]] else rowHeaders.toArray.map(_.toArray)
+    // If there are no row fields or measure fields there with be an empty row in the headers that isn't needed so
+    // remove it
+    val rowHeadersToUse = if (rowHeaderFields.nonEmpty || measureAreaPathsMeasureOptions.exists(_.isDefined)) {
+      rowHeaders.toArray.map(_.toArray)
+    } else {
+      Array.empty[Array[Int]]
+    }
 
     val pathData = colHeaders.map(_.toArray.map(_.toArray)).zip(aggregatedDataForPath).map{
       case (colData, mainData) => PathData(colData, mainData.toMap)

@@ -1,16 +1,21 @@
 package com.openaf.table.server
 
-import com.openaf.table.lib.api.{StringRenderer, Renderer, FieldGroup, Field}
+import com.openaf.table.lib.api._
+import com.openaf.table.lib.api.Field
 
 trait FieldDefinition {
+  type T
   def field:Field
-  def renderer:Renderer
   def primaryKey:Boolean
+  def renderer:Renderer
+  def ordering:Ordering[T]
 }
 
-case class DefaultFieldDefinition(field:Field) extends FieldDefinition {
-  val renderer = StringRenderer
+case class AnyFieldDefinition(field:Field) extends FieldDefinition {
+  type T = Any
   val primaryKey = false
+  val renderer = AnyRenderer
+  val ordering = AnyOrdering
 }
 
 case class FieldDefinitionGroup(groupName:String, children:List[Either[FieldDefinitionGroup,FieldDefinition]]) {
@@ -29,11 +34,11 @@ case class FieldDefinitionGroup(groupName:String, children:List[Either[FieldDefi
     }
   }
 
-  def fieldDefinition(field:Field) = fieldDefinitions.find(_.field == field).get
+  def fieldDefinition(fieldID:String) = fieldDefinitions.find(_.field.id == fieldID).get
 }
 object FieldDefinitionGroup {
   val Empty = FieldDefinitionGroup("Fields", Nil)
   def apply(fields:Field*) = {
-    new FieldDefinitionGroup("Fields", fields.map(field => Right(DefaultFieldDefinition(field))).toList)
+    new FieldDefinitionGroup("Fields", fields.map(field => Right(AnyFieldDefinition(field))).toList)
   }
 }

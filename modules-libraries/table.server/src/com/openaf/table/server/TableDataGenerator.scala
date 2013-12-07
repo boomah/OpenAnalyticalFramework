@@ -2,54 +2,113 @@ package com.openaf.table.server
 
 import com.openaf.table.lib.api._
 import com.openaf.table.server.datasources.TableDataSource
+import java.util.Comparator
+import java.util
 
 object TableDataGenerator {
+  // This is far from idiomatic Scala. Written this way for speed.
+  // TODO - remove the need to keep converting to and from lists
   def tableData(tableState:TableState, tableDataSource:TableDataSource) = {
+    val result = tableDataSource.result(tableState)
     val fieldGroup = tableDataSource.fieldDefinitionGroup.fieldGroup
-    /*val result = tableDataSource.result(tableState)
+
+    val rowHeaderFieldDefinitions = tableState.tableLayout.rowHeaderFields.map(field => {
+      tableDataSource.fieldDefinitionGroup.fieldDefinition(field.id)
+    }).toArray
+    val rowHeaderLookUps = tableState.tableLayout.rowHeaderFields.map(field => {
+      result.valueLookUp(field.id)
+    }).toArray
 
     val rowHeaderValues = result.rowHeaderValues
-    val rowHeaderValuesLength = rowHeaderValues.length
-    var rowCounter = 0
+    util.Arrays.sort(
+      rowHeaderValues,
+      new TableDataGeneratorComparator(tableState.tableLayout.rowHeaderFields.toArray, rowHeaderFieldDefinitions,
+        rowHeaderLookUps)
+    )
+    val numRowHeaderValues = rowHeaderValues.length
+    var rowHeaderCounter = 0
 
-    val measureAreaValues = result.colHeaderValues
-    val measureAreaLength = measureAreaValues.length
-    var measureAreaCounter = 0
-    val measureAreaLengths = measureAreaValues.map(_.length)
-    val totalMeasureAreaLength = measureAreaLengths.sum
-    var totalMeasureAreaCounter = 0
+    val allPathData = result.pathData
+    val numPaths = allPathData.length
+    var pathCounter = 0
 
+    val allColHeaderValues = allPathData.map(_.colHeaderValues)
+    val colHeaderValuesLengths = allColHeaderValues.map(_.length)
+    var colHeaderCounter = 0
 
-    val data:Array[Array[Any]] = new Array(rowHeaderValuesLength)
+    var dataForPath:Map[(List[Int], List[Int]), Any] = null
+    var numColHeaders = -1
+    var colHeaderValues:Array[Array[Int]] = null
 
-    while (rowCounter < rowHeaderValuesLength) {
-      data(rowCounter) = new Array[Any](totalMeasureAreaLength)
-      val rowKey = rowHeaderValues(rowCounter).toList
-      while (measureAreaCounter < measureAreaLength) {
-        val measureAreaSection = measureAreaValues(measureAreaCounter)
-        val measureAreaSectionLength = measureAreaSection.length
-        var measureAreaSectionCounter = 0
-        while (measureAreaSectionCounter < measureAreaSectionLength) {
-          val measureAreaKey = measureAreaSection(measureAreaSectionCounter).toList
+    val dataForPaths = allPathData.map(_.data)
 
-          val key = (rowKey, measureAreaKey)
-          val value = result.data.getOrElse(key, NoValue)
-          data(rowCounter)(totalMeasureAreaCounter) = value
+    var rowHeaderKey:List[Int] = Nil
+    var colHeaderKey:List[Int] = Nil
+    var key:(List[Int],List[Int]) = null
+    var value:Any = null
+    val data:Array[Array[Array[Any]]] = Array.fill(numPaths)(new Array(numRowHeaderValues))
 
-          measureAreaSectionCounter += 1
-          totalMeasureAreaCounter += 1
+    // TODO - order the col header values
+
+    while (rowHeaderCounter < numRowHeaderValues) {
+      rowHeaderKey = rowHeaderValues(rowHeaderCounter).toList
+      while (pathCounter < numPaths) {
+        colHeaderValues = allColHeaderValues(pathCounter)
+        numColHeaders = colHeaderValuesLengths(pathCounter)
+        data(pathCounter)(rowHeaderCounter) = new Array[Any](numColHeaders)
+        dataForPath = dataForPaths(pathCounter)
+        while (colHeaderCounter < numColHeaders) {
+          colHeaderKey = colHeaderValues(colHeaderCounter).toList
+          key = (rowHeaderKey, colHeaderKey)
+          value = dataForPath.getOrElse(key, NoValue)
+          data(pathCounter)(rowHeaderCounter)(colHeaderCounter) = value
+          colHeaderCounter += 1
         }
-        totalMeasureAreaCounter = 0
-        measureAreaCounter += 1
+        colHeaderCounter = 0
+        pathCounter += 1
       }
-      measureAreaCounter = 0
-      totalMeasureAreaCounter = 0
-
-      rowCounter += 1
+      pathCounter = 0
+      rowHeaderCounter += 1
     }
 
-    TableData(fieldGroup, tableState, result.rowHeaderValues, result.colHeaderValues, data, result.valueLookUp)*/
+    TableData(fieldGroup, tableState, result.rowHeaderValues, allColHeaderValues, data, result.valueLookUp)
+  }
+}
 
-    TableData(fieldGroup, tableState, Array.empty, Array.empty, Array.empty, Map.empty)
+class TableDataGeneratorComparator(fields:Array[Field], fieldDefinitions:Array[FieldDefinition],
+                                   lookUps:Array[Array[Any]]) extends Comparator[Array[Int]] {
+  require(fieldDefinitions.length == lookUps.length, "Must be the same length")
+
+  private var length = -1
+  private var counter = 0
+  private var sorted = false
+  private var result = 0
+  private var lookUp:Array[Any] = _
+
+  def compare(array1:Array[Int], array2:Array[Int]) = {
+    length = array1.length
+    sorted = false
+    counter = 0
+    while (!sorted && counter < length) {
+      val fieldDefinition = fieldDefinitions(counter)
+      lookUp = lookUps(counter)
+      if (fields(counter).sortOrder == SortOrder.Ascending) {
+        result = fieldDefinition.ordering.compare(
+          lookUp(array1(counter)).asInstanceOf[fieldDefinition.T],
+          lookUp(array2(counter)).asInstanceOf[fieldDefinition.T]
+        )
+      } else {
+        result = fieldDefinition.ordering.compare(
+          lookUp(array2(counter)).asInstanceOf[fieldDefinition.T],
+          lookUp(array1(counter)).asInstanceOf[fieldDefinition.T]
+        )
+      }
+      if (result != 0) {
+        sorted = true
+      } else {
+        counter += 1
+      }
+    }
+    result
   }
 }
