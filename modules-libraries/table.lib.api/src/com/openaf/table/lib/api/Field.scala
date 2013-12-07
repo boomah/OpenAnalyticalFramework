@@ -2,9 +2,10 @@ package com.openaf.table.lib.api
 
 import SortOrder._
 
-case class Field(id:String, fieldType:FieldType=Dimension, sortOrder:SortOrder=Ascending) {
+case class Field(id:String, fieldType:FieldType=Dimension, filter:Filter=AllSelection, sortOrder:SortOrder=Ascending) {
   def displayName = id
-  def flipSortOrder = {copy(sortOrder = if (sortOrder == Ascending) Descending else Ascending)}
+  def flipSortOrder = copy(sortOrder = if (sortOrder == Ascending) Descending else Ascending)
+  def updateFilter(filter:Filter) = copy(filter = filter)
 }
 
 sealed trait FieldType {
@@ -24,5 +25,5 @@ case class MultipleFieldType(currentFieldType:FieldType) extends FieldType {
   def isMeasure = currentFieldType.isMeasure
 }
 
-sealed trait Selection
-case object AllSelection extends Selection
+sealed trait Filter
+case object AllSelection extends Filter
