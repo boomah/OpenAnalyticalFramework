@@ -16,6 +16,15 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedValueLookUp)
   }
 
+  test("2 row (key - duplicate), 0 measure, 0 column") {
+    val tableState = TableState.Blank.withRowHeaderFields(List(NameField, NameField))
+
+    val expectedRowHeaderValues = Set(List(1,1), List(2,2), List(3,3), List(4,4), List(5,5), List(6,6))
+    val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
+
+    check(tableState, expectedRowHeaderValues, Nil, Nil, expectedValueLookUp)
+  }
+
   test("1 row, 0 measure, 0 column") {
     val tableState = TableState.Blank.withRowHeaderFields(List(GenderField))
 

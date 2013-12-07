@@ -26,11 +26,24 @@ object TableDataGenerator {
     val numRowHeaderValues = rowHeaderValues.length
     var rowHeaderCounter = 0
 
+    val paths = tableState.tableLayout.measureAreaLayout.reversePaths
     val allPathData = result.pathData
     val numPaths = allPathData.length
     var pathCounter = 0
 
-    val allColHeaderValues = allPathData.map(_.colHeaderValues)
+    val allColHeaderValues = paths.zipWithIndex.map{case (path, i) => {
+      val pathData = allPathData(i)
+      val colHeaderValues = pathData.colHeaderValues
+      val colHeaderFieldDefinitions = path.fields.map(field => {
+        tableDataSource.fieldDefinitionGroup.fieldDefinition(field.id)
+      }).toArray
+      val colHeaderLookUps = path.fields.map(field => result.valueLookUp(field.id)).toArray
+      util.Arrays.sort(
+        colHeaderValues,
+        new TableDataGeneratorComparator(path.fields.toArray, colHeaderFieldDefinitions, colHeaderLookUps)
+      )
+      colHeaderValues
+    }}.toArray
     val colHeaderValuesLengths = allColHeaderValues.map(_.length)
     var colHeaderCounter = 0
 
@@ -45,8 +58,6 @@ object TableDataGenerator {
     var key:(List[Int],List[Int]) = null
     var value:Any = null
     val data:Array[Array[Array[Any]]] = Array.fill(numPaths)(new Array(numRowHeaderValues))
-
-    // TODO - order the col header values
 
     while (rowHeaderCounter < numRowHeaderValues) {
       rowHeaderKey = rowHeaderValues(rowHeaderCounter).toList
