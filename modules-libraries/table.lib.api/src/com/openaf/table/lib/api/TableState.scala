@@ -2,6 +2,7 @@ package com.openaf.table.lib.api
 
 case class TableState(tableLayout:TableLayout) {
   def allFields = tableLayout.allFields
+  def distinctFieldIDs = tableLayout.distinctFieldIDs
   def withRowHeaderFields(newRowHeaderFields:List[Field]) = {
     copy(tableLayout = tableLayout.withRowHeaderFields(newRowHeaderFields))
   }

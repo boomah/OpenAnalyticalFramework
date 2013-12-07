@@ -5,7 +5,7 @@ import DataSourceTestData._
 import com.openaf.table.lib.api._
 
 class RawRowBasedTableDataSourceTest extends FunSuite {
-  val dataSource = RawRowBasedTableDataSource(data, Fields, Group)
+  val dataSource = RawRowBasedTableDataSource(data, FieldIDs, Group)
 
   test("1 row (key), 0 measure, 0 column") {
     val tableState = TableState.Blank.withRowHeaderFields(List(NameField))
@@ -267,7 +267,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
 
   private def check(tableState:TableState, expectedRowHeaderValues:Set[List[Int]],
                     expectedColHeaderValues:List[Set[List[Int]]], expectedData:List[Map[(List[Int],List[Int]),Int]],
-                    expectedValueLookUp:Map[String,List[String]]) {
+                    expectedValueLookUp:Map[FieldID,List[Any]]) {
     val result = dataSource.result(tableState)
     assert(result.rowHeaderValues.map(_.toList).toSet === expectedRowHeaderValues)
     assert(result.pathData.map(_.colHeaderValues.map(_.toList).toSet).toList === expectedColHeaderValues)

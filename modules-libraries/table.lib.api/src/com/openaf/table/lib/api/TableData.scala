@@ -2,8 +2,7 @@ package com.openaf.table.lib.api
 
 case class TableData(fieldGroup:FieldGroup, tableState:TableState, rowHeaders:Array[Array[Int]],
                      columnHeaders:Array[Array[Array[Int]]], data:Array[Array[Array[Any]]],
-                     valueLookUp:Map[String,Array[Any]]) {
-  def fields = fieldGroup.fields
+                     valueLookUp:Map[FieldID,Array[Any]]) {
   def withTableState(newTableState:TableState) = copy(tableState = newTableState)
   def withRowHeaderFields(newRowHeaderFields:List[Field]) = withTableState(tableState.withRowHeaderFields(newRowHeaderFields))
   def withFilterFields(newFilterFields:List[Field]) = withTableState(tableState.withFilterFields(newFilterFields))

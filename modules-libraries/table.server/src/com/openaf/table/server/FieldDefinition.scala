@@ -34,7 +34,7 @@ case class FieldDefinitionGroup(groupName:String, children:List[Either[FieldDefi
     }
   }
 
-  def fieldDefinition(fieldID:String) = fieldDefinitions.find(_.field.id == fieldID).get
+  def fieldDefinition(fieldID:FieldID) = fieldDefinitions.find(_.field.id == fieldID).get
 }
 object FieldDefinitionGroup {
   val Empty = FieldDefinitionGroup("Fields", Nil)

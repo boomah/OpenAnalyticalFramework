@@ -10,7 +10,8 @@ object DataSourceTestData {
   val AgeField = Field("age")
   val ScoreField = Field("score", Measure)
 
-  val Fields = Array(NameField, GenderField, LocationField, AgeField, ScoreField)
+  private val Fields = Array(NameField, GenderField, LocationField, AgeField, ScoreField)
+  val FieldIDs = Fields.map(_.id)
   val Group = FieldDefinitionGroup(Fields:_*)
 
   val Rosie = "Rosie"
