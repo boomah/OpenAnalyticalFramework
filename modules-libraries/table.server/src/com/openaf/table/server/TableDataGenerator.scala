@@ -10,14 +10,12 @@ object TableDataGenerator {
   // TODO - remove the need to keep converting to and from lists
   def tableData(tableState:TableState, tableDataSource:TableDataSource) = {
     val result = tableDataSource.result(tableState)
-    val fieldGroup = tableDataSource.fieldDefinitionGroup.fieldGroup
 
-    val rowHeaderFieldDefinitions = tableState.tableLayout.rowHeaderFields.map(field => {
-      tableDataSource.fieldDefinitionGroup.fieldDefinition(field.id)
+    val rowHeaderFieldIDs = tableState.tableLayout.rowHeaderFieldIDs
+    val rowHeaderFieldDefinitions = rowHeaderFieldIDs.map(fieldID => {
+      tableDataSource.fieldDefinitionGroup.fieldDefinition(fieldID)
     }).toArray
-    val rowHeaderLookUps = tableState.tableLayout.rowHeaderFields.map(field => {
-      result.valueLookUp(field.id)
-    }).toArray
+    val rowHeaderLookUps = rowHeaderFieldIDs.map(result.valueLookUp).toArray
 
     val rowHeaderValues = result.rowHeaderValues
     util.Arrays.sort(
@@ -70,6 +68,8 @@ object TableDataGenerator {
       pathCounter = 0
       rowHeaderCounter += 1
     }
+
+    val fieldGroup = tableDataSource.fieldDefinitionGroup.fieldGroup
 
     TableData(fieldGroup, tableState, result.rowHeaderValues, allColHeaderValues, data, result.valueLookUp)
   }

@@ -5,13 +5,14 @@ import com.openaf.table.lib.api.Field
 
 trait FieldDefinition {
   type T
-  def field:Field
+  def defaultField:Field
+  def fieldID = defaultField.id
   def primaryKey:Boolean
   def renderer:Renderer
   def ordering:Ordering[T]
 }
 
-case class AnyFieldDefinition(field:Field) extends FieldDefinition {
+case class AnyFieldDefinition(defaultField:Field) extends FieldDefinition {
   type T = Any
   val primaryKey = false
   val renderer = AnyRenderer
@@ -22,7 +23,7 @@ case class FieldDefinitionGroup(groupName:String, children:List[Either[FieldDefi
   def fieldGroup:FieldGroup = {
     val convertedChildren = children.map{
       case Left(fieldDefinitionGroup) => Left(fieldDefinitionGroup.fieldGroup)
-      case Right(fieldDefinition) => Right(fieldDefinition.field)
+      case Right(fieldDefinition) => Right(fieldDefinition.defaultField)
     }
     FieldGroup(groupName, convertedChildren)
   }
@@ -34,7 +35,7 @@ case class FieldDefinitionGroup(groupName:String, children:List[Either[FieldDefi
     }
   }
 
-  def fieldDefinition(fieldID:FieldID) = fieldDefinitions.find(_.field.id == fieldID).get
+  def fieldDefinition(fieldID:FieldID) = fieldDefinitions.find(_.fieldID == fieldID).get
 }
 object FieldDefinitionGroup {
   val Empty = FieldDefinitionGroup("Fields", Nil)
