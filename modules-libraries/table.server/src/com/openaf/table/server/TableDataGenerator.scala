@@ -18,11 +18,13 @@ object TableDataGenerator {
     val rowHeaderLookUps = rowHeaderFieldIDs.map(result.valueLookUp).toArray
 
     val rowHeaderValues = result.rowHeaderValues
-    util.Arrays.sort(
-      rowHeaderValues,
-      new TableDataGeneratorComparator(tableState.tableLayout.rowHeaderFields.toArray, rowHeaderFieldDefinitions,
-        rowHeaderLookUps)
-    )
+    if (!result.resultDetails.sortDetails.rowHeadersSorted) {
+      util.Arrays.sort(
+        rowHeaderValues,
+        new TableDataGeneratorComparator(tableState.tableLayout.rowHeaderFields.toArray, rowHeaderFieldDefinitions,
+          rowHeaderLookUps)
+      )
+    }
     val numRowHeaderValues = rowHeaderValues.length
     var rowHeaderCounter = 0
 
@@ -34,14 +36,16 @@ object TableDataGenerator {
     val allColHeaderValues = paths.zipWithIndex.map{case (path, i) => {
       val pathData = allPathData(i)
       val colHeaderValues = pathData.colHeaderValues
-      val colHeaderFieldDefinitions = path.fields.map(field => {
-        tableDataSource.fieldDefinitionGroup.fieldDefinition(field.id)
-      }).toArray
-      val colHeaderLookUps = path.fields.map(field => result.valueLookUp(field.id)).toArray
-      util.Arrays.sort(
-        colHeaderValues,
-        new TableDataGeneratorComparator(path.fields.toArray, colHeaderFieldDefinitions, colHeaderLookUps)
-      )
+      if (!result.resultDetails.sortDetails.pathDataSorted(i)) {
+        val colHeaderFieldDefinitions = path.fields.map(field => {
+          tableDataSource.fieldDefinitionGroup.fieldDefinition(field.id)
+        }).toArray
+        val colHeaderLookUps = path.fields.map(field => result.valueLookUp(field.id)).toArray
+        util.Arrays.sort(
+          colHeaderValues,
+          new TableDataGeneratorComparator(path.fields.toArray, colHeaderFieldDefinitions, colHeaderLookUps)
+        )
+      }
       colHeaderValues
     }}.toArray
     val colHeaderValuesLengths = allColHeaderValues.map(_.length)

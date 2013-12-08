@@ -159,6 +159,7 @@ case class RawRowBasedTableDataSource(data:Array[Array[Any]], fieldIDs:Array[Fie
     val pathData = colHeaders.map(_.toArray.map(_.toArray)).zip(aggregatedDataForPath).map{
       case (colData, mainData) => PathData(colData, mainData.toMap)
     }
-    Result(rowHeadersToUse, pathData, valueLookUp)
+    val resultDetails = ResultDetails(SortDetails.allUnsorted(pathData.length))
+    Result(rowHeadersToUse, pathData, valueLookUp, resultDetails)
   }
 }
