@@ -2,7 +2,6 @@ package com.openaf.table.server.datasources
 
 import com.openaf.table.lib.api.{FieldID, TableState}
 import com.openaf.table.server.FieldDefinitionGroup
-import java.util
 
 trait TableDataSource {
   def fieldDefinitionGroup:FieldDefinitionGroup

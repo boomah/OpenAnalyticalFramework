@@ -3,7 +3,7 @@ package com.openaf.table.server
 import org.scalatest.FunSuite
 import com.openaf.table.server.datasources.DataSourceTestData._
 import com.openaf.table.server.datasources.RawRowBasedTableDataSource
-import com.openaf.table.lib.api.{MeasureAreaLayout, FieldID, TableState}
+import com.openaf.table.lib.api.{NoValue, MeasureAreaLayout, FieldID, TableState}
 
 class TableDataGeneratorTest extends FunSuite {
   val dataSource = RawRowBasedTableDataSource(data, FieldIDs, Group)
@@ -176,6 +176,68 @@ class TableDataGeneratorTest extends FunSuite {
     )
 
     check(tableState, List(Nil), expectedColHeaderValues, expectedData, expectedValueLookUp)
+  }
+
+  test("1 row (key), 0 measure, 1 column (key, same as row)") {
+    val tableState = TableState.Blank
+      .withRowHeaderFields(List(NameField))
+      .withMeasureAreaLayout(MeasureAreaLayout(NameField))
+
+    val expectedRowHeaderValues = List(List(6), List(3), List(2), List(4), List(5), List(1))
+    val expectedColHeaderValues = List(List(List(6), List(3), List(2), List(4), List(5), List(1)))
+    val expectedData = List(List.fill(6)(List.fill(6)(NoValue)))
+    val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
+
+    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp)
+  }
+
+  test("1 row (key, reversed), 0 measure, 1 column (key, same as row)") {
+    val tableState = TableState.Blank
+      .withRowHeaderFields(List(NameField.flipSortOrder))
+      .withMeasureAreaLayout(MeasureAreaLayout(NameField))
+
+    val expectedRowHeaderValues = List(List(1), List(5), List(4), List(2), List(3), List(6))
+    val expectedColHeaderValues = List(List(List(6), List(3), List(2), List(4), List(5), List(1)))
+    val expectedData = List(List.fill(6)(List.fill(6)(NoValue)))
+    val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
+
+    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp)
+  }
+
+  test("1 row (key), 0 measure, 1 column (key, same as row but reversed)") {
+    val tableState = TableState.Blank
+      .withRowHeaderFields(List(NameField))
+      .withMeasureAreaLayout(MeasureAreaLayout(NameField.flipSortOrder))
+
+    val expectedRowHeaderValues = List(List(6), List(3), List(2), List(4), List(5), List(1))
+    val expectedColHeaderValues = List(List(List(1), List(5), List(4), List(2), List(3), List(6)))
+    val expectedData = List(List.fill(6)(List.fill(6)(NoValue)))
+    val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
+
+    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp)
+  }
+
+  test("1 row (key), 1 measure, 1 column (key, same as row but reversed)") {
+    val tableState = TableState.Blank
+      .withRowHeaderFields(List(NameField))
+      .withMeasureAreaLayout(MeasureAreaLayout(ScoreField, List(NameField.flipSortOrder)))
+
+    val expectedRowHeaderValues = List(List(6), List(3), List(2), List(4), List(5), List(1))
+    val expectedColHeaderValues = List(List(List(1,0), List(5,0), List(4,0), List(2,0), List(3,0), List(6,0)))
+    val expectedData = List(List(
+      List(NoValue, NoValue, NoValue, NoValue, NoValue, 75     ),
+      List(NoValue, NoValue, NoValue, NoValue, 70,      NoValue),
+      List(NoValue, NoValue, NoValue, 60,      NoValue, NoValue),
+      List(NoValue, NoValue, 80,      NoValue, NoValue, NoValue),
+      List(NoValue, 90,      NoValue, NoValue, NoValue, NoValue),
+      List(50,      NoValue, NoValue, NoValue, NoValue, NoValue)
+    ))
+    val expectedValueLookUp = Map(
+      NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
+      ScoreField.id -> List(ScoreField.id)
+    )
+
+    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp)
   }
 
   private def check(tableState:TableState, expectedRowHeaderValues:List[List[Int]],

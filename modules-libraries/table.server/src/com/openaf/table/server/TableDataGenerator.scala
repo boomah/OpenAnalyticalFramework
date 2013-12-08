@@ -59,8 +59,6 @@ object TableDataGenerator {
 
     var rowHeaderKey:List[Int] = Nil
     var colHeaderKey:List[Int] = Nil
-    var key:(List[Int],List[Int]) = null
-    var value:Any = null
     val data:Array[Array[Array[Any]]] = Array.fill(numPaths)(new Array(numRowHeaderValues))
 
     while (rowHeaderCounter < numRowHeaderValues) {
@@ -72,9 +70,7 @@ object TableDataGenerator {
         dataForPath = dataForPaths(pathCounter)
         while (colHeaderCounter < numColHeaders) {
           colHeaderKey = colHeaderValues(colHeaderCounter).toList
-          key = (rowHeaderKey, colHeaderKey)
-          value = dataForPath.getOrElse(key, NoValue)
-          data(pathCounter)(rowHeaderCounter)(colHeaderCounter) = value
+          data(pathCounter)(rowHeaderCounter)(colHeaderCounter) = dataForPath.getOrElse((rowHeaderKey, colHeaderKey), NoValue)
           colHeaderCounter += 1
         }
         colHeaderCounter = 0
