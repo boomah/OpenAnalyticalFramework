@@ -18,11 +18,12 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
 
   def setup() {
     doingSetup = true
-    setTableData(pageData.tableData)
+    goingToTableDataProperty.set(pageData.tableData)
+    tableDataProperty.set(pageData.tableData)
     doingSetup = false
   }
 
-  tableDataProperty.addListener(new ChangeListener[TableData] {
+  goingToTableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observable:ObservableValue[_<:TableData], oldValue:TableData, newValue:TableData) {
       if (!doingSetup) {
         pageContext.goToPage(page.withTableData(newValue))

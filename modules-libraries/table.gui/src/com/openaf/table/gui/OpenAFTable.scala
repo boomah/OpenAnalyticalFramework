@@ -13,17 +13,16 @@ class OpenAFTable extends GridPane {
   setGridLinesVisible(true)
 
   val tableDataProperty = new SimpleObjectProperty[TableData]
-  def getTableData = tableDataProperty.get
-  def setTableData(tableData0:TableData) {tableDataProperty.set(tableData0)}
+  val goingToTableDataProperty = new SimpleObjectProperty[TableData]
 
   private val dragAndDrop = new DragAndDrop
 
   val localeProperty = new SimpleObjectProperty[Locale](Locale.getDefault)
 
-  private val configArea = new ConfigArea(tableDataProperty, dragAndDrop, localeProperty)
-  private val filterFieldsArea = new FilterFieldsArea(tableDataProperty, dragAndDrop, localeProperty)
-  private val rowHeaderFieldsArea = new RowHeaderFieldsArea(tableDataProperty, dragAndDrop, localeProperty)
-  private val measureFieldsArea = new MeasureFieldsArea(tableDataProperty, dragAndDrop, localeProperty)
+  private val configArea = new ConfigArea(goingToTableDataProperty, dragAndDrop, localeProperty)
+  private val filterFieldsArea = new FilterFieldsArea(goingToTableDataProperty, dragAndDrop, localeProperty)
+  private val rowHeaderFieldsArea = new RowHeaderFieldsArea(goingToTableDataProperty, dragAndDrop, localeProperty)
+  private val measureFieldsArea = new MeasureFieldsArea(goingToTableDataProperty, dragAndDrop, localeProperty)
   private val tableView = new OpenAFTableView(tableDataProperty)
 
   {
