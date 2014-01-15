@@ -2,15 +2,16 @@ package com.openaf.table.lib.api
 
 import SortOrder._
 
-case class Field(id:FieldID, fieldType:FieldType=Dimension, filter:Filter=AllSelection, sortOrder:SortOrder=Ascending) {
+case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=NoFilter[T](),
+                    sortOrder:SortOrder=Ascending) {
   def displayName = id.id
   def flipSortOrder = copy(sortOrder = if (sortOrder == Ascending) Descending else Ascending)
-  def updateFilter(filter:Filter) = copy(filter = filter)
+  def updateFilter(filter:Filter[T]) = copy(filter = filter)
 }
 
 object Field {
-  def apply(id:String) = new Field(FieldID(id))
-  def apply(id:String, fieldType:FieldType) = new Field(FieldID(id), fieldType)
+  def apply[T](id:String) = new Field[T](FieldID(id))
+  def apply[T](id:String, fieldType:FieldType) = new Field[T](FieldID(id), fieldType)
 }
 
 case class FieldID(id:String)
@@ -32,5 +33,12 @@ case class MultipleFieldType(currentFieldType:FieldType) extends FieldType {
   def isMeasure = currentFieldType.isMeasure
 }
 
-sealed trait Filter
-case object AllSelection extends Filter
+sealed trait Filter[T] {
+  def matches(value:T):Boolean
+}
+case class NoFilter[T]() extends Filter[T] {
+  def matches(value:T) = true
+}
+case class SpecifiedFilter[T](values:Set[T]) extends Filter[T] {
+  def matches(value:T) = values.contains(value)
+}

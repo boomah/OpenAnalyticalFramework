@@ -8,6 +8,8 @@ class RowHeaderFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData],
                           val locale:SimpleObjectProperty[Locale]) extends FlatDragAndDropNode {
   getStyleClass.add("row-header-fields-area")
   def descriptionID = "rowHeaderDescription"
-  def fields(tableDataOption:Option[TableData]) = tableDataOption.getOrElse(tableDataProperty.get).tableState.tableLayout.rowHeaderFields
-  def withNewFields(fields:List[Field], tableData:TableData) = tableData.withRowHeaderFields(fields)
+  def fields(tableDataOption:Option[TableData]) = {
+    tableDataOption.getOrElse(tableDataProperty.get).tableState.tableLayout.rowHeaderFields
+  }
+  def withNewFields(fields:List[Field[_]], tableData:TableData) = tableData.withRowHeaderFields(fields)
 }

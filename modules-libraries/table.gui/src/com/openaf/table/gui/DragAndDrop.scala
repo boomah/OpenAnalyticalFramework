@@ -92,7 +92,7 @@ class DragAndDrop {
 trait Draggable extends Region {
   def dragAndDrop:DragAndDrop
   def draggableParent:DraggableParent
-  def fields:List[Field]
+  def fields:List[Field[_]]
   // When dropped here, nothing will happen. Usually just the Draggable itself, but in the case of a Draggable being
   // dragged from the AllFieldsArea, the AllFieldsArea scene bounds are used.
   def noOpSceneBounds = localToScene(getBoundsInLocal)
@@ -173,8 +173,8 @@ trait DragAndDropNode extends StackPane with DropTargetContainer with DraggableP
   val tableDataProperty:SimpleObjectProperty[TableData]
   def descriptionID:String
   def locale:SimpleObjectProperty[Locale]
-  def fields(tableDataOption:Option[TableData]):List[Field]
-  protected def fields:List[Field] = fields(None)
+  def fields(tableDataOption:Option[TableData]):List[Field[_]]
+  protected def fields:List[Field[_]] = fields(None)
   protected def hasFields = fields.nonEmpty
   def nodes:List[Node]
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = dropTargetMap.keySet.toList

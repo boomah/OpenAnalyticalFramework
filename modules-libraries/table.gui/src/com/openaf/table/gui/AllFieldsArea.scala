@@ -8,10 +8,10 @@ import javafx.util.Callback
 import com.openaf.table.lib.api.{TableData, FieldGroup, Field}
 
 object AllFieldsArea {
-  type TreeItemType = Either[TreeGroup,Field]
+  type TreeItemType = Either[TreeGroup,Field[_]]
 }
 
-case class TreeGroup(fieldGroup:String, allChildFields:List[Field])
+case class TreeGroup(fieldGroup:String, allChildFields:List[Field[_]])
 
 import AllFieldsArea._
 
@@ -64,7 +64,7 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragA
 
 class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsArea,
                            val tableData:SimpleObjectProperty[TableData]) extends TreeCell[TreeItemType] with Draggable {
-  private var fields0:List[Field] = Nil
+  private var fields0:List[Field[_]] = Nil
   override def updateItem(treeItemType:TreeItemType, empty:Boolean) {
     super.updateItem(treeItemType, empty)
     if (empty) {

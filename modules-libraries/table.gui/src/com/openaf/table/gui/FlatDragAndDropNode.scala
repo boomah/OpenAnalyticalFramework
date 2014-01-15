@@ -6,7 +6,7 @@ import javafx.scene.control.Label
 import com.openaf.table.lib.api.{TableData, Field}
 
 trait FlatDragAndDropNode extends DragAndDropNode {
-  def withNewFields(fields:List[Field], tableData:TableData):TableData
+  def withNewFields(fields:List[Field[_]], tableData:TableData):TableData
 
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo) = {
     val currentChildren = mainContent.getChildren

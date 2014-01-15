@@ -3,10 +3,10 @@ package com.openaf.table.lib.api
 import org.scalatest.FunSuite
 
 class MeasureAreaLayoutTest extends FunSuite {
-  val measureField1 = Field("measure1", Measure)
-  val dimensionField1 = Field("dimensionField1")
-  val dimensionField2 = Field("dimensionField2")
-  val dimensionField3 = Field("dimensionField3")
+  val measureField1 = Field[Any]("measure1", Measure)
+  val dimensionField1 = Field[Any]("dimensionField1")
+  val dimensionField2 = Field[Any]("dimensionField2")
+  val dimensionField3 = Field[Any]("dimensionField3")
   val layout1 = MeasureAreaLayout(measureField1, List(dimensionField1, dimensionField2))
 
   test("allFields") {

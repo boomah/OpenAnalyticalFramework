@@ -86,7 +86,7 @@ object TableDataGenerator {
   }
 }
 
-class TableDataGeneratorComparator(fields:Array[Field], fieldDefinitions:Array[FieldDefinition],
+class TableDataGeneratorComparator(fields:Array[Field[_]], fieldDefinitions:Array[FieldDefinition],
                                    lookUps:Array[Array[Any]]) extends Comparator[Array[Int]] {
   require(fieldDefinitions.length == lookUps.length, "Must be the same length")
 

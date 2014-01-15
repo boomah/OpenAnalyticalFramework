@@ -3,7 +3,7 @@ package com.openaf.table.lib.api
 import MeasureAreaLayout._
 
 case class MeasureAreaTree(measureAreaTreeType:MeasureAreaTreeType, childMeasureAreaLayout:MeasureAreaLayout=MeasureAreaLayout.Blank) {
-  def allFields:List[Field] = {
+  def allFields:List[Field[_]] = {
     (measureAreaTreeType match {
       case Left(field) => List(field)
       case Right(measureAreaLayout) => measureAreaLayout.allFields
@@ -49,11 +49,11 @@ case class MeasureAreaTree(measureAreaTreeType:MeasureAreaTreeType, childMeasure
 }
 
 object MeasureAreaTree {
-  def apply(field:Field):MeasureAreaTree = MeasureAreaTree(Left(field))
-  def apply(field:Field, childMeasureAreaLayout:MeasureAreaLayout):MeasureAreaTree = {
+  def apply(field:Field[_]):MeasureAreaTree = MeasureAreaTree(Left(field))
+  def apply(field:Field[_], childMeasureAreaLayout:MeasureAreaLayout):MeasureAreaTree = {
     MeasureAreaTree(Left(field), childMeasureAreaLayout)
   }
-  def apply(fields:Field*):MeasureAreaTree = {
+  def apply(fields:Field[_]*):MeasureAreaTree = {
     if (fields.size == 1) {
       MeasureAreaTree(fields.head)
     } else {
@@ -63,7 +63,7 @@ object MeasureAreaTree {
     val measureAreaLayout = MeasureAreaLayout.fromFields(fields.toList)
     MeasureAreaTree(Right(measureAreaLayout))
   }
-  def apply(topFields:List[Field], childFields:List[Field]):MeasureAreaTree = {
+  def apply(topFields:List[Field[_]], childFields:List[Field[_]]):MeasureAreaTree = {
     MeasureAreaTree(Right(MeasureAreaLayout.fromFields(topFields)), MeasureAreaLayout.fromFields(childFields))
   }
 }

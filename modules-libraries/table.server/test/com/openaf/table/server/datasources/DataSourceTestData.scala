@@ -4,11 +4,11 @@ import com.openaf.table.lib.api.{Measure, Field}
 import com.openaf.table.server.FieldDefinitionGroup
 
 object DataSourceTestData {
-  val NameField = Field("name")
-  val GenderField = Field("gender")
-  val LocationField = Field("location")
-  val AgeField = Field("age")
-  val ScoreField = Field("score", Measure)
+  val NameField = Field[Any]("name")
+  val GenderField = Field[Any]("gender")
+  val LocationField = Field[Any]("location")
+  val AgeField = Field[Any]("age")
+  val ScoreField = Field[Any]("score", Measure)
 
   private val Fields = Array(NameField, GenderField, LocationField, AgeField, ScoreField)
   val FieldIDs = Fields.map(_.id)

@@ -4,9 +4,13 @@ case class TableData(fieldGroup:FieldGroup, tableState:TableState, rowHeaders:Ar
                      columnHeaders:Array[Array[Array[Int]]], data:Array[Array[Array[Any]]],
                      valueLookUp:Map[FieldID,Array[Any]]) {
   def withTableState(newTableState:TableState) = copy(tableState = newTableState)
-  def withRowHeaderFields(newRowHeaderFields:List[Field]) = withTableState(tableState.withRowHeaderFields(newRowHeaderFields))
-  def withFilterFields(newFilterFields:List[Field]) = withTableState(tableState.withFilterFields(newFilterFields))
-  def withMeasureAreaLayout(newMeasureAreaLayout:MeasureAreaLayout) = withTableState(tableState.withMeasureAreaLayout(newMeasureAreaLayout))
+  def withRowHeaderFields(newRowHeaderFields:List[Field[_]]) = {
+    withTableState(tableState.withRowHeaderFields(newRowHeaderFields))
+  }
+  def withFilterFields(newFilterFields:List[Field[_]]) = withTableState(tableState.withFilterFields(newFilterFields))
+  def withMeasureAreaLayout(newMeasureAreaLayout:MeasureAreaLayout) = {
+    withTableState(tableState.withMeasureAreaLayout(newMeasureAreaLayout))
+  }
 }
 object TableData {
   val Empty = TableData(FieldGroup.Empty, TableState.Blank, Array.empty, Array.empty, Array.empty, Map.empty)

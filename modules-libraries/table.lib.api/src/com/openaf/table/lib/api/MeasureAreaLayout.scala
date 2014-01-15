@@ -19,27 +19,27 @@ case class MeasureAreaLayout(measureAreaTrees:List[MeasureAreaTree]) {
 
 object MeasureAreaLayout {
   val Blank = MeasureAreaLayout(Nil)
-  type MeasureAreaTreeType = Either[Field,MeasureAreaLayout]
+  type MeasureAreaTreeType = Either[Field[_],MeasureAreaLayout]
 
   def apply(measureAreaTree:MeasureAreaTree):MeasureAreaLayout = MeasureAreaLayout(List(measureAreaTree))
 
-  def fromFields(fields:List[Field]) = {
+  def fromFields(fields:List[Field[_]]) = {
     val measureAreaTrees = fields.map(field => MeasureAreaTree(field))
     MeasureAreaLayout(measureAreaTrees)
   }
 
-  def apply(topField:Field, childFields:List[Field]=Nil):MeasureAreaLayout = {
+  def apply(topField:Field[_], childFields:List[Field[_]]=Nil):MeasureAreaLayout = {
     val childMeasureAreaLayout = fromFields(childFields)
     val measureAreaTree = MeasureAreaTree(topField, childMeasureAreaLayout)
     MeasureAreaLayout(measureAreaTree)
   }
 
-  def apply(topFields:List[Field], childFields:List[Field]):MeasureAreaLayout = {
+  def apply(topFields:List[Field[_]], childFields:List[Field[_]]):MeasureAreaLayout = {
     MeasureAreaLayout(MeasureAreaTree(topFields, childFields))
   }
 }
 
-case class MeasureAreaLayoutPath(fields:List[Field]) {
+case class MeasureAreaLayoutPath(fields:List[Field[_]]) {
   def measureFieldOption = fields.find(_.fieldType.isMeasure)
   def measureFieldIndex = fields.indexWhere(_.fieldType.isMeasure)
 }
