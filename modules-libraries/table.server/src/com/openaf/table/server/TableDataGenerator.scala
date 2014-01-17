@@ -105,13 +105,13 @@ class TableDataGeneratorComparator(fields:Array[Field[_]], fieldDefinitions:Arra
       lookUp = lookUps(counter)
       if (fields(counter).sortOrder == SortOrder.Ascending) {
         result = fieldDefinition.ordering.compare(
-          lookUp(array1(counter)).asInstanceOf[fieldDefinition.T],
-          lookUp(array2(counter)).asInstanceOf[fieldDefinition.T]
+          lookUp(array1(counter)).asInstanceOf[fieldDefinition.V],
+          lookUp(array2(counter)).asInstanceOf[fieldDefinition.V]
         )
       } else {
         result = fieldDefinition.ordering.compare(
-          lookUp(array2(counter)).asInstanceOf[fieldDefinition.T],
-          lookUp(array1(counter)).asInstanceOf[fieldDefinition.T]
+          lookUp(array2(counter)).asInstanceOf[fieldDefinition.V],
+          lookUp(array1(counter)).asInstanceOf[fieldDefinition.V]
         )
       }
       if (result != 0) {

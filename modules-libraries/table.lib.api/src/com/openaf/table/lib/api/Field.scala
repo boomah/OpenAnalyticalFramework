@@ -10,11 +10,15 @@ case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=
 }
 
 object Field {
+  val Null = Field[Null](FieldID.Null)
   def apply[T](id:String) = new Field[T](FieldID(id))
   def apply[T](id:String, fieldType:FieldType) = new Field[T](FieldID(id), fieldType)
 }
 
 case class FieldID(id:String)
+object FieldID {
+  val Null = FieldID("Null")
+}
 
 sealed trait FieldType {
   def isDimension:Boolean

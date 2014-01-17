@@ -1,7 +1,7 @@
 package com.openaf.table.server.datasources
 
 import com.openaf.table.lib.api.{FieldID, TableState}
-import com.openaf.table.server.FieldDefinitionGroup
+import com.openaf.table.server.{NullFieldDefinition, FieldDefinitionGroup}
 import java.util.{HashMap => JMap}
 import scala.collection.{JavaConversions, mutable}
 
@@ -52,6 +52,10 @@ object RawRowBasedTableDataSource {
       case Some(field) => fieldIDs.indexOf(field.id)
       case _ => -1
     }
+    val measureFieldDefinitions = measureAreaPathsMeasureOptions.map{
+      case Some(field) => fieldDefinitionGroup.fieldDefinition(field.id)
+      case _ => NullFieldDefinition
+    }
 
     val aggregatedDataForPath = Array.fill(numPaths)(new JMap[(List[Int],List[Int]),Any])
 
@@ -61,7 +65,7 @@ object RawRowBasedTableDataSource {
     var dataRow:Array[Any] = null
     var rowHeaderValues:Array[Int] = null
     var value:Any = -1
-    var newDataValue = -1
+    var newDataValue:Any = null
     var lookUp:JMap[Any,Int] = null
     var intForValue = -1
     var fieldsValueCounterIndex = -1
@@ -132,12 +136,19 @@ object RawRowBasedTableDataSource {
           value = dataRow(measureFieldPosition)
           key = (rowHeaderValues.toList, colHeaderValues.toList)
           currentValue = aggregatedData.get(key)
+          val fieldDefinition = measureFieldDefinitions(pathsCounter)
           if (currentValue == null) {
-            aggregatedData.put(key, value)
+            newDataValue = fieldDefinition.combine(
+              fieldDefinition.combiner.initialCombinedValue,
+              value.asInstanceOf[fieldDefinition.V]
+            )
           } else {
-            newDataValue = currentValue.asInstanceOf[Int] + value.asInstanceOf[Int]
-            aggregatedData.put(key, newDataValue)
+            newDataValue = fieldDefinition.combine(
+              currentValue.asInstanceOf[fieldDefinition.C],
+              value.asInstanceOf[fieldDefinition.V]
+            )
           }
+          aggregatedData.put(key, newDataValue)
         }
         pathsCounter += 1
       }

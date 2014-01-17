@@ -9,3 +9,7 @@ case object AnyOrdering extends Ordering[Any] {
     }
   }
 }
+
+case object NullOrdering extends Ordering[Null] {
+  def compare(anyX:Null,anyY:Null) = 0
+}
