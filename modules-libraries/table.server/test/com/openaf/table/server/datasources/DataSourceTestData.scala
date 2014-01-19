@@ -1,18 +1,23 @@
 package com.openaf.table.server.datasources
 
 import com.openaf.table.lib.api.{Measure, Field}
-import com.openaf.table.server.FieldDefinitionGroup
+import com.openaf.table.server.{FieldDefinition, IntFieldDefinition, StringFieldDefinition, FieldDefinitionGroup}
 
 object DataSourceTestData {
-  val NameField = Field[Any]("name")
-  val GenderField = Field[Any]("gender")
-  val LocationField = Field[Any]("location")
-  val AgeField = Field[Any]("age")
-  val ScoreField = Field[Any]("score", Measure)
+  val NameField = Field[String]("name")
+  val GenderField = Field[String]("gender")
+  val LocationField = Field[String]("location")
+  val AgeField = Field[Int]("age")
+  val ScoreField = Field[Int]("score", Measure)
 
-  private val Fields = Array(NameField, GenderField, LocationField, AgeField, ScoreField)
-  val FieldIDs = Fields.map(_.id)
-  val Group = FieldDefinitionGroup(Fields:_*)
+  private val StringFields = List(NameField, GenderField, LocationField)
+  private val StringFieldDefinitions = StringFields.map(StringFieldDefinition)
+  private val IntFields = List(AgeField, ScoreField)
+  private val IntFieldDefinitions = IntFields.map(IntFieldDefinition)
+  private val FieldDefinitions:List[FieldDefinition] = StringFieldDefinitions ::: IntFieldDefinitions
+
+  val FieldIDs = FieldDefinitions.map(_.defaultField.id).toArray
+  val Group = FieldDefinitionGroup("Fields", FieldDefinitions.map(definition => Right(definition)))
 
   val Rosie = "Rosie"
   val Laura = "Laura"

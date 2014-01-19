@@ -2,7 +2,7 @@ package com.openaf.table.server
 
 import com.openaf.table.lib.api._
 import com.openaf.table.lib.api.Field
-import java.util.{Set => JSet}
+import collection.mutable.{Set => MSet}
 
 trait FieldDefinition {
   type V
@@ -28,34 +28,27 @@ case object NullFieldDefinition extends FieldDefinition {
 
 case class AnyFieldDefinition(defaultField:Field[Any]) extends FieldDefinition {
   type V = Any
-  type C = JSet[Any]
+  type C = MSet[Any]
   val primaryKey = false
   val renderer = AnyRenderer
   val ordering = AnyOrdering
   val combiner = AnyCombiner
 }
 
-case class FieldDefinitionGroup(groupName:String, children:List[Either[FieldDefinitionGroup,FieldDefinition]]) {
-  def fieldGroup:FieldGroup = {
-    val convertedChildren = children.map{
-      case Left(fieldDefinitionGroup) => Left(fieldDefinitionGroup.fieldGroup)
-      case Right(fieldDefinition) => Right(fieldDefinition.defaultField)
-    }
-    FieldGroup(groupName, convertedChildren)
-  }
-
-  def fieldDefinitions:List[FieldDefinition] = {
-    children.flatMap {
-      case Left(childFieldDefinitionGroup) => childFieldDefinitionGroup.fieldDefinitions
-      case Right(childFieldDefinition) => List(childFieldDefinition)
-    }
-  }
-
-  def fieldDefinition(fieldID:FieldID) = fieldDefinitions.find(_.fieldID == fieldID).get
+case class StringFieldDefinition(defaultField:Field[String]) extends FieldDefinition {
+  type V = String
+  type C = MSet[String]
+  val primaryKey = false
+  val renderer = StringRenderer
+  val ordering = StringOrdering
+  val combiner = StringCombiner
 }
-object FieldDefinitionGroup {
-  val Empty = FieldDefinitionGroup("Fields", Nil)
-  def apply(fields:Field[Any]*) = {
-    new FieldDefinitionGroup("Fields", fields.map(field => Right(AnyFieldDefinition(field))).toList)
-  }
+
+case class IntFieldDefinition(defaultField:Field[Int]) extends FieldDefinition {
+  type V = Int
+  type C = Int
+  def primaryKey = false
+  def renderer = IntRenderer
+  def ordering = IntOrdering
+  def combiner = IntCombiner
 }

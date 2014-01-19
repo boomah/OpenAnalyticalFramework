@@ -9,14 +9,14 @@ trait SportPage extends TablePage {
 }
 
 object SportPage {
-  val PlayerField = Field[Any]("player")
-  val TimeField = Field[Any]("time")
-  val TeamField = Field[Any]("team")
-  val OppositionTeamField = Field[Any]("oppositionTeam")
-  val VenueField = Field[Any]("venue")
-  val DateField = Field[Any]("date")
-  val KickOffTimeField = Field[Any]("kickOffTime")
-  val CompetitionField = Field[Any]("competition")
+  val PlayerField = Field[String]("player")
+  val TimeField = Field[Int]("time")
+  val TeamField = Field[String]("team")
+  val OppositionTeamField = Field[String]("oppositionTeam")
+  val VenueField = Field[String]("venue")
+  val DateField = Field[String]("date")
+  val KickOffTimeField = Field[String]("kickOffTime")
+  val CompetitionField = Field[String]("competition")
 }
 
 case class GoalsPage(tableState:TableState) extends SportPage {

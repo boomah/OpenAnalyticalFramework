@@ -13,3 +13,11 @@ case object AnyOrdering extends Ordering[Any] {
 case object NullOrdering extends Ordering[Null] {
   def compare(anyX:Null,anyY:Null) = 0
 }
+
+case object StringOrdering extends Ordering[String] {
+  def compare(stringX:String,stringY:String) = stringX.compareTo(stringY)
+}
+
+case object IntOrdering extends Ordering[Int] {
+  def compare(intX:Int,intY:Int) = Integer.compare(intX, intY)
+}

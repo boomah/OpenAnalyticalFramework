@@ -1,6 +1,7 @@
 package com.openaf.table.lib.api
 
-import java.util.{Set => JSet, HashSet => JHashSet}
+import collection.mutable.{Set => MSet}
+import collection.mutable
 
 trait Combiner[C,V] {
   def initialCombinedValue:C
@@ -12,10 +13,18 @@ case object NullCombiner extends Combiner[Null,Null] {
   def combine(combinedValue:Null, value:Null) = null
 }
 
-case object AnyCombiner extends Combiner[JSet[Any],Any] {
-  def initialCombinedValue = new JHashSet[Any]
-  def combine(combinedValue:JSet[Any], value:Any) = {
+case object AnyCombiner extends Combiner[MSet[Any],Any] {
+  def initialCombinedValue = new mutable.HashSet[Any]
+  def combine(combinedValue:MSet[Any], value:Any) = {
     combinedValue.add(value)
+    combinedValue
+  }
+}
+
+case object StringCombiner extends Combiner[MSet[String],String] {
+  def initialCombinedValue = new mutable.HashSet[String]
+  def combine(combinedValue:MSet[String], value:String) = {
+    combinedValue += value
     combinedValue
   }
 }

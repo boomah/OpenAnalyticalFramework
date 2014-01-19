@@ -7,8 +7,10 @@ import com.openaf.table.server.datasources.{RawRowBasedTableDataSource, TableDat
 
 class GoalsTableDataSource extends TableDataSource {
   val fieldDefinitions:List[Either[FieldDefinitionGroup,FieldDefinition]] = List(
-    PlayerField, TimeField, TeamField, OppositionTeamField, VenueField, DateField, KickOffTimeField, CompetitionField
-  ).map(field => Right(AnyFieldDefinition(field)))
+    StringFieldDefinition(PlayerField), IntFieldDefinition(TimeField), StringFieldDefinition(TeamField),
+    StringFieldDefinition(OppositionTeamField), StringFieldDefinition(VenueField), StringFieldDefinition(DateField),
+    StringFieldDefinition(KickOffTimeField), StringFieldDefinition(CompetitionField)
+  ).map(fieldDefinition => Right(fieldDefinition))
 
   val data:Array[Array[Any]] = Array(
     Array("Ba", 54, "Newcastle United", "Tottenham Hotspur", "Sports Direct Arena", "18Aug12", "17:30", "Barclays Premier League"),
