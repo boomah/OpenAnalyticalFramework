@@ -1,14 +1,16 @@
 package com.openaf.table.gui
 
-import javafx.scene.control.{TableCell, TableColumn, TableView}
+import javafx.scene.control.{Cell, TableCell, TableColumn, TableView}
 import javafx.beans.property.{ReadOnlyObjectWrapper, Property}
 import javafx.beans.value.{ObservableValue, ChangeListener}
-import com.openaf.table.lib.api.TableData
-import javafx.collections.{ObservableList, FXCollections}
+import com.openaf.table.lib.api.{RendererID, TableData}
+import javafx.collections.{ObservableMap, ObservableList, FXCollections}
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
 
-class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[ObservableList[Int]] {
+class OpenAFTableView(tableDataProperty:Property[TableData], cellFactories:ObservableMap[RendererID,CellFactory[_]])
+  extends TableView[ObservableList[Int]] {
+
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
       setUpTableView(newTableData)
@@ -31,26 +33,36 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
     setItems(rowHeaderData)
 
     rowHeaderTableColumns.zipWithIndex.foreach{case (column, index) => {
-      column.setCellValueFactory(new Callback[CellDataFeatures[ObservableList[Int],Int], ObservableValue[Int]] {
-        def call(cellDataFeatures:CellDataFeatures[ObservableList[Int],Int]) = {
-          val row = cellDataFeatures.getValue
-          new ReadOnlyObjectWrapper[Int](row.get(index))
-        }
-      })
-
-      column.setCellFactory(new Callback[TableColumn[ObservableList[Int], Int], TableCell[ObservableList[Int], Int]] {
-        def call(tableColumn:TableColumn[ObservableList[Int],Int]) = new TableCell[ObservableList[Int],Int] {
-          override def updateItem(intValue:Int, isEmpty:Boolean) {
-            if (isEmpty) {
-              setText(null)
-            } else {
-              val values = tableData.valueLookUp(rowHeaders(index).id)
-              val s = values(intValue).asInstanceOf[String]
-              setText(s)
-            }
-          }
-        }
-      })
+      column.setCellValueFactory(new DefaultCellValueFactory(index))
+      column.setCellFactory(new DefaultCellFactory(tableData.valueLookUp(rowHeaders(index).id)))
     }}
   }
+}
+
+class DefaultCellValueFactory(index:Int)
+  extends Callback[CellDataFeatures[ObservableList[Int],Int],ObservableValue[Int]] {
+
+  def call(cellDataFeatures:CellDataFeatures[ObservableList[Int],Int]) = {
+    val row = cellDataFeatures.getValue
+    new ReadOnlyObjectWrapper[Int](row.get(index))
+  }
+}
+
+class DefaultCellFactory(values:Array[Any])
+  extends Callback[TableColumn[ObservableList[Int],Int],TableCell[ObservableList[Int],Int]] {
+
+  def call(tableColumn:TableColumn[ObservableList[Int],Int]) = new TableCell[ObservableList[Int],Int] {
+    override def updateItem(intValue:Int, isEmpty:Boolean) {
+      if (isEmpty) {
+        setText(null)
+      } else {
+        val string = values(intValue).toString
+        setText(string)
+      }
+    }
+  }
+}
+
+trait CellFactory[V] {
+  def cell(values:Array[V]):Cell[Int]
 }

@@ -20,3 +20,5 @@ case object IntRenderer extends Renderer[Int] {
   def text(value:Int) = value.toString
 }
 
+trait RendererID
+case object DefaultRendererID extends RendererID
