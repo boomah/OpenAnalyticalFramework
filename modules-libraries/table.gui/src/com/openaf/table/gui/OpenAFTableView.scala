@@ -8,7 +8,7 @@ import javafx.collections.{ObservableMap, ObservableList, FXCollections}
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
 
-class OpenAFTableView(tableDataProperty:Property[TableData], cellFactories:ObservableMap[RendererID,CellFactory[_]])
+class OpenAFTableView(tableDataProperty:Property[TableData]/*, cellFactories:ObservableMap[RendererID,CellFactory[_]]*/)
   extends TableView[ObservableList[Int]] {
 
   tableDataProperty.addListener(new ChangeListener[TableData] {

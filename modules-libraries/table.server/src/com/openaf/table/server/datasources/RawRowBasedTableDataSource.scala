@@ -138,12 +138,12 @@ object RawRowBasedTableDataSource {
           currentValue = aggregatedData.get(key)
           val fieldDefinition = measureFieldDefinitions(pathsCounter)
           if (currentValue == null) {
-            newDataValue = fieldDefinition.combine(
+            newDataValue = fieldDefinition.combiner.combine(
               fieldDefinition.combiner.initialCombinedValue,
               value.asInstanceOf[fieldDefinition.V]
             )
           } else {
-            newDataValue = fieldDefinition.combine(
+            newDataValue = fieldDefinition.combiner.combine(
               currentValue.asInstanceOf[fieldDefinition.C],
               value.asInstanceOf[fieldDefinition.V]
             )

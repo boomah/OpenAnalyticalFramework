@@ -10,10 +10,9 @@ trait FieldDefinition {
   def defaultField:Field[V]
   def fieldID = defaultField.id
   def primaryKey:Boolean
-  def renderer:Renderer[V]
+  def renderer:Renderer[C,V]
   def ordering:Ordering[V]
   def combiner:Combiner[C,V]
-  def combine(combinedValue:C, value:V) = combiner.combine(combinedValue, value)
 }
 
 case object NullFieldDefinition extends FieldDefinition {
@@ -30,7 +29,7 @@ case class AnyFieldDefinition(defaultField:Field[Any]) extends FieldDefinition {
   type V = Any
   type C = MSet[Any]
   val primaryKey = false
-  val renderer = AnyRenderer
+  val renderer = AnyMSetCombineRenderer
   val ordering = AnyOrdering
   val combiner = AnyCombiner
 }
@@ -39,7 +38,7 @@ case class StringFieldDefinition(defaultField:Field[String]) extends FieldDefini
   type V = String
   type C = MSet[String]
   val primaryKey = false
-  val renderer = StringRenderer
+  val renderer = StringMSetCombineRenderer
   val ordering = StringOrdering
   val combiner = StringCombiner
 }
