@@ -3,14 +3,12 @@ package com.openaf.table.gui
 import javafx.scene.control.{Cell, TableCell, TableColumn, TableView}
 import javafx.beans.property.{ReadOnlyObjectWrapper, Property}
 import javafx.beans.value.{ObservableValue, ChangeListener}
-import com.openaf.table.lib.api.{RendererID, TableData}
-import javafx.collections.{ObservableMap, ObservableList, FXCollections}
+import com.openaf.table.lib.api.{AnyRenderer, Renderer, TableData}
+import javafx.collections.{ObservableList, FXCollections}
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
 
-class OpenAFTableView(tableDataProperty:Property[TableData]/*, cellFactories:ObservableMap[RendererID,CellFactory[_]]*/)
-  extends TableView[ObservableList[Int]] {
-
+class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[ObservableList[Int]] {
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
       setUpTableView(newTableData)
@@ -18,8 +16,8 @@ class OpenAFTableView(tableDataProperty:Property[TableData]/*, cellFactories:Obs
   })
 
   private def setUpTableView(tableData:TableData) {
-    val rowHeaders = tableData.tableState.tableLayout.rowHeaderFields
-    val rowHeaderTableColumns = rowHeaders.map(field => new TableColumn[ObservableList[Int],Int](field.displayName))
+    val rowHeaderFields = tableData.tableState.tableLayout.rowHeaderFields
+    val rowHeaderTableColumns = rowHeaderFields.map(field => new TableColumn[ObservableList[Int],Int](field.displayName))
     getColumns.clear()
     getColumns.addAll(rowHeaderTableColumns :_*)
 
@@ -34,7 +32,10 @@ class OpenAFTableView(tableDataProperty:Property[TableData]/*, cellFactories:Obs
 
     rowHeaderTableColumns.zipWithIndex.foreach{case (column, index) => {
       column.setCellValueFactory(new DefaultCellValueFactory(index))
-      column.setCellFactory(new DefaultCellFactory(tableData.valueLookUp(rowHeaders(index).id)))
+      val rowHeaderField = rowHeaderFields(index)
+      val values = tableData.valueLookUp(rowHeaderFields(index).id)
+      val cellFactory = new DefaultCellFactory(values, AnyRenderer)
+      column.setCellFactory(cellFactory)
     }}
   }
 }
@@ -48,7 +49,7 @@ class DefaultCellValueFactory(index:Int)
   }
 }
 
-class DefaultCellFactory(values:Array[Any])
+class DefaultCellFactory[T](values:Array[Any], renderer:Renderer[T])
   extends Callback[TableColumn[ObservableList[Int],Int],TableCell[ObservableList[Int],Int]] {
 
   def call(tableColumn:TableColumn[ObservableList[Int],Int]) = new TableCell[ObservableList[Int],Int] {
@@ -56,8 +57,8 @@ class DefaultCellFactory(values:Array[Any])
       if (isEmpty) {
         setText(null)
       } else {
-        val string = values(intValue).toString
-        setText(string)
+        val value = values(intValue).asInstanceOf[T]
+        setText(renderer.render(value))
       }
     }
   }
