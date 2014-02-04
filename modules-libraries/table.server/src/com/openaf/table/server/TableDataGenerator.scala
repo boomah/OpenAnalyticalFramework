@@ -84,9 +84,10 @@ object TableDataGenerator {
 
     val tableValues = TableValues(result.rowHeaderValues, allColHeaderValues, data, result.valueLookUp)
 
-    val defaultRenderers:Map[Field[_],Renderer[_]] = tableState.tableLayout.rowHeaderFields.map(field => {
+    val defaultRenderers:Map[Field[_],Renderer[_]] = tableState.tableLayout.allFields.map(field => {
       val fieldDefinition = tableDataSource.fieldDefinitionGroup.fieldDefinition(field.id)
-      field -> fieldDefinition.renderer
+      val renderer = if (field.fieldType.isDimension) fieldDefinition.renderer else fieldDefinition.combinedRenderer
+      field -> renderer
     }).toMap
 
     TableData(fieldGroup, tableState, tableValues, defaultRenderers)
