@@ -3,7 +3,7 @@ package com.openaf.table.gui
 import javafx.scene.control.{Cell, TableCell, TableColumn, TableView}
 import javafx.beans.property.{ReadOnlyObjectWrapper, Property}
 import javafx.beans.value.{ObservableValue, ChangeListener}
-import com.openaf.table.lib.api.{AnyRenderer, Renderer, TableData}
+import com.openaf.table.lib.api.{Renderer, TableData}
 import javafx.collections.{ObservableList, FXCollections}
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
@@ -21,10 +21,8 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
     getColumns.clear()
     getColumns.addAll(rowHeaderTableColumns :_*)
 
-    // TODO - do this properly with renderers etc
-
     val rowHeaderData = FXCollections.observableArrayList[ObservableList[Int]]()
-    tableData.rowHeaders.foreach(rowArray => {
+    tableData.tableValues.rowHeaders.foreach(rowArray => {
       val rowHeaderRow = FXCollections.observableArrayList(rowArray :_*)
       rowHeaderData.add(rowHeaderRow)
     })
@@ -32,9 +30,10 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
 
     rowHeaderTableColumns.zipWithIndex.foreach{case (column, index) => {
       column.setCellValueFactory(new DefaultCellValueFactory(index))
+      val values = tableData.tableValues.valueLookUp(rowHeaderFields(index).id)
       val rowHeaderField = rowHeaderFields(index)
-      val values = tableData.valueLookUp(rowHeaderFields(index).id)
-      val cellFactory = new DefaultCellFactory(values, AnyRenderer)
+      val defaultRenderer = tableData.defaultRenderers(rowHeaderField)
+      val cellFactory = new DefaultCellFactory(values, defaultRenderer)
       column.setCellFactory(cellFactory)
     }}
   }

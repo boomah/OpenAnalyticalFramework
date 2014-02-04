@@ -246,9 +246,9 @@ class TableDataGeneratorTest extends FunSuite {
                     expectedValueLookUp:Map[FieldID,List[Any]]) {
     val tableData = TableDataGenerator.tableData(tableState, dataSource)
 
-    assert(tableData.rowHeaders.map(_.toList).toList === expectedRowHeaderValues)
-    assert(tableData.columnHeaders.map(_.map(_.toList).toList).toList === expectedColHeaderValues)
-    assert(tableData.data.map(_.map(_.toList).toList).toList === expectedData)
-    assert(tableData.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
+    assert(tableData.tableValues.rowHeaders.map(_.toList).toList === expectedRowHeaderValues)
+    assert(tableData.tableValues.columnHeaders.map(_.map(_.toList).toList).toList === expectedColHeaderValues)
+    assert(tableData.tableValues.data.map(_.map(_.toList).toList).toList === expectedData)
+    assert(tableData.tableValues.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
   }
 }

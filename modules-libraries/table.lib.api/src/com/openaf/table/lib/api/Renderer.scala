@@ -1,5 +1,7 @@
 package com.openaf.table.lib.api
 
+import collection.mutable.{Set => MSet}
+
 trait Renderer[V] {
   def render(value:V):String
 }
@@ -18,6 +20,21 @@ case object StringRenderer extends Renderer[String] {
 
 case object IntRenderer extends Renderer[Int] {
   def render(value:Int) = value.toString
+}
+
+case class MSetRenderer[T](maxNumberToDisplay:Int) extends Renderer[MSet[T]] {
+  def render(value:MSet[T]) = {
+    val numberOfValues = value.size
+    if (numberOfValues > maxNumberToDisplay) {
+      numberOfValues + " values"
+    } else {
+      value.mkString(",")
+    }
+  }
+}
+
+object MSetRenderer {
+  val DefaultMaxNumberToDisplay = 3
 }
 
 trait RendererID

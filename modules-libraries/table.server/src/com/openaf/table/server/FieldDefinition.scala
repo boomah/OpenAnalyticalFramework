@@ -11,6 +11,7 @@ trait FieldDefinition {
   def fieldID = defaultField.id
   def primaryKey:Boolean
   def renderer:Renderer[V]
+  def combinedRenderer:Renderer[C]
   def ordering:Ordering[V]
   def combiner:Combiner[C,V]
 }
@@ -21,6 +22,7 @@ case object NullFieldDefinition extends FieldDefinition {
   def defaultField = Field.Null
   def primaryKey = false
   def renderer = NullRenderer
+  def combinedRenderer = NullRenderer
   def ordering = NullOrdering
   def combiner = NullCombiner
 }
@@ -30,6 +32,7 @@ case class AnyFieldDefinition(defaultField:Field[Any]) extends FieldDefinition {
   type C = MSet[Any]
   val primaryKey = false
   val renderer = AnyRenderer
+  def combinedRenderer = MSetRenderer[Any](MSetRenderer.DefaultMaxNumberToDisplay)
   val ordering = AnyOrdering
   val combiner = AnyCombiner
 }
@@ -39,6 +42,7 @@ case class StringFieldDefinition(defaultField:Field[String]) extends FieldDefini
   type C = MSet[String]
   val primaryKey = false
   val renderer = StringRenderer
+  def combinedRenderer = MSetRenderer[String](MSetRenderer.DefaultMaxNumberToDisplay)
   val ordering = StringOrdering
   val combiner = StringCombiner
 }
@@ -48,6 +52,7 @@ case class IntFieldDefinition(defaultField:Field[Int]) extends FieldDefinition {
   type C = Int
   def primaryKey = false
   def renderer = IntRenderer
+  def combinedRenderer = renderer
   def ordering = IntOrdering
   def combiner = IntCombiner
 }

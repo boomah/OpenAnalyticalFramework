@@ -82,7 +82,14 @@ object TableDataGenerator {
 
     val fieldGroup = tableDataSource.fieldDefinitionGroup.fieldGroup
 
-    TableData(fieldGroup, tableState, result.rowHeaderValues, allColHeaderValues, data, result.valueLookUp)
+    val tableValues = TableValues(result.rowHeaderValues, allColHeaderValues, data, result.valueLookUp)
+
+    val defaultRenderers:Map[Field[_],Renderer[_]] = tableState.tableLayout.rowHeaderFields.map(field => {
+      val fieldDefinition = tableDataSource.fieldDefinitionGroup.fieldDefinition(field.id)
+      field -> fieldDefinition.renderer
+    }).toMap
+
+    TableData(fieldGroup, tableState, tableValues, defaultRenderers)
   }
 }
 
