@@ -168,7 +168,7 @@ class TableDataGeneratorTest extends FunSuite {
   test("0 row, 1 measure, 1 column (key)") {
     val tableState = TableState.Blank.withMeasureAreaLayout(MeasureAreaLayout(ScoreField, List(NameField)))
 
-    val expectedColHeaderValues = List(List(List(6,0), List(3,0), List(2,0), List(4,0), List(5,0), List(1,0)))
+    val expectedColHeaderValues = List(List(List(0,6), List(0,3), List(0,2), List(0,4), List(0,5), List(0,1)))
     val expectedData = List(List(List(75, 70, 60, 80, 90, 50)))
     val expectedValueLookUp = Map(
       NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
@@ -223,7 +223,7 @@ class TableDataGeneratorTest extends FunSuite {
       .withMeasureAreaLayout(MeasureAreaLayout(ScoreField, List(NameField.flipSortOrder)))
 
     val expectedRowHeaderValues = List(List(6), List(3), List(2), List(4), List(5), List(1))
-    val expectedColHeaderValues = List(List(List(1,0), List(5,0), List(4,0), List(2,0), List(3,0), List(6,0)))
+    val expectedColHeaderValues = List(List(List(0,1), List(0,5), List(0,4), List(0,2), List(0,3), List(0,6)))
     val expectedData = List(List(
       List(NoValue, NoValue, NoValue, NoValue, NoValue, 75     ),
       List(NoValue, NoValue, NoValue, NoValue, 70,      NoValue),
@@ -238,6 +238,20 @@ class TableDataGeneratorTest extends FunSuite {
     )
 
     check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp)
+  }
+
+  test("0 row, 0 measure, 2 column (one under the other)") {
+    val tableState = TableState.Blank.withMeasureAreaLayout(MeasureAreaLayout(GenderField, List(LocationField)))
+
+    val expectedColHeaderValues = List(
+      List(List(1,1), List(1,2), List(2,3), List(2,1), List(2,2))
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh)
+    )
+
+    check(tableState, Nil, expectedColHeaderValues, List(Nil), expectedValueLookUp)
   }
 
   private def check(tableState:TableState, expectedRowHeaderValues:List[List[Int]],

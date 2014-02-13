@@ -31,7 +31,7 @@ object RawRowBasedTableDataSource {
     val rowHeadersLookUp = rowHeaderFieldIDs.map(fieldIDToLookUp).toArray
     val rowHeadersValueCounter = rowHeaderFieldIDs.map(allFieldIDs.indexOf(_)).toArray
 
-    val measureAreaPaths = tableState.tableLayout.measureAreaLayout.reversePaths
+    val measureAreaPaths = tableState.tableLayout.measureAreaLayout.paths
     val numPaths = measureAreaPaths.length
     var pathsCounter = 0
     val numColumnHeaderColsPerPath = measureAreaPaths.map(_.fields.length).toArray

@@ -3,7 +3,6 @@ package com.openaf.table.lib.api
 case class MeasureAreaLayout(measureAreaTrees:List[MeasureAreaTree]) {
   def allFields = measureAreaTrees.flatMap(_.allFields)
   def paths:List[MeasureAreaLayoutPath] = measureAreaTrees.flatMap(_.paths)
-  def reversePaths:List[MeasureAreaLayoutPath] = paths.map(path => MeasureAreaLayoutPath(path.fields.reverse))
 
   def normalise:MeasureAreaLayout = {
     val normalisedTrees = measureAreaTrees.flatMap(_.normalise).flatMap(tree => {

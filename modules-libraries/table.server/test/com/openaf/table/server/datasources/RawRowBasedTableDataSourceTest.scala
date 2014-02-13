@@ -119,14 +119,14 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
   test("0 row, 1 measure, 1 column (key)") {
     val tableState = TableState.Blank.withMeasureAreaLayout(MeasureAreaLayout(ScoreField, List(NameField)))
 
-    val expectedColHeaderValues = List(Set(List(1,0), List(2,0), List(3,0), List(4,0), List(5,0), List(6,0)))
+    val expectedColHeaderValues = List(Set(List(0,1), List(0,2), List(0,3), List(0,4), List(0,5), List(0,6)))
     val expectedData = List(Map(
-      (List[Int](), List(1,0)) -> 50,
-      (List[Int](), List(2,0)) -> 60,
-      (List[Int](), List(3,0)) -> 70,
-      (List[Int](), List(4,0)) -> 80,
-      (List[Int](), List(5,0)) -> 90,
-      (List[Int](), List(6,0)) -> 75
+      (List[Int](), List(0,1)) -> 50,
+      (List[Int](), List(0,2)) -> 60,
+      (List[Int](), List(0,3)) -> 70,
+      (List[Int](), List(0,4)) -> 80,
+      (List[Int](), List(0,5)) -> 90,
+      (List[Int](), List(0,6)) -> 75
     ))
     val expectedValueLookUp = Map(
       NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
@@ -141,18 +141,18 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       .withMeasureAreaLayout(MeasureAreaLayout(ScoreField, List(GenderField, LocationField)))
 
     val expectedColHeaderValues = List(
-      Set(List(1,0), List(2,0)),
-      Set(List(1,0), List(2,0), List(3,0))
+      Set(List(0,1), List(0,2)),
+      Set(List(0,1), List(0,2), List(0,3))
     )
     val expectedData = List(
       Map(
-        (List[Int](), List(1,0)) -> 180,
-        (List[Int](), List(2,0)) -> 245
+        (List[Int](), List(0,1)) -> 180,
+        (List[Int](), List(0,2)) -> 245
       ),
       Map(
-        (List[Int](), List(1,0)) -> 130,
-        (List[Int](), List(2,0)) -> 220,
-        (List[Int](), List(3,0)) -> 75
+        (List[Int](), List(0,1)) -> 130,
+        (List[Int](), List(0,2)) -> 220,
+        (List[Int](), List(0,3)) -> 75
       )
     )
     val expectedValueLookUp = Map(
@@ -170,14 +170,14 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       .withMeasureAreaLayout(MeasureAreaLayout(ScoreField, List(NameField)))
 
     val expectedRowHeaderValues = Set(List(1), List(2))
-    val expectedColHeaderValues = List(Set(List(1,0), List(2,0), List(3,0), List(4,0), List(5,0), List(6,0)))
+    val expectedColHeaderValues = List(Set(List(0,1), List(0,2), List(0,3), List(0,4), List(0,5), List(0,6)))
     val expectedData = List(Map(
-      (List(1), List(1,0)) -> 50,
-      (List(1), List(2,0)) -> 60,
-      (List(1), List(3,0)) -> 70,
-      (List(2), List(4,0)) -> 80,
-      (List(2), List(5,0)) -> 90,
-      (List(2), List(6,0)) -> 75
+      (List(1), List(0,1)) -> 50,
+      (List(1), List(0,2)) -> 60,
+      (List(1), List(0,3)) -> 70,
+      (List(2), List(0,4)) -> 80,
+      (List(2), List(0,5)) -> 90,
+      (List(2), List(0,6)) -> 75
     ))
     val expectedValueLookUp = Map(
       GenderField.id -> List(GenderField.id, F, M),
@@ -197,16 +197,16 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
 
     val expectedRowHeaderValues = Set(List(1), List(2))
     val expectedColHeaderValues = List(
-      Set(List(1,0), List(2,0), List(3,0)),
+      Set(List(0,1), List(0,2), List(0,3)),
       Set(List(0))
     )
     val expectedData = List(
       Map(
-        (List(1), List(1,0)) -> 50,
-        (List(1), List(2,0)) -> 130,
-        (List(2), List(1,0)) -> 80,
-        (List(2), List(2,0)) -> 90,
-        (List(2), List(3,0)) -> 75
+        (List(1), List(0,1)) -> 50,
+        (List(1), List(0,2)) -> 130,
+        (List(2), List(0,1)) -> 80,
+        (List(2), List(0,2)) -> 90,
+        (List(2), List(0,3)) -> 75
       ),
       Map(
         (List(1), List(0)) -> 103,
@@ -242,25 +242,25 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
 
     val expectedRowHeaderValues = Set(List(1), List(2), List(3), List(4), List(5), List(6))
     val expectedColHeaderValues = List(
-      Set(List(1,0), List(2,0), List(3,0)),
-      Set(List(1,0), List(2,0))
+      Set(List(0,1), List(0,2), List(0,3)),
+      Set(List(0,1), List(0,2))
     )
     val expectedData = List(
       Map(
-        (List(1), List(1,0)) -> 50,
-        (List(2), List(2,0)) -> 60,
-        (List(3), List(2,0)) -> 70,
-        (List(4), List(1,0)) -> 80,
-        (List(5), List(2,0)) -> 90,
-        (List(6), List(3,0)) -> 75
+        (List(1), List(0,1)) -> 50,
+        (List(2), List(0,2)) -> 60,
+        (List(3), List(0,2)) -> 70,
+        (List(4), List(0,1)) -> 80,
+        (List(5), List(0,2)) -> 90,
+        (List(6), List(0,3)) -> 75
       ),
       Map(
-        (List(1), List(1,0)) -> 36,
-        (List(2), List(1,0)) -> 36,
-        (List(3), List(1,0)) -> 31,
-        (List(4), List(2,0)) -> 34,
-        (List(5), List(2,0)) -> 32,
-        (List(6), List(2,0)) -> 34
+        (List(1), List(0,1)) -> 36,
+        (List(2), List(0,1)) -> 36,
+        (List(3), List(0,1)) -> 31,
+        (List(4), List(0,2)) -> 34,
+        (List(5), List(0,2)) -> 32,
+        (List(6), List(0,2)) -> 34
       )
     )
     val expectedValueLookUp = Map(

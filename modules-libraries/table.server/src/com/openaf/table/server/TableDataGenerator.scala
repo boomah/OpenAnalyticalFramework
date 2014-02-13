@@ -28,15 +28,15 @@ object TableDataGenerator {
     val numRowHeaderValues = rowHeaderValues.length
     var rowHeaderCounter = 0
 
-    val paths = tableState.tableLayout.measureAreaLayout.reversePaths
+    val paths = tableState.tableLayout.measureAreaLayout.paths
     val allPathData = result.pathData
     val numPaths = allPathData.length
     var pathCounter = 0
 
-    val allColHeaderValues = paths.zipWithIndex.map{case (path, i) => {
-      val pathData = allPathData(i)
+    val allColHeaderValues = paths.zipWithIndex.map{case (path,pathIndex) => {
+      val pathData = allPathData(pathIndex)
       val colHeaderValues = pathData.colHeaderValues
-      if (!result.resultDetails.sortDetails.pathDataSorted(i)) {
+      if (!result.resultDetails.sortDetails.pathDataSorted(pathIndex)) {
         val colHeaderFieldDefinitions = path.fields.map(field => {
           tableDataSource.fieldDefinitionGroup.fieldDefinition(field.id)
         }).toArray
@@ -103,24 +103,32 @@ class TableDataGeneratorComparator(fields:Array[Field[_]], fieldDefinitions:Arra
   private var sorted = false
   private var result = 0
   private var lookUp:Array[Any] = _
+  private var value1 = -1
+  private var value2 = -1
 
   def compare(array1:Array[Int], array2:Array[Int]) = {
     length = array1.length
     sorted = false
     counter = 0
     while (!sorted && counter < length) {
-      val fieldDefinition = fieldDefinitions(counter)
-      lookUp = lookUps(counter)
-      if (fields(counter).sortOrder == SortOrder.Ascending) {
-        result = fieldDefinition.ordering.compare(
-          lookUp(array1(counter)).asInstanceOf[fieldDefinition.V],
-          lookUp(array2(counter)).asInstanceOf[fieldDefinition.V]
-        )
+      value1 = array1(counter)
+      value2 = array2(counter)
+      result = if (value1 != value2) {
+        val fieldDefinition = fieldDefinitions(counter)
+        lookUp = lookUps(counter)
+        if (fields(counter).sortOrder == SortOrder.Ascending) {
+          fieldDefinition.ordering.compare(
+            lookUp(value1).asInstanceOf[fieldDefinition.V],
+            lookUp(value2).asInstanceOf[fieldDefinition.V]
+          )
+        } else {
+          fieldDefinition.ordering.compare(
+            lookUp(value2).asInstanceOf[fieldDefinition.V],
+            lookUp(value1).asInstanceOf[fieldDefinition.V]
+          )
+        }
       } else {
-        result = fieldDefinition.ordering.compare(
-          lookUp(array2(counter)).asInstanceOf[fieldDefinition.V],
-          lookUp(array1(counter)).asInstanceOf[fieldDefinition.V]
-        )
+        0
       }
       if (result != 0) {
         sorted = true
