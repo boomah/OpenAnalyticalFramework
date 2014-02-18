@@ -254,6 +254,21 @@ class TableDataGeneratorTest extends FunSuite {
     check(tableState, Nil, expectedColHeaderValues, List(Nil), expectedValueLookUp)
   }
 
+  test("0 row, 0 measure, 2 column (one under the other and reversed)") {
+    val tableState = TableState.Blank.withMeasureAreaLayout(
+      MeasureAreaLayout(GenderField, List(LocationField.flipSortOrder)))
+
+    val expectedColHeaderValues = List(
+      List(List(1,2), List(1,1), List(2,2), List(2,1), List(2,3))
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh)
+    )
+
+    check(tableState, Nil, expectedColHeaderValues, List(Nil), expectedValueLookUp)
+  }
+
   private def check(tableState:TableState, expectedRowHeaderValues:List[List[Int]],
                     expectedColHeaderValues:List[List[List[Int]]],
                     expectedData:List[List[List[Any]]],
