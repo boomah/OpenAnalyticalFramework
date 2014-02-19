@@ -7,6 +7,7 @@ import com.openaf.table.lib.api.{Renderer, TableData}
 import javafx.collections.{ObservableList, FXCollections}
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
+import scala.collection.mutable.ListBuffer
 
 class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[ObservableList[Int]] {
   tableDataProperty.addListener(new ChangeListener[TableData] {
@@ -18,8 +19,10 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
   private def setUpTableView(tableData:TableData) {
     val rowHeaderFields = tableData.tableState.tableLayout.rowHeaderFields
     val rowHeaderTableColumns = rowHeaderFields.map(field => new TableColumn[ObservableList[Int],Int](field.displayName))
+    val columnHeaderTableColumns = createColumnHeaderTableColumns(tableData)
+
     getColumns.clear()
-    getColumns.addAll(rowHeaderTableColumns :_*)
+    getColumns.addAll(rowHeaderTableColumns ::: columnHeaderTableColumns :_*)
 
     val rowHeaderData = FXCollections.observableArrayList[ObservableList[Int]]()
     tableData.tableValues.rowHeaders.foreach(rowArray => {
@@ -36,6 +39,61 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
       val cellFactory = new DefaultCellFactory(values, defaultRenderer)
       column.setCellFactory(cellFactory)
     }}
+  }
+
+  private def createColumnHeaderTableColumns(tableData:TableData):List[TableColumn[ObservableList[Int],Int]] = {
+    val columnHeaders = tableData.tableValues.columnHeaders
+    val paths = tableData.tableState.tableLayout.measureAreaLayout.paths
+    val valueLookUp = tableData.tableValues.valueLookUp
+    val numberOfPaths = columnHeaders.length
+    val parentColumns = new ListBuffer[TableColumn[ObservableList[Int],Int]]
+    (0 until numberOfPaths).foreach(pathIndex => {
+      val pathColumnHeaders = columnHeaders(pathIndex)
+
+      val numColumns = pathColumnHeaders.length
+      val tableColumns = new Array[TableColumn[ObservableList[Int],Int]](numColumns)
+      val pathFields = paths(pathIndex).fields
+      val numRows = pathFields.size
+      (0 until numRows).foreach(row => {
+        val field = pathFields(row)
+        val values = valueLookUp(field.id)
+        (0 until numColumns).foreach(column => {
+          val value = pathColumnHeaders(column)(row)
+
+          if (column == 0) {
+            val tableColumn = new TableColumn[ObservableList[Int],Int](values(value).toString)
+            val existingTableColumn = tableColumns(0)
+            if (existingTableColumn != null) {
+              existingTableColumn.getColumns.add(tableColumn)
+            }
+            tableColumns(0) = tableColumn
+
+            if (row == 0) {
+              parentColumns += tableColumn
+            }
+          } else {
+            val previousColumn = column - 1
+            val previousValue = pathColumnHeaders(previousColumn)(row)
+            if (previousValue == value) {
+              tableColumns(column) = tableColumns(previousColumn)
+            } else {
+              val tableColumn = new TableColumn[ObservableList[Int],Int](values(value).toString)
+              val existingTableColumn = tableColumns(column)
+              if (existingTableColumn != null) {
+                existingTableColumn.getColumns.add(tableColumn)
+              }
+              tableColumns(column) = tableColumn
+
+              if (row == 0) {
+                parentColumns += tableColumn
+              }
+            }
+          }
+        })
+      })
+    })
+
+    parentColumns.toList.distinct
   }
 }
 
