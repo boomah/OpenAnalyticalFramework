@@ -60,7 +60,15 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
         (0 until numColumns).foreach(column => {
           val value = pathColumnHeaders(column)(row)
 
-          if (column == 0) {
+          if (row == 0 && column == 0 && pathIndex > 0 && field == paths(pathIndex - 1).fields(0)) {
+            val previousPathColumnHeaders = columnHeaders(pathIndex - 1)
+            val previousValue = previousPathColumnHeaders(previousPathColumnHeaders.length - 1)(0)
+            if (value == previousValue) {
+              tableColumns(0) = parentColumns.last
+            } else {
+              tableColumns(0) = new TableColumn[ObservableList[Int],Int](values(value).toString)
+            }
+          } else if (column == 0) {
             val tableColumn = new TableColumn[ObservableList[Int],Int](values(value).toString)
             val existingTableColumn = tableColumns(0)
             if (existingTableColumn != null) {
