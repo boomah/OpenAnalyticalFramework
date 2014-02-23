@@ -16,10 +16,10 @@ object RawRowBasedTableDataSource {
   def result(tableState:TableState, data:Array[Array[Any]], fieldIDs:Array[FieldID],
              fieldDefinitionGroup:FieldDefinitionGroup) = {
     val allFieldIDs = tableState.distinctFieldIDs
-    val fieldIDToLookUp:Map[FieldID,JMap[Any,Int]] = allFieldIDs.map(field => {
+    val fieldIDToLookUp:Map[FieldID,JMap[Any,Int]] = allFieldIDs.map(fieldID => {
       val map = new JMap[Any,Int]
-      map.put(field, 0)
-      field -> map
+      map.put(fieldID, 0)
+      fieldID -> map
     })(collection.breakOut)
     val fieldsValueCounter = new Array[Int](allFieldIDs.size)
 

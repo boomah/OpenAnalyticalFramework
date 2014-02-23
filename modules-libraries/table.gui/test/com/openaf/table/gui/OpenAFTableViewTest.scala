@@ -87,7 +87,7 @@ class OpenAFTableViewTest extends FunSuite {
     val columns = tableView.getColumns
     assert(columns.size === 1)
     assert(columns.get(0).getText === "Age")
-//    assert(columns.get(0).getCellData(0) === 34)
+    assert(columns.get(0).getCellData(0) === 34)
   }
 }
 

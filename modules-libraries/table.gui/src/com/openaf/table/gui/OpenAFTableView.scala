@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.scene.control.{Cell, TableCell, TableColumn, TableView}
+import javafx.scene.control.{TableCell, TableColumn, TableView}
 import javafx.beans.property.{ReadOnlyObjectWrapper, Property}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import com.openaf.table.lib.api.{Renderer, TableData}
@@ -36,11 +36,51 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
     val tableItems = FXCollections.observableArrayList[ObservableList[Any]]
 
     val rowHeaderData = tableData.tableValues.rowHeaders
-    val numberOfRows = rowHeaderData.length
+
+    val pathData = tableData.tableValues.data
+    val numberOfPaths = pathData.length
+    var path = 0
+    var column = 0
+    var numberOfColumns = 0
+
+    val numberOfRows = if (rowHeaderData.length > 0) {
+      rowHeaderData.length
+    } else {
+      if (pathData.length > 0) {
+        val firstPathData = pathData(0)
+        if (firstPathData.length > 0) {
+          firstPathData(0).length
+        } else {
+          0
+        }
+      } else {
+        0
+      }
+    }
     var row = 0
     while (row < numberOfRows) {
-      val rowHeaderArray = rowHeaderData(row)
-      val tableItem = FXCollections.observableArrayList[Any](rowHeaderArray :_*)
+
+      val tableItem = if (rowHeaderData.length > 0) {
+        val rowHeaderArray = rowHeaderData(row)
+        FXCollections.observableArrayList[Any](rowHeaderArray :_*)
+      } else {
+        if (rowHeaderFields.isEmpty) {
+          FXCollections.observableArrayList[Any]
+        } else {
+          FXCollections.observableArrayList[Any](List.fill(rowHeaderFields.length)(0))
+        }
+      }
+
+      while (path < numberOfPaths) {
+        numberOfColumns = pathData(path).length
+        while (column < numberOfColumns) {
+          tableItem.add(pathData(path)(column)(row))
+          column += 1
+        }
+        column = 0
+        path += 1
+      }
+      path = 0
       tableItems.add(tableItem)
       row += 1
     }
@@ -54,6 +94,8 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
     val valueLookUp = tableData.tableValues.valueLookUp
     val numberOfPaths = columnHeaders.length
     val parentColumns = new ListBuffer[TableColumn[ObservableList[Any],Any]]
+    val numberOfRowHeaders = tableData.tableState.tableLayout.rowHeaderFields.length
+    var grandColumnCount = numberOfRowHeaders
     (0 until numberOfPaths).foreach(pathIndex => {
       val pathColumnHeaders = columnHeaders(pathIndex)
 
@@ -64,6 +106,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
       (0 until numRows).foreach(row => {
         val field = pathFields(row)
         val values = valueLookUp(field.id)
+        grandColumnCount = numberOfRowHeaders
         (0 until numColumns).foreach(column => {
           val value = pathColumnHeaders(column)(row)
 
@@ -104,6 +147,8 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
               }
             }
           }
+          tableColumns(column).setCellValueFactory(new DefaultCellValueFactory(grandColumnCount))
+          grandColumnCount += 1
         })
       })
     })
@@ -136,6 +181,11 @@ class DefaultRowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T])
   }
 }
 
-trait CellFactory[V] {
-  def cell(values:Array[V]):Cell[Int]
+class DefaultCellValueFactory(index:Int)
+  extends Callback[CellDataFeatures[ObservableList[Any],Any],ObservableValue[Any]] {
+
+  def call(cellDataFeatures:CellDataFeatures[ObservableList[Any],Any]) = {
+    val row = cellDataFeatures.getValue
+    new ReadOnlyObjectWrapper[Any](row.get(index))
+  }
 }
