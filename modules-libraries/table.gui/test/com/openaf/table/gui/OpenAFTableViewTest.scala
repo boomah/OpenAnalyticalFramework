@@ -64,6 +64,30 @@ class OpenAFTableViewTest extends FunSuite {
     val columns = tableView.getColumns
     assert(columns.size === 1)
     assert(columns.get(0).getText === "Friends")
+    assert(columns.get(0).getColumns.size === 5)
+    assert(columns.get(0).getColumns.get(0).getText === "F")
+    assert(columns.get(0).getColumns.get(1).getText === "M")
+    assert(columns.get(0).getColumns.get(2).getText === "Edinburgh")
+    assert(columns.get(0).getColumns.get(3).getText === "London")
+    assert(columns.get(0).getColumns.get(4).getText === "Manchester")
+    assert((0 to 4).exists(col => columns.get(0).getColumns.get(col).getColumns.isEmpty) === true)
+  }
+
+  test("0 column, 1 measure") {
+    val tableLayout = TableLayout.Blank.copy(measureAreaLayout = MeasureAreaLayout(AgeField))
+    val tableState = TableState(tableLayout)
+    val tableValues = TableValues.Empty.copy(
+      columnHeaders = Array(Array(Array(0))),
+      data = Array(Array(Array(34))),
+      valueLookUp = AgeValuesLookUp
+    )
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    tableDataProperty.set(tableData)
+
+    val columns = tableView.getColumns
+    assert(columns.size === 1)
+    assert(columns.get(0).getText === "Age")
+//    assert(columns.get(0).getCellData(0) === 34)
   }
 }
 

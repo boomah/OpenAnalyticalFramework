@@ -18,11 +18,13 @@ object GUITestData {
   val LocationValuesLookUp:Map[FieldID,Array[Any]] = Map(
     LocationField.id -> Array("Gender", "Edinburgh", "London", "Manchester")
   )
+  val AgeValuesLookUp:Map[FieldID,Array[Any]] = Map(AgeField.id -> Array("Age"))
   val GroupValuesLookUp:Map[FieldID,Array[Any]] = Map(GroupField.id -> Array("Group", "Friends"))
 
   val DefaultRenderers:Map[Field[_],Renderer[_]] = Map(
     GenderField -> StringRenderer,
     LocationField -> StringRenderer,
+    AgeField -> IntRenderer,
     GroupField -> StringRenderer
   )
 }
