@@ -22,4 +22,6 @@ case class FieldDefinitionGroup(groupName:String, children:List[Either[FieldDefi
 }
 object FieldDefinitionGroup {
   val Empty = FieldDefinitionGroup("Fields", Nil)
+
+  val Standard = FieldDefinitionGroup("Standard", StandardFieldDefinitions.All.map(Right(_)))
 }

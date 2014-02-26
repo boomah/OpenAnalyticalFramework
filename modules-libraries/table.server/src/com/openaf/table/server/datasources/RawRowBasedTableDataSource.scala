@@ -1,6 +1,7 @@
 package com.openaf.table.server.datasources
 
 import com.openaf.table.lib.api.{FieldID, TableState}
+import com.openaf.table.lib.api.StandardFields._
 import com.openaf.table.server.{NullFieldDefinition, FieldDefinitionGroup}
 import java.util.{HashMap => JMap}
 import scala.collection.{JavaConversions, mutable}
@@ -49,7 +50,17 @@ object RawRowBasedTableDataSource {
     val measureAreaMeasureFieldPositions = measureAreaPaths.map(_.measureFieldIndex).toArray
     val measureAreaPathsMeasureOptions = measureAreaPaths.map(_.measureFieldOption).toArray
     val measureFieldPositions = measureAreaPathsMeasureOptions.map{
-      case Some(field) => fieldIDs.indexOf(field.id)
+      case Some(field) => {
+        val index = fieldIDs.indexOf(field.id)
+        if (index >= 0) {
+          index
+        } else {
+          field.id match {
+            case CountField.id => -2
+            case _ => -1
+          }
+        }
+      }
       case _ => -1
     }
     val measureFieldDefinitions = measureAreaPathsMeasureOptions.map{
@@ -132,8 +143,26 @@ object RawRowBasedTableDataSource {
 
         measureFieldPosition = measureFieldPositions(pathsCounter)
         // If there isn't a measure field there is no need to update the aggregated data
-        if (measureFieldPosition != -1) {
+        if (measureFieldPosition >= 0) {
           value = dataRow(measureFieldPosition)
+          key = (rowHeaderValues.toList, colHeaderValues.toList)
+          currentValue = aggregatedData.get(key)
+          val fieldDefinition = measureFieldDefinitions(pathsCounter)
+          if (currentValue == null) {
+            newDataValue = fieldDefinition.combiner.combine(
+              fieldDefinition.combiner.initialCombinedValue,
+              value.asInstanceOf[fieldDefinition.V]
+            )
+          } else {
+            newDataValue = fieldDefinition.combiner.combine(
+              currentValue.asInstanceOf[fieldDefinition.C],
+              value.asInstanceOf[fieldDefinition.V]
+            )
+          }
+          aggregatedData.put(key, newDataValue)
+        } else if (measureFieldPosition == -2) {
+          // Count field
+          value = 1
           key = (rowHeaderValues.toList, colHeaderValues.toList)
           currentValue = aggregatedData.get(key)
           val fieldDefinition = measureFieldDefinitions(pathsCounter)

@@ -42,20 +42,12 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
     var path = 0
     var column = 0
     var numberOfColumns = 0
+    var columnData:Array[Any] = null
 
     val numberOfRows = if (rowHeaderData.length > 0) {
       rowHeaderData.length
     } else {
-      if (pathData.length > 0) {
-        val firstPathData = pathData(0)
-        if (firstPathData.length > 0) {
-          firstPathData(0).length
-        } else {
-          0
-        }
-      } else {
-        0
-      }
+      if (pathData.length > 0) pathData(0).length else 0
     }
     var row = 0
     while (row < numberOfRows) {
@@ -72,9 +64,10 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
       }
 
       while (path < numberOfPaths) {
-        numberOfColumns = pathData(path).length
+        columnData = pathData(path)(row)
+        numberOfColumns = columnData.length
         while (column < numberOfColumns) {
-          tableItem.add(pathData(path)(column)(row))
+          tableItem.add(columnData(column))
           column += 1
         }
         column = 0
@@ -98,11 +91,18 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
     var grandColumnCount = numberOfRowHeaders
     (0 until numberOfPaths).foreach(pathIndex => {
       val pathColumnHeaders = columnHeaders(pathIndex)
+      val path = paths(pathIndex)
+      val pathFields = path.fields
+      val numRows = pathFields.size
+      val measureFieldOption = path.measureFieldOption
+      val defaultCellFactoryOption = measureFieldOption.map(measureField => {
+        val defaultRenderer = tableData.defaultRenderers(measureField)
+        new DefaultCellFactory(defaultRenderer)
+      })
 
       val numColumns = pathColumnHeaders.length
       val tableColumns = new Array[TableColumn[ObservableList[Any],Any]](numColumns)
-      val pathFields = paths(pathIndex).fields
-      val numRows = pathFields.size
+
       (0 until numRows).foreach(row => {
         val field = pathFields(row)
         val values = valueLookUp(field.id)
@@ -148,6 +148,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
             }
           }
           tableColumns(column).setCellValueFactory(new DefaultCellValueFactory(grandColumnCount))
+          defaultCellFactoryOption.foreach(tableColumns(column).setCellFactory(_))
           grandColumnCount += 1
         })
       })
@@ -187,5 +188,20 @@ class DefaultCellValueFactory(index:Int)
   def call(cellDataFeatures:CellDataFeatures[ObservableList[Any],Any]) = {
     val row = cellDataFeatures.getValue
     new ReadOnlyObjectWrapper[Any](row.get(index))
+  }
+}
+
+class DefaultCellFactory[T](renderer:Renderer[T])
+  extends Callback[TableColumn[ObservableList[Any],Any],TableCell[ObservableList[Any],Any]] {
+
+  def call(tableColumn:TableColumn[ObservableList[Any],Any]) = new TableCell[ObservableList[Any],Any] {
+    override def updateItem(anyValue:Any, isEmpty:Boolean) {
+      if (isEmpty) {
+        setText(null)
+      } else {
+        val value = anyValue.asInstanceOf[T]
+        setText(renderer.render(value))
+      }
+    }
   }
 }
