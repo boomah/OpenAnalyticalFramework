@@ -132,7 +132,14 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
           } else {
             val previousColumn = column - 1
             val previousValue = pathColumnHeaders(previousColumn)(row)
-            if (previousValue == value) {
+            def checkPreviousRow = {
+              if (row > 0) {
+                pathColumnHeaders(previousColumn)(row - 1) == pathColumnHeaders(column)(row - 1)
+              } else {
+                true
+              }
+            }
+            if (previousValue == value && checkPreviousRow) {
               tableColumns(column) = tableColumns(previousColumn)
             } else {
               val tableColumn = new TableColumn[ObservableList[Any],Any](values(value).toString)

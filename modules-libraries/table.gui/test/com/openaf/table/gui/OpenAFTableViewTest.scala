@@ -29,7 +29,7 @@ class OpenAFTableViewTest extends FunSuite {
     assert(columns.get(1).getColumns.size === 0)
   }
 
-  test("2 column (1 on top of the other)") {
+  test("2 column (1 on top of the other, top one single value)") {
     val tableLayout = TableLayout.Blank.copy(measureAreaLayout = MeasureAreaLayout(GroupField, List(GenderField)))
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
@@ -47,6 +47,28 @@ class OpenAFTableViewTest extends FunSuite {
     assert(columns.get(0).getColumns.get(0).getColumns.size === 0)
     assert(columns.get(0).getColumns.get(1).getText === "M")
     assert(columns.get(0).getColumns.get(1).getColumns.size === 0)
+  }
+
+  test("2 column (1 on top of the other, bottom one single value)") {
+    val tableLayout = TableLayout.Blank.copy(measureAreaLayout = MeasureAreaLayout(GenderField, List(GroupField)))
+    val tableState = TableState(tableLayout)
+    val tableValues = TableValues.Empty.copy(
+      columnHeaders = Array(Array(Array(1,1), Array(2,1))),
+      valueLookUp = GenderValuesLookUp ++ GroupValuesLookUp
+    )
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    tableDataProperty.set(tableData)
+
+    val columns = tableView.getColumns
+    assert(columns.size === 2)
+    assert(columns.get(0).getText === "F")
+    assert(columns.get(1).getText === "M")
+    assert(columns.get(0).getColumns.size === 1)
+    assert(columns.get(0).getColumns.get(0).getText === "Friends")
+    assert(columns.get(0).getColumns.get(0).getColumns.size === 0)
+    assert(columns.get(1).getColumns.size === 1)
+    assert(columns.get(1).getColumns.get(0).getText === "Friends")
+    assert(columns.get(1).getColumns.get(0).getColumns.size === 0)
   }
 
   test("3 column (1 on top, 2 under)") {
