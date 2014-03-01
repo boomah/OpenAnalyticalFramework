@@ -10,6 +10,50 @@ case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:T
   def withMeasureAreaLayout(newMeasureAreaLayout:MeasureAreaLayout) = {
     withTableState(tableState.withMeasureAreaLayout(newMeasureAreaLayout))
   }
+
+  def rowHeadersAsString = {
+    val rowHeaderFields = tableState.tableLayout.rowHeaderFields.toArray
+    val numRows = tableValues.rowHeaders.length
+    val numCols = rowHeaderFields.length
+    val arraysOfStrings = tableValues.rowHeaders.map(row => {
+      row.zipWithIndex.map{case (rowValue, column) => {
+        val field = rowHeaderFields(column)
+        val renderer = defaultRenderers(field).asInstanceOf[Renderer[Any]]
+        val value = tableValues.valueLookUp(field.id)(rowValue)
+        renderer.render(value)
+      }}
+    })
+    val columnWidths = arraysOfStrings.transpose.map(_.map(_.length).max)
+    val sb = new StringBuilder
+    def drawSeparatingLine(row:Int) {
+      val (start, middle, end) = if (row == 0) ('┌','┬','┐') else if (row == numRows) ('└','┴','┘') else ('├','┼','┤')
+      sb += start
+      (0 until numCols).foreach(col => {
+        sb ++= ("─" * columnWidths(col))
+        if (col != numCols - 1) {
+          sb += middle
+        }
+      })
+      sb += end
+      if (row != numRows) {
+        sb ++= System.lineSeparator
+      }
+    }
+    (0 until numRows).foreach(row => {
+      drawSeparatingLine(row)
+      val rowArray = arraysOfStrings(row)
+      (0 until numCols).foreach(col => {
+        sb += '│'
+        sb ++= rowArray(col).padTo(columnWidths(col), " ").mkString("")
+        if (col == numCols - 1) {
+          sb += '│'
+        }
+      })
+      sb ++= System.lineSeparator
+    })
+    drawSeparatingLine(numRows)
+    sb.mkString
+  }
 }
 object TableData {
   val Empty = TableData(FieldGroup.Empty, TableState.Blank, TableValues.Empty, Map.empty)
