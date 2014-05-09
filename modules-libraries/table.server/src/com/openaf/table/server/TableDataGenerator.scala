@@ -87,7 +87,7 @@ object TableDataGenerator {
     val defaultRenderers:Map[Field[_],Renderer[_]] = tableState.tableLayout.allFields.map(field => {
       val fieldDefinition = tableDataSource.fieldDefinitionGroup.fieldDefinition(field.id)
       val renderer = if (field.fieldType.isDimension) fieldDefinition.renderer else fieldDefinition.combinedRenderer
-      field -> renderer
+      field -> NoValueAwareDelegatingRenderer(renderer)
     }).toMap
 
     TableData(fieldGroup, tableState, tableValues, defaultRenderers)

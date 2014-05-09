@@ -6,6 +6,14 @@ trait Renderer[V] {
   def render(value:V):String
 }
 
+case object BlankRenderer extends Renderer[Any] {
+  def render(value:Any) = ""
+}
+
+case class NoValueAwareDelegatingRenderer[V](renderer:Renderer[V]) extends Renderer[Any] {
+  def render(value:Any) = if (value == NoValue) "" else renderer.render(value.asInstanceOf[V])
+}
+
 case object NullRenderer extends Renderer[Null] {
   def render(value:Null) = "Null"
 }

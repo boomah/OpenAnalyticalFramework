@@ -3,7 +3,7 @@ package com.openaf.table.gui
 import javafx.scene.control.{TableCell, TableColumn, TableView}
 import javafx.beans.property.{ReadOnlyObjectWrapper, Property}
 import javafx.beans.value.{ObservableValue, ChangeListener}
-import com.openaf.table.lib.api.{Renderer, TableData}
+import com.openaf.table.lib.api.{BlankRenderer, Renderer, TableData}
 import javafx.collections.{ObservableList, FXCollections}
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
@@ -95,11 +95,10 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
       val pathFields = path.fields
       val numRows = pathFields.size
       val measureFieldOption = path.measureFieldOption
-      val defaultCellFactoryOption = measureFieldOption.map(measureField => {
-        val defaultRenderer = tableData.defaultRenderers(measureField)
-        new DefaultCellFactory(defaultRenderer)
-      })
-
+      val defaultRenderer = measureFieldOption match {
+        case Some(measureField) => tableData.defaultRenderers(measureField)
+        case None => BlankRenderer
+      }
       val numColumns = pathColumnHeaders.length
       val tableColumns = new Array[TableColumn[ObservableList[Any],Any]](numColumns)
 
@@ -155,7 +154,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
             }
           }
           tableColumns(column).setCellValueFactory(new DefaultCellValueFactory(grandColumnCount))
-          defaultCellFactoryOption.foreach(tableColumns(column).setCellFactory(_))
+          tableColumns(column).setCellFactory(new DefaultCellFactory(defaultRenderer))
           grandColumnCount += 1
         })
       })
