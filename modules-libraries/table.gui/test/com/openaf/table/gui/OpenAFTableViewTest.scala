@@ -96,41 +96,64 @@ class OpenAFTableViewTest extends FunSuite {
   }
 
   test("0 column, 1 measure") {
-    val tableLayout = TableLayout.Blank.copy(measureAreaLayout = MeasureAreaLayout(AgeField))
+    val tableLayout = TableLayout.Blank.copy(measureAreaLayout = MeasureAreaLayout(ScoreField))
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
       columnHeaders = Array(Array(Array(0))),
       data = Array(Array(Array(34))),
-      valueLookUp = AgeValuesLookUp
+      valueLookUp = ScoreValuesLookUp
     )
     val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
     assert(columns.size === 1)
-    assert(columns.get(0).getText === "Age")
+    assert(columns.get(0).getText === "Score")
     assert(columns.get(0).getCellData(0) === 34)
   }
 
   test("1 column, 1 measure (on top of the column)") {
-    val tableLayout = TableLayout.Blank.copy(measureAreaLayout = MeasureAreaLayout(AgeField, List(GenderField)))
+    val tableLayout = TableLayout.Blank.copy(measureAreaLayout = MeasureAreaLayout(ScoreField, List(GenderField)))
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
       columnHeaders = Array(Array(Array(0,1),Array(0,2))),
-      data = Array(Array(Array(34, 36))),
-      valueLookUp = AgeValuesLookUp ++ GenderValuesLookUp
+      data = Array(Array(Array(98, 78))),
+      valueLookUp = ScoreValuesLookUp ++ GenderValuesLookUp
     )
     val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
     assert(columns.size === 1)
-    assert(columns.get(0).getText === "Age")
+    assert(columns.get(0).getText === "Score")
     assert(columns.get(0).getColumns.size === 2)
     assert(columns.get(0).getColumns.get(0).getText === "F")
     assert(columns.get(0).getColumns.get(1).getText === "M")
-    assert(columns.get(0).getColumns.get(0).getCellData(0) === 34)
-    assert(columns.get(0).getColumns.get(1).getCellData(0) === 36)
+    assert(columns.get(0).getColumns.get(0).getCellData(0) === 98)
+    assert(columns.get(0).getColumns.get(1).getCellData(0) === 78)
+  }
+
+  test("1 column, 1 measure (underneath the column)") {
+    val tableLayout = TableLayout.Blank.copy(measureAreaLayout = MeasureAreaLayout(GenderField, List(ScoreField)))
+    val tableState = TableState(tableLayout)
+    val tableValues = TableValues.Empty.copy(
+      columnHeaders = Array(Array(Array(1,0),Array(2,0))),
+      data = Array(Array(Array(98, 78))),
+      valueLookUp = GenderValuesLookUp ++ ScoreValuesLookUp
+    )
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    tableDataProperty.set(tableData)
+
+    val columns = tableView.getColumns
+    assert(columns.size === 2)
+    assert(columns.get(0).getText === "F")
+    assert(columns.get(1).getText === "M")
+    assert(columns.get(0).getColumns.size === 1)
+    assert(columns.get(0).getColumns.get(0).getText === "Score")
+    assert(columns.get(1).getColumns.size === 1)
+    assert(columns.get(1).getColumns.get(0).getText === "Score")
+    assert(columns.get(0).getColumns.get(0).getCellData(0) === 98)
+    assert(columns.get(1).getColumns.get(0).getCellData(0) === 78)
   }
 }
 
