@@ -1,10 +1,10 @@
 package com.openaf.table.server.datasources
 
 import com.openaf.table.lib.api.{FieldID, TableState}
-import com.openaf.table.server.FieldDefinitionGroup
+import com.openaf.table.server.FieldDefinitionGroups
 
 trait TableDataSource {
-  def fieldDefinitionGroup:FieldDefinitionGroup
+  def fieldDefinitionGroups:FieldDefinitionGroups
   def result(tableState:TableState):Result
   def defaultTableState = TableState.Blank
 }

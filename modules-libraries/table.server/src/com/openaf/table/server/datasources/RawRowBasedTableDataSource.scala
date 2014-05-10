@@ -2,20 +2,21 @@ package com.openaf.table.server.datasources
 
 import com.openaf.table.lib.api.{FieldID, TableState}
 import com.openaf.table.lib.api.StandardFields._
-import com.openaf.table.server.{NullFieldDefinition, FieldDefinitionGroup}
+import com.openaf.table.server.{FieldDefinitionGroups, NullFieldDefinition}
 import java.util.{HashMap => JMap}
 import scala.collection.{JavaConversions, mutable}
 
 case class RawRowBasedTableDataSource(data:Array[Array[Any]], fieldIDs:Array[FieldID],
-                                      fieldDefinitionGroup:FieldDefinitionGroup) extends TableDataSource {
-  def result(tableState:TableState) = RawRowBasedTableDataSource.result(tableState, data, fieldIDs, fieldDefinitionGroup)
+                                      fieldDefinitionGroups:FieldDefinitionGroups) extends TableDataSource {
+  def result(tableState:TableState) = RawRowBasedTableDataSource.result(tableState, data, fieldIDs, fieldDefinitionGroups)
 }
 
 object RawRowBasedTableDataSource {
   // This is far from idiomatic Scala. Written this way for speed.
   // TODO - remove the need to keep converting to and from lists
   def result(tableState:TableState, data:Array[Array[Any]], fieldIDs:Array[FieldID],
-             fieldDefinitionGroup:FieldDefinitionGroup) = {
+             fieldDefinitionGroups:FieldDefinitionGroups) = {
+    val fieldDefinitionGroup = fieldDefinitionGroups.rootGroup
     val allFieldIDs = tableState.distinctFieldIDs
     val fieldIDToLookUp:Map[FieldID,JMap[Any,Int]] = allFieldIDs.map(fieldID => {
       val map = new JMap[Any,Int]

@@ -13,7 +13,7 @@ object TableDataGenerator {
 
     val rowHeaderFieldIDs = tableState.tableLayout.rowHeaderFieldIDs
     val rowHeaderFieldDefinitions = rowHeaderFieldIDs.map(fieldID => {
-      tableDataSource.fieldDefinitionGroup.fieldDefinition(fieldID)
+      tableDataSource.fieldDefinitionGroups.fieldDefinition(fieldID)
     }).toArray
     val rowHeaderLookUps = rowHeaderFieldIDs.map(result.valueLookUp).toArray
 
@@ -38,7 +38,7 @@ object TableDataGenerator {
       val colHeaderValues = pathData.colHeaderValues
       if (!result.resultDetails.sortDetails.pathDataSorted(pathIndex)) {
         val colHeaderFieldDefinitions = path.fields.map(field => {
-          tableDataSource.fieldDefinitionGroup.fieldDefinition(field.id)
+          tableDataSource.fieldDefinitionGroups.fieldDefinition(field.id)
         }).toArray
         val colHeaderLookUps = path.fields.map(field => result.valueLookUp(field.id)).toArray
         util.Arrays.sort(
@@ -80,12 +80,12 @@ object TableDataGenerator {
       rowHeaderCounter += 1
     }
 
-    val fieldGroup = tableDataSource.fieldDefinitionGroup.fieldGroup
+    val fieldGroup = tableDataSource.fieldDefinitionGroups.fieldGroup
 
     val tableValues = TableValues(result.rowHeaderValues, allColHeaderValues, data, result.valueLookUp)
 
     val defaultRenderers:Map[Field[_],Renderer[_]] = tableState.tableLayout.allFields.map(field => {
-      val fieldDefinition = tableDataSource.fieldDefinitionGroup.fieldDefinition(field.id)
+      val fieldDefinition = tableDataSource.fieldDefinitionGroups.fieldDefinition(field.id)
       val renderer = if (field.fieldType.isDimension) fieldDefinition.renderer else fieldDefinition.combinedRenderer
       field -> NoValueAwareDelegatingRenderer(renderer)
     }).toMap

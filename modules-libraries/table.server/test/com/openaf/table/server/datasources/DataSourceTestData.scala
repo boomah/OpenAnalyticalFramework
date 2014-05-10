@@ -1,7 +1,9 @@
 package com.openaf.table.server.datasources
 
 import com.openaf.table.lib.api.{Measure, Field}
-import com.openaf.table.server.{FieldDefinition, IntFieldDefinition, StringFieldDefinition, FieldDefinitionGroup}
+import com.openaf.table.server._
+import com.openaf.table.server.StringFieldDefinition
+import com.openaf.table.server.IntFieldDefinition
 
 object DataSourceTestData {
   val NameField = Field[String]("name")
@@ -18,6 +20,7 @@ object DataSourceTestData {
 
   val FieldIDs = FieldDefinitions.map(_.defaultField.id).toArray
   val Group = FieldDefinitionGroup("Fields", FieldDefinitions.map(definition => Right(definition)))
+  val Groups = FieldDefinitionGroups(List(Group))
 
   val Rosie = "Rosie"
   val Laura = "Laura"

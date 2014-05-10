@@ -5,7 +5,7 @@ import DataSourceTestData._
 import com.openaf.table.lib.api._
 
 class RawRowBasedTableDataSourceTest extends FunSuite {
-  val dataSource = RawRowBasedTableDataSource(data, FieldIDs, Group)
+  val dataSource = RawRowBasedTableDataSource(data, FieldIDs, Groups)
 
   test("1 row (key), 0 measure, 0 column") {
     val tableState = TableState.Blank.withRowHeaderFields(List(NameField))

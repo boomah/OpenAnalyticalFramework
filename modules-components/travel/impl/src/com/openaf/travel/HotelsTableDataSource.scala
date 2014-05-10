@@ -11,6 +11,6 @@ class HotelsTableDataSource extends TableDataSource {
     HotelNameField, PeriodField, CostField, StarRatingField
   ).map(field => Right(AnyFieldDefinition(field)))
 
-  def fieldDefinitionGroup = FieldDefinitionGroup("Hotel", fieldDefinitions)
+  def fieldDefinitionGroups = FieldDefinitionGroups(List(FieldDefinitionGroup("Hotel", fieldDefinitions)))
   def result(tableState:TableState) = Result.Empty
 }

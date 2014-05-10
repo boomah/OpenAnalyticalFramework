@@ -26,6 +26,7 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragA
 
   private val root = new TreeItem[TreeItemType]
   private val treeView = new TreeView[TreeItemType](root)
+  treeView.setShowRoot(false)
   treeView.setCellFactory(new Callback[TreeView[TreeItemType],TreeCell[TreeItemType]] {
     def call(treeView:TreeView[TreeItemType]) = new TreeItemTypeTreeCell(dragAndDrop, AllFieldsArea.this, tableDataProperty)
   })

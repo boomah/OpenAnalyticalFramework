@@ -6,7 +6,7 @@ import com.openaf.table.server.datasources.RawRowBasedTableDataSource
 import com.openaf.table.lib.api.TableState
 
 class TableDataTest extends FunSuite {
-  val dataSource = RawRowBasedTableDataSource(data, FieldIDs, Group)
+  val dataSource = RawRowBasedTableDataSource(data, FieldIDs, Groups)
   
   test("test rowHeaderAsString 1 row") {
     val tableState = TableState.Blank.withRowHeaderFields(List(GenderField))

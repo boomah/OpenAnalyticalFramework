@@ -25,3 +25,9 @@ object FieldDefinitionGroup {
 
   val Standard = FieldDefinitionGroup("Standard", StandardFieldDefinitions.All.map(Right(_)))
 }
+
+case class FieldDefinitionGroups(fieldDefinitionGroups:Seq[FieldDefinitionGroup]) {
+  def rootGroup = FieldDefinitionGroup("root", fieldDefinitionGroups.map(group => Left(group)).toList)
+  def fieldGroup = rootGroup.fieldGroup
+  def fieldDefinition(fieldID:FieldID) = fieldDefinitionGroups.flatMap(_.fieldDefinitions).find(_.fieldID == fieldID).get
+}
