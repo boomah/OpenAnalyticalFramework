@@ -88,7 +88,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
     val numberOfPaths = columnHeaders.length
     val parentColumns = new ListBuffer[TableColumn[ObservableList[Any],Any]]
     val numberOfRowHeaders = tableData.tableState.tableLayout.rowHeaderFields.length
-    var grandColumnCount = numberOfRowHeaders
+    var runningColumnCount = numberOfRowHeaders
     (0 until numberOfPaths).foreach(pathIndex => {
       val pathColumnHeaders = columnHeaders(pathIndex)
       val path = paths(pathIndex)
@@ -105,7 +105,6 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
       (0 until numRows).foreach(row => {
         val field = pathFields(row)
         val values = valueLookUp(field.id)
-        grandColumnCount = numberOfRowHeaders
         (0 until numColumns).foreach(column => {
           val value = pathColumnHeaders(column)(row)
 
@@ -133,7 +132,9 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
             val previousValue = pathColumnHeaders(previousColumn)(row)
             def checkPreviousRow = {
               if (row > 0) {
-                pathColumnHeaders(previousColumn)(row - 1) == pathColumnHeaders(column)(row - 1)
+                val existingTableColumn = tableColumns(column)
+                val previousExistingTableColumn = tableColumns(previousColumn).getParentColumn
+                existingTableColumn eq previousExistingTableColumn
               } else {
                 true
               }
@@ -153,11 +154,11 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
               }
             }
           }
-          tableColumns(column).setCellValueFactory(new DefaultCellValueFactory(grandColumnCount))
+          tableColumns(column).setCellValueFactory(new DefaultCellValueFactory(runningColumnCount + column))
           tableColumns(column).setCellFactory(new DefaultCellFactory(defaultRenderer))
-          grandColumnCount += 1
         })
       })
+      runningColumnCount += numColumns
     })
 
     parentColumns.toList.distinct

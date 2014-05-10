@@ -178,6 +178,32 @@ class TableDataGeneratorTest extends FunSuite {
     check(tableState, List(Nil), expectedColHeaderValues, expectedData, expectedValueLookUp)
   }
 
+  test("0 row, 1 measure, 1 column (right of measure)") {
+    val tableState = TableState.Blank.withMeasureAreaLayout(MeasureAreaLayout(List(ScoreField, GenderField), Nil))
+
+    val expectedColHeaderValues = List(List(List(0)), List(List(1), List(2)))
+    val expectedData = List(List(List(425)), List(List(NoValue, NoValue)))
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      ScoreField.id -> List(ScoreField.id)
+    )
+
+    check(tableState, List(Nil), expectedColHeaderValues, expectedData, expectedValueLookUp)
+  }
+
+  test("0 row, 1 measure, 1 column (left of measure)") {
+    val tableState = TableState.Blank.withMeasureAreaLayout(MeasureAreaLayout(List(GenderField, ScoreField), Nil))
+
+    val expectedColHeaderValues = List(List(List(1), List(2)), List(List(0)))
+    val expectedData = List(List(List(NoValue, NoValue)), List(List(425)))
+    val expectedValueLookUp = Map(
+      ScoreField.id -> List(ScoreField.id),
+      GenderField.id -> List(GenderField.id, F, M)
+    )
+
+    check(tableState, List(Nil), expectedColHeaderValues, expectedData, expectedValueLookUp)
+  }
+
   test("1 row (key), 0 measure, 1 column (key, same as row)") {
     val tableState = TableState.Blank
       .withRowHeaderFields(List(NameField))

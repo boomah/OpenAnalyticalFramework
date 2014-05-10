@@ -22,19 +22,21 @@ object MeasureAreaLayout {
 
   def apply(measureAreaTree:MeasureAreaTree):MeasureAreaLayout = MeasureAreaLayout(List(measureAreaTree))
 
-  def fromFields(fields:List[Field[_]]) = {
+  def fromFields(fields:List[Field[_]]):MeasureAreaLayout = {
     val measureAreaTrees = fields.map(field => MeasureAreaTree(field))
-    MeasureAreaLayout(measureAreaTrees)
+    MeasureAreaLayout(measureAreaTrees.toList)
   }
 
-  def apply(topField:Field[_], childFields:List[Field[_]]=Nil):MeasureAreaLayout = {
-    val childMeasureAreaLayout = fromFields(childFields)
+  def fromFields(fields:Field[_]*):MeasureAreaLayout = {fromFields(fields.toList)}
+
+  def apply(topField:Field[_], childFields:Seq[Field[_]]=Nil):MeasureAreaLayout = {
+    val childMeasureAreaLayout = fromFields(childFields.toList)
     val measureAreaTree = MeasureAreaTree(topField, childMeasureAreaLayout)
     MeasureAreaLayout(measureAreaTree)
   }
 
-  def apply(topFields:List[Field[_]], childFields:List[Field[_]]):MeasureAreaLayout = {
-    MeasureAreaLayout(MeasureAreaTree(topFields, childFields))
+  def apply(topFields:Seq[Field[_]], childFields:Seq[Field[_]]):MeasureAreaLayout = {
+    MeasureAreaLayout(MeasureAreaTree(topFields.toList, childFields.toList)).normalise
   }
 }
 

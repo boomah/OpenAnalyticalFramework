@@ -14,9 +14,9 @@ class MeasureAreaLayoutTest extends FunSuite {
   }
 
   test("normalise 1") {
-    val layoutToBeNormalised = MeasureAreaLayout(MeasureAreaTree(Right(MeasureAreaLayout.fromFields(List(dimensionField1, dimensionField2)))))
+    val layoutToBeNormalised = MeasureAreaLayout(MeasureAreaTree(Right(MeasureAreaLayout.fromFields(dimensionField1, dimensionField2))))
     val normalisedLayout = layoutToBeNormalised.normalise
-    val expectedLayout = MeasureAreaLayout.fromFields(List(dimensionField1, dimensionField2))
+    val expectedLayout = MeasureAreaLayout.fromFields(dimensionField1, dimensionField2)
     assert(normalisedLayout === expectedLayout)
   }
 
@@ -162,8 +162,8 @@ class MeasureAreaLayoutTest extends FunSuite {
 
   test("normalise doesn't remove fields it shouldn't") {
     val layoutThatShouldStayTheSame = MeasureAreaLayout(
-      MeasureAreaTree(Right(MeasureAreaLayout.fromFields(List(dimensionField1, dimensionField1))),
-        MeasureAreaLayout.fromFields(List(dimensionField2))
+      MeasureAreaTree(Right(MeasureAreaLayout.fromFields(dimensionField1, dimensionField1)),
+        MeasureAreaLayout.fromFields(dimensionField2)
       )
     )
     val normalisedLayout = layoutThatShouldStayTheSame.normalise
@@ -238,5 +238,34 @@ class MeasureAreaLayoutTest extends FunSuite {
       MeasureAreaLayoutPath(List(dimensionField2, measureField1))
     )
     assert(layout4.paths === expected4)
+
+    val layout5 = MeasureAreaLayout.fromFields(measureField1, dimensionField1)
+    val expected5 = List(
+      MeasureAreaLayoutPath(List(measureField1)),
+      MeasureAreaLayoutPath(List(dimensionField1))
+    )
+    assert(layout5.paths === expected5)
+  }
+
+  test("single field path") {
+    val expectedPathList = List(MeasureAreaLayoutPath(List(measureField1)))
+
+    val layout1 = MeasureAreaLayout(MeasureAreaTree(measureField1))
+    assert(layout1.paths === expectedPathList)
+
+    val layout2 = MeasureAreaLayout(measureField1)
+    assert(layout2.paths === expectedPathList)
+
+    val layout3 = MeasureAreaLayout(List(measureField1), Nil)
+    assert(layout3.paths === expectedPathList)
+
+    val layout4 = MeasureAreaLayout(List(MeasureAreaTree(measureField1)))
+    assert(layout4.paths === expectedPathList)
+
+    val layout5 = MeasureAreaLayout.fromFields(List(measureField1))
+    assert(layout5.paths === expectedPathList)
+
+    val layout6 = MeasureAreaLayout.fromFields(measureField1)
+    assert(layout6.paths === expectedPathList)
   }
 }

@@ -155,5 +155,85 @@ class OpenAFTableViewTest extends FunSuite {
     assert(columns.get(0).getColumns.get(0).getCellData(0) === 98)
     assert(columns.get(1).getColumns.get(0).getCellData(0) === 78)
   }
+
+  test("1 column, 1 measure (left of column)") {
+    val tableLayout = TableLayout.Blank.copy(measureAreaLayout = MeasureAreaLayout.fromFields(ScoreField, GenderField))
+    val tableState = TableState(tableLayout)
+    val tableValues = TableValues.Empty.copy(
+      columnHeaders = Array(Array(Array(0)), Array(Array(1),Array(2))),
+      data = Array(Array(Array(176)), Array(Array(NoValue, NoValue))),
+      valueLookUp = ScoreValuesLookUp ++ GenderValuesLookUp
+    )
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    tableDataProperty.set(tableData)
+
+    val columns = tableView.getColumns
+    assert(columns.size === 3)
+    assert(columns.get(0).getText === "Score")
+    assert(columns.get(1).getText === "F")
+    assert(columns.get(2).getText === "M")
+    assert(columns.get(0).getColumns.size === 0)
+    assert(columns.get(1).getColumns.size === 0)
+    assert(columns.get(2).getColumns.size === 0)
+    assert(columns.get(0).getCellData(0) === 176)
+    assert(columns.get(1).getCellData(0) === NoValue)
+    assert(columns.get(2).getCellData(0) === NoValue)
+  }
+
+  test("2 column, 1 measure (measure in middle, all on top of each other") {
+    val layout = MeasureAreaLayout(MeasureAreaTree(GenderField, MeasureAreaLayout(ScoreField, List(GroupField))))
+    val tableLayout = TableLayout.Blank.copy(measureAreaLayout = layout)
+    val tableState = TableState(tableLayout)
+    val tableValues = TableValues.Empty.copy(
+      columnHeaders = Array(Array(Array(2,0,1), Array(1,0,1))),
+      data = Array(Array(Array(98,78))),
+      valueLookUp = GenderValuesLookUp ++ ScoreValuesLookUp ++ GroupValuesLookUp
+    )
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    tableDataProperty.set(tableData)
+
+    val columns = tableView.getColumns
+    assert(columns.size === 2)
+    assert(columns.get(0).getText === "M")
+    assert(columns.get(1).getText === "F")
+    assert(columns.get(0).getColumns.size === 1)
+    assert(columns.get(0).getColumns.get(0).getText === "Score")
+    assert(columns.get(0).getColumns.get(0).getColumns.size === 1)
+    assert(columns.get(0).getColumns.get(0).getColumns.get(0).getText === "Friends")
+    assert(columns.get(0).getColumns.get(0).getColumns.get(0).getCellData(0) === 98)
+    assert(columns.get(0).getColumns.get(0).getColumns.get(0).getColumns.size === 0)
+    assert(columns.get(1).getColumns.size === 1)
+    assert(columns.get(1).getColumns.get(0).getText === "Score")
+    assert(columns.get(1).getColumns.get(0).getColumns.size === 1)
+    assert(columns.get(1).getColumns.get(0).getColumns.get(0).getText === "Friends")
+    assert(columns.get(1).getColumns.get(0).getColumns.get(0).getCellData(0) === 78)
+    assert(columns.get(1).getColumns.get(0).getColumns.get(0).getColumns.size === 0)
+  }
+
+  test("2 column, 1 measure (measure on top, all on top of each other") {
+    val layout = MeasureAreaLayout(MeasureAreaTree(ScoreField, MeasureAreaLayout(GroupField, List(GenderField))))
+    val tableLayout = TableLayout.Blank.copy(measureAreaLayout = layout)
+    val tableState = TableState(tableLayout)
+    val tableValues = TableValues.Empty.copy(
+      columnHeaders = Array(Array(Array(0,1,2), Array(0,1,1))),
+      data = Array(Array(Array(98,78))),
+      valueLookUp = GenderValuesLookUp ++ ScoreValuesLookUp ++ GroupValuesLookUp
+    )
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    tableDataProperty.set(tableData)
+
+    val columns = tableView.getColumns
+    assert(columns.size === 1)
+    assert(columns.get(0).getText === "Score")
+    assert(columns.get(0).getColumns.size === 1)
+    assert(columns.get(0).getColumns.get(0).getText === "Friends")
+    assert(columns.get(0).getColumns.get(0).getColumns.size === 2)
+    assert(columns.get(0).getColumns.get(0).getColumns.get(0).getText === "M")
+    assert(columns.get(0).getColumns.get(0).getColumns.get(0).getCellData(0) === 98)
+    assert(columns.get(0).getColumns.get(0).getColumns.get(0).getColumns.size === 0)
+    assert(columns.get(0).getColumns.get(0).getColumns.get(1).getText === "F")
+    assert(columns.get(0).getColumns.get(0).getColumns.get(1).getCellData(0) === 78)
+    assert(columns.get(0).getColumns.get(0).getColumns.get(1).getColumns.size === 0)
+  }
 }
 
