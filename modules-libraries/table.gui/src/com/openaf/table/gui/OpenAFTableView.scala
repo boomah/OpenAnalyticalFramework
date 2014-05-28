@@ -8,6 +8,7 @@ import javafx.collections.{ObservableList, FXCollections}
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
 import scala.collection.mutable.ListBuffer
+import scala.annotation.tailrec
 
 class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[ObservableList[Any]] {
   tableDataProperty.addListener(new ChangeListener[TableData] {
@@ -178,12 +179,43 @@ class DefaultRowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T])
   extends Callback[TableColumn[ObservableList[Any],Int],TableCell[ObservableList[Any],Int]] {
 
   def call(tableColumn:TableColumn[ObservableList[Any],Int]) = new TableCell[ObservableList[Any],Int] {
-    override def updateItem(intValue:Int, isEmpty:Boolean) {
-      if (isEmpty) {
-        setText(null)
+    @tailrec private def checkColumnToTheLeft(rowIndex:Int, columnIndex:Int):Boolean = {
+      if (columnIndex == 0) {
+        false
       } else {
+        val columnToTheLeft = getTableView.getColumns.get(columnIndex - 1)
+        val different = columnToTheLeft.getCellData(rowIndex) != columnToTheLeft.getCellData(rowIndex - 1)
+        if (different) {
+          true
+        } else {
+          checkColumnToTheLeft(rowIndex, columnIndex - 1)
+        }
+      }
+    }
+
+    override def updateItem(intValue:Int, isEmpty:Boolean) {
+      val shouldRender = !isEmpty && (Option(getTableRow).map(_.getIndex) match {
+        case None => false
+        case Some(rowIndex) => {
+          if (rowIndex == 0) {
+            true // Always render the value in the first row
+          } else {
+            if (getTableColumn.getCellData(rowIndex - 1) != intValue) {
+              true // The value in the row above is different so render this value
+            } else {
+              // Check the values in the previous column to see if we need to render
+              val columnIndex = getTableView.getColumns.indexOf(getTableColumn)
+              checkColumnToTheLeft(rowIndex, columnIndex)
+            }
+          }
+        }
+      })
+
+      if (shouldRender) {
         val value = values(intValue).asInstanceOf[T]
         setText(renderer.render(value))
+      } else {
+        setText(null)
       }
     }
   }
