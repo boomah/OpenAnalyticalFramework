@@ -195,7 +195,7 @@ trait DragAndDropNode extends StackPane with DropTargetContainer with DraggableP
   protected var dropTargetMap = Map.empty[DropTarget,NodeSide]
 
   private val descriptionLabel = new Label
-  descriptionLabel.textProperty.bind(new TableLocaleStringBinding(locale, descriptionID))
+  descriptionLabel.textProperty.bind(new TableLocaleStringBinding(descriptionID, locale))
 
   protected val mainContent = new FlowPane
   protected val dropTargetPane = new Pane

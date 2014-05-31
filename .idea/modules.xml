@@ -7,7 +7,6 @@
       <module fileurl="file://$PROJECT_DIR$/modules-components/browser/gui/browser.gui.iml" filepath="$PROJECT_DIR$/modules-components/browser/gui/browser.gui.iml" group="browser" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/browser/gui.api/browser.gui.api.iml" filepath="$PROJECT_DIR$/modules-components/browser/gui.api/browser.gui.api.iml" group="browser" />
       <module fileurl="file://$PROJECT_DIR$/modules-libraries/cache/cache.iml" filepath="$PROJECT_DIR$/modules-libraries/cache/cache.iml" />
-      <module fileurl="file://$PROJECT_DIR$/modules-libraries/gui/gui.iml" filepath="$PROJECT_DIR$/modules-libraries/gui/gui.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/guiServlet/impl/guiServlet.impl.iml" filepath="$PROJECT_DIR$/modules-components/guiServlet/impl/guiServlet.impl.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-libraries/osgi/osgi.iml" filepath="$PROJECT_DIR$/modules-libraries/osgi/osgi.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules-components/pageManager/api/pageManager.api.iml" filepath="$PROJECT_DIR$/modules-components/pageManager/api/pageManager.api.iml" group="pageManager" />

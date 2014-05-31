@@ -28,7 +28,8 @@ class HomePageComponent extends BorderPane with PageComponent {
   private val content = new FlowPane
   private def updateBrowserApplications(browserApplications:ObservableList[OpenAFApplication]) {
     val applicationButtons = browserApplications.filter(_.applicationButtons(pageContext).nonEmpty).map(application => {
-      new OpenAFApplicationComponent(pageContext, application.applicationName, application.applicationButtons(pageContext))
+      new OpenAFApplicationComponent(pageContext, application.applicationNameBinding(pageContext),
+        application.applicationButtons(pageContext))
     })
     content.getChildren.clear()
     content.getChildren.addAll(applicationButtons.toArray :_*)
