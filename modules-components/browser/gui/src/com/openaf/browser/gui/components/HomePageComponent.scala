@@ -10,6 +10,7 @@ import scala.collection.JavaConversions._
 import com.openaf.pagemanager.api.NoPageData
 import utils.BrowserUtils
 import com.openaf.browser.gui.api._
+import com.openaf.browser.gui.binding.ApplicationLocaleStringBinding
 
 class HomePageComponent extends BorderPane with PageComponent {
   type P = HomePage.type
@@ -28,8 +29,8 @@ class HomePageComponent extends BorderPane with PageComponent {
   private val content = new FlowPane
   private def updateBrowserApplications(browserApplications:ObservableList[OpenAFApplication]) {
     val applicationButtons = browserApplications.filter(_.applicationButtons(pageContext).nonEmpty).map(application => {
-      new OpenAFApplicationComponent(pageContext, application.applicationNameBinding(pageContext),
-        application.applicationButtons(pageContext))
+      val nameBinding = new ApplicationLocaleStringBinding(BrowserUtils.ApplicationName, application, pageContext.browserCache)
+      new OpenAFApplicationComponent(pageContext, nameBinding, application.applicationButtons(pageContext))
     })
     content.getChildren.clear()
     content.getChildren.addAll(applicationButtons.toArray :_*)

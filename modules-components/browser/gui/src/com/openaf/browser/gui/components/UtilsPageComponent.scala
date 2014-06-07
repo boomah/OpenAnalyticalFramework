@@ -12,6 +12,7 @@ import com.openaf.browser.gui.api.{PageComponentFactory, PageComponent, OpenAFAp
 import javafx.event.{ActionEvent, EventHandler}
 import java.util.Locale
 import com.openaf.browser.gui.InternalBrowserCacheKey
+import com.openaf.browser.gui.binding.ApplicationLocaleStringBinding
 
 class UtilsPageComponent extends BorderPane with PageComponent {
   type P = UtilsPage.type
@@ -31,8 +32,8 @@ class UtilsPageComponent extends BorderPane with PageComponent {
   private val browserApplicationsPane = new FlowPane
   private def updateBrowserApplications(browserApplications:ObservableList[OpenAFApplication]) {
     val utilButtons = browserApplications.filter(_.utilButtons(pageContext).nonEmpty).map(application => {
-      new OpenAFApplicationComponent(pageContext, application.applicationNameBinding(pageContext),
-        application.utilButtons(pageContext))
+      val nameBinding = new ApplicationLocaleStringBinding(BrowserUtils.ApplicationName, application, pageContext.browserCache)
+      new OpenAFApplicationComponent(pageContext, nameBinding, application.utilButtons(pageContext))
     })
     browserApplicationsPane.getChildren.clear()
     browserApplicationsPane.getChildren.addAll(utilButtons.toArray :_*)

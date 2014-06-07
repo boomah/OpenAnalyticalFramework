@@ -12,6 +12,7 @@ import javafx.geometry.Insets
 import com.openaf.browser.gui.FrameLocation
 
 object BrowserUtils {
+  val ApplicationName = "applicationName"
   private val FrameLocationName = "frameLocation"
   private val Prefs = Preferences.userNodeForPackage(this.getClass)
   def initialFrameLocation = {

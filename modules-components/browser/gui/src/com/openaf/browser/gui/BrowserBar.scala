@@ -13,7 +13,7 @@ import com.openaf.browser.gui.utils.{FontAwesomeText, FontAwesome}
 import com.openaf.browser.gui.utils.FontAwesome._
 import com.openaf.browser.gui.utils.BrowserUtils._
 import com.openaf.browser.gui.pages.{UtilsPage, HomePage}
-import com.openaf.browser.gui.binding.BrowserLocaleStringBinding
+import com.openaf.browser.gui.binding.ApplicationLocaleStringBinding
 import com.openaf.browser.gui.api.BrowserCache
 
 class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage, cache:BrowserCache) extends ToolBar {
@@ -51,17 +51,17 @@ class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage, ca
 class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage, cache:BrowserCache) extends MenuButton {
   setGraphic(new StackPane(new FontAwesomeText(Cog)))
   private val newTabMenuItem = new MenuItem
-  newTabMenuItem.textProperty.bind(new BrowserLocaleStringBinding("newTab", cache))
+  newTabMenuItem.textProperty.bind(new ApplicationLocaleStringBinding("newTab", BrowserApplication, cache))
   newTabMenuItem.setAccelerator(keyMap.newTab.accelerator)
   newTabMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.createTab(HomePage)}})
 
   private val newWindowMenuItem = new MenuItem
-  newWindowMenuItem.textProperty.bind(new BrowserLocaleStringBinding("newWindow", cache))
+  newWindowMenuItem.textProperty.bind(new ApplicationLocaleStringBinding("newWindow", BrowserApplication, cache))
   newWindowMenuItem.setAccelerator(keyMap.newWindow.accelerator)
   newWindowMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {stage.createStage(HomePage)}})
 
   private val utilsMenuItem = new MenuItem
-  utilsMenuItem.textProperty.bind(new BrowserLocaleStringBinding("utils", cache))
+  utilsMenuItem.textProperty.bind(new ApplicationLocaleStringBinding("utils", BrowserApplication, cache))
   utilsMenuItem.setAccelerator(keyMap.utilsPage.accelerator)
   utilsMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.createTab(UtilsPage)}})
 
