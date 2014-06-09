@@ -12,7 +12,7 @@ import utils.BrowserUtils
 import com.openaf.browser.gui.api._
 import com.openaf.browser.gui.binding.ApplicationLocaleStringBinding
 
-class HomePageComponent extends BorderPane with PageComponent {
+class HomePageComponent extends BorderPane with BrowserPageComponent {
   type P = HomePage.type
   type PD = NoPageData.type
   def name = "OpenAF"

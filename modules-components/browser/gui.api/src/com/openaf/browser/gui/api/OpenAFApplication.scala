@@ -16,6 +16,11 @@ trait OpenAFApplication {
   def applicationButtons(context:PageContext):List[BrowserActionButton] = Nil
   def utilButtons(context:PageContext):List[BrowserActionButton] = Nil
   def componentFactoryMap:Map[String,PageComponentFactory] = Map.empty
+  final def componentFactoryMapWithInitialisation = {
+    val newComponentFactoryMap = componentFactoryMap
+    newComponentFactoryMap.values.foreach(_.application = this)
+    newComponentFactoryMap
+  }
   def styleSheets:List[String] = Nil
 }
 

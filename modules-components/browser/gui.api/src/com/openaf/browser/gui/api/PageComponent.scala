@@ -8,24 +8,33 @@ trait PageComponent extends Region {
   type P <: Page
   type PD <: PageData
   val image:Option[Node]=None
-  protected var page:P = _
-  protected var pageData:PD = _
-  protected var pageContext:PageContext = _
+
+  private var page0:P = _
+  private var pageData0:PD = _
+  private var pageContext0:PageContext = _
+  private var application0:OpenAFApplication = _
+
+  final protected def page = page0
+  final protected def pageData = pageData0
+  final protected def pageContext = pageContext0
+
+  protected def resourceLocation = application0.resourceLocation
 
   def name:String
   def shortText = name
   def longText = name
 
-  def initialise(pageContext0:PageContext) {
-    pageContext = pageContext0
+  final private[api] def initialise(pageContext:PageContext, application:OpenAFApplication) {
+    pageContext0 = pageContext
+    application0 = application
     initialise()
   }
-  def initialise() {}
+  protected def initialise() {}
 
-  def setup(page:P, pageData:PD) {
-    this.page = page
-    this.pageData = pageData
+  final def setup(page:P, pageData:PD) {
+    page0 = page
+    pageData0 = pageData
     setup()
   }
-  def setup()
+  protected def setup()
 }

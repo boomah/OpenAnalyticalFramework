@@ -8,13 +8,13 @@ import javafx.collections.ListChangeListener.Change
 import scala.collection.JavaConversions._
 import com.openaf.pagemanager.api.NoPageData
 import com.openaf.browser.gui.utils.BrowserUtils
-import com.openaf.browser.gui.api.{PageComponentFactory, PageComponent, OpenAFApplication, BrowserCacheKey}
+import com.openaf.browser.gui.api.{PageComponentFactory, OpenAFApplication, BrowserCacheKey}
 import javafx.event.{ActionEvent, EventHandler}
 import java.util.Locale
 import com.openaf.browser.gui.InternalBrowserCacheKey
 import com.openaf.browser.gui.binding.ApplicationLocaleStringBinding
 
-class UtilsPageComponent extends BorderPane with PageComponent {
+class UtilsPageComponent extends BorderPane with BrowserPageComponent {
   type P = UtilsPage.type
   type PD = NoPageData.type
   def name = "Utils"

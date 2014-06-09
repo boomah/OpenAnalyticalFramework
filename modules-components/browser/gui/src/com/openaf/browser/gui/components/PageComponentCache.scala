@@ -16,7 +16,8 @@ class PageComponentCache {
 
   private def pageComponentFactoryOption(pageClassName:String, pageContext:PageContext) = {
     val browserApplications = pageContext.browserCache(InternalBrowserCacheKey.ApplicationsKey).listIterator.toList
-    val allPageComponentFactories = browserApplications.map(_.componentFactoryMap).foldLeft(factoryMap)((map, totalMap) => map ++ totalMap)
+    val allPageComponentFactories = browserApplications.map(_.componentFactoryMapWithInitialisation)
+      .foldLeft(factoryMap)((map, totalMap) => map ++ totalMap)
     allPageComponentFactories.get(pageClassName)
   }
 

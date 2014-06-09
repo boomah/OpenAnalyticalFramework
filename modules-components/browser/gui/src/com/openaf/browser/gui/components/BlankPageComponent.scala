@@ -4,9 +4,9 @@ import javafx.scene.layout.BorderPane
 import com.openaf.pagemanager.api.NoPageData
 import com.openaf.browser.gui.pages.BlankPage
 import javafx.scene.text.Text
-import com.openaf.browser.gui.api.{PageComponentFactory, PageComponent}
+import com.openaf.browser.gui.api.PageComponentFactory
 
-class BlankPageComponent extends BorderPane with PageComponent {
+class BlankPageComponent extends BorderPane with BrowserPageComponent {
   type P = BlankPage.type
   type PD = NoPageData.type
   def name = "Blank Page"

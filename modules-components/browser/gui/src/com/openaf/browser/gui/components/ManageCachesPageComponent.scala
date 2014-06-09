@@ -8,9 +8,9 @@ import com.openaf.cache.{CacheChanged, CacheFactory}
 import com.google.common.eventbus.Subscribe
 import com.openaf.pagemanager.api.NoPageData
 import com.openaf.browser.gui.utils.BrowserUtils
-import com.openaf.browser.gui.api.{PageComponentFactory, PageComponent}
+import com.openaf.browser.gui.api.PageComponentFactory
 
-class ManageCachesPageComponent extends BorderPane with PageComponent {
+class ManageCachesPageComponent extends BorderPane with BrowserPageComponent {
   type P = ManageCachesPage.type
   type PD = NoPageData.type
   def name = "Manage Caches"

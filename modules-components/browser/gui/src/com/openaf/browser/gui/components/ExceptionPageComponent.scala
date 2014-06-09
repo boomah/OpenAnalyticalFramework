@@ -9,9 +9,9 @@ import com.openaf.browser.gui.utils.BrowserUtils
 import javafx.geometry.Pos
 import javafx.event.{ActionEvent, EventHandler}
 import javafx.scene.input.{ClipboardContent, Clipboard}
-import com.openaf.browser.gui.api.{PageComponentFactory, PageComponent}
+import com.openaf.browser.gui.api.PageComponentFactory
 
-class ExceptionPageComponent extends BorderPane with PageComponent {
+class ExceptionPageComponent extends BorderPane with BrowserPageComponent {
   type P = BlankPage.type
   type PD = ExceptionPageData
   def name = "Exception"
