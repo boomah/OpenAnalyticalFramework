@@ -4,7 +4,7 @@ import com.openaf.table.gui.api.TablePageComponent
 import com.openaf.browser.gui.api.PageComponentFactory
 
 class GoalsPageComponent extends TablePageComponent {
-  def name = "Goals"
+  def nameId = "goalsName"
 }
 
 object GoalsPageComponentFactory extends PageComponentFactory {

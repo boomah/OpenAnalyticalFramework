@@ -61,7 +61,7 @@ class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage, cache:Brows
   newWindowMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {stage.createStage(HomePage)}})
 
   private val utilsMenuItem = new MenuItem
-  utilsMenuItem.textProperty.bind(new ApplicationLocaleStringBinding("utils", BrowserApplication, cache))
+  utilsMenuItem.textProperty.bind(new ApplicationLocaleStringBinding("utilsName", BrowserApplication, cache))
   utilsMenuItem.setAccelerator(keyMap.utilsPage.accelerator)
   utilsMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.createTab(UtilsPage)}})
 

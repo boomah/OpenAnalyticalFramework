@@ -9,7 +9,7 @@ import com.openaf.browser.gui.api.PageComponentFactory
 class BlankPageComponent extends BorderPane with BrowserPageComponent {
   type P = BlankPage.type
   type PD = NoPageData.type
-  def name = "Blank Page"
+  def nameId = "blankPageName"
 
   setCenter(new Text("BLANK PAGE"))
 

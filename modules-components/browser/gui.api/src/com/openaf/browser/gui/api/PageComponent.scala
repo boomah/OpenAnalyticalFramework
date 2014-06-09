@@ -3,6 +3,7 @@ package com.openaf.browser.gui.api
 import javafx.scene.layout.Region
 import com.openaf.pagemanager.api.{PageData, Page}
 import javafx.scene.Node
+import java.util.ResourceBundle
 
 trait PageComponent extends Region {
   type P <: Page
@@ -19,8 +20,14 @@ trait PageComponent extends Region {
   final protected def pageContext = pageContext0
 
   protected def resourceLocation = application0.resourceLocation
+  protected def textFromResource(id:String) = {
+    ResourceBundle.getBundle(
+      resourceLocation, pageContext.browserCache(BrowserCacheKey.LocaleKey).get, getClass.getClassLoader
+    ).getString(id)
+  }
 
-  def name:String
+  def nameId:String
+  def name = textFromResource(nameId)
   def shortText = name
   def longText = name
 

@@ -9,7 +9,7 @@ import ref.SoftReference
 import com.openaf.pagemanager.api.{NoPageData, Page}
 import javafx.scene.Node
 import com.openaf.browser.gui.utils.BrowserUtils._
-import com.openaf.browser.gui.api.{PageContext, PageComponent}
+import com.openaf.browser.gui.api.{BrowserCacheKey, PageContext, PageComponent}
 import com.openaf.browser.gui.animation.{BackOnePageTransition, ForwardOnePageTransition}
 import scala.Some
 import com.openaf.pagemanager.api.ExceptionPageData
@@ -54,11 +54,11 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     }
   }
   val pageShortText = new StringBinding {
-    bind(goingToPage, currentPage)
+    bind(goingToPage, currentPage, browserCache(BrowserCacheKey.LocaleKey))
     def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), Browser.this).shortText
   }
   val pageLongText = new StringBinding {
-    bind(goingToPage, currentPage)
+    bind(goingToPage, currentPage, browserCache(BrowserCacheKey.LocaleKey))
     def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), Browser.this).longText
   }
   val pageImage = new ObjectBinding[Node] {

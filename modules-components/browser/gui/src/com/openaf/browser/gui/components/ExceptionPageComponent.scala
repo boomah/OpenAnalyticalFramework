@@ -14,7 +14,7 @@ import com.openaf.browser.gui.api.PageComponentFactory
 class ExceptionPageComponent extends BorderPane with BrowserPageComponent {
   type P = BlankPage.type
   type PD = ExceptionPageData
-  def name = "Exception"
+  def nameId = "exceptionName"
 
   private val textArea = new TextArea
   private val copyToClipboardButton = new Button("Copy to Clipboard")

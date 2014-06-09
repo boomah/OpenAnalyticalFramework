@@ -8,7 +8,7 @@ class HotelsPageComponent extends TablePageComponent {
   type P = HotelsPage
   type PD = HotelsPageData
 
-  def name = "Hotels"
+  def nameId = "hotelsName"
 }
 
 object HotelsPageComponentFactory extends PageComponentFactory {

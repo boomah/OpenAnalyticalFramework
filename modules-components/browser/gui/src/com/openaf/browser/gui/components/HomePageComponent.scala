@@ -15,7 +15,7 @@ import com.openaf.browser.gui.binding.ApplicationLocaleStringBinding
 class HomePageComponent extends BorderPane with BrowserPageComponent {
   type P = HomePage.type
   type PD = NoPageData.type
-  def name = "OpenAF"
+  def nameId = "openAFName"
   override val image = Some(BrowserUtils.icon("16x16_home.png"))
 
   override def initialise() {
