@@ -16,7 +16,6 @@ class HomePageComponent extends BorderPane with BrowserPageComponent {
   type P = HomePage.type
   type PD = NoPageData.type
   def nameId = "openAFName"
-  override val image = Some(BrowserUtils.icon("16x16_home.png"))
 
   override def initialise() {
     val browserApplications = context.cache(InternalBrowserCacheKey.ApplicationsKey)

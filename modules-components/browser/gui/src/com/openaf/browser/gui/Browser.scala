@@ -54,15 +54,15 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
       case _ => currentPage.get
     }
   }
-  val pageShortText = new StringBinding {
+  private[gui] val pageNameBinding = new StringBinding {
     bind(goingToPage, currentPage, cache(BrowserCacheKey.LocaleKey))
-    def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), Browser.this).shortText
+    def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), Browser.this).name
   }
-  val pageLongText = new StringBinding {
+  private[gui] val pageDescriptionBinding = new StringBinding {
     bind(goingToPage, currentPage, cache(BrowserCacheKey.LocaleKey))
-    def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), Browser.this).longText
+    def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), Browser.this).description
   }
-  val pageImage = new ObjectBinding[Node] {
+  private[gui] val pageImage = new ObjectBinding[Node] {
     bind(goingToPage, currentPage)
     def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), Browser.this).image.getOrElse(null)
   }

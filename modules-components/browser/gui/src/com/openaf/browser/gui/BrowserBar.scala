@@ -40,7 +40,7 @@ class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage, ca
     button.widthProperty.addListener(buttonResizeListener)
     button.heightProperty.addListener(buttonResizeListener)
   })
-  private val addressBar = new AddressBar(browser.pageLongText)
+  private val addressBar = new AddressBar(browser.pageDescriptionBinding)
   HBox.setHgrow(addressBar, Priority.ALWAYS)
   private val settingsButton = new SettingsMenuButton(tabPane, stage, cache)
 

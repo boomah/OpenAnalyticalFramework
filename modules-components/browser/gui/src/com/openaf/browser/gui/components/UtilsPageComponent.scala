@@ -18,7 +18,6 @@ class UtilsPageComponent extends BorderPane with BrowserPageComponent {
   type P = UtilsPage.type
   type PD = NoPageData.type
   def nameId = "utilsName"
-  override val image = Some(BrowserUtils.icon("16x16_home.png"))
 
   override def initialise() {
     val browserApplications = context.cache(InternalBrowserCacheKey.ApplicationsKey)

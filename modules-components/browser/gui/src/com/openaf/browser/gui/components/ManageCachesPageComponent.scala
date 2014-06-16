@@ -14,7 +14,6 @@ class ManageCachesPageComponent extends BorderPane with BrowserPageComponent {
   type P = ManageCachesPage.type
   type PD = NoPageData.type
   def nameId = "manageCachesName"
-  override val image = Some(BrowserUtils.icon("16x16_home.png"))
 
   CacheFactory.registerListener(this)
 

@@ -8,7 +8,6 @@ import java.util.ResourceBundle
 trait PageComponent extends Region {
   type P <: Page
   type PD <: PageData
-  val image:Option[Node]=None
 
   private var page0:P = _
   private var pageData0:PD = _
@@ -28,8 +27,9 @@ trait PageComponent extends Region {
 
   def nameId:String
   def name = textFromResource(nameId)
-  def shortText = name
-  def longText = name
+  def descriptionId = nameId
+  def description = textFromResource(descriptionId)
+  def image:Option[Node]=None
 
   final private[api] def initialise(context:BrowserContext, application:OpenAFApplication) {
     context0 = context
