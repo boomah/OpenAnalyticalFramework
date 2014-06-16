@@ -10,9 +10,7 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
   type PD <: TablePageData
   type P <: TablePage
 
-  override def initialise() {
-    localeProperty.bind(pageContext.browserCache(BrowserCacheKey.LocaleKey))
-  }
+  override def initialise() {localeProperty.bind(context.cache(BrowserCacheKey.LocaleKey))}
 
   private var doingSetup = false
 
@@ -25,9 +23,7 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
 
   goingToTableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observable:ObservableValue[_<:TableData], oldValue:TableData, newValue:TableData) {
-      if (!doingSetup) {
-        pageContext.goToPage(page.withTableData(newValue))
-      }
+      if (!doingSetup) {context.goToPage(page.withTableData(newValue))}
     }
   })
 }

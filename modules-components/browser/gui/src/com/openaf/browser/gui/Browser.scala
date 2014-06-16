@@ -9,15 +9,16 @@ import ref.SoftReference
 import com.openaf.pagemanager.api.{NoPageData, Page}
 import javafx.scene.Node
 import com.openaf.browser.gui.utils.BrowserUtils._
-import com.openaf.browser.gui.api.{BrowserCacheKey, PageContext, PageComponent}
+import com.openaf.browser.gui.api.{BrowserCacheKey, BrowserContext, PageComponent}
 import com.openaf.browser.gui.animation.{BackOnePageTransition, ForwardOnePageTransition}
 import scala.Some
 import com.openaf.pagemanager.api.ExceptionPageData
 import com.openaf.browser.gui.components.PageComponentCache
 
-class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager) extends BorderPane with PageContext {
+class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager)
+  extends BorderPane with BrowserContext {
   checkFXThread()
-  def browserCache = manager.cache
+  def cache = manager.cache
   private val content = new StackPane
   setCenter(content)
   private val pageComponentCache = new PageComponentCache
@@ -54,11 +55,11 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     }
   }
   val pageShortText = new StringBinding {
-    bind(goingToPage, currentPage, browserCache(BrowserCacheKey.LocaleKey))
+    bind(goingToPage, currentPage, cache(BrowserCacheKey.LocaleKey))
     def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), Browser.this).shortText
   }
   val pageLongText = new StringBinding {
-    bind(goingToPage, currentPage, browserCache(BrowserCacheKey.LocaleKey))
+    bind(goingToPage, currentPage, cache(BrowserCacheKey.LocaleKey))
     def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), Browser.this).longText
   }
   val pageImage = new ObjectBinding[Node] {
@@ -101,7 +102,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
       val fromPagePosition = currentPagePosition.get
       val indexOfDifferentPage = pages.listIterator.toList
         .indexWhere(pageInfo => pageID(pageInfo.page) != pageID(page(fromPagePosition)), fromPagePosition + 1)
-      val toPagePosition = if (indexOfDifferentPage == -1) (pages.size - 1) else indexOfDifferentPage
+      val toPagePosition = if (indexOfDifferentPage == -1) pages.size - 1 else indexOfDifferentPage
       goToPage(fromPagePosition, toPagePosition, pages.get(toPagePosition))
     }
   }

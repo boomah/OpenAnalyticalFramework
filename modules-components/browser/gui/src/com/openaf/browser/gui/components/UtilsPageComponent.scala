@@ -21,7 +21,7 @@ class UtilsPageComponent extends BorderPane with BrowserPageComponent {
   override val image = Some(BrowserUtils.icon("16x16_home.png"))
 
   override def initialise() {
-    val browserApplications = pageContext.browserCache(InternalBrowserCacheKey.ApplicationsKey)
+    val browserApplications = context.cache(InternalBrowserCacheKey.ApplicationsKey)
     browserApplications.addListener(new ListChangeListener[OpenAFApplication] {
       def onChanged(change:Change[_<:OpenAFApplication]) {updateBrowserApplications(browserApplications)}
     })
@@ -31,9 +31,9 @@ class UtilsPageComponent extends BorderPane with BrowserPageComponent {
   private val content = new VBox
   private val browserApplicationsPane = new FlowPane
   private def updateBrowserApplications(browserApplications:ObservableList[OpenAFApplication]) {
-    val utilButtons = browserApplications.filter(_.utilButtons(pageContext).nonEmpty).map(application => {
-      val nameBinding = new ApplicationLocaleStringBinding(BrowserUtils.ApplicationName, application, pageContext.browserCache)
-      new OpenAFApplicationComponent(pageContext, nameBinding, application.utilButtons(pageContext))
+    val utilButtons = browserApplications.filter(_.utilButtons(context).nonEmpty).map(application => {
+      val nameBinding = new ApplicationLocaleStringBinding(BrowserUtils.ApplicationName, application, context.cache)
+      new OpenAFApplicationComponent(context, nameBinding, application.utilButtons(context))
     })
     browserApplicationsPane.getChildren.clear()
     browserApplicationsPane.getChildren.addAll(utilButtons.toArray :_*)
@@ -42,11 +42,11 @@ class UtilsPageComponent extends BorderPane with BrowserPageComponent {
   private val localePane = new FlowPane
   private val englishButton = new Button("English")
   englishButton.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {
-    pageContext.browserCache(BrowserCacheKey.LocaleKey).set(Locale.UK)
+    context.cache(BrowserCacheKey.LocaleKey).set(Locale.UK)
   }})
   private val frenchButton = new Button("French")
   frenchButton.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {
-    pageContext.browserCache(BrowserCacheKey.LocaleKey).set(Locale.FRANCE)
+    context.cache(BrowserCacheKey.LocaleKey).set(Locale.FRANCE)
   }})
   localePane.getChildren.addAll(englishButton, frenchButton)
 

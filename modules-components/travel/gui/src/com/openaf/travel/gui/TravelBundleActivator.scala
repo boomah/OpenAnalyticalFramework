@@ -4,7 +4,7 @@ import components.HotelsPageComponentFactory
 import org.osgi.framework.{BundleActivator, BundleContext}
 import com.openaf.travel.api.{HotelsPage, FlightsAndHotelsPageFactory, HotelsPageFactory}
 import com.openaf.table.gui.OpenAFTable
-import com.openaf.browser.gui.api.{PageContext, BrowserActionButton, OpenAFApplication}
+import com.openaf.browser.gui.api.{BrowserContext, BrowserActionButton, OpenAFApplication}
 
 class TravelBundleActivator extends BundleActivator {
   def start(context:BundleContext) {
@@ -17,7 +17,7 @@ class TravelBundleActivator extends BundleActivator {
 }
 
 object TravelBrowserApplication extends OpenAFApplication {
-  override def applicationButtons(context:PageContext) = {
+  override def applicationButtons(context:BrowserContext) = {
     List(
       BrowserActionButton("Hotels", HotelsPageFactory),
       BrowserActionButton("Flights and Hotels", FlightsAndHotelsPageFactory)

@@ -13,8 +13,8 @@ trait OpenAFApplication {
       ""
     }
   }
-  def applicationButtons(context:PageContext):List[BrowserActionButton] = Nil
-  def utilButtons(context:PageContext):List[BrowserActionButton] = Nil
+  def applicationButtons(context:BrowserContext):List[BrowserActionButton] = Nil
+  def utilButtons(context:BrowserContext):List[BrowserActionButton] = Nil
   def componentFactoryMap:Map[String,PageComponentFactory] = Map.empty
   final def componentFactoryMapWithInitialisation = {
     val newComponentFactoryMap = componentFactoryMap

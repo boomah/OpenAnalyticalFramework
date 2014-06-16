@@ -12,17 +12,17 @@ trait PageComponent extends Region {
 
   private var page0:P = _
   private var pageData0:PD = _
-  private var pageContext0:PageContext = _
+  private var context0:BrowserContext = _
   private var application0:OpenAFApplication = _
 
   final protected def page = page0
   final protected def pageData = pageData0
-  final protected def pageContext = pageContext0
+  final protected def context = context0
 
   protected def resourceLocation = application0.resourceLocation
   protected def textFromResource(id:String) = {
     ResourceBundle.getBundle(
-      resourceLocation, pageContext.browserCache(BrowserCacheKey.LocaleKey).get, getClass.getClassLoader
+      resourceLocation, context.cache(BrowserCacheKey.LocaleKey).get, getClass.getClassLoader
     ).getString(id)
   }
 
@@ -31,8 +31,8 @@ trait PageComponent extends Region {
   def shortText = name
   def longText = name
 
-  final private[api] def initialise(pageContext:PageContext, application:OpenAFApplication) {
-    pageContext0 = pageContext
+  final private[api] def initialise(context:BrowserContext, application:OpenAFApplication) {
+    context0 = context
     application0 = application
     initialise()
   }

@@ -1,7 +1,7 @@
 package com.openaf.sport.gui
 
 import org.osgi.framework.{BundleContext, BundleActivator}
-import com.openaf.browser.gui.api.{BrowserActionButton, PageContext, OpenAFApplication}
+import com.openaf.browser.gui.api.{BrowserActionButton, BrowserContext, OpenAFApplication}
 import com.openaf.table.gui.OpenAFTable
 import com.openaf.sport.gui.components.GoalsPageComponentFactory
 import com.openaf.sport.api.{GoalsPageFactory, GoalsPage}
@@ -17,7 +17,7 @@ class SportBundleActivator extends BundleActivator {
 }
 
 object SportBrowserApplication extends OpenAFApplication {
-  override def applicationButtons(context:PageContext) = {
+  override def applicationButtons(context:BrowserContext) = {
     List(BrowserActionButton("Goals", GoalsPageFactory))
   }
   override def componentFactoryMap = Map(classOf[GoalsPage].getName -> GoalsPageComponentFactory)

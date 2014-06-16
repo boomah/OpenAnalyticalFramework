@@ -19,7 +19,7 @@ class HomePageComponent extends BorderPane with BrowserPageComponent {
   override val image = Some(BrowserUtils.icon("16x16_home.png"))
 
   override def initialise() {
-    val browserApplications = pageContext.browserCache(InternalBrowserCacheKey.ApplicationsKey)
+    val browserApplications = context.cache(InternalBrowserCacheKey.ApplicationsKey)
     browserApplications.addListener(new ListChangeListener[OpenAFApplication] {
       def onChanged(change:Change[_<:OpenAFApplication]) {updateBrowserApplications(browserApplications)}
     })
@@ -28,9 +28,9 @@ class HomePageComponent extends BorderPane with BrowserPageComponent {
 
   private val content = new FlowPane
   private def updateBrowserApplications(browserApplications:ObservableList[OpenAFApplication]) {
-    val applicationButtons = browserApplications.filter(_.applicationButtons(pageContext).nonEmpty).map(application => {
-      val nameBinding = new ApplicationLocaleStringBinding(BrowserUtils.ApplicationName, application, pageContext.browserCache)
-      new OpenAFApplicationComponent(pageContext, nameBinding, application.applicationButtons(pageContext))
+    val applicationButtons = browserApplications.filter(_.applicationButtons(context).nonEmpty).map(application => {
+      val nameBinding = new ApplicationLocaleStringBinding(BrowserUtils.ApplicationName, application, context.cache)
+      new OpenAFApplicationComponent(context, nameBinding, application.applicationButtons(context))
     })
     content.getChildren.clear()
     content.getChildren.addAll(applicationButtons.toArray :_*)
