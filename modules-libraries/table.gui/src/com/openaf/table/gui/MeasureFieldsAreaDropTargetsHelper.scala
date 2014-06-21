@@ -6,8 +6,8 @@ import javafx.geometry.Side
 import scala.collection.JavaConversions._
 import javafx.scene.control.Label
 
-class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, dropTargetContainer:DropTargetContainer) {
-  private val fieldNodeDropTargetsHelper = new FieldNodeDropTargetsHelper(dropTargetPane, dropTargetContainer)
+class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, dragAndDropContainer:DragAndDropContainer) {
+  private val fieldNodeDropTargetsHelper = new FieldNodeDropTargetsHelper(dropTargetPane, dragAndDropContainer)
 
   private def allNodes(pane:Pane):List[Node] = {
     val paneChildNodes = pane.getChildren.toList
@@ -23,7 +23,7 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo):Map[DropTarget,NodeSide] = {
     mainContent.getChildren.get(0) match {
       case label:Label => {
-        val (dropTarget1, dropTarget2) = DropTargetNode.createDropTargetNodesForLabel(label, dropTargetContainer)
+        val (dropTarget1, dropTarget2) = DropTargetNode.createDropTargetNodesForLabel(label, dragAndDropContainer)
         Map(dropTarget1 -> NodeSide(label, Side.LEFT), dropTarget2 -> NodeSide(label, Side.LEFT))
       }
       case currentMeasureAreaLayoutNode:MeasureAreaLayoutNode => {
@@ -58,7 +58,7 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
     }
 
     val leftDropTargetNodeOption = if (shouldCreateLeftDropTargetNode) {
-      val leftDropTargetNode = new DropTargetNode(dropTargetContainer)
+      val leftDropTargetNode = new DropTargetNode(dragAndDropContainer)
       val isFirstMeasureAreaTreeNodeInParent = (parentMeasureAreaLayoutNode.getChildren.get(0) == measureAreaTreeNode)
       val xDelta = if (isFirstMeasureAreaTreeNodeInParent) 0 else (leftDropTargetNode.prefWidth(0) / 2)
       leftDropTargetNode.setLayoutX(boundsForDropTarget.getMinX - xDelta)
@@ -72,7 +72,7 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
       (parentMeasureAreaLayoutNode.getChildren.get(parentMeasureAreaLayoutNode.getChildren.size - 1) == measureAreaTreeNode)
 
     val rightDropTargetNodeOption = if (shouldCreateRightDropTargetNode) {
-      val rightDropTargetNode = new DropTargetNode(dropTargetContainer)
+      val rightDropTargetNode = new DropTargetNode(dragAndDropContainer)
       rightDropTargetNode.setLayoutX(boundsForDropTarget.getMaxX - rightDropTargetNode.prefWidth(0))
       rightDropTargetNode.setLayoutY(boundsForDropTarget.getMinY + ((nodeHeight / 2) - (rightDropTargetNode.prefHeight(0) / 2)))
       Some(rightDropTargetNode -> NodeSide(measureAreaTreeNode, Side.RIGHT))
@@ -117,7 +117,7 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
     val shouldCreateTopDropTargetNode = (multipleChildren && (isTopLevelParent || multipleChildrenAbove))
 
     val topDropTargetNodeOption = if (shouldCreateTopDropTargetNode) {
-      val topDropTargetNode = new DropTargetNode(dropTargetContainer)
+      val topDropTargetNode = new DropTargetNode(dragAndDropContainer)
       topDropTargetNode.setLayoutX(boundsForDropTarget.getMinX + ((nodeWidth / 2) - (topDropTargetNode.prefWidth(0) / 2)))
       val yDelta = if (multipleChildrenAbove) (topDropTargetNode.prefHeight(0) / 2) else 0
       topDropTargetNode.setLayoutY(boundsForDropTarget.getMinY - yDelta)
@@ -138,7 +138,7 @@ class MeasureFieldsAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, 
     }
 
     val bottomDropTargetNodeOption = if (shouldCreateBottomDropTargetNode) {
-      val bottomDropTargetNode = new DropTargetNode(dropTargetContainer)
+      val bottomDropTargetNode = new DropTargetNode(dragAndDropContainer)
       bottomDropTargetNode.setLayoutX(boundsForDropTarget.getMinX + ((nodeWidth / 2) - (bottomDropTargetNode.prefWidth(0) / 2)))
       bottomDropTargetNode.setLayoutY(boundsForDropTarget.getMaxY - bottomDropTargetNode.prefHeight(0))
       Some(bottomDropTargetNode -> NodeSide(measureAreaLayoutNode, Side.BOTTOM))

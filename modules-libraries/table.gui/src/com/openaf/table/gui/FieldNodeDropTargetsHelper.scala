@@ -3,7 +3,7 @@ package com.openaf.table.gui
 import javafx.geometry.Side
 import javafx.scene.layout.Pane
 
-class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dropTargetContainer:DropTargetContainer) {
+class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dragAndDropContainer:DragAndDropContainer) {
   def dropTargetsForFieldNode(fieldNode:FieldNode, draggableFieldsInfo:DraggableFieldsInfo) = {
     val parentMeasureAreaTreeNode = fieldNode.getParent.asInstanceOf[MeasureAreaTreeNode]
     val parentMeasureAreaLayoutNode = parentMeasureAreaTreeNode.getParent.asInstanceOf[MeasureAreaLayoutNode]
@@ -77,7 +77,7 @@ class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dropTargetContainer:DropTa
     val boundsForDropTarget = dropTargetPane.sceneToLocal(fieldNodeSceneBounds)
 
     val topDropTargetElementOption = if (showTopDropTargetNode) {
-      val topDropTargetNode = new DropTargetNode(dropTargetContainer)
+      val topDropTargetNode = new DropTargetNode(dragAndDropContainer)
       val yDelta = -(topDropTargetNode.prefWidth(0) / 2)
       val topX = boundsForDropTarget.getMinX + ((fieldNodeWidth / 2) - (topDropTargetNode.prefWidth(0) / 2))
       val topY = boundsForDropTarget.getMinY + (if (moveTopDropTargetNode) yDelta else (fieldNodeHeight / 4))
@@ -89,7 +89,7 @@ class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dropTargetContainer:DropTa
     }
 
     val bottomDropTargetElementOption = if (showBottomDropTargetNode ) {
-      val bottomDropTargetNode = new DropTargetNode(dropTargetContainer)
+      val bottomDropTargetNode = new DropTargetNode(dragAndDropContainer)
       val bottomX = boundsForDropTarget.getMinX + ((fieldNodeWidth / 2) - (bottomDropTargetNode.prefWidth(0) / 2))
       val bottomY = boundsForDropTarget.getMinY + (((fieldNodeHeight / 4) * 3) - bottomDropTargetNode.prefHeight(0))
       bottomDropTargetNode.setLayoutX(bottomX)
@@ -100,7 +100,7 @@ class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dropTargetContainer:DropTa
     }
 
     val leftDropTargetElementOption = if (showLeftDropTargetNode) {
-      val leftDropTargetNode = new DropTargetNode(dropTargetContainer)
+      val leftDropTargetNode = new DropTargetNode(dragAndDropContainer)
       val xDelta = -(leftDropTargetNode.prefWidth(0) / 2)
       val leftX = boundsForDropTarget.getMinX + (if (moveLeftDropTargetNode) xDelta else (fieldNodeWidth / 4))
       val leftY = boundsForDropTarget.getMinY + ((fieldNodeHeight / 2) - (leftDropTargetNode.prefHeight(0) / 2))
@@ -112,7 +112,7 @@ class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dropTargetContainer:DropTa
     }
 
     val rightDropTargetElementOption = if (showRightDropTargetNode) {
-      val rightDropTargetNode = new DropTargetNode(dropTargetContainer)
+      val rightDropTargetNode = new DropTargetNode(dragAndDropContainer)
       val rightX = boundsForDropTarget.getMinX + (((fieldNodeWidth / 4) * 3) - rightDropTargetNode.prefWidth(0))
       val rightY = boundsForDropTarget.getMinY + ((fieldNodeHeight / 2) - (rightDropTargetNode.prefHeight(0) / 2))
       rightDropTargetNode.setLayoutX(rightX)

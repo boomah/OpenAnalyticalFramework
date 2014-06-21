@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.layout.HBox
 import com.openaf.table.lib.api.{TableData, Field}
 
-class FieldNode(val field:Field[_], val dragAndDrop:DragAndDrop, val draggableParent:DraggableParent,
+class FieldNode(val field:Field[_], val dragAndDrop:DragAndDrop, val dragAndDropContainer:DragAndDropContainer,
                 val tableData:SimpleObjectProperty[TableData]) extends HBox with Draggable {
   getStyleClass.add("field-node")
   def fields = List(field)

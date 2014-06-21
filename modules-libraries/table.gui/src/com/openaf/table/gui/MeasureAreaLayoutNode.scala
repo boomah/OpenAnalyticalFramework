@@ -7,10 +7,10 @@ import scala.collection.JavaConversions._
 import com.openaf.table.lib.api.{TableData, MeasureAreaTree, MeasureAreaLayout}
 
 class MeasureAreaLayoutNode(measureAreaLayout:MeasureAreaLayout, tableDataProperty:SimpleObjectProperty[TableData],
-                            dragAndDrop:DragAndDrop, draggableParent:DraggableParent) extends HBox {
+                            dragAndDrop:DragAndDrop, dragAndDropContainer:DragAndDropContainer) extends HBox {
   setStyle("-fx-border-color: blue;")
   private val measureAreaTreeNodes = measureAreaLayout.measureAreaTrees.map(measureAreaTree => {
-    val measureAreaTreeNode = new MeasureAreaTreeNode(measureAreaTree, tableDataProperty, dragAndDrop, draggableParent)
+    val measureAreaTreeNode = new MeasureAreaTreeNode(measureAreaTree, tableDataProperty, dragAndDrop, dragAndDropContainer)
     HBox.setHgrow(measureAreaTreeNode, Priority.ALWAYS)
     measureAreaTreeNode
   })

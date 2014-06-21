@@ -5,7 +5,7 @@ import scala.collection.JavaConversions._
 import javafx.scene.control.Label
 import com.openaf.table.lib.api.{TableData, Field}
 
-trait FlatDragAndDropNode extends DragAndDropNode {
+trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
   def withNewFields(fields:List[Field[_]], tableData:TableData):TableData
 
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo) = {

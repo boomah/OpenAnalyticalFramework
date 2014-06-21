@@ -17,10 +17,10 @@ class DragAndDrop {
   val fieldsBeingDraggedInfo = new SimpleObjectProperty[Option[DraggableFieldsInfo]](None)
   val closestDropTarget = new SimpleObjectProperty[Option[DropTarget]](None)
 
-  private val dropTargetContainers = new mutable.HashSet[DropTargetContainer]
+  private val dragAndDropContainers = new mutable.HashSet[DragAndDropContainer]
   private var removeDropTargetOption:Option[DropTarget] = None
 
-  def register(dropTargetContainer:DropTargetContainer) {dropTargetContainers += dropTargetContainer}
+  def register(dragAndDropContainer:DragAndDropContainer) {dragAndDropContainers += dragAndDropContainer}
   def setRemoveDropTarget(removeDropTarget:DropTarget) {removeDropTargetOption = Some(removeDropTarget)}
 
   closestDropTarget.addListener(new ChangeListener[Option[DropTarget]] {
@@ -40,7 +40,7 @@ class DragAndDrop {
 
   private def closestDropTarget(mouseSceneX:Double, mouseSceneY:Double) = {
     val draggableFieldsInfo = fieldsBeingDraggedInfo.get.get
-    val dropTargets = dropTargetContainers.flatMap(_.dropTargets(draggableFieldsInfo))
+    val dropTargets = dragAndDropContainers.flatMap(_.dropTargets(draggableFieldsInfo))
     dropTargets.minBy(dropTarget => {
       val sceneBounds = dropTarget.localToScene(dropTarget.getBoundsInLocal)
 
@@ -77,7 +77,7 @@ class DragAndDrop {
 
   private def shouldRemove(mouseSceneX:Double, mouseSceneY:Double) = {
     val removeDistance = -30
-    ((mouseSceneX < removeDistance) || (mouseSceneY < removeDistance))
+    (mouseSceneX < removeDistance) || (mouseSceneY < removeDistance)
   }
 
   def updateClosestDropTarget(mouseSceneX:Double, mouseSceneY:Double) {
@@ -91,7 +91,7 @@ class DragAndDrop {
 
 trait Draggable extends Region {
   def dragAndDrop:DragAndDrop
-  def draggableParent:DraggableParent
+  def dragAndDropContainer:DragAndDropContainer
   def fields:List[Field[_]]
   // When dropped here, nothing will happen. Usually just the Draggable itself, but in the case of a Draggable being
   // dragged from the AllFieldsArea, the AllFieldsArea scene bounds are used.
@@ -109,7 +109,7 @@ trait Draggable extends Region {
   setOnDragDetected(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
       if (event.getButton == MouseButton.PRIMARY) {
-        dragAndDrop.fieldsBeingDraggedInfo.set(Some(DraggableFieldsInfo(Draggable.this, draggableParent)))
+        dragAndDrop.fieldsBeingDraggedInfo.set(Some(DraggableFieldsInfo(Draggable.this, dragAndDropContainer)))
         updateClosestDropTarget(event.getSceneX, event.getSceneY)
       }
       event.consume()
@@ -128,7 +128,7 @@ trait Draggable extends Region {
       val newTableDataOption = dragAndDrop.fieldsBeingDraggedInfo.get.flatMap(draggableFieldsInfo => {
         updateClosestDropTarget(event.getSceneX, event.getSceneY)
         dragAndDrop.closestDropTarget.get.map(dropTarget => {
-          val tableDataWithFieldsRemoved = draggableFieldsInfo.draggableParent.removeFields(draggableFieldsInfo, tableData.get)
+          val tableDataWithFieldsRemoved = draggableFieldsInfo.dragAndDropContainer.removeFields(draggableFieldsInfo, tableData.get)
           dropTarget.fieldsDropped(draggableFieldsInfo, tableDataWithFieldsRemoved)
         })
       })
@@ -144,7 +144,7 @@ trait DropTarget extends Node {
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
 }
 
-trait DropTargetContainer {
+trait DragAndDropContainer {
   val dragAndDrop:DragAndDrop
   dragAndDrop.register(this)
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo):List[DropTarget]
@@ -161,15 +161,12 @@ trait DropTargetContainer {
       }
     }
   })
-}
-
-trait DraggableParent {
   def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
 }
 
-case class DraggableFieldsInfo(draggable:Draggable, draggableParent:DraggableParent)
+case class DraggableFieldsInfo(draggable:Draggable, dragAndDropContainer:DragAndDropContainer)
 
-trait DragAndDropNode extends StackPane with DropTargetContainer with DraggableParent {
+trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
   val tableDataProperty:SimpleObjectProperty[TableData]
   def descriptionID:String
   def locale:SimpleObjectProperty[Locale]

@@ -16,7 +16,7 @@ case class TreeGroup(fieldGroup:String, allChildFields:List[Field[_]])
 import AllFieldsArea._
 
 class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragAndDrop:DragAndDrop)
-  extends StackPane with DropTargetContainer with DropTarget with DraggableParent {
+  extends StackPane with DropTarget with DragAndDropContainer {
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
@@ -85,6 +85,6 @@ class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsA
     }
   }
   override def noOpSceneBounds = allFieldsArea.localToScene(allFieldsArea.getBoundsInLocal)
-  def draggableParent = allFieldsArea
+  def dragAndDropContainer = allFieldsArea
   def fields = fields0
 }

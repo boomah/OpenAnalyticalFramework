@@ -5,7 +5,7 @@ import java.util.Locale
 import com.openaf.table.lib.api.{TableData, MeasureAreaLayout}
 
 class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], val dragAndDrop:DragAndDrop,
-                        val locale:SimpleObjectProperty[Locale]) extends DragAndDropNode {
+                        val locale:SimpleObjectProperty[Locale]) extends DragAndDropContainerNode {
   getStyleClass.add("measure-fields-area")
   private val dropTargetsHelper = new MeasureFieldsAreaDropTargetsHelper(mainContent, dropTargetPane, this)
 
