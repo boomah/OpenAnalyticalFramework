@@ -4,6 +4,7 @@ import javafx.scene.layout.Region
 import com.openaf.pagemanager.api.{PageData, Page}
 import javafx.scene.Node
 import java.util.ResourceBundle
+import javafx.beans.binding.StringBinding
 
 trait PageComponent extends Region {
   type P <: Page
@@ -23,6 +24,12 @@ trait PageComponent extends Region {
     ResourceBundle.getBundle(
       resourceLocation, context.cache(BrowserCacheKey.LocaleKey).get, getClass.getClassLoader
     ).getString(id)
+  }
+  protected def stringBindingFromResource(id:String) = {
+    new StringBinding {
+      bind(context.cache(BrowserCacheKey.LocaleKey))
+      def computeValue = textFromResource(id)
+    }
   }
 
   def nameId:String

@@ -3,14 +3,16 @@ package com.openaf.table.gui
 import javafx.scene.control.{TableCell, TableColumn, TableView}
 import javafx.beans.property.{ReadOnlyObjectWrapper, Property}
 import javafx.beans.value.{ObservableValue, ChangeListener}
-import com.openaf.table.lib.api.{BlankRenderer, Renderer, TableData}
-import javafx.collections.{ObservableList, FXCollections}
+import com.openaf.table.lib.api.{FieldID, BlankRenderer, Renderer, TableData}
+import javafx.collections.{ObservableMap, ObservableList, FXCollections}
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
 import scala.collection.mutable.ListBuffer
 import scala.annotation.tailrec
+import javafx.beans.binding.StringBinding
 
-class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[ObservableList[Any]] {
+class OpenAFTableView(tableDataProperty:Property[TableData],
+                      fieldBindings:ObservableMap[FieldID,StringBinding]) extends TableView[ObservableList[Any]] {
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
       setUpTableView(newTableData)
@@ -20,7 +22,11 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
   private def setUpTableView(tableData:TableData) {
     val rowHeaderFields = tableData.tableState.tableLayout.rowHeaderFields
     val rowHeaderTableColumns = rowHeaderFields.zipWithIndex.map{case (field,index) => {
-      val tableColumn = new TableColumn[ObservableList[Any],Int](field.displayName)
+      val tableColumn = new TableColumn[ObservableList[Any],Int]
+      Option(fieldBindings.get(field.id)) match {
+        case Some(binding) => tableColumn.textProperty.bind(binding)
+        case None => tableColumn.setText(field.id.id)
+      }
       tableColumn.setCellValueFactory(new DefaultRowHeaderCellValueFactory(index))
       val values = tableData.tableValues.valueLookUp(rowHeaderFields(index).id)
       val rowHeaderField = rowHeaderFields(index)
@@ -82,6 +88,20 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
     setItems(tableItems)
   }
 
+  private def createTableColumn(value:Any) = {
+    val tableColumn = new TableColumn[ObservableList[Any],Any]
+    value match {
+      case fieldID:FieldID => {
+        Option(fieldBindings.get(fieldID)) match {
+          case Some(binding) => tableColumn.textProperty.bind(binding)
+          case None => tableColumn.setText(fieldID.id)
+        }
+      }
+      case other => tableColumn.setText(other.toString)
+    }
+    tableColumn
+  }
+
   private def createColumnHeaderTableColumns(tableData:TableData):List[TableColumn[ObservableList[Any],Any]] = {
     val columnHeaders = tableData.tableValues.columnHeaders
     val paths = tableData.tableState.tableLayout.measureAreaLayout.paths
@@ -115,10 +135,10 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
             if (value == previousValue) {
               tableColumns(0) = parentColumns.last
             } else {
-              tableColumns(0) = new TableColumn[ObservableList[Any],Any](values(value).toString)
+              tableColumns(0) = createTableColumn(values(value))
             }
           } else if (column == 0) {
-            val tableColumn = new TableColumn[ObservableList[Any],Any](values(value).toString)
+            val tableColumn = createTableColumn(values(value))
             val existingTableColumn = tableColumns(0)
             if (existingTableColumn != null) {
               existingTableColumn.getColumns.add(tableColumn)
@@ -143,7 +163,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData]) extends TableView[O
             if (previousValue == value && checkPreviousRow) {
               tableColumns(column) = tableColumns(previousColumn)
             } else {
-              val tableColumn = new TableColumn[ObservableList[Any],Any](values(value).toString)
+              val tableColumn = createTableColumn(values(value))
               val existingTableColumn = tableColumns(column)
               if (existingTableColumn != null) {
                 existingTableColumn.getColumns.add(tableColumn)

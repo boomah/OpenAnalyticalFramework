@@ -5,11 +5,13 @@ import javafx.beans.property.SimpleObjectProperty
 import com.openaf.table.lib.api._
 import javafx.embed.swing.JFXPanel
 import GUITestData._
+import javafx.collections.FXCollections
+import javafx.beans.binding.StringBinding
 
 class OpenAFTableViewTest extends FunSuite {
   javax.swing.SwingUtilities.invokeAndWait(new Runnable {def run() {new JFXPanel()}})
   val tableDataProperty = new SimpleObjectProperty[TableData]
-  val tableView = new OpenAFTableView(tableDataProperty)
+  val tableView = new OpenAFTableView(tableDataProperty, FXCollections.emptyObservableMap[FieldID,StringBinding])
 
   test("1 column") {
     val tableLayout = TableLayout.Blank.copy(measureAreaLayout = MeasureAreaLayout(GenderField))

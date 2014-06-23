@@ -4,13 +4,17 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.layout.{Priority, HBox}
 import javafx.geometry.Side
 import scala.collection.JavaConversions._
-import com.openaf.table.lib.api.{TableData, MeasureAreaTree, MeasureAreaLayout}
+import com.openaf.table.lib.api.{FieldID, TableData, MeasureAreaTree, MeasureAreaLayout}
+import javafx.collections.ObservableMap
+import javafx.beans.binding.StringBinding
 
 class MeasureAreaLayoutNode(measureAreaLayout:MeasureAreaLayout, tableDataProperty:SimpleObjectProperty[TableData],
-                            dragAndDrop:DragAndDrop, dragAndDropContainer:DragAndDropContainer) extends HBox {
+                            dragAndDrop:DragAndDrop, dragAndDropContainer:DragAndDropContainer,
+                            fieldBindings:ObservableMap[FieldID,StringBinding]) extends HBox {
   setStyle("-fx-border-color: blue;")
   private val measureAreaTreeNodes = measureAreaLayout.measureAreaTrees.map(measureAreaTree => {
-    val measureAreaTreeNode = new MeasureAreaTreeNode(measureAreaTree, tableDataProperty, dragAndDrop, dragAndDropContainer)
+    val measureAreaTreeNode = new MeasureAreaTreeNode(measureAreaTree, tableDataProperty, dragAndDrop,
+      dragAndDropContainer, fieldBindings)
     HBox.setHgrow(measureAreaTreeNode, Priority.ALWAYS)
     measureAreaTreeNode
   })

@@ -3,12 +3,23 @@ package com.openaf.table.gui
 import javafx.scene.control.Label
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.layout.HBox
-import com.openaf.table.lib.api.{TableData, Field}
+import com.openaf.table.lib.api.{FieldID, TableData, Field}
+import javafx.collections.ObservableMap
+import javafx.beans.binding.StringBinding
 
 class FieldNode(val field:Field[_], val dragAndDrop:DragAndDrop, val dragAndDropContainer:DragAndDropContainer,
-                val tableData:SimpleObjectProperty[TableData]) extends HBox with Draggable {
+                val tableData:SimpleObjectProperty[TableData], fieldBindings:ObservableMap[FieldID,StringBinding])
+  extends HBox with Draggable {
+
   getStyleClass.add("field-node")
   def fields = List(field)
-  private val nameLabel = new Label(field.displayName)
+  private val nameLabel = {
+    val label = new Label
+    Option(fieldBindings.get(field.id)) match {
+      case Some(binding) => label.textProperty.bind(binding)
+      case None => label.setText(field.id.id)
+    }
+    label
+  }
   getChildren.add(nameLabel)
 }
