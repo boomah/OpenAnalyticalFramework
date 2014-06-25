@@ -1,8 +1,3 @@
-.root{
-    /*-table-view-background-colour: transparent;*/
-    -table-view-background-colour: rgb(190,214,248);
-}
-
 .drop-target-node{
     /*-fx-background-color: #CCFF99AA;*/
     -fx-background-color: red;
@@ -12,25 +7,47 @@
     -fx-background-color: #87ceebAA;
 }
 
+.drag-and-drop-container-node{
+    -fx-background-color: rgb(190,214,248);
+    -fx-padding: 1;
+}
+.drag-and-drop-container-node .description-label{
+    -fx-padding: 3 5 3 5;
+}
+
 .filter-fields-area{
-    -fx-background-color: -table-view-background-colour;
-    -fx-padding: 1px;
+    -fx-border-width: 1 0 0 0;
+    -fx-border-color: -fx-box-border;
 }
 
 .row-header-fields-area{
-    -fx-background-color: -table-view-background-colour;
-    -fx-padding: 1px;
+    -fx-border-width: 1 1 0 0;
+    -fx-border-color: -fx-box-border;
 }
 
 .measure-fields-area{
-    -fx-background-color: -table-view-background-colour;
+    -fx-border-width: 1 0 0 0;
+    -fx-border-color: -fx-box-border;
 }
 
 .field-node{
-    -fx-background-color: lightgrey;
-    -fx-background-insets: 1px;
-    -fx-border-width: 1px;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-    -fx-border-color: black;
+    -fx-background-color:
+        #3c7fb1,
+        linear-gradient(#fafdfe, #e8f5fc),
+        linear-gradient(#eaf6fd 0%, #d9f0fc 49%, #bee6fd 50%, #a7d9f5 100%);
+    -fx-background-insets: 0,1,2;
+    -fx-background-radius: 3,2,1;
+    -fx-padding: 3 5 3 5;
+    -fx-text-fill: black;
+}
+
+.openaf-table-view{
+    /*-fx-background-color: red, green;*/
+    /*-fx-background-insets: 0, 1;*/
+}
+
+.button-bar{
+    -fx-padding: 1 1 1 1;
+    -fx-border-width: 0 1 0 0;
+    -fx-border-color: -fx-box-border;
 }

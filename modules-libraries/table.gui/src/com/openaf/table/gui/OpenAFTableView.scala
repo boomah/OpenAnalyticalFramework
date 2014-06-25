@@ -13,6 +13,7 @@ import javafx.beans.binding.StringBinding
 
 class OpenAFTableView(tableDataProperty:Property[TableData],
                       fieldBindings:ObservableMap[FieldID,StringBinding]) extends TableView[ObservableList[Any]] {
+  getStyleClass.add("openaf-table-view")
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
       setUpTableView(newTableData)

@@ -11,7 +11,6 @@ import javafx.beans.binding.StringBinding
 class MeasureAreaLayoutNode(measureAreaLayout:MeasureAreaLayout, tableDataProperty:SimpleObjectProperty[TableData],
                             dragAndDrop:DragAndDrop, dragAndDropContainer:DragAndDropContainer,
                             fieldBindings:ObservableMap[FieldID,StringBinding]) extends HBox {
-  setStyle("-fx-border-color: blue;")
   private val measureAreaTreeNodes = measureAreaLayout.measureAreaTrees.map(measureAreaTree => {
     val measureAreaTreeNode = new MeasureAreaTreeNode(measureAreaTree, tableDataProperty, dragAndDrop,
       dragAndDropContainer, fieldBindings)

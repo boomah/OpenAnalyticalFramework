@@ -10,7 +10,6 @@ import javafx.beans.binding.StringBinding
 class MeasureAreaTreeNode(val measureAreaTree:MeasureAreaTree, tableDataProperty:SimpleObjectProperty[TableData],
                           dragAndDrop:DragAndDrop, dragAndDropContainer:DragAndDropContainer,
                           fieldBindings:ObservableMap[FieldID,StringBinding]) extends VBox {
-  setStyle("-fx-border-color: green;")
   private val topNode = measureAreaTree.measureAreaTreeType match {
     case Left(field) => new FieldNode(field, dragAndDrop, dragAndDropContainer, tableDataProperty, fieldBindings)
     case Right(measureAreaLayout) => new MeasureAreaLayoutNode(measureAreaLayout, tableDataProperty, dragAndDrop,

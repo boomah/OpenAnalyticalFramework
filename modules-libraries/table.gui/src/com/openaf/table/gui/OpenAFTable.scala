@@ -12,8 +12,6 @@ object OpenAFTable {
 }
 
 class OpenAFTable extends GridPane {
-  setGridLinesVisible(true)
-
   val tableDataProperty = new SimpleObjectProperty[TableData]
   val goingToTableDataProperty = new SimpleObjectProperty[TableData]
 

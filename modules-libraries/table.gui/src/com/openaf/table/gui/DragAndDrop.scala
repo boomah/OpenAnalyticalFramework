@@ -167,6 +167,7 @@ trait DragAndDropContainer {
 case class DraggableFieldsInfo(draggable:Draggable, dragAndDropContainer:DragAndDropContainer)
 
 trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
+  getStyleClass.add("drag-and-drop-container-node")
   val tableDataProperty:SimpleObjectProperty[TableData]
   def descriptionID:String
   def locale:SimpleObjectProperty[Locale]
@@ -192,6 +193,7 @@ trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
   protected var dropTargetMap = Map.empty[DropTarget,NodeSide]
 
   private val descriptionLabel = new Label
+  descriptionLabel.getStyleClass.add("description-label")
   descriptionLabel.textProperty.bind(new TableLocaleStringBinding(descriptionID, locale))
 
   protected val mainContent = new FlowPane

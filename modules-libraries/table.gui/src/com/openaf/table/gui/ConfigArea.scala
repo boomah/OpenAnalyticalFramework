@@ -13,6 +13,7 @@ import javafx.beans.binding.StringBinding
 
 class ConfigArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:DragAndDrop,
                  locale:SimpleObjectProperty[Locale], fieldBindings:ObservableMap[FieldID,StringBinding]) extends HBox {
+  getStyleClass.add("config-area")
   private val fieldsButton = new ToggleButton
   fieldsButton.textProperty.bind(new TableLocaleStringBinding("fields", locale))
   fieldsButton.setFocusTraversable(false)
@@ -42,6 +43,7 @@ class ConfigArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:
 
 class ButtonBar(buttons:ObservableList[ToggleButton]) extends Group {
   private val bar = new HBox
+  bar.getStyleClass.add("button-bar")
   FXCollections.reverse(buttons)
   bar.getChildren.addAll(buttons)
   bar.setRotate(-90)
