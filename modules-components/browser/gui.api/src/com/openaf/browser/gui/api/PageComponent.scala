@@ -20,15 +20,15 @@ trait PageComponent extends Region {
   final protected def context = context0
 
   protected def resourceLocation = application0.resourceLocation
-  protected def textFromResource(id:String) = {
-    ResourceBundle.getBundle(
-      resourceLocation, context.cache(BrowserCacheKey.LocaleKey).get, getClass.getClassLoader
-    ).getString(id)
+  protected def textFromResource(id:String, location:String=resourceLocation,
+                                 classLoader:ClassLoader=getClass.getClassLoader) = {
+    ResourceBundle.getBundle(location, context.cache(BrowserCacheKey.LocaleKey).get, classLoader).getString(id)
   }
-  protected def stringBindingFromResource(id:String) = {
+  protected def stringBindingFromResource(id:String, location:String=resourceLocation,
+                                          classLoader:ClassLoader=getClass.getClassLoader) = {
     new StringBinding {
       bind(context.cache(BrowserCacheKey.LocaleKey))
-      def computeValue = textFromResource(id)
+      def computeValue = textFromResource(id, location, classLoader)
     }
   }
 

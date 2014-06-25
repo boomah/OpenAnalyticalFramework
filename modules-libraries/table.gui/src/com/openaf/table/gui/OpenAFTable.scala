@@ -20,8 +20,8 @@ class OpenAFTable extends GridPane {
   private val dragAndDrop = new DragAndDrop
 
   val localeProperty = new SimpleObjectProperty[Locale](Locale.getDefault)
-  val fieldBindingsProperty = FXCollections.observableHashMap[FieldID,StringBinding]
-  def unmodifiableFieldBindings = FXCollections.unmodifiableObservableMap(fieldBindingsProperty)
+  val fieldBindings = FXCollections.observableHashMap[FieldID,StringBinding]
+  val unmodifiableFieldBindings = FXCollections.unmodifiableObservableMap(fieldBindings)
 
   private val configArea = new ConfigArea(goingToTableDataProperty, dragAndDrop, localeProperty, unmodifiableFieldBindings)
   private val filterFieldsArea = new FilterFieldsArea(goingToTableDataProperty, dragAndDrop, localeProperty, unmodifiableFieldBindings)
