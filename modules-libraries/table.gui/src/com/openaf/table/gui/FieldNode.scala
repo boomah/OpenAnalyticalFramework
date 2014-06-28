@@ -6,6 +6,8 @@ import javafx.scene.layout.HBox
 import com.openaf.table.lib.api.{FieldID, TableData, Field}
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
+import javafx.scene.SnapshotParameters
+import javafx.scene.paint.Color
 
 class FieldNode(val field:Field[_], val dragAndDrop:DragAndDrop, val dragAndDropContainer:DragAndDropContainer,
                 val tableData:SimpleObjectProperty[TableData], fieldBindings:ObservableMap[FieldID,StringBinding])
@@ -22,4 +24,10 @@ class FieldNode(val field:Field[_], val dragAndDrop:DragAndDrop, val dragAndDrop
     label
   }
   getChildren.add(nameLabel)
+
+  def dragImage = {
+    val parameters = new SnapshotParameters
+    parameters.setFill(Color.TRANSPARENT)
+    snapshot(parameters, null)
+  }
 }

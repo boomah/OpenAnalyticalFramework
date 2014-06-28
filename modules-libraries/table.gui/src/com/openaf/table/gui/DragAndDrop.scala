@@ -1,7 +1,7 @@
 package com.openaf.table.gui
 
 import javafx.beans.property.SimpleObjectProperty
-import javafx.scene.Node
+import javafx.scene.{Cursor, Node}
 import javafx.event.EventHandler
 import javafx.scene.input.{MouseButton, MouseEvent}
 import collection.mutable
@@ -12,10 +12,16 @@ import javafx.geometry.Side
 import com.openaf.table.gui.binding.TableLocaleStringBinding
 import java.util.Locale
 import com.openaf.table.lib.api.{TableData, Field}
+import javafx.scene.image.{Image, ImageView}
 
 class DragAndDrop {
   val fieldsBeingDraggedInfo = new SimpleObjectProperty[Option[DraggableFieldsInfo]](None)
   val closestDropTarget = new SimpleObjectProperty[Option[DropTarget]](None)
+  val dragPane = new Pane
+  dragPane.setMouseTransparent(true)
+  private val dragImageView = new ImageView
+  dragImageView.setId("drag-image-view")
+  var dragOffset = (0.0, 0.0)
 
   private val dragAndDropContainers = new mutable.HashSet[DragAndDropContainer]
   private var removeDropTargetOption:Option[DropTarget] = None
@@ -87,6 +93,24 @@ class DragAndDrop {
     }
     closestDropTarget.set(Some(dropTarget))
   }
+
+  private def dragPanelMousePoints(event:MouseEvent) = {
+    val dragPaneMousePoint = dragPane.sceneToLocal(event.getSceneX, event.getSceneY)
+    (dragPaneMousePoint.getX, dragPaneMousePoint.getY)
+  }
+  def addDragImage(image:Image, event:MouseEvent) {
+    dragImageView.setImage(image)
+    dragImageView.setTranslateX(-dragOffset._1)
+    dragImageView.setTranslateY(-dragOffset._2)
+    val (dragPaneX, dragPaneY) = dragPanelMousePoints(event)
+    dragImageView.relocate(dragPaneX, dragPaneY)
+    dragPane.getChildren.add(dragImageView)
+  }
+  def updateDragImagePosition(event:MouseEvent) {
+    val (dragPaneX, dragPaneY) = dragPanelMousePoints(event)
+    dragImageView.relocate(dragPaneX, dragPaneY)
+  }
+  def clearDragPane() {dragPane.getChildren.clear()}
 }
 
 trait Draggable extends Region {
@@ -96,21 +120,31 @@ trait Draggable extends Region {
   // When dropped here, nothing will happen. Usually just the Draggable itself, but in the case of a Draggable being
   // dragged from the AllFieldsArea, the AllFieldsArea scene bounds are used.
   def noOpSceneBounds = localToScene(getBoundsInLocal)
-  val tableData:SimpleObjectProperty[TableData]
+  def tableData:SimpleObjectProperty[TableData]
+  def dragImage:Image
 
-  private def updateClosestDropTarget(mouseSceneX:Double, mouseSceneY:Double) {
-    if (!noOpSceneBounds.contains(mouseSceneX, mouseSceneY)) {
-      dragAndDrop.updateClosestDropTarget(mouseSceneX, mouseSceneY)
-    } else {
+  private def updateClosestDropTarget(event:MouseEvent) {
+    val (mouseSceneX, mouseSceneY) = (event.getSceneX, event.getSceneY)
+    if (noOpSceneBounds.contains(mouseSceneX, mouseSceneY)) {
       dragAndDrop.closestDropTarget.set(None)
+    } else {
+      dragAndDrop.updateClosestDropTarget(mouseSceneX, mouseSceneY)
     }
   }
+
+  setOnMousePressed(new EventHandler[MouseEvent] {
+    def handle(event:MouseEvent) {
+      if (event.getButton == MouseButton.PRIMARY) {dragAndDrop.dragOffset = (event.getX, event.getY)}
+    }
+  })
 
   setOnDragDetected(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
       if (event.getButton == MouseButton.PRIMARY) {
         dragAndDrop.fieldsBeingDraggedInfo.set(Some(DraggableFieldsInfo(Draggable.this, dragAndDropContainer)))
-        updateClosestDropTarget(event.getSceneX, event.getSceneY)
+        getScene.setCursor(Cursor.CLOSED_HAND)
+        dragAndDrop.addDragImage(dragImage, event)
+        updateClosestDropTarget(event)
       }
       event.consume()
     }
@@ -118,24 +152,29 @@ trait Draggable extends Region {
 
   setOnMouseDragged(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
-      dragAndDrop.fieldsBeingDraggedInfo.get.foreach(_ => updateClosestDropTarget(event.getSceneX, event.getSceneY))
+      dragAndDrop.fieldsBeingDraggedInfo.get.foreach(_ => {
+        dragAndDrop.updateDragImagePosition(event)
+        updateClosestDropTarget(event)
+      })      
       event.consume()
     }
   })
 
   setOnMouseReleased(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
-      val newTableDataOption = dragAndDrop.fieldsBeingDraggedInfo.get.flatMap(draggableFieldsInfo => {
-        updateClosestDropTarget(event.getSceneX, event.getSceneY)
-        dragAndDrop.closestDropTarget.get.map(dropTarget => {
+      event.consume()
+      dragAndDrop.fieldsBeingDraggedInfo.get.foreach(draggableFieldsInfo => {
+        updateClosestDropTarget(event)
+        val newTableDataOption = dragAndDrop.closestDropTarget.get.map(dropTarget => {
           val tableDataWithFieldsRemoved = draggableFieldsInfo.dragAndDropContainer.removeFields(draggableFieldsInfo, tableData.get)
           dropTarget.fieldsDropped(draggableFieldsInfo, tableDataWithFieldsRemoved)
         })
+        getScene.setCursor(Cursor.DEFAULT)
+        dragAndDrop.clearDragPane()
+        dragAndDrop.closestDropTarget.set(None)
+        dragAndDrop.fieldsBeingDraggedInfo.set(None)
+        newTableDataOption.foreach(newTableData => tableData.set(newTableData))
       })
-      dragAndDrop.closestDropTarget.set(None)
-      dragAndDrop.fieldsBeingDraggedInfo.set(None)
-      event.consume()
-      newTableDataOption.foreach(newTableData => tableData.set(newTableData))
     }
   })
 }
@@ -145,7 +184,7 @@ trait DropTarget extends Node {
 }
 
 trait DragAndDropContainer {
-  val dragAndDrop:DragAndDrop
+  def dragAndDrop:DragAndDrop
   dragAndDrop.register(this)
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo):List[DropTarget]
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
@@ -168,7 +207,7 @@ case class DraggableFieldsInfo(draggable:Draggable, dragAndDropContainer:DragAnd
 
 trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
   getStyleClass.add("drag-and-drop-container-node")
-  val tableDataProperty:SimpleObjectProperty[TableData]
+  def tableDataProperty:SimpleObjectProperty[TableData]
   def descriptionID:String
   def locale:SimpleObjectProperty[Locale]
   def fields(tableDataOption:Option[TableData]):List[Field[_]]

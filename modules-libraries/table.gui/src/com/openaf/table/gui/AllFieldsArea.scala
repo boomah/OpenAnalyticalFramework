@@ -8,6 +8,7 @@ import javafx.util.Callback
 import com.openaf.table.lib.api.{FieldID, TableData, FieldGroup, Field}
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
+import javafx.scene.SnapshotParameters
 
 object AllFieldsArea {
   type TreeItemType = Either[TreeGroup,Field[_]]
@@ -95,4 +96,5 @@ class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsA
   override def noOpSceneBounds = allFieldsArea.localToScene(allFieldsArea.getBoundsInLocal)
   def dragAndDropContainer = allFieldsArea
   def fields = fields0
+  def dragImage = snapshot(new SnapshotParameters, null)
 }

@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.scene.layout.{RowConstraints, Priority, ColumnConstraints, GridPane}
+import javafx.scene.layout._
 import javafx.beans.property.SimpleObjectProperty
 import java.util.Locale
 import com.openaf.table.lib.api.{FieldID, TableData}
@@ -11,7 +11,7 @@ object OpenAFTable {
   def styleSheets = List(getClass.getResource("/com/openaf/table/gui/resources/table.css").toExternalForm)
 }
 
-class OpenAFTable extends GridPane {
+class OpenAFTable extends StackPane {
   val tableDataProperty = new SimpleObjectProperty[TableData]
   val goingToTableDataProperty = new SimpleObjectProperty[TableData]
 
@@ -28,20 +28,23 @@ class OpenAFTable extends GridPane {
   private val tableView = new OpenAFTableView(tableDataProperty, unmodifiableFieldBindings)
 
   {
-    add(configArea, 0, 0, 1, 3)
-    add(filterFieldsArea, 1, 0, 2, 1)
-    add(rowHeaderFieldsArea, 1, 1)
-    add(measureFieldsArea, 2, 1)
-    add(tableView, 1, 2, 2, 1)
+    val mainContent = new GridPane
+    mainContent.add(configArea, 0, 0, 1, 3)
+    mainContent.add(filterFieldsArea, 1, 0, 2, 1)
+    mainContent.add(rowHeaderFieldsArea, 1, 1)
+    mainContent.add(measureFieldsArea, 2, 1)
+    mainContent.add(tableView, 1, 2, 2, 1)
 
     val blankColumnConstraints = new ColumnConstraints
     val growColumnConstraints = new ColumnConstraints
     growColumnConstraints.setHgrow(Priority.ALWAYS)
-    getColumnConstraints.addAll(blankColumnConstraints, growColumnConstraints, growColumnConstraints)
+    mainContent.getColumnConstraints.addAll(blankColumnConstraints, growColumnConstraints, growColumnConstraints)
 
     val blankRowConstraints = new RowConstraints
     val growRowConstraints = new RowConstraints
     growRowConstraints.setVgrow(Priority.ALWAYS)
-    getRowConstraints.addAll(blankRowConstraints, blankRowConstraints, growRowConstraints)
+    mainContent.getRowConstraints.addAll(blankRowConstraints, blankRowConstraints, growRowConstraints)
+
+    getChildren.addAll(mainContent, dragAndDrop.dragPane)
   }
 }

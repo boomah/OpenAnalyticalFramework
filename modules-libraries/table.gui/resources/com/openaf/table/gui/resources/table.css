@@ -41,13 +41,24 @@
     -fx-text-fill: black;
 }
 
+.field-node:hover{
+    -fx-background-color:
+        blue,
+        linear-gradient(#fafdfe, #e8f5fc),
+        linear-gradient(#eaf6fd 0%, #d9f0fc 49%, #bee6fd 50%, #a7d9f5 100%);
+}
+
+#drag-image-view{
+    -fx-opacity: 0.7;
+}
+
 .openaf-table-view{
     /*-fx-background-color: red, green;*/
     /*-fx-background-insets: 0, 1;*/
 }
 
 .button-bar{
-    -fx-padding: 1 1 1 1;
+    -fx-padding: 1;
     -fx-border-width: 0 1 0 0;
     -fx-border-color: -fx-box-border;
 }
