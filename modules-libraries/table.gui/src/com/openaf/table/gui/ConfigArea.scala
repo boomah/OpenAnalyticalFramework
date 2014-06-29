@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.scene.layout.HBox
+import javafx.scene.layout.{Priority, HBox}
 import javafx.scene.control.{Toggle, ToggleGroup, ToggleButton}
 import javafx.scene.{Node, Group}
 import javafx.collections.{ObservableMap, ObservableList, FXCollections}
@@ -14,6 +14,8 @@ import javafx.beans.binding.StringBinding
 class ConfigArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:DragAndDrop,
                  locale:SimpleObjectProperty[Locale], fieldBindings:ObservableMap[FieldID,StringBinding]) extends HBox {
   getStyleClass.add("config-area")
+  private val configAreaEmptyText = "config-area-empty"
+  setId(configAreaEmptyText)
   private val fieldsButton = new ToggleButton
   fieldsButton.textProperty.bind(new TableLocaleStringBinding("fields", locale))
   fieldsButton.setFocusTraversable(false)
@@ -34,8 +36,14 @@ class ConfigArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:
   }
   private def updateConfigArea(toggleOption:Option[Toggle]) {
     toggleOption match {
-      case Some(toggle) => updateConfigArea(fieldsToConfigComponent(toggle))
-      case None => clearConfigArea()
+      case Some(toggle) => {
+        setId(null)
+        updateConfigArea(fieldsToConfigComponent(toggle))
+      }
+      case None => {
+        setId(configAreaEmptyText)
+        clearConfigArea()
+      }
     }
   }
   getChildren.add(buttonBar)
