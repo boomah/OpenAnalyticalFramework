@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.scene.layout.{Priority, HBox}
+import javafx.scene.layout.HBox
 import javafx.scene.control.{Toggle, ToggleGroup, ToggleButton}
 import javafx.scene.{Node, Group}
 import javafx.collections.{ObservableMap, ObservableList, FXCollections}
