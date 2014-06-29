@@ -4,6 +4,7 @@ import org.scalatest.FunSuite
 
 class MeasureAreaLayoutTest extends FunSuite {
   val measureField1 = Field[Any]("measure1", Measure)
+  val measureField2 = Field[Any]("measure2", Measure)
   val dimensionField1 = Field[Any]("dimensionField1")
   val dimensionField2 = Field[Any]("dimensionField2")
   val dimensionField3 = Field[Any]("dimensionField3")
@@ -267,5 +268,46 @@ class MeasureAreaLayoutTest extends FunSuite {
 
     val layout6 = MeasureAreaLayout.fromFields(measureField1)
     assert(layout6.paths === expectedPathList)
+  }
+
+  test("remove") {
+    val layout1 = MeasureAreaLayout(measureField1)
+    val result1 = layout1.remove(measureField1)
+    assert(result1 === MeasureAreaLayout.Blank)
+
+    val layout2 = MeasureAreaLayout(measureField1, List(dimensionField1))
+    val result2 = layout2.remove(measureField1)
+    assert(result2 === MeasureAreaLayout(dimensionField1))
+
+    val result3 = layout2.remove(dimensionField1)
+    assert(result3 === MeasureAreaLayout(measureField1))
+
+    val result4 = layout2.remove(dimensionField2)
+    assert(result4 === layout2)
+
+    val layout5 = MeasureAreaLayout(measureField1, List(dimensionField1, dimensionField2))
+    val result5 = layout5.remove(measureField1)
+    assert(result5 === MeasureAreaLayout(List(dimensionField1, dimensionField2), Nil))
+
+    val result6 = layout5.remove(dimensionField1)
+    assert(result6 === MeasureAreaLayout(measureField1, List(dimensionField2)))
+
+    val result7 = layout5.remove(dimensionField2)
+    assert(result7 === MeasureAreaLayout(measureField1, List(dimensionField1)))
+
+    val layout8 = MeasureAreaLayout(List(dimensionField1, dimensionField2, measureField1), Nil)
+    val result8 = layout8.remove(dimensionField2)
+    assert(result8 === MeasureAreaLayout(List(dimensionField1, measureField1), Nil))
+  }
+
+  test("addFieldToRight") {
+    val result1 = MeasureAreaLayout.Blank.addFieldToRight(measureField1)
+    assert(result1 === MeasureAreaLayout(measureField1))
+
+    val result2 = MeasureAreaLayout(measureField1, List(dimensionField1, dimensionField2)).addFieldToRight(measureField2)
+    assert(result2 === MeasureAreaLayout(List(
+      MeasureAreaTree(List(measureField1), List(dimensionField1, dimensionField2)),
+      MeasureAreaTree(measureField2)
+    )).normalise)
   }
 }

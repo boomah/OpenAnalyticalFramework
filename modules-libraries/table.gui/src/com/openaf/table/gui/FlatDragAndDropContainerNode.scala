@@ -3,13 +3,15 @@ package com.openaf.table.gui
 import javafx.geometry.Side
 import scala.collection.JavaConversions._
 import javafx.scene.control.Label
-import com.openaf.table.lib.api.{FieldID, TableData, Field}
+import com.openaf.table.lib.api.{TableStateGenerator, FieldID, TableData, Field}
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
+import javafx.beans.property.SimpleObjectProperty
 
 trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
   def fieldBindings:ObservableMap[FieldID,StringBinding]
   def withNewFields(fields:List[Field[_]], tableData:TableData):TableData
+  def tableStateGenerator:SimpleObjectProperty[TableStateGenerator]
 
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo) = {
     val currentChildren = mainContent.getChildren
@@ -57,7 +59,7 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
     }
   }
 
-  def nodes = fields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty, fieldBindings))
+  def nodes = fields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty, fieldBindings, tableStateGenerator))
 
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     val currentFields = fields(Some(tableData))

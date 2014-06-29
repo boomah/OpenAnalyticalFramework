@@ -3,23 +3,25 @@ package com.openaf.table.gui
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.layout.{Priority, VBox}
 import javafx.geometry.Side
-import com.openaf.table.lib.api.{FieldID, TableData, MeasureAreaTree, MeasureAreaLayout}
+import com.openaf.table.lib.api._
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
 
 class MeasureAreaTreeNode(val measureAreaTree:MeasureAreaTree, tableDataProperty:SimpleObjectProperty[TableData],
                           dragAndDrop:DragAndDrop, dragAndDropContainer:DragAndDropContainer,
-                          fieldBindings:ObservableMap[FieldID,StringBinding]) extends VBox {
+                          fieldBindings:ObservableMap[FieldID,StringBinding],
+                          tableStateGeneratorProperty:SimpleObjectProperty[TableStateGenerator]) extends VBox {
   private val topNode = measureAreaTree.measureAreaTreeType match {
-    case Left(field) => new FieldNode(field, dragAndDrop, dragAndDropContainer, tableDataProperty, fieldBindings)
+    case Left(field) => new FieldNode(field, dragAndDrop, dragAndDropContainer, tableDataProperty, fieldBindings,
+      tableStateGeneratorProperty)
     case Right(measureAreaLayout) => new MeasureAreaLayoutNode(measureAreaLayout, tableDataProperty, dragAndDrop,
-      dragAndDropContainer, fieldBindings)
+      dragAndDropContainer, fieldBindings, tableStateGeneratorProperty)
   }
   VBox.setVgrow(topNode, Priority.ALWAYS)
   getChildren.add(topNode)
   if (measureAreaTree.hasChildren) {
     val childMeasureLayoutNode = new MeasureAreaLayoutNode(measureAreaTree.childMeasureAreaLayout, tableDataProperty,
-      dragAndDrop, dragAndDropContainer, fieldBindings)
+      dragAndDrop, dragAndDropContainer, fieldBindings, tableStateGeneratorProperty)
     VBox.setVgrow(childMeasureLayoutNode, Priority.ALWAYS)
     getChildren.add(childMeasureLayoutNode)
   }

@@ -12,6 +12,13 @@ case class TableLayout(rowHeaderFields:List[Field[_]], measureAreaLayout:Measure
     copy(measureAreaLayout = newMeasureAreaLayout.normalise)
   }
   def withFilterFields(newFilterFields:List[Field[_]]) = copy(filterFields = newFilterFields)
+  def remove(fields:Field[_]*) = {
+    copy(
+      rowHeaderFields = rowHeaderFields.filterNot(fields.contains),
+      measureAreaLayout = measureAreaLayout.remove(fields:_*),
+      filterFields = filterFields.filterNot(fields.contains)
+    )
+  }
 }
 
 object TableLayout {

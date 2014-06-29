@@ -2,13 +2,16 @@ package com.openaf.table.gui
 
 import javafx.beans.property.SimpleObjectProperty
 import java.util.Locale
-import com.openaf.table.lib.api.{FieldID, TableData, MeasureAreaLayout}
+import com.openaf.table.lib.api.{TableStateGenerator, FieldID, TableData, MeasureAreaLayout}
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
 
 class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], val dragAndDrop:DragAndDrop,
                         val locale:SimpleObjectProperty[Locale],
-                        fieldBindings:ObservableMap[FieldID,StringBinding]) extends DragAndDropContainerNode {
+                        fieldBindings:ObservableMap[FieldID,StringBinding],
+                        tableStateGeneratorProperty:SimpleObjectProperty[TableStateGenerator])
+  extends DragAndDropContainerNode {
+
   getStyleClass.add("measure-fields-area")
   private val dropTargetsHelper = new MeasureFieldsAreaDropTargetsHelper(mainContent, dropTargetPane, this)
 
@@ -18,7 +21,8 @@ class MeasureFieldsArea(val tableDataProperty:SimpleObjectProperty[TableData], v
   }
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo) = dropTargetsHelper.dropTargetsToNodeSide(draggableFieldsInfo)
   def fields(tableDataOption:Option[TableData]) = measureAreaLayout(tableDataOption).allFields
-  def nodes = List(new MeasureAreaLayoutNode(measureAreaLayout, tableDataProperty, dragAndDrop, this, fieldBindings))
+  def nodes = List(new MeasureAreaLayoutNode(measureAreaLayout, tableDataProperty, dragAndDrop, this, fieldBindings,
+    tableStateGeneratorProperty))
   private def measureAreaLayout(tableDataOption:Option[TableData]) = {
     tableDataOption.getOrElse(tableDataProperty.get).tableState.tableLayout.measureAreaLayout
   }

@@ -46,6 +46,16 @@ case class MeasureAreaTree(measureAreaTreeType:MeasureAreaTreeType, childMeasure
       }
     }
   }
+
+  def remove(fields:Field[_]*) = {
+    val newMeasureAreaTreeType = measureAreaTreeType match {
+      case Left(field) if fields.contains(field) => Right(MeasureAreaLayout.Blank)
+      case field@Left(_) => field
+      case Right(measureAreaLayout) => Right(measureAreaLayout.remove(fields:_*))
+    }
+    val newChildMeasureAreaLayout = childMeasureAreaLayout.remove(fields:_*)
+    copy(measureAreaTreeType = newMeasureAreaTreeType, childMeasureAreaLayout = newChildMeasureAreaLayout)
+  }
 }
 
 object MeasureAreaTree {

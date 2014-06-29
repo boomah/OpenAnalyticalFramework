@@ -5,7 +5,7 @@ import javafx.scene.control.{TreeCell, TreeItem, TreeView}
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.util.Callback
-import com.openaf.table.lib.api.{FieldID, TableData, FieldGroup, Field}
+import com.openaf.table.lib.api._
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
 import javafx.scene.SnapshotParameters
@@ -19,7 +19,9 @@ case class TreeGroup(fieldGroup:String, allChildFields:List[Field[_]])
 import AllFieldsArea._
 
 class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragAndDrop:DragAndDrop,
-                    fieldBindings:ObservableMap[FieldID,StringBinding]) extends StackPane with DropTarget with DragAndDropContainer {
+                    fieldBindings:ObservableMap[FieldID,StringBinding],
+                    tableStateGeneratorProperty:SimpleObjectProperty[TableStateGenerator])
+  extends StackPane with DropTarget with DragAndDropContainer {
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
@@ -32,7 +34,7 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragA
   treeView.setShowRoot(false)
   treeView.setCellFactory(new Callback[TreeView[TreeItemType],TreeCell[TreeItemType]] {
     def call(treeView:TreeView[TreeItemType]) = new TreeItemTypeTreeCell(dragAndDrop, AllFieldsArea.this,
-      tableDataProperty, fieldBindings)
+      tableDataProperty, fieldBindings, tableStateGeneratorProperty)
   })
 
   private def updateTreeItem(treeItem:TreeItem[TreeItemType], fieldGroup:FieldGroup) {
@@ -69,7 +71,10 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragA
 
 class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsArea,
                            val tableData:SimpleObjectProperty[TableData],
-                           fieldBindings:ObservableMap[FieldID,StringBinding]) extends TreeCell[TreeItemType] with Draggable {
+                           fieldBindings:ObservableMap[FieldID,StringBinding],
+                           val tableStateGenerator:SimpleObjectProperty[TableStateGenerator])
+  extends TreeCell[TreeItemType] with Draggable {
+
   private var fields0:List[Field[_]] = Nil
   override def updateItem(treeItemType:TreeItemType, empty:Boolean) {
     super.updateItem(treeItemType, empty)

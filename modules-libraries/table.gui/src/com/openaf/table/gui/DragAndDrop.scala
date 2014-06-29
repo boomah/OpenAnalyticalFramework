@@ -11,7 +11,7 @@ import javafx.scene.control.Label
 import javafx.geometry.Side
 import com.openaf.table.gui.binding.TableLocaleStringBinding
 import java.util.Locale
-import com.openaf.table.lib.api.{TableData, Field}
+import com.openaf.table.lib.api.{TableStateGenerator, TableData, Field}
 import javafx.scene.image.{Image, ImageView}
 
 class DragAndDrop {
@@ -122,6 +122,7 @@ trait Draggable extends Region {
   def noOpSceneBounds = localToScene(getBoundsInLocal)
   def tableData:SimpleObjectProperty[TableData]
   def dragImage:Image
+  def tableStateGenerator:SimpleObjectProperty[TableStateGenerator]
 
   private def updateClosestDropTarget(event:MouseEvent) {
     val (mouseSceneX, mouseSceneY) = (event.getSceneX, event.getSceneY)
@@ -175,6 +176,15 @@ trait Draggable extends Region {
         dragAndDrop.fieldsBeingDraggedInfo.set(None)
         newTableDataOption.foreach(newTableData => tableData.set(newTableData))
       })
+    }
+  })
+
+  setOnMouseClicked(new EventHandler[MouseEvent] {
+    def handle(event:MouseEvent) {
+      if (event.getButton == MouseButton.PRIMARY && event.getClickCount == 2) {
+        val tableState = tableStateGenerator.get.tableStateFromDoubleClick(fields, tableData.get)
+        tableData.set(tableData.get.withTableState(tableState))
+      }
     }
   })
 }
