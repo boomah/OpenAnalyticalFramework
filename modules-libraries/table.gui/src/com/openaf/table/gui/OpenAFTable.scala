@@ -6,6 +6,8 @@ import java.util.Locale
 import com.openaf.table.lib.api.{DefaultTableStateGenerator, TableStateGenerator, FieldID, TableData}
 import javafx.collections.FXCollections
 import javafx.beans.binding.StringBinding
+import javafx.event.EventHandler
+import javafx.scene.input.{KeyCombination, KeyCodeCombination, KeyCode, KeyEvent}
 
 object OpenAFTable {
   def styleSheets = List(getClass.getResource("/com/openaf/table/gui/resources/table.css").toExternalForm)
@@ -52,4 +54,20 @@ class OpenAFTable extends StackPane {
 
     getChildren.addAll(mainContent, dragAndDrop.dragPane)
   }
+
+  addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler[KeyEvent] {
+    val isMac = System.getProperty("os.name").toLowerCase.startsWith("mac")
+    import KeyCode._
+    val escapeKeyCombination = new KeyCodeCombination(ESCAPE)
+    val mac1KeyCombination = KeyCombination.keyCombination("Shortcut+1")
+    val gen1KeyCombination = KeyCombination.keyCombination("Alt+1")
+
+    def handle(e:KeyEvent) {
+      if (isMac && mac1KeyCombination.`match`(e) || !isMac && gen1KeyCombination.`match`(e)) {
+        configArea.toggleSelected(1)
+      } else if (escapeKeyCombination.`match`(e) && configArea.isConfigAreaNodeFocused) {
+        tableView.requestFocus()
+      }
+    }
+  })
 }

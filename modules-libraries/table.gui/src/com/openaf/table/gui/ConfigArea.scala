@@ -18,10 +18,10 @@ class ConfigArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:
   private val configAreaEmptyText = "config-area-empty"
   setId(configAreaEmptyText)
   private val fieldsButton = new ToggleButton
-  fieldsButton.textProperty.bind(new TableLocaleStringBinding("fields", locale))
+  fieldsButton.textProperty.bind(new TableLocaleStringBinding("fields", locale, Some("1:")))
   fieldsButton.setFocusTraversable(false)
 
-  private val fieldsToConfigComponent = Map[Toggle,Node](
+  private val fieldsToConfigAreaNode = Map[Toggle,ConfigAreaNode](
     fieldsButton -> new AllFieldsArea(tableDataProperty, dragAndDrop, fieldBindings, tableStateGeneratorProperty)
   )
 
@@ -33,15 +33,16 @@ class ConfigArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:
     def changed(observableValue:ObservableValue[_<:Toggle], oldToggle:Toggle, newToggle:Toggle) {updateConfigArea(Option(newToggle))}
   })
   private def clearConfigArea() {getChildren.retainAll(buttonBar)}
-  private def updateConfigArea(node:Node) {
+  private def updateConfigArea(node:ConfigAreaNode) {
     clearConfigArea()
     getChildren.add(1, node)
+    node.setDefaultFocus()
   }
   private def updateConfigArea(toggleOption:Option[Toggle]) {
     toggleOption match {
       case Some(toggle) => {
         setId(null)
-        updateConfigArea(fieldsToConfigComponent(toggle))
+        updateConfigArea(fieldsToConfigAreaNode(toggle))
       }
       case None => {
         setId(configAreaEmptyText)
@@ -50,6 +51,30 @@ class ConfigArea(tableDataProperty:SimpleObjectProperty[TableData], dragAndDrop:
     }
   }
   getChildren.add(buttonBar)
+
+  def toggleSelected(index:Int) {
+    if (index > 0 && index <= toggleGroup.getToggles.size) {
+      val specifiedToggle = toggleGroup.getToggles.get(index - 1)
+      val selectedToggle = toggleGroup.getSelectedToggle
+      if (specifiedToggle == selectedToggle) {
+        val configAreaNode = fieldsToConfigAreaNode(selectedToggle)
+        if (configAreaNode.isConfigAreaNodeFocused) {
+          toggleGroup.selectToggle(null)
+        } else {
+          configAreaNode.setDefaultFocus()
+        }
+      } else {
+        toggleGroup.selectToggle(specifiedToggle)
+      }
+    }
+  }
+
+  def isConfigAreaNodeFocused = {
+    Option(toggleGroup.getSelectedToggle) match {
+      case Some(toggle) => fieldsToConfigAreaNode(toggle).isConfigAreaNodeFocused
+      case None => false
+    }
+  }
 }
 
 class ButtonBar(buttons:ObservableList[ToggleButton]) extends Group {

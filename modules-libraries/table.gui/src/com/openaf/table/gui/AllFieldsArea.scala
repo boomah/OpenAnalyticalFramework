@@ -21,7 +21,7 @@ import AllFieldsArea._
 class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragAndDrop:DragAndDrop,
                     fieldBindings:ObservableMap[FieldID,StringBinding],
                     tableStateGeneratorProperty:SimpleObjectProperty[TableStateGenerator])
-  extends StackPane with DropTarget with DragAndDropContainer {
+  extends StackPane with DropTarget with DragAndDropContainer with ConfigAreaNode {
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
@@ -65,6 +65,8 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragA
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
   def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
+  def setDefaultFocus() = {treeView.requestFocus()}
+  def isConfigAreaNodeFocused = treeView.isFocused
 
   dragAndDrop.setRemoveDropTarget(this)
 }
