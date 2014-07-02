@@ -25,7 +25,9 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragA
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
-      updateTreeView(newTableData)
+      if (Option(oldTableData).map(_.fieldGroup) != Option(newTableData).map(_.fieldGroup)) {
+        updateTreeView(newTableData.fieldGroup)
+      }
     }
   })
 
@@ -52,9 +54,9 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragA
     })
   }
 
-  private def updateTreeView(tableData:TableData) {
+  private def updateTreeView(fieldGroup:FieldGroup) {
     root.getChildren.clear()
-    updateTreeItem(root, tableData.fieldGroup)
+    updateTreeItem(root, fieldGroup)
   }
 
   getChildren.addAll(treeView)
