@@ -104,4 +104,5 @@ class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsA
   def dragAndDropContainer = allFieldsArea
   def fields = fields0
   def dragImage = snapshot(new SnapshotParameters, null)
+  override def isParent = getTreeItem.getValue.isLeft
 }

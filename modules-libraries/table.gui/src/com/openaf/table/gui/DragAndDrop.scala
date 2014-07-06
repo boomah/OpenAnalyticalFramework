@@ -122,6 +122,7 @@ trait Draggable extends Region {
   def noOpSceneBounds = localToScene(getBoundsInLocal)
   def tableData:SimpleObjectProperty[TableData]
   def dragImage:Image
+  def isParent = false
 
   private def updateClosestDropTarget(event:MouseEvent) {
     val (mouseSceneX, mouseSceneY) = (event.getSceneX, event.getSceneY)
@@ -180,11 +181,28 @@ trait Draggable extends Region {
 
   setOnMouseClicked(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
-      if (event.getButton == MouseButton.PRIMARY && event.getClickCount == 2 && fields.size == 1) {
-        println("Do something here")
-      }
+      if (event.getButton == MouseButton.PRIMARY && event.getClickCount == 2 && !isParent) {moveField()}
     }
   })
+
+  private def moveField() {
+    val currentTableData = tableData.get
+    val draggableFieldsInfo = DraggableFieldsInfo(Draggable.this, dragAndDropContainer)
+    val tableDataWithRemoved = dragAndDropContainer.removeFields(draggableFieldsInfo, currentTableData)
+    val tableDataToUse = if (tableDataWithRemoved == currentTableData) {
+      val field = fields.head
+      if (field.fieldType.isDimension) {
+        val newRowHeaderFields = currentTableData.tableState.tableLayout.rowHeaderFields :+ field
+        currentTableData.withRowHeaderFields(newRowHeaderFields)
+      } else {
+        val newMeasureAreaLayout = currentTableData.tableState.tableLayout.measureAreaLayout.addFieldToRight(field)
+        currentTableData.withMeasureAreaLayout(newMeasureAreaLayout)
+      }
+    } else {
+      tableDataWithRemoved
+    }
+    tableData.set(tableDataToUse)
+  }
 }
 
 trait DropTarget extends Node {
