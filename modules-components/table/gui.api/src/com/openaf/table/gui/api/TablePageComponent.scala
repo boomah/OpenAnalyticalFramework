@@ -6,6 +6,8 @@ import javafx.beans.value.{ObservableValue, ChangeListener}
 import com.openaf.table.lib.api.{StandardFields, FieldID, TableData}
 import com.openaf.table.api.{TablePage, TablePageData}
 import javafx.beans.binding.StringBinding
+import javafx.event.EventHandler
+import javafx.scene.input.MouseEvent
 
 trait TablePageComponent extends OpenAFTable with PageComponent {
   type PD <: TablePageData
@@ -46,4 +48,6 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
       if (!doingSetup) {context.goToPage(page.withTableData(newValue))}
     }
   })
+
+  setOnMousePressed(new EventHandler[MouseEvent] {def handle(event:MouseEvent) {event.consume()}})
 }
