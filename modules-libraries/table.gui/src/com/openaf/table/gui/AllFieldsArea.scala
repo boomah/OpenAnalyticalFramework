@@ -19,8 +19,7 @@ case class TreeGroup(fieldGroup:String, allChildFields:List[Field[_]])
 import AllFieldsArea._
 
 class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragAndDrop:DragAndDrop,
-                    fieldBindings:ObservableMap[FieldID,StringBinding],
-                    tableStateGeneratorProperty:SimpleObjectProperty[TableStateGenerator])
+                    fieldBindings:ObservableMap[FieldID,StringBinding])
   extends StackPane with DropTarget with DragAndDropContainer with ConfigAreaNode {
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
@@ -36,7 +35,7 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragA
   treeView.setShowRoot(false)
   treeView.setCellFactory(new Callback[TreeView[TreeItemType],TreeCell[TreeItemType]] {
     def call(treeView:TreeView[TreeItemType]) = new TreeItemTypeTreeCell(dragAndDrop, AllFieldsArea.this,
-      tableDataProperty, fieldBindings, tableStateGeneratorProperty)
+      tableDataProperty, fieldBindings)
   })
 
   private def updateTreeItem(treeItem:TreeItem[TreeItemType], fieldGroup:FieldGroup) {
@@ -75,8 +74,7 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragA
 
 class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsArea,
                            val tableData:SimpleObjectProperty[TableData],
-                           fieldBindings:ObservableMap[FieldID,StringBinding],
-                           val tableStateGenerator:SimpleObjectProperty[TableStateGenerator])
+                           fieldBindings:ObservableMap[FieldID,StringBinding])
   extends TreeCell[TreeItemType] with Draggable {
 
   private var fields0:List[Field[_]] = Nil

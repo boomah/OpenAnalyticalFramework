@@ -9,19 +9,17 @@ import javafx.beans.binding.StringBinding
 
 class MeasureAreaTreeNode(val measureAreaTree:MeasureAreaTree, tableDataProperty:SimpleObjectProperty[TableData],
                           dragAndDrop:DragAndDrop, dragAndDropContainer:DragAndDropContainer,
-                          fieldBindings:ObservableMap[FieldID,StringBinding],
-                          tableStateGeneratorProperty:SimpleObjectProperty[TableStateGenerator]) extends VBox {
+                          fieldBindings:ObservableMap[FieldID,StringBinding]) extends VBox {
   private val topNode = measureAreaTree.measureAreaTreeType match {
-    case Left(field) => new FieldNode(field, dragAndDrop, dragAndDropContainer, tableDataProperty, fieldBindings,
-      tableStateGeneratorProperty)
+    case Left(field) => new FieldNode(field, dragAndDrop, dragAndDropContainer, tableDataProperty, fieldBindings)
     case Right(measureAreaLayout) => new MeasureAreaLayoutNode(measureAreaLayout, tableDataProperty, dragAndDrop,
-      dragAndDropContainer, fieldBindings, tableStateGeneratorProperty)
+      dragAndDropContainer, fieldBindings)
   }
   VBox.setVgrow(topNode, Priority.ALWAYS)
   getChildren.add(topNode)
   if (measureAreaTree.hasChildren) {
     val childMeasureLayoutNode = new MeasureAreaLayoutNode(measureAreaTree.childMeasureAreaLayout, tableDataProperty,
-      dragAndDrop, dragAndDropContainer, fieldBindings, tableStateGeneratorProperty)
+      dragAndDrop, dragAndDropContainer, fieldBindings)
     VBox.setVgrow(childMeasureLayoutNode, Priority.ALWAYS)
     getChildren.add(childMeasureLayoutNode)
   }

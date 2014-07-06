@@ -3,7 +3,7 @@ package com.openaf.table.gui
 import javafx.scene.layout._
 import javafx.beans.property.SimpleObjectProperty
 import java.util.Locale
-import com.openaf.table.lib.api.{DefaultTableStateGenerator, TableStateGenerator, FieldID, TableData}
+import com.openaf.table.lib.api.{FieldID, TableData}
 import javafx.collections.FXCollections
 import javafx.beans.binding.StringBinding
 import javafx.event.EventHandler
@@ -16,7 +16,6 @@ object OpenAFTable {
 class OpenAFTable extends StackPane {
   val tableDataProperty = new SimpleObjectProperty[TableData]
   val goingToTableDataProperty = new SimpleObjectProperty[TableData]
-  val tableStateGeneratorProperty = new SimpleObjectProperty[TableStateGenerator](new DefaultTableStateGenerator)
 
   private val dragAndDrop = new DragAndDrop
 
@@ -25,13 +24,13 @@ class OpenAFTable extends StackPane {
   val unmodifiableFieldBindings = FXCollections.unmodifiableObservableMap(fieldBindings)
 
   private val configArea = new ConfigArea(goingToTableDataProperty, dragAndDrop, localeProperty,
-    unmodifiableFieldBindings, tableStateGeneratorProperty)
+    unmodifiableFieldBindings)
   private val filterFieldsArea = new FilterFieldsArea(goingToTableDataProperty, dragAndDrop, localeProperty,
-    unmodifiableFieldBindings, tableStateGeneratorProperty)
+    unmodifiableFieldBindings)
   private val rowHeaderFieldsArea = new RowHeaderFieldsArea(goingToTableDataProperty, dragAndDrop, localeProperty,
-    unmodifiableFieldBindings, tableStateGeneratorProperty)
+    unmodifiableFieldBindings)
   private val measureFieldsArea = new MeasureFieldsArea(goingToTableDataProperty, dragAndDrop, localeProperty,
-    unmodifiableFieldBindings, tableStateGeneratorProperty)
+    unmodifiableFieldBindings)
   private val tableView = new OpenAFTableView(tableDataProperty, unmodifiableFieldBindings)
 
   {
