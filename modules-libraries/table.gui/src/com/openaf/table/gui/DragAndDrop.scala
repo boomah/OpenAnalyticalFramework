@@ -236,10 +236,6 @@ trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
   def tableDataProperty:SimpleObjectProperty[TableData]
   def descriptionID:String
   def locale:SimpleObjectProperty[Locale]
-  def fields(tableDataOption:Option[TableData]):List[Field[_]]
-  protected def fields:List[Field[_]] = fields(None)
-  protected def hasFields = fields.nonEmpty
-  def nodes:List[Node]
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = dropTargetMap.keySet.toList
   def removeDropTargets() {
     dropTargetPane.getChildren.clear()
@@ -250,9 +246,12 @@ trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
     dropTargetMap = dropTargetsToNodeSide(draggableFieldsInfo)
     dropTargetPane.getChildren.addAll(dropTargetMap.keySet.toArray :_*)
   }
+  def setup(oldTableDataOption:Option[TableData], newTableData:TableData)
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
-    def changed(observable:ObservableValue[_<:TableData], oldValue:TableData, newValue:TableData) {setup()}
+    def changed(observable:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
+      setup(Option(oldTableData), newTableData)
+    }
   })
 
   protected var dropTargetMap = Map.empty[DropTarget,NodeSide]
@@ -266,10 +265,9 @@ trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
   dropTargetPane.setMouseTransparent(true)
   getChildren.addAll(mainContent, dropTargetPane)
 
-  def setup() {
+  protected def setupForEmpty() {
     mainContent.getChildren.clear()
-    val nodesToAdd = if (fields.isEmpty) Array(descriptionLabel) else nodes.toArray
-    mainContent.getChildren.addAll(nodesToAdd :_*)
+    mainContent.getChildren.add(descriptionLabel)
   }
 }
 

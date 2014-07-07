@@ -9,12 +9,12 @@ class OSGIAwareObjectInputStream(inputStream:InputStream, topLevelClassLoader:Cl
 
   override def resolveClass(desc:ObjectStreamClass):Class[_] = {
     var classAndClassLoader:Option[ClassAndClassLoader] = None
-    for (classLoader <- classLoaders if (classAndClassLoader == None)) {
+    for (classLoader <- classLoaders if classAndClassLoader == None) {
       try {
         val klass = classLoader.loadClass(desc.getName)
         classAndClassLoader = Some(ClassAndClassLoader(klass, klass.getClassLoader))
       } catch {
-        case e:Exception => println("Can't find " + (desc.getName, classLoader))
+        case e:Exception => //println("Can't find " + (desc.getName, classLoader))
       }
     }
     classAndClassLoader match {

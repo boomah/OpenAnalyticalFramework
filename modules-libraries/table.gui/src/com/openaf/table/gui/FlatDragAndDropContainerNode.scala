@@ -10,6 +10,8 @@ import javafx.beans.binding.StringBinding
 trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
   def fieldBindings:ObservableMap[FieldID,StringBinding]
   def withNewFields(fields:List[Field[_]], tableData:TableData):TableData
+  def fields(tableDataOption:Option[TableData]):List[Field[_]]
+  protected def fields:List[Field[_]] = fields(None)
 
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo) = {
     val currentChildren = mainContent.getChildren
@@ -57,8 +59,6 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
     }
   }
 
-  def nodes = fields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty, fieldBindings))
-
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     val currentFields = fields(Some(tableData))
     val nodeSide = dropTargetMap(dropTarget)
@@ -92,7 +92,26 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
     withNewFields(updatedFields, tableData)
   }
 
-  def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
-    withNewFields(draggableFieldsInfo.draggable.fields, tableData)
+  private def fullSetup(fields:List[Field[_]]) {
+    val nodes = fields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty, fieldBindings))
+    mainContent.getChildren.clear()
+    mainContent.getChildren.addAll(nodes.toArray:_*)
+  }
+
+  def setup(oldTableDataOption:Option[TableData], newTableData:TableData) {
+    val newFields = fields(Some(newTableData))
+    if (newFields.isEmpty) {
+      setupForEmpty()
+    } else {
+      oldTableDataOption match {
+        case None => fullSetup(newFields)
+        case oldTableDataSome@Some(oldTableData) => {
+          val oldFields = fields(oldTableDataSome)
+          if (oldFields != newFields) {
+            fullSetup(newFields)
+          }
+        }
+      }
+    }
   }
 }
