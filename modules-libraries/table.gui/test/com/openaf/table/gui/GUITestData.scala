@@ -14,13 +14,28 @@ object GUITestData {
 
   val FieldGroupData = FieldGroup("Fields", Fields.map(Right(_)))
 
-  val GenderValuesLookUp:Map[FieldID,Array[Any]] = Map(GenderField.id -> Array("Gender", "F", "M"))
+  val F = "F"
+  val M = "M"
+
+  val Edinburgh = "Edinburgh"
+  val London = "London"
+  val Manchester = "Manchester"
+
+  val Friends = "Friends"
+
+  val Gender = "Gender"
+  val Location = "Location"
+  val Age = "Age"
+  val Score = "Score"
+  val Group = "Group"
+
+  val GenderValuesLookUp:Map[FieldID,Array[Any]] = Map(GenderField.id -> Array(Gender, F, M))
   val LocationValuesLookUp:Map[FieldID,Array[Any]] = Map(
-    LocationField.id -> Array("Gender", "Edinburgh", "London", "Manchester")
+    LocationField.id -> Array(Location, Edinburgh, London, Manchester)
   )
-  val AgeValuesLookUp:Map[FieldID,Array[Any]] = Map(AgeField.id -> Array("Age"))
-  val ScoreValuesLookUp:Map[FieldID,Array[Any]] = Map(ScoreField.id -> Array("Score"))
-  val GroupValuesLookUp:Map[FieldID,Array[Any]] = Map(GroupField.id -> Array("Group", "Friends"))
+  val AgeValuesLookUp:Map[FieldID,Array[Any]] = Map(AgeField.id -> Array(Age))
+  val ScoreValuesLookUp:Map[FieldID,Array[Any]] = Map(ScoreField.id -> Array(Score))
+  val GroupValuesLookUp:Map[FieldID,Array[Any]] = Map(GroupField.id -> Array(Group, Friends))
 
   val DefaultRenderers:Map[Field[_],Renderer[_]] = Map(
     GenderField -> StringRenderer,

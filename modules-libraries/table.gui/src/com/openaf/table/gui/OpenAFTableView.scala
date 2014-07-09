@@ -105,7 +105,9 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
 
   private def createColumnHeaderTableColumns(tableData:TableData):List[TableColumn[ObservableList[Any],Any]] = {
     val columnHeaders = tableData.tableValues.columnHeaders
-    val paths = tableData.tableState.tableLayout.measureAreaLayout.paths
+    val measureAreaLayout = tableData.tableState.tableLayout.measureAreaLayout
+    val paths = measureAreaLayout.paths
+    val measureAreaLayoutPathBreaks = measureAreaLayout.measureAreaLayoutPathBreaks
     val valueLookUp = tableData.tableValues.valueLookUp
     val numberOfPaths = columnHeaders.length
     val parentColumns = new ListBuffer[TableColumn[ObservableList[Any],Any]]
@@ -131,12 +133,18 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
           val value = pathColumnHeaders(column)(row)
 
           if (row == 0 && column == 0 && pathIndex > 0 && field == paths(pathIndex - 1).fields(0)) {
+            // If it is the first row and column in this path but not the very first path then we might be able to use
+            // the previous parent column as the fields are the same
             val previousPathColumnHeaders = columnHeaders(pathIndex - 1)
             val previousValue = previousPathColumnHeaders(previousPathColumnHeaders.length - 1)(0)
-            if (value == previousValue) {
+            if (value == previousValue && !measureAreaLayoutPathBreaks.contains(pathIndex)) {
+              // The values for the same field are the same and we are not at a measure area layout path boundary so
+              // use the previous column
               tableColumns(0) = parentColumns.last
             } else {
+              // Either the values are different or we are at a path boundary. Either way we need a new column
               tableColumns(0) = createTableColumn(values(value))
+              parentColumns += tableColumns(0)
             }
           } else if (column == 0) {
             val tableColumn = createTableColumn(values(value))

@@ -3,6 +3,7 @@ package com.openaf.table.lib.api
 case class MeasureAreaLayout(measureAreaTrees:List[MeasureAreaTree]) {
   def allFields = measureAreaTrees.flatMap(_.allFields)
   def paths:List[MeasureAreaLayoutPath] = measureAreaTrees.flatMap(_.paths)
+  def measureAreaLayoutPathBreaks = measureAreaTrees.map(_.paths.size).scanLeft(0)(_ + _).tail.toSet
   def remove(fields:Field[_]*):MeasureAreaLayout = {
     copy(measureAreaTrees = measureAreaTrees.map(_.remove(fields:_*))).normalise
   }
