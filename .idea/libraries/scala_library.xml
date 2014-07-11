@@ -2,11 +2,8 @@
   <library name="scala-library">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/common-bundles/scala-library.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/scala-reflect.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$PROJECT_DIR$/common-bundles/src/scala-library-src.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

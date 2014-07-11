@@ -5,19 +5,19 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library" exported="" scope="TEST">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/scalatest_2.10-1.9.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/scalatest_2.11-2.2.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library" exported="" scope="TEST">
+    <orderEntry type="module-library" exported="" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/scala-actors.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/scala-xml_2.11-1.0.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
