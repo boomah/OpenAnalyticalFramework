@@ -21,27 +21,27 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
   })
 
   private def setUpTableView(oldTableDataOption:Option[TableData], newTableData:TableData) {
-    if (newTableData.rowHeaderFields.isEmpty && newTableData.measureAreaLayout.isEmpty) {
+    if (newTableData.rowHeaderFields.isEmpty && newTableData.columnHeaderLayout.isEmpty) {
       getColumns.clear()
       setItems(null)
     } else {
       oldTableDataOption match {
         case None => fullSetup(newTableData)
-        case Some(oldTableData) if oldTableData.rowHeaderFields.isEmpty && oldTableData.measureAreaLayout.isEmpty => {
+        case Some(oldTableData) if oldTableData.rowHeaderFields.isEmpty && oldTableData.columnHeaderLayout.isEmpty => {
           fullSetup(newTableData)
         }
         case Some(oldTableData) => {
           if (oldTableData.rowHeaderFields == newTableData.rowHeaderFields &&
-            oldTableData.measureAreaLayout == newTableData.measureAreaLayout) {
+            oldTableData.columnHeaderLayout == newTableData.columnHeaderLayout) {
             // Nothing has changed, just populate the data in the table
             populateTable(newTableData)
           } else if (oldTableData.rowHeaderFields == newTableData.rowHeaderFields) {
-            // Just the measure area layout has changed
+            // Just the column header layout has changed
             val columnHeaderColumns = createColumnHeaderTableColumns(newTableData)
             getColumns.remove(newTableData.rowHeaderFields.size, getColumns.size)
             getColumns.addAll(columnHeaderColumns :_*)
             populateTable(newTableData)
-          } else if (oldTableData.measureAreaLayout == newTableData.measureAreaLayout) {
+          } else if (oldTableData.columnHeaderLayout == newTableData.columnHeaderLayout) {
             // Just the rows have changed
             val rowHeaderColumns = createRowHeaderTableColumns(newTableData)
             getColumns.remove(0, oldTableData.rowHeaderFields.size)
@@ -146,9 +146,9 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
   
   private def createColumnHeaderTableColumns(tableData:TableData):List[TableColumn[ObservableList[Any],Any]] = {
     val columnHeaders = tableData.tableValues.columnHeaders
-    val measureAreaLayout = tableData.tableState.tableLayout.measureAreaLayout
-    val paths = measureAreaLayout.paths
-    val measureAreaLayoutPathBreaks = measureAreaLayout.measureAreaLayoutPathBreaks
+    val columnHeaderLayout = tableData.tableState.tableLayout.columnHeaderLayout
+    val paths = columnHeaderLayout.paths
+    val columnHeaderLayoutPathBreaks = columnHeaderLayout.columnHeaderLayoutPathBreaks
     val valueLookUp = tableData.tableValues.valueLookUp
     val numberOfPaths = columnHeaders.length
     val parentColumns = new ListBuffer[TableColumn[ObservableList[Any],Any]]
@@ -178,8 +178,8 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
             // the previous parent column as the fields are the same
             val previousPathColumnHeaders = columnHeaders(pathIndex - 1)
             val previousValue = previousPathColumnHeaders(previousPathColumnHeaders.length - 1)(0)
-            if (value == previousValue && !measureAreaLayoutPathBreaks.contains(pathIndex)) {
-              // The values for the same field are the same and we are not at a measure area layout path boundary so
+            if (value == previousValue && !columnHeaderLayoutPathBreaks.contains(pathIndex)) {
+              // The values for the same field are the same and we are not at a column header layout path boundary so
               // use the previous column
               tableColumns(0) = parentColumns.last
             } else {

@@ -5,15 +5,15 @@ import javafx.scene.layout.Pane
 
 class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dragAndDropContainer:DragAndDropContainer) {
   def dropTargetsForFieldNode(fieldNode:FieldNode, draggableFieldsInfo:DraggableFieldsInfo) = {
-    val parentMeasureAreaTreeNode = fieldNode.getParent.asInstanceOf[MeasureAreaTreeNode]
-    val parentMeasureAreaLayoutNode = parentMeasureAreaTreeNode.getParent.asInstanceOf[MeasureAreaLayoutNode]
+    val parentColumnAreaTreeNode = fieldNode.getParent.asInstanceOf[ColumnHeaderTreeNode]
+    val parentColumnHeaderLayoutNode = parentColumnAreaTreeNode.getParent.asInstanceOf[ColumnHeaderLayoutNode]
 
-    val outerNode = parentMeasureAreaLayoutNode.getParent
+    val outerNode = parentColumnHeaderLayoutNode.getParent
     val showTopDropTargetNode = outerNode match {
-      case outerMeasureAreaTreeNode:MeasureAreaTreeNode => {
-        val indexInOuterMeasureAreaTreeNode = outerMeasureAreaTreeNode.getChildren.indexOf(parentMeasureAreaLayoutNode)
-        if (indexInOuterMeasureAreaTreeNode == 1) {
-          outerMeasureAreaTreeNode.topFieldNodeOption match {
+      case outerColumnAreaTreeNode:ColumnHeaderTreeNode => {
+        val indexInOuterColumnAreaTreeNode = outerColumnAreaTreeNode.getChildren.indexOf(parentColumnHeaderLayoutNode)
+        if (indexInOuterColumnAreaTreeNode == 1) {
+          outerColumnAreaTreeNode.topFieldNodeOption match {
             case Some(topFieldNode) if topFieldNode == draggableFieldsInfo.draggable => false
             case _ => true
           }
@@ -24,50 +24,50 @@ class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dragAndDropContainer:DragA
       case _ => true
     }
     val moveTopDropTargetNode = showTopDropTargetNode && (outerNode match {
-      case outerMeasureAreaTreeNode:MeasureAreaTreeNode => {
-        val indexInOuterMeasureAreaTreeNode = outerMeasureAreaTreeNode.getChildren.indexOf(parentMeasureAreaLayoutNode)
-        val bottomInTree = (indexInOuterMeasureAreaTreeNode == 1)
-        bottomInTree && (outerMeasureAreaTreeNode.topFieldNodes.size == 1) && (parentMeasureAreaLayoutNode.childMeasureAreaTreeNodes.size == 1)
+      case outerColumnAreaTreeNode:ColumnHeaderTreeNode => {
+        val indexInOuterColumnAreaTreeNode = outerColumnAreaTreeNode.getChildren.indexOf(parentColumnHeaderLayoutNode)
+        val bottomInTree = (indexInOuterColumnAreaTreeNode == 1)
+        bottomInTree && (outerColumnAreaTreeNode.topFieldNodes.size == 1) && (parentColumnHeaderLayoutNode.childColumnAreaTreeNodes.size == 1)
       }
       case _ => false
     })
     val showBottomDropTargetNode = {
-      val measureAreaTreesBelow = parentMeasureAreaTreeNode.measureAreaTree.childMeasureAreaLayout.measureAreaTrees
-      measureAreaTreesBelow match {
-        case measureAreaTreeBelow :: Nil if measureAreaTreeBelow.measureAreaTreeType.isLeft => false
+      val columnHeaderTreesBelow = parentColumnAreaTreeNode.columnHeaderTree.childColumnHeaderLayout.columnHeaderTrees
+      columnHeaderTreesBelow match {
+        case columnHeaderTreeBelow :: Nil if columnHeaderTreeBelow.columnHeaderTreeType.isLeft => false
         case _ => true
       }
     }
 
-    val siblingMeasureAreaTreeNodes = parentMeasureAreaLayoutNode.childMeasureAreaTreeNodes
-    val indexInSiblings = siblingMeasureAreaTreeNodes.indexOf(parentMeasureAreaTreeNode)
+    val siblingColumnAreaTreeNodes = parentColumnHeaderLayoutNode.childColumnAreaTreeNodes
+    val indexInSiblings = siblingColumnAreaTreeNodes.indexOf(parentColumnAreaTreeNode)
     val showLeftDropTargetNode = if (indexInSiblings == 0) {
       true
     } else {
-      val measureAreaTreeNodeToTheLeft = siblingMeasureAreaTreeNodes(indexInSiblings - 1)
-      val onlyOneFieldToTheLeft = (measureAreaTreeNodeToTheLeft.measureAreaTree.allFields.size == 1)
+      val columnHeaderTreeNodeToTheLeft = siblingColumnAreaTreeNodes(indexInSiblings - 1)
+      val onlyOneFieldToTheLeft = (columnHeaderTreeNodeToTheLeft.columnHeaderTree.allFields.size == 1)
       if (onlyOneFieldToTheLeft) {
-        (measureAreaTreeNodeToTheLeft.topFieldNodeOption.get != draggableFieldsInfo.draggable)
+        (columnHeaderTreeNodeToTheLeft.topFieldNodeOption.get != draggableFieldsInfo.draggable)
       } else {
         true
       }
     }
-    val fieldIsAlone = (parentMeasureAreaTreeNode.measureAreaTree.allFields.size == 1)
+    val fieldIsAlone = (parentColumnAreaTreeNode.columnHeaderTree.allFields.size == 1)
     val moveLeftDropTargetNode = showLeftDropTargetNode && fieldIsAlone && {
       if (indexInSiblings == 0) {
         false
       } else {
-        val measureAreaTreeNodeToTheLeft = siblingMeasureAreaTreeNodes(indexInSiblings - 1)
-        val onlyOneFieldToTheLeft = (measureAreaTreeNodeToTheLeft.measureAreaTree.allFields.size == 1)
+        val columnHeaderTreeNodeToTheLeft = siblingColumnAreaTreeNodes(indexInSiblings - 1)
+        val onlyOneFieldToTheLeft = (columnHeaderTreeNodeToTheLeft.columnHeaderTree.allFields.size == 1)
         onlyOneFieldToTheLeft
       }
     }
     val showRightDropTargetNode = !fieldIsAlone || {
-      if (indexInSiblings == (siblingMeasureAreaTreeNodes.size - 1)) {
+      if (indexInSiblings == (siblingColumnAreaTreeNodes.size - 1)) {
         true
       } else {
-        val measureAreaTreeNodeToTheRight = siblingMeasureAreaTreeNodes(indexInSiblings + 1)
-        val multipleFieldsToTheRight = (measureAreaTreeNodeToTheRight.measureAreaTree.allFields.size > 1)
+        val columnHeaderTreeNodeToTheRight = siblingColumnAreaTreeNodes(indexInSiblings + 1)
+        val multipleFieldsToTheRight = (columnHeaderTreeNodeToTheRight.columnHeaderTree.allFields.size > 1)
         multipleFieldsToTheRight
       }
     }

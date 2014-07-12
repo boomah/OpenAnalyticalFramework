@@ -7,9 +7,9 @@ case class TableState(tableLayout:TableLayout) {
   def withRowHeaderFields(newRowHeaderFields:List[Field[_]]) = {
     copy(tableLayout = tableLayout.withRowHeaderFields(newRowHeaderFields))
   }
-  def measureAreaLayout = tableLayout.measureAreaLayout
-  def withMeasureAreaLayout(newMeasureAreaLayout:MeasureAreaLayout) = {
-    copy(tableLayout = tableLayout.withMeasureAreaLayout(newMeasureAreaLayout))
+  def columnHeaderLayout = tableLayout.columnHeaderLayout
+  def withColumnHeaderLayout(newColumnHeaderLayout:ColumnHeaderLayout) = {
+    copy(tableLayout = tableLayout.withColumnHeaderLayout(newColumnHeaderLayout))
   }
   def withFilterFields(newFilterFields:List[Field[_]]) = {
     copy(tableLayout = tableLayout.withFilterFields(newFilterFields))

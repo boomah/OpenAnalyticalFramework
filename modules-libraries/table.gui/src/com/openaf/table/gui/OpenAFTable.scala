@@ -29,7 +29,7 @@ class OpenAFTable extends StackPane {
     unmodifiableFieldBindings)
   private val rowHeaderFieldsArea = new RowHeaderFieldsArea(goingToTableDataProperty, dragAndDrop, localeProperty,
     unmodifiableFieldBindings)
-  private val measureFieldsArea = new MeasureFieldsArea(goingToTableDataProperty, dragAndDrop, localeProperty,
+  private val columnHeaderArea = new ColumnHeaderArea(goingToTableDataProperty, dragAndDrop, localeProperty,
     unmodifiableFieldBindings)
   private val tableView = new OpenAFTableView(tableDataProperty, unmodifiableFieldBindings)
 
@@ -38,7 +38,7 @@ class OpenAFTable extends StackPane {
     mainContent.add(configArea, 0, 0, 1, 3)
     mainContent.add(filterFieldsArea, 1, 0, 2, 1)
     mainContent.add(rowHeaderFieldsArea, 1, 1)
-    mainContent.add(measureFieldsArea, 2, 1)
+    mainContent.add(columnHeaderArea, 2, 1)
     mainContent.add(tableView, 1, 2, 2, 1)
 
     val blankColumnConstraints = new ColumnConstraints

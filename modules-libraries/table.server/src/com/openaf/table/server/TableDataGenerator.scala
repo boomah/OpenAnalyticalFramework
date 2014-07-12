@@ -27,7 +27,7 @@ object TableDataGenerator {
     val numRowHeaderValues = rowHeaderValues.length
     var rowHeaderCounter = 0
 
-    val paths = tableState.tableLayout.measureAreaLayout.paths
+    val paths = tableState.tableLayout.columnHeaderLayout.paths
     val allPathData = result.pathData
     val numPaths = allPathData.length
     var pathCounter = 0

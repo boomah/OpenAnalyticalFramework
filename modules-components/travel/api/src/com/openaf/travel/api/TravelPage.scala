@@ -24,33 +24,33 @@ case class FlightsAndHotelsPage() extends TravelPage {
 
 object HotelsPageFactory extends PageFactory {
 
-  val ma = MeasureAreaLayout(TravelPage.CostField, List(TravelPage.HotelNameField, TravelPage.PeriodField)).measureAreaTrees.head
-  val maaa = MeasureAreaLayout(List(ma, ma))
+  val ma = ColumnHeaderLayout(TravelPage.CostField, List(TravelPage.HotelNameField, TravelPage.PeriodField)).columnHeaderTrees.head
+  val maaa = ColumnHeaderLayout(List(ma, ma))
 
 
-  val mat = MeasureAreaTree(Right(MeasureAreaLayout(ma)), ma.childMeasureAreaLayout)
-  val mat2 = MeasureAreaTree(Right(MeasureAreaLayout(ma)), ma.childMeasureAreaLayout.copy(measureAreaTrees = ma.childMeasureAreaLayout.measureAreaTrees.reverse))
+  val mat = ColumnHeaderTree(Right(ColumnHeaderLayout(ma)), ma.childColumnHeaderLayout)
+  val mat2 = ColumnHeaderTree(Right(ColumnHeaderLayout(ma)), ma.childColumnHeaderLayout.copy(columnHeaderTrees = ma.childColumnHeaderLayout.columnHeaderTrees.reverse))
 
   import TravelPage._
 
-  val topHeavy = MeasureAreaLayout(MeasureAreaTree(Right(MeasureAreaLayout.fromFields(CostField, StarRatingField)), MeasureAreaLayout(HotelNameField))).normalise
+  val topHeavy = ColumnHeaderLayout(ColumnHeaderTree(Right(ColumnHeaderLayout.fromFields(CostField, StarRatingField)), ColumnHeaderLayout(HotelNameField))).normalise
 
-  val twoTopTwoBottom = MeasureAreaLayout(MeasureAreaTree(Right(MeasureAreaLayout.fromFields(CostField, StarRatingField)),
-    MeasureAreaLayout.fromFields(HotelNameField, PeriodField))).normalise
+  val twoTopTwoBottom = ColumnHeaderLayout(ColumnHeaderTree(Right(ColumnHeaderLayout.fromFields(CostField, StarRatingField)),
+    ColumnHeaderLayout.fromFields(HotelNameField, PeriodField))).normalise
 
-  val topBottom = MeasureAreaLayout(CostField, List(StarRatingField))
+  val topBottom = ColumnHeaderLayout(CostField, List(StarRatingField))
 
 
   def page = HotelsPage(TableState.Blank
     .withRowHeaderFields(List(TravelPage.HotelNameField, TravelPage.PeriodField))
-//    .withMeasureAreaLayout(MeasureAreaLayout(TravelPage.CostField, List(TravelPage.HotelNameField, TravelPage.PeriodField)))
-//    .withMeasureAreaLayout(MeasureAreaLayout.fromFields(TravelPage.HotelNameField, TravelPage.PeriodField))
-//    .withMeasureAreaLayout(maaa)
-//    .withMeasureAreaLayout(MeasureAreaLayout(mat))
-//    .withMeasureAreaLayout(MeasureAreaLayout(mat2))
-//    .withMeasureAreaLayout(topHeavy)
-//    .withMeasureAreaLayout(twoTopTwoBottom)
-    .withMeasureAreaLayout(topBottom)
+//    .withColumnHeaderLayout(ColumnHeaderLayout(TravelPage.CostField, List(TravelPage.HotelNameField, TravelPage.PeriodField)))
+//    .withColumnHeaderLayout(ColumnHeaderLayout.fromFields(TravelPage.HotelNameField, TravelPage.PeriodField))
+//    .withColumnHeaderLayout(maaa)
+//    .withColumnHeaderLayout(ColumnHeaderLayout(mat))
+//    .withColumnHeaderLayout(ColumnHeaderLayout(mat2))
+//    .withColumnHeaderLayout(topHeavy)
+//    .withColumnHeaderLayout(twoTopTwoBottom)
+    .withColumnHeaderLayout(topBottom)
   )
 }
 

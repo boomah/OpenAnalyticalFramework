@@ -8,9 +8,9 @@ case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:T
     withTableState(tableState.withRowHeaderFields(newRowHeaderFields))
   }
   def withFilterFields(newFilterFields:List[Field[_]]) = withTableState(tableState.withFilterFields(newFilterFields))
-  def measureAreaLayout = tableState.measureAreaLayout
-  def withMeasureAreaLayout(newMeasureAreaLayout:MeasureAreaLayout) = {
-    withTableState(tableState.withMeasureAreaLayout(newMeasureAreaLayout))
+  def columnHeaderLayout = tableState.columnHeaderLayout
+  def withColumnHeaderLayout(newColumnHeaderLayout:ColumnHeaderLayout) = {
+    withTableState(tableState.withColumnHeaderLayout(newColumnHeaderLayout))
   }
 
   def rowHeadersAsString = {

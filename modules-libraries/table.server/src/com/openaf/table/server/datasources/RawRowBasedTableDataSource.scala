@@ -32,24 +32,24 @@ object RawRowBasedTableDataSource {
     val rowHeadersLookUp = rowHeaderFieldIDs.map(fieldIDToLookUp).toArray
     val rowHeadersValueCounter = rowHeaderFieldIDs.map(allFieldIDs.indexOf(_)).toArray
 
-    val measureAreaPaths = tableState.tableLayout.measureAreaLayout.paths
-    val numPaths = measureAreaPaths.length
+    val columnHeaderPaths = tableState.tableLayout.columnHeaderLayout.paths
+    val numPaths = columnHeaderPaths.length
     var pathsCounter = 0
-    val numColumnHeaderColsPerPath = measureAreaPaths.map(_.fields.length).toArray
+    val numColumnHeaderColsPerPath = columnHeaderPaths.map(_.fields.length).toArray
     var numColumnHeaderCols = -1
     var colHeaderColCounter = 0
-    val colHeaderFieldsPositions = measureAreaPaths.map(_.fields.map(field => fieldIDs.indexOf(field.id)).toArray).toArray
+    val colHeaderFieldsPositions = columnHeaderPaths.map(_.fields.map(field => fieldIDs.indexOf(field.id)).toArray).toArray
     val colHeaders = Array.fill(numPaths)(new mutable.HashSet[IntArrayWrapper])
-    val colHeadersLookUps = measureAreaPaths.map(path =>
+    val colHeadersLookUps = columnHeaderPaths.map(path =>
       path.fields.map(field => fieldIDToLookUp(field.id)).toArray
     ).toArray
-    val colHeadersValuesCounter = measureAreaPaths.map(path =>
+    val colHeadersValuesCounter = columnHeaderPaths.map(path =>
       path.fields.map(field => allFieldIDs.indexOf(field.id)).toArray
     ).toArray
 
-    val measureAreaMeasureFieldPositions = measureAreaPaths.map(_.measureFieldIndex).toArray
-    val measureAreaPathsMeasureOptions = measureAreaPaths.map(_.measureFieldOption).toArray
-    val measureFieldPositions = measureAreaPathsMeasureOptions.map{
+    val columnHeaderMeasureFieldPositions = columnHeaderPaths.map(_.measureFieldIndex).toArray
+    val columnHeaderPathsMeasureOptions = columnHeaderPaths.map(_.measureFieldOption).toArray
+    val measureFieldPositions = columnHeaderPathsMeasureOptions.map{
       case Some(field) => {
         val index = fieldIDs.indexOf(field.id)
         if (index >= 0) {
@@ -63,7 +63,7 @@ object RawRowBasedTableDataSource {
       }
       case _ => -1
     }
-    val measureFieldDefinitions = measureAreaPathsMeasureOptions.map{
+    val measureFieldDefinitions = columnHeaderPathsMeasureOptions.map{
       case Some(field) => fieldDefinitionGroup.fieldDefinition(field.id)
       case _ => NullFieldDefinition
     }
@@ -82,9 +82,9 @@ object RawRowBasedTableDataSource {
     var fieldsValueCounterIndex = -1
     var newCounter = -1
     var measureFieldIndex = -1
-    var measureAreaFieldPositions:Array[Int] = null
-    var measureAreaLookUp:Array[JMap[Any,Int]] = null
-    var measureAreaValueCounter:Array[Int] = null
+    var columnHeaderFieldPositions:Array[Int] = null
+    var columnHeaderLookUp:Array[JMap[Any,Int]] = null
+    var columnHeaderValueCounter:Array[Int] = null
     var colHeaderValues:Array[Int] = null
     var measureFieldPosition = -1
     var key:IntArrayWrapperKey = null
@@ -115,19 +115,19 @@ object RawRowBasedTableDataSource {
 
       while (pathsCounter < numPaths) {
         aggregatedData = aggregatedDataForPath(pathsCounter)
-        measureFieldIndex = measureAreaMeasureFieldPositions(pathsCounter)
-        measureAreaFieldPositions = colHeaderFieldsPositions(pathsCounter)
-        measureAreaLookUp = colHeadersLookUps(pathsCounter)
-        measureAreaValueCounter = colHeadersValuesCounter(pathsCounter)
+        measureFieldIndex = columnHeaderMeasureFieldPositions(pathsCounter)
+        columnHeaderFieldPositions = colHeaderFieldsPositions(pathsCounter)
+        columnHeaderLookUp = colHeadersLookUps(pathsCounter)
+        columnHeaderValueCounter = colHeadersValuesCounter(pathsCounter)
         numColumnHeaderCols = numColumnHeaderColsPerPath(pathsCounter)
         colHeaderValues = new Array[Int](numColumnHeaderCols)
         while (colHeaderColCounter < numColumnHeaderCols) {
           if (colHeaderColCounter != measureFieldIndex) {
-            value = dataRow(measureAreaFieldPositions(colHeaderColCounter))
-            lookUp = measureAreaLookUp(colHeaderColCounter)
+            value = dataRow(columnHeaderFieldPositions(colHeaderColCounter))
+            lookUp = columnHeaderLookUp(colHeaderColCounter)
             intForValue = lookUp.get(value)
             if (intForValue == 0) {
-              fieldsValueCounterIndex = measureAreaValueCounter(colHeaderColCounter)
+              fieldsValueCounterIndex = columnHeaderValueCounter(colHeaderColCounter)
               newCounter = fieldsValueCounter(fieldsValueCounterIndex) + 1
               fieldsValueCounter(fieldsValueCounterIndex) = newCounter
               lookUp.put(value, newCounter)
@@ -198,7 +198,7 @@ object RawRowBasedTableDataSource {
 
     // If there are no row fields or measure fields there with be an empty row in the headers that isn't needed so
     // remove it
-    val rowHeadersToUse = if (rowHeaderFieldIDs.nonEmpty || measureAreaPathsMeasureOptions.exists(_.isDefined)) {
+    val rowHeadersToUse = if (rowHeaderFieldIDs.nonEmpty || columnHeaderPathsMeasureOptions.exists(_.isDefined)) {
       rowHeaders.toArray.map(_.array)
     } else {
       Array.empty[Array[Int]]

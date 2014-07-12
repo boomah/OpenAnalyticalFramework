@@ -37,7 +37,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
   test("1 row (key), 1 measure, 0 column") {
     val tableState = TableState.Blank
       .withRowHeaderFields(List(NameField))
-      .withMeasureAreaLayout(MeasureAreaLayout(ScoreField))
+      .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
 
     val expectedRowHeaderValues = Set(List(1), List(2), List(3), List(4), List(5), List(6))
     val expectedColHeaderValues = List(Set(List(0)))
@@ -72,7 +72,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
   test("2 row, 1 measure, 0 column") {
     val tableState = TableState.Blank
       .withRowHeaderFields(List(GenderField, LocationField))
-      .withMeasureAreaLayout(MeasureAreaLayout(ScoreField))
+      .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
 
     val expectedRowHeaderValues = Set(List(1,1), List(1,2), List(2,1), List(2,2), List(2,3))
     val expectedColHeaderValues = List(Set(List(0)))
@@ -93,7 +93,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
   }
 
   test("0 row, 0 measure, 1 column (key)") {
-    val tableState = TableState.Blank.withMeasureAreaLayout(MeasureAreaLayout(NameField))
+    val tableState = TableState.Blank.withColumnHeaderLayout(ColumnHeaderLayout(NameField))
 
     val expectedColHeaderValues = List(Set(List(1), List(2), List(3), List(4), List(5), List(6)))
     val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
@@ -102,7 +102,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
   }
 
   test("0 row, 0 measure, 2 column") {
-    val tableState = TableState.Blank.withMeasureAreaLayout(MeasureAreaLayout(List(GenderField, LocationField), Nil))
+    val tableState = TableState.Blank.withColumnHeaderLayout(ColumnHeaderLayout(List(GenderField, LocationField), Nil))
 
     val expectedColHeaderValues = List(
       Set(List(1), List(2)),
@@ -117,7 +117,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
   }
 
   test("0 row, 1 measure, 1 column (key)") {
-    val tableState = TableState.Blank.withMeasureAreaLayout(MeasureAreaLayout(ScoreField, List(NameField)))
+    val tableState = TableState.Blank.withColumnHeaderLayout(ColumnHeaderLayout(ScoreField, List(NameField)))
 
     val expectedColHeaderValues = List(Set(List(0,1), List(0,2), List(0,3), List(0,4), List(0,5), List(0,6)))
     val expectedData = List(Map(
@@ -138,7 +138,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
 
   test("0 row, 1 measure, 2 column") {
     val tableState = TableState.Blank
-      .withMeasureAreaLayout(MeasureAreaLayout(ScoreField, List(GenderField, LocationField)))
+      .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField, List(GenderField, LocationField)))
 
     val expectedColHeaderValues = List(
       Set(List(0,1), List(0,2)),
@@ -167,7 +167,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
   test("1 row, 1 measure, 1 column (key)") {
     val tableState = TableState.Blank
       .withRowHeaderFields(List(GenderField))
-      .withMeasureAreaLayout(MeasureAreaLayout(ScoreField, List(NameField)))
+      .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField, List(NameField)))
 
     val expectedRowHeaderValues = Set(List(1), List(2))
     val expectedColHeaderValues = List(Set(List(0,1), List(0,2), List(0,3), List(0,4), List(0,5), List(0,6)))
@@ -189,11 +189,11 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
   }
 
   test("1 row, 2 measure, 1 column under measure 1") {
-    val measureAreaLayout = MeasureAreaLayout(List(
-      MeasureAreaTree(List(ScoreField), List(LocationField)),
-      MeasureAreaTree(AgeField.copy(fieldType = Measure))
+    val columnHeaderLayout = ColumnHeaderLayout(List(
+      ColumnHeaderTree(List(ScoreField), List(LocationField)),
+      ColumnHeaderTree(AgeField.copy(fieldType = Measure))
     ))
-    val tableState = TableState.Blank.withRowHeaderFields(List(GenderField)).withMeasureAreaLayout(measureAreaLayout)
+    val tableState = TableState.Blank.withRowHeaderFields(List(GenderField)).withColumnHeaderLayout(columnHeaderLayout)
 
     val expectedRowHeaderValues = Set(List(1), List(2))
     val expectedColHeaderValues = List(
@@ -224,7 +224,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
   }
 
   test("0 row, 1 measure, 0 column") {
-    val tableState = TableState.Blank.withMeasureAreaLayout(MeasureAreaLayout(ScoreField))
+    val tableState = TableState.Blank.withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
 
     val expectedColHeaderValues = List(Set(List(0)))
     val expectedData = List(Map((List[Int](), List(0)) -> 425))
@@ -234,11 +234,11 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
   }
 
   test("1 row (key), 2 measure, 2 column (1 under each measure)") {
-    val measureAreaLayout = MeasureAreaLayout(List(
-      MeasureAreaTree(List(ScoreField), List(LocationField)),
-      MeasureAreaTree(List(AgeField.copy(fieldType = Measure)), List(GenderField))
+    val columnHeaderLayout = ColumnHeaderLayout(List(
+      ColumnHeaderTree(List(ScoreField), List(LocationField)),
+      ColumnHeaderTree(List(AgeField.copy(fieldType = Measure)), List(GenderField))
     ))
-    val tableState = TableState.Blank.withRowHeaderFields(List(NameField)).withMeasureAreaLayout(measureAreaLayout)
+    val tableState = TableState.Blank.withRowHeaderFields(List(NameField)).withColumnHeaderLayout(columnHeaderLayout)
 
     val expectedRowHeaderValues = Set(List(1), List(2), List(3), List(4), List(5), List(6))
     val expectedColHeaderValues = List(

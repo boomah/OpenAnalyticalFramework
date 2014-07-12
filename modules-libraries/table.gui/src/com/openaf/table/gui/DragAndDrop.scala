@@ -195,8 +195,8 @@ trait Draggable extends Region {
         val newRowHeaderFields = currentTableData.tableState.tableLayout.rowHeaderFields :+ field
         currentTableData.withRowHeaderFields(newRowHeaderFields)
       } else {
-        val newMeasureAreaLayout = currentTableData.tableState.tableLayout.measureAreaLayout.addFieldToRight(field)
-        currentTableData.withMeasureAreaLayout(newMeasureAreaLayout)
+        val newColumnHeaderLayout = currentTableData.tableState.tableLayout.columnHeaderLayout.addFieldToRight(field)
+        currentTableData.withColumnHeaderLayout(newColumnHeaderLayout)
       }
     } else {
       tableDataWithRemoved
