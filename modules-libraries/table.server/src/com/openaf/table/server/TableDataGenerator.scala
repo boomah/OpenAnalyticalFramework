@@ -1,13 +1,12 @@
 package com.openaf.table.server
 
 import com.openaf.table.lib.api._
-import com.openaf.table.server.datasources.TableDataSource
+import com.openaf.table.server.datasources.{IntArrayWrapperKey, TableDataSource}
 import java.util.Comparator
 import java.util
 
 object TableDataGenerator {
   // This is far from idiomatic Scala. Written this way for speed.
-  // TODO - remove the need to keep converting to and from lists
   def tableData(tableState:TableState, tableDataSource:TableDataSource) = {
     val result = tableDataSource.result(tableState)
 
@@ -51,26 +50,26 @@ object TableDataGenerator {
     val colHeaderValuesLengths = allColHeaderValues.map(_.length)
     var colHeaderCounter = 0
 
-    var dataForPath:Map[(List[Int], List[Int]), Any] = null
+    var dataForPath:Map[IntArrayWrapperKey, Any] = null
     var numColHeaders = -1
     var colHeaderValues:Array[Array[Int]] = null
 
     val dataForPaths = allPathData.map(_.data)
 
-    var rowHeaderKey:List[Int] = Nil
-    var colHeaderKey:List[Int] = Nil
+    var rowHeaderKey:Array[Int] = null
+    var key:IntArrayWrapperKey = null
     val data:Array[Array[Array[Any]]] = Array.fill(numPaths)(new Array(numRowHeaderValues))
 
     while (rowHeaderCounter < numRowHeaderValues) {
-      rowHeaderKey = rowHeaderValues(rowHeaderCounter).toList
+      rowHeaderKey = rowHeaderValues(rowHeaderCounter)
       while (pathCounter < numPaths) {
         colHeaderValues = allColHeaderValues(pathCounter)
         numColHeaders = colHeaderValuesLengths(pathCounter)
         data(pathCounter)(rowHeaderCounter) = new Array[Any](numColHeaders)
         dataForPath = dataForPaths(pathCounter)
         while (colHeaderCounter < numColHeaders) {
-          colHeaderKey = colHeaderValues(colHeaderCounter).toList
-          data(pathCounter)(rowHeaderCounter)(colHeaderCounter) = dataForPath.getOrElse((rowHeaderKey, colHeaderKey), NoValue)
+          key = new IntArrayWrapperKey(rowHeaderKey, colHeaderValues(colHeaderCounter))
+          data(pathCounter)(rowHeaderCounter)(colHeaderCounter) = dataForPath.getOrElse(key, NoValue)
           colHeaderCounter += 1
         }
         colHeaderCounter = 0

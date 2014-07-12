@@ -16,7 +16,7 @@ object Result {
   val Empty = Result(Array.empty, Array.empty, Map.empty, ResultDetails.Default)
 }
 
-case class PathData(colHeaderValues:Array[Array[Int]], data:Map[(List[Int],List[Int]),Any])
+case class PathData(colHeaderValues:Array[Array[Int]], data:Map[IntArrayWrapperKey,Any])
 
 case class ResultDetails(sortDetails:SortDetails)
 

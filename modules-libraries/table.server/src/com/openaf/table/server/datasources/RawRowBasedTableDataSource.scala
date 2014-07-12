@@ -13,7 +13,6 @@ case class RawRowBasedTableDataSource(data:Array[Array[Any]], fieldIDs:Array[Fie
 
 object RawRowBasedTableDataSource {
   // This is far from idiomatic Scala. Written this way for speed.
-  // TODO - remove the need to keep converting to and from lists
   def result(tableState:TableState, data:Array[Array[Any]], fieldIDs:Array[FieldID],
              fieldDefinitionGroups:FieldDefinitionGroups) = {
     val fieldDefinitionGroup = fieldDefinitionGroups.rootGroup
@@ -29,7 +28,7 @@ object RawRowBasedTableDataSource {
     val numRowHeaderCols = rowHeaderFieldIDs.length
     var rowHeaderCounter = 0
     val rowHeaderFieldPositions = rowHeaderFieldIDs.map(fieldIDs.indexOf(_)).toArray
-    val rowHeaders = new mutable.HashSet[List[Int]]
+    val rowHeaders = new mutable.HashSet[IntArrayWrapper]
     val rowHeadersLookUp = rowHeaderFieldIDs.map(fieldIDToLookUp).toArray
     val rowHeadersValueCounter = rowHeaderFieldIDs.map(allFieldIDs.indexOf(_)).toArray
 
@@ -40,7 +39,7 @@ object RawRowBasedTableDataSource {
     var numColumnHeaderCols = -1
     var colHeaderColCounter = 0
     val colHeaderFieldsPositions = measureAreaPaths.map(_.fields.map(field => fieldIDs.indexOf(field.id)).toArray).toArray
-    val colHeaders = Array.fill(numPaths)(new mutable.HashSet[List[Int]])
+    val colHeaders = Array.fill(numPaths)(new mutable.HashSet[IntArrayWrapper])
     val colHeadersLookUps = measureAreaPaths.map(path =>
       path.fields.map(field => fieldIDToLookUp(field.id)).toArray
     ).toArray
@@ -69,7 +68,7 @@ object RawRowBasedTableDataSource {
       case _ => NullFieldDefinition
     }
 
-    val aggregatedDataForPath = Array.fill(numPaths)(new JMap[(List[Int],List[Int]),Any])
+    val aggregatedDataForPath = Array.fill(numPaths)(new JMap[IntArrayWrapperKey,Any])
 
     val dataLength = data.length
     var dataCounter = 0
@@ -88,9 +87,9 @@ object RawRowBasedTableDataSource {
     var measureAreaValueCounter:Array[Int] = null
     var colHeaderValues:Array[Int] = null
     var measureFieldPosition = -1
-    var key:(List[Int],List[Int]) = null
+    var key:IntArrayWrapperKey = null
     var currentValue:Any = -1
-    var aggregatedData:JMap[(List[Int],List[Int]),Any] = null
+    var aggregatedData:JMap[IntArrayWrapperKey,Any] = null
 
     while (dataCounter < dataLength) {
       dataRow = data(dataCounter)
@@ -105,14 +104,14 @@ object RawRowBasedTableDataSource {
           newCounter = fieldsValueCounter(fieldsValueCounterIndex) + 1
           fieldsValueCounter(fieldsValueCounterIndex) = newCounter
           lookUp.put(value, newCounter)
-          rowHeaderValues(rowHeaderCounter) = newCounter
+          rowHeaderValues.array(rowHeaderCounter) = newCounter
         } else {
-          rowHeaderValues(rowHeaderCounter) = intForValue
+          rowHeaderValues.array(rowHeaderCounter) = intForValue
         }
         rowHeaderCounter += 1
       }
       rowHeaderCounter = 0
-      rowHeaders += rowHeaderValues.toList
+      rowHeaders += new IntArrayWrapper(rowHeaderValues)
 
       while (pathsCounter < numPaths) {
         aggregatedData = aggregatedDataForPath(pathsCounter)
@@ -132,21 +131,21 @@ object RawRowBasedTableDataSource {
               newCounter = fieldsValueCounter(fieldsValueCounterIndex) + 1
               fieldsValueCounter(fieldsValueCounterIndex) = newCounter
               lookUp.put(value, newCounter)
-              colHeaderValues(colHeaderColCounter) = newCounter
+              colHeaderValues.array(colHeaderColCounter) = newCounter
             } else {
-              colHeaderValues(colHeaderColCounter) = intForValue
+              colHeaderValues.array(colHeaderColCounter) = intForValue
             }
           }
           colHeaderColCounter += 1
         }
         colHeaderColCounter = 0
-        colHeaders(pathsCounter) += colHeaderValues.toList
+        colHeaders(pathsCounter) += new IntArrayWrapper(colHeaderValues)
 
         measureFieldPosition = measureFieldPositions(pathsCounter)
         // If there isn't a measure field there is no need to update the aggregated data
         if (measureFieldPosition >= 0) {
           value = dataRow(measureFieldPosition)
-          key = (rowHeaderValues.toList, colHeaderValues.toList)
+          key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
           currentValue = aggregatedData.get(key)
           val fieldDefinition = measureFieldDefinitions(pathsCounter)
           if (currentValue == null) {
@@ -164,7 +163,7 @@ object RawRowBasedTableDataSource {
         } else if (measureFieldPosition == -2) {
           // Count field
           value = 1
-          key = (rowHeaderValues.toList, colHeaderValues.toList)
+          key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
           currentValue = aggregatedData.get(key)
           val fieldDefinition = measureFieldDefinitions(pathsCounter)
           if (currentValue == null) {
@@ -186,23 +185,40 @@ object RawRowBasedTableDataSource {
       dataCounter += 1
     }
 
-    import JavaConversions._
-    val valueLookUp = fieldIDToLookUp.map{case (fieldID, hashMap) => {
+    val valueLookUp = fieldIDToLookUp.map{case (fieldID,hashMap) => {
       val values = new Array[Any](hashMap.size)
-      hashMap.foreach(element => values(element._2) = element._1)
+      val keyIterator = hashMap.keySet.iterator
+      var key:Any = null
+      while (keyIterator.hasNext) {
+        key = keyIterator.next
+        values(hashMap.get(key)) = key
+      }
       fieldID -> values
     }}
 
     // If there are no row fields or measure fields there with be an empty row in the headers that isn't needed so
     // remove it
     val rowHeadersToUse = if (rowHeaderFieldIDs.nonEmpty || measureAreaPathsMeasureOptions.exists(_.isDefined)) {
-      rowHeaders.toArray.map(_.toArray)
+      rowHeaders.toArray.map(_.array)
     } else {
       Array.empty[Array[Int]]
     }
 
-    val pathData = colHeaders.map(_.toArray.map(_.toArray)).zip(aggregatedDataForPath).map{
-      case (colData, mainData) => PathData(colData, mainData.toMap)
+    import JavaConversions._
+    val pathData = new Array[PathData](numPaths)
+    pathsCounter = 0
+    while (pathsCounter < numPaths) {
+      val colHeadersForPath:Array[IntArrayWrapper] = colHeaders(pathsCounter).toArray
+      val numColHeadersForPath = colHeadersForPath.length
+      val colHeadersArray:Array[Array[Int]] = new Array[Array[Int]](numColHeadersForPath)
+      var colHeadersForPathCounter = 0
+      while (colHeadersForPathCounter < numColHeadersForPath) {
+        colHeadersArray(colHeadersForPathCounter) = colHeadersForPath(colHeadersForPathCounter).array
+        colHeadersForPathCounter += 1
+      }
+      val dataForPath:JMap[IntArrayWrapperKey, Any] = aggregatedDataForPath(pathsCounter)
+      pathData(pathsCounter) = PathData(colHeadersArray, dataForPath.toMap)
+      pathsCounter += 1
     }
     val resultDetails = ResultDetails(SortDetails.allUnsorted(pathData.length))
     Result(rowHeadersToUse, pathData, valueLookUp, resultDetails)

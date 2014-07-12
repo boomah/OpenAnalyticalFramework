@@ -280,7 +280,8 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
     val result = dataSource.result(tableState)
     assert(result.rowHeaderValues.map(_.toList).toSet === expectedRowHeaderValues)
     assert(result.pathData.map(_.colHeaderValues.map(_.toList).toSet).toList === expectedColHeaderValues)
-    assert(result.pathData.map(_.data).toList === expectedData)
+    val convertedData = result.pathData.map(_.data.map{case (key,value) => (key.array1.toList, key.array2.toList) -> value}).toList
+    assert(convertedData === expectedData)
     assert(result.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
   }
 }
