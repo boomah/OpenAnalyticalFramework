@@ -3,7 +3,7 @@ package com.openaf.table.gui
 import javafx.scene.control.{TableCell, TableColumn, TableView}
 import javafx.beans.property.{ReadOnlyObjectWrapper, Property}
 import javafx.beans.value.{ObservableValue, ChangeListener}
-import com.openaf.table.lib.api.{FieldID, BlankRenderer, Renderer, TableData}
+import com.openaf.table.lib.api._
 import javafx.collections.{ObservableMap, ObservableList, FXCollections}
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
@@ -16,31 +16,55 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
   getStyleClass.add("openaf-table-view")
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
-      setUpTableView(newTableData)
+      setUpTableView(Option(oldTableData), newTableData)
     }
   })
 
-  private def setUpTableView(tableData:TableData) {
-    val rowHeaderFields = tableData.tableState.tableLayout.rowHeaderFields
-    val rowHeaderTableColumns = rowHeaderFields.zipWithIndex.map{case (field,index) => {
-      val tableColumn = new TableColumn[ObservableList[Any],Int]
-      Option(fieldBindings.get(field.id)) match {
-        case Some(binding) => tableColumn.textProperty.bind(binding)
-        case None => tableColumn.setText(field.id.id)
+  private def setUpTableView(oldTableDataOption:Option[TableData], newTableData:TableData) {
+    if (newTableData.rowHeaderFields.isEmpty && newTableData.measureAreaLayout.isEmpty) {
+      getColumns.clear()
+      setItems(null)
+    } else {
+      oldTableDataOption match {
+        case None => fullSetup(newTableData)
+        case Some(oldTableData) if oldTableData.rowHeaderFields.isEmpty && oldTableData.measureAreaLayout.isEmpty => {
+          fullSetup(newTableData)
+        }
+        case Some(oldTableData) => {
+          if (oldTableData.rowHeaderFields == newTableData.rowHeaderFields &&
+            oldTableData.measureAreaLayout == newTableData.measureAreaLayout) {
+            // Nothing has changed, just populate the data in the table
+            populateTable(newTableData)
+          } else if (oldTableData.rowHeaderFields == newTableData.rowHeaderFields) {
+            // Just the measure area layout has changed
+            val columnHeaderColumns = createColumnHeaderTableColumns(newTableData)
+            getColumns.remove(newTableData.rowHeaderFields.size, getColumns.size)
+            getColumns.addAll(columnHeaderColumns :_*)
+            populateTable(newTableData)
+          } else if (oldTableData.measureAreaLayout == newTableData.measureAreaLayout) {
+            // Just the rows have changed
+            val rowHeaderColumns = createRowHeaderTableColumns(newTableData)
+            getColumns.remove(0, oldTableData.rowHeaderFields.size)
+            import scala.collection.JavaConversions._
+            getColumns.addAll(0, rowHeaderColumns)
+            populateTable(newTableData)
+          }
+        }
       }
-      tableColumn.setCellValueFactory(new DefaultRowHeaderCellValueFactory(index))
-      val values = tableData.tableValues.valueLookUp(rowHeaderFields(index).id)
-      val rowHeaderField = rowHeaderFields(index)
-      val defaultRenderer = tableData.defaultRenderers(rowHeaderField)
-      val cellFactory = new DefaultRowHeaderCellFactory(values, defaultRenderer)
-      tableColumn.setCellFactory(cellFactory)
-      tableColumn
-    }}
+    }
+  }
+  
+  private def fullSetup(tableData:TableData) {
+    val rowHeaderTableColumns = createRowHeaderTableColumns(tableData)
     val columnHeaderTableColumns = createColumnHeaderTableColumns(tableData)
 
     getColumns.clear()
     getColumns.addAll(rowHeaderTableColumns ::: columnHeaderTableColumns :_*)
 
+    populateTable(tableData)
+  }
+
+  private def populateTable(tableData:TableData) {
     val tableItems = FXCollections.observableArrayList[ObservableList[Any]]
 
     val rowHeaderData = tableData.tableValues.rowHeaders
@@ -64,10 +88,10 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
         val rowHeaderArray = rowHeaderData(row)
         FXCollections.observableArrayList[Any](rowHeaderArray :_*)
       } else {
-        if (rowHeaderFields.isEmpty) {
+        if (tableData.rowHeaderFields.isEmpty) {
           FXCollections.observableArrayList[Any]
         } else {
-          FXCollections.observableArrayList[Any](List.fill(rowHeaderFields.length)(0))
+          FXCollections.observableArrayList[Any](List.fill(tableData.rowHeaderFields.length)(0))
         }
       }
 
@@ -88,8 +112,25 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
 
     setItems(tableItems)
   }
+    
+  private def createRowHeaderTableColumns(tableData:TableData) = {
+    tableData.rowHeaderFields.zipWithIndex.map{case (field,index) => {
+      val tableColumn = new TableColumn[ObservableList[Any],Int]
+      Option(fieldBindings.get(field.id)) match {
+        case Some(binding) => tableColumn.textProperty.bind(binding)
+        case None => tableColumn.setText(field.id.id)
+      }
+      tableColumn.setCellValueFactory(new DefaultRowHeaderCellValueFactory(index))
+      val values = tableData.tableValues.valueLookUp(tableData.rowHeaderFields(index).id)
+      val rowHeaderField = tableData.rowHeaderFields(index)
+      val defaultRenderer = tableData.defaultRenderers(rowHeaderField)
+      val cellFactory = new DefaultRowHeaderCellFactory(values, defaultRenderer)
+      tableColumn.setCellFactory(cellFactory)
+      tableColumn
+    }}
+  }
 
-  private def createTableColumn(value:Any) = {
+  private def createColumnHeaderTableColumn(value:Any) = {
     val tableColumn = new TableColumn[ObservableList[Any],Any]
     value match {
       case fieldID:FieldID => {
@@ -102,7 +143,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
     }
     tableColumn
   }
-
+  
   private def createColumnHeaderTableColumns(tableData:TableData):List[TableColumn[ObservableList[Any],Any]] = {
     val columnHeaders = tableData.tableValues.columnHeaders
     val measureAreaLayout = tableData.tableState.tableLayout.measureAreaLayout
@@ -143,11 +184,11 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
               tableColumns(0) = parentColumns.last
             } else {
               // Either the values are different or we are at a path boundary. Either way we need a new column
-              tableColumns(0) = createTableColumn(values(value))
+              tableColumns(0) = createColumnHeaderTableColumn(values(value))
               parentColumns += tableColumns(0)
             }
           } else if (column == 0) {
-            val tableColumn = createTableColumn(values(value))
+            val tableColumn = createColumnHeaderTableColumn(values(value))
             val existingTableColumn = tableColumns(0)
             if (existingTableColumn != null) {
               existingTableColumn.getColumns.add(tableColumn)
@@ -172,7 +213,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
             if (previousValue == value && checkPreviousRow) {
               tableColumns(column) = tableColumns(previousColumn)
             } else {
-              val tableColumn = createTableColumn(values(value))
+              val tableColumn = createColumnHeaderTableColumn(values(value))
               val existingTableColumn = tableColumns(column)
               if (existingTableColumn != null) {
                 existingTableColumn.getColumns.add(tableColumn)

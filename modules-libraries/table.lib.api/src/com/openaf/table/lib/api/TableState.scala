@@ -3,9 +3,11 @@ package com.openaf.table.lib.api
 case class TableState(tableLayout:TableLayout) {
   def allFields = tableLayout.allFields
   def distinctFieldIDs = tableLayout.distinctFieldIDs
+  def rowHeaderFields = tableLayout.rowHeaderFields
   def withRowHeaderFields(newRowHeaderFields:List[Field[_]]) = {
     copy(tableLayout = tableLayout.withRowHeaderFields(newRowHeaderFields))
   }
+  def measureAreaLayout = tableLayout.measureAreaLayout
   def withMeasureAreaLayout(newMeasureAreaLayout:MeasureAreaLayout) = {
     copy(tableLayout = tableLayout.withMeasureAreaLayout(newMeasureAreaLayout))
   }

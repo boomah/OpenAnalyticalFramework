@@ -3,10 +3,12 @@ package com.openaf.table.lib.api
 case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:TableValues,
                      defaultRenderers:Map[Field[_],Renderer[_]]) {
   def withTableState(newTableState:TableState) = copy(tableState = newTableState)
+  def rowHeaderFields = tableState.rowHeaderFields
   def withRowHeaderFields(newRowHeaderFields:List[Field[_]]) = {
     withTableState(tableState.withRowHeaderFields(newRowHeaderFields))
   }
   def withFilterFields(newFilterFields:List[Field[_]]) = withTableState(tableState.withFilterFields(newFilterFields))
+  def measureAreaLayout = tableState.measureAreaLayout
   def withMeasureAreaLayout(newMeasureAreaLayout:MeasureAreaLayout) = {
     withTableState(tableState.withMeasureAreaLayout(newMeasureAreaLayout))
   }
