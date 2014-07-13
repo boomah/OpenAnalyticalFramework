@@ -31,7 +31,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
           fullSetup(newTableData)
         }
         case Some(oldTableData) => {
-          if (oldTableData.rowHeaderFields == newTableData.rowHeaderFields &&
+          /*if (oldTableData.rowHeaderFields == newTableData.rowHeaderFields &&
             oldTableData.columnHeaderLayout == newTableData.columnHeaderLayout) {
             // Nothing has changed, just populate the data in the table
             populateTable(newTableData)
@@ -48,7 +48,8 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
             import scala.collection.JavaConversions._
             getColumns.addAll(0, rowHeaderColumns)
             populateTable(newTableData)
-          }
+          }*/
+          fullSetup(newTableData)
         }
       }
     }
