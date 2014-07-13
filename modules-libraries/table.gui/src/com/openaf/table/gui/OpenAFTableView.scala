@@ -31,9 +31,10 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
           fullSetup(newTableData)
         }
         case Some(oldTableData) => {
-          /*if (oldTableData.rowHeaderFields == newTableData.rowHeaderFields &&
+          if (oldTableData.rowHeaderFields == newTableData.rowHeaderFields &&
             oldTableData.columnHeaderLayout == newTableData.columnHeaderLayout) {
-            // Nothing has changed, just populate the data in the table
+            // The columns haven't changed so just populate the data in the table
+            // TODO - if the data that is used to populate the table hasn't changed, don't bother with this
             populateTable(newTableData)
           } else if (oldTableData.rowHeaderFields == newTableData.rowHeaderFields) {
             // Just the column header layout has changed
@@ -43,13 +44,10 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
             populateTable(newTableData)
           } else if (oldTableData.columnHeaderLayout == newTableData.columnHeaderLayout) {
             // Just the rows have changed
-            val rowHeaderColumns = createRowHeaderTableColumns(newTableData)
-            getColumns.remove(0, oldTableData.rowHeaderFields.size)
-            import scala.collection.JavaConversions._
-            getColumns.addAll(0, rowHeaderColumns)
-            populateTable(newTableData)
-          }*/
-          fullSetup(newTableData)
+            // TODO - For now do a full setup as an index is hardcoded into each column header column making adding or
+            // TODO - removing row header columns difficult.
+            fullSetup(newTableData)
+          }
         }
       }
     }
@@ -100,6 +98,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
         columnData = pathData(path)(row)
         numberOfColumns = columnData.length
         while (column < numberOfColumns) {
+          // TODO - don't add these individually - add them along with the row header array all in one go
           tableItem.add(columnData(column))
           column += 1
         }
