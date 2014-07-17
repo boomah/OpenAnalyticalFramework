@@ -46,31 +46,25 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     bind(currentPagePosition, pages)
     def computeValue = page(currentPagePosition.get)
   }
-  private def goingToOrCurrentPage = {
-    goingToPage.get match {
-      case Some(page) => page
-      case _ => currentPage.get
-    }
-  }
   private def pageComponent = {
     try {
-      pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), this)
+      pageComponentCache.pageComponent(pageID(currentPage.get), this)
     } catch {
       case exception:Exception => pageComponentCache.exceptionPageComponent(this)
     }
   }
   private[gui] val nameBinding = new StringBinding {
-    bind(goingToPage, currentPage, cache(BrowserCacheKey.LocaleKey))
+    bind(currentPage, cache(BrowserCacheKey.LocaleKey))
     def computeValue = pageComponent.name
   }
   def nameChanged() {nameBinding.invalidate()}
   private[gui] val descriptionBinding = new StringBinding {
-    bind(goingToPage, currentPage, cache(BrowserCacheKey.LocaleKey))
+    bind(currentPage, cache(BrowserCacheKey.LocaleKey))
     def computeValue = pageComponent.description
   }
   def descriptionChanged() {descriptionBinding.invalidate()}
   private[gui] val imageBinding = new ObjectBinding[Node] {
-    bind(goingToPage, currentPage)
+    bind(currentPage)
     def computeValue = pageComponent.image.getOrElse(null)
   }
   def imageChanged() {imageBinding.invalidate()}
@@ -240,9 +234,9 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
   }
 
   def goToPage(page:Page) {
-    println("Going to page: " + page)
     checkFXThread()
     if (goingToPage.get != Some(page)) {
+      println("Going to page: " + page)
       val fromPagePosition = currentPagePosition.get
       val toPagePosition = fromPagePosition + 1
 
