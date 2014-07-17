@@ -32,7 +32,7 @@ class PageComponentCache {
     }
   }
 
-  def exceptionComponent(context:BrowserContext) = {
+  def exceptionPageComponent(context:BrowserContext) = {
     cache.getOrElseUpdate(classOf[ExceptionPageComponent].getName, ExceptionPageComponentFactory.pageComponent(context))
   }
 }

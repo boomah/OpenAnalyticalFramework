@@ -6,13 +6,11 @@ import javafx.beans.property.{SimpleObjectProperty, SimpleBooleanProperty, Simpl
 import javafx.collections.FXCollections
 import collection.JavaConversions._
 import ref.SoftReference
-import com.openaf.pagemanager.api.{NoPageData, Page}
+import com.openaf.pagemanager.api._
 import javafx.scene.Node
 import com.openaf.browser.gui.utils.BrowserUtils._
 import com.openaf.browser.gui.api.{BrowserCacheKey, BrowserContext, PageComponent}
 import com.openaf.browser.gui.animation.{BackOnePageTransition, ForwardOnePageTransition}
-import scala.Some
-import com.openaf.pagemanager.api.ExceptionPageData
 import com.openaf.browser.gui.components.PageComponentCache
 
 class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager)
@@ -54,19 +52,26 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
       case _ => currentPage.get
     }
   }
+  private def pageComponent = {
+    try {
+      pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), this)
+    } catch {
+      case exception:Exception => pageComponentCache.exceptionPageComponent(this)
+    }
+  }
   private[gui] val nameBinding = new StringBinding {
     bind(goingToPage, currentPage, cache(BrowserCacheKey.LocaleKey))
-    def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), Browser.this).name
+    def computeValue = pageComponent.name
   }
   def nameChanged() {nameBinding.invalidate()}
   private[gui] val descriptionBinding = new StringBinding {
     bind(goingToPage, currentPage, cache(BrowserCacheKey.LocaleKey))
-    def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), Browser.this).description
+    def computeValue = pageComponent.description
   }
   def descriptionChanged() {descriptionBinding.invalidate()}
   private[gui] val imageBinding = new ObjectBinding[Node] {
     bind(goingToPage, currentPage)
-    def computeValue = pageComponentCache.pageComponent(pageID(goingToOrCurrentPage), Browser.this).image.getOrElse(null)
+    def computeValue = pageComponent.image.getOrElse(null)
   }
   def imageChanged() {imageBinding.invalidate()}
 
@@ -166,20 +171,30 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
                                pageInfoToGoTo:PageInfo, newPage:Boolean) {
     checkFXThread()
     val pageInfoWithResponseToGoTo = pageInfoToGoTo.copy(softPageResponse = new SoftReference(pageResponse))
-    val (pageComponentToGoTo, pageDataToUse) = pageResponse match {
-      case SuccessPageResponse(pageData) => {
-        (pageComponentCache.pageComponent(pageID(pageInfoWithResponseToGoTo.page), this), pageData)
-      }
-      case ProblemPageResponse(exception) => {
-        exception.printStackTrace()
-        val exceptionPageData = ExceptionPageData(exception)
-        (pageComponentCache.exceptionComponent(this), exceptionPageData)
-      }
+    def setup(pageComponent:PageComponent, pageData:PageData) {
+      pageComponent.setup(
+        pageInfoWithResponseToGoTo.page.asInstanceOf[pageComponent.P],
+        pageData.asInstanceOf[pageComponent.PD]
+      )
     }
-    pageComponentToGoTo.setup(
-      pageInfoWithResponseToGoTo.page.asInstanceOf[pageComponentToGoTo.P],
-      pageDataToUse.asInstanceOf[pageComponentToGoTo.PD]
-    )
+    def exceptionPageComponent(exception:Exception) = {
+      exception.printStackTrace()
+      val pageComponent = pageComponentCache.exceptionPageComponent(this)
+      setup(pageComponent, ExceptionPageData(exception))
+      pageComponent
+    }
+    val pageComponentToGoTo = pageResponse match {
+      case SuccessPageResponse(pageData) => {
+        try {
+          val pageComponent = pageComponentCache.pageComponent(pageID(pageInfoWithResponseToGoTo.page), this)
+          setup(pageComponent, pageData)
+          pageComponent
+        } catch {
+          case exception:Exception => exceptionPageComponent(exception)
+        }
+      }
+      case ProblemPageResponse(exception) => exceptionPageComponent(exception)
+    }
 
     def tidyUp() {
       if (newPage) {
