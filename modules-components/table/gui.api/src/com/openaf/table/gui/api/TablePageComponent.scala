@@ -13,6 +13,8 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
   type PD <: TablePageData
   type P <: TablePage
 
+  override def providesTopBorder = true
+
   override def initialise() {
     localeProperty.bind(context.cache(BrowserCacheKey.LocaleKey))
   }

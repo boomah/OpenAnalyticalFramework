@@ -166,6 +166,12 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     checkFXThread()
     val pageInfoWithResponseToGoTo = pageInfoToGoTo.copy(softPageResponse = new SoftReference(pageResponse))
     def setup(pageComponent:PageComponent, pageData:PageData) {
+      val id = if (pageComponent.providesTopBorder) {
+        "page-component-top-border-provided"
+      } else {
+        "page-component-top-border-not-provided"
+      }
+      pageComponent.setId(id)
       pageComponent.setup(
         pageInfoWithResponseToGoTo.page.asInstanceOf[pageComponent.P],
         pageData.asInstanceOf[pageComponent.PD]

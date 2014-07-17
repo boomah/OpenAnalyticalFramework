@@ -37,6 +37,7 @@ trait PageComponent extends Region {
   def descriptionId = nameId
   def description = textFromResource(descriptionId)
   def image:Option[Node]=None
+  def providesTopBorder = false
 
   final private[api] def initialise(context:BrowserContext, application:OpenAFApplication) {
     context0 = context

@@ -27,7 +27,17 @@
     -fx-border-color: -font-awesome-color;
 }
 
-.tab-pane {
+.tab-pane{
     -fx-open-tab-animation: none;
     -fx-close-tab-animation: none;
+}
+
+#page-component-top-border-not-provided{
+    -fx-border-width: 1 0 0 0;
+    -fx-border-color: -fx-box-border;
+}
+
+#page-component-top-border-provided{
+    -fx-border-width: null;
+    -fx-border-color: null;
 }

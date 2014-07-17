@@ -5,6 +5,7 @@ import com.openaf.browser.gui.BrowserApplication
 import com.openaf.browser.gui.utils.BrowserUtils
 
 trait BrowserPageComponent extends PageComponent {
+  getStyleClass.add("browser-page-component")
   override protected def resourceLocation = BrowserApplication.resourceLocation
   override def image = Some(BrowserUtils.icon("16x16_home.png"))
 }
