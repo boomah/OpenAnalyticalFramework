@@ -25,27 +25,21 @@ class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage, ca
                                                                    browser.stopOrRefreshDisableProperty, browser.working)
   private val homeButton = new SingleActionToolBarButton(Home, browser.home, browser.homeDisableProperty)
   private val navigationButtons = List(backButton, forwardButton, stopOrRefreshButton, homeButton)
-  private val buttonResizeListener = new InvalidationListener {
-    def invalidated(observable:Observable) {
-      val maxSideSize = navigationButtons.flatMap(button => {
-        List(button.prefWidth(Integer.MAX_VALUE), button.prefHeight(Integer.MAX_VALUE))
-      }).max
-      navigationButtons.foreach(button => {
-        button.setPrefWidth(maxSideSize)
-        button.setPrefHeight(maxSideSize)
-      })
-    }
-  }
-  navigationButtons.foreach(button => {
-    button.widthProperty.addListener(buttonResizeListener)
-    button.heightProperty.addListener(buttonResizeListener)
-  })
+
   private val addressBar = new AddressBar(browser.descriptionBinding)
   HBox.setHgrow(addressBar, Priority.ALWAYS)
   private val settingsButton = new SettingsMenuButton(tabPane, stage, cache)
 
   getItems.addAll(navigationButtons.toArray :_*)
   getItems.addAll(addressBar, settingsButton)
+
+  override def layoutChildren() {
+    // Because the icons on the buttons are actually from a font the buttons are all slightly different sizes. We want
+    // them to all be the same size and square. Set here we set them to the same size as the height of the addressBar.
+    val length = addressBar.prefHeight(Double.MaxValue)
+    navigationButtons.foreach(_.setPrefSize(length, length))
+    super.layoutChildren()
+  }
 }
 
 class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage, cache:BrowserCache) extends MenuButton {
