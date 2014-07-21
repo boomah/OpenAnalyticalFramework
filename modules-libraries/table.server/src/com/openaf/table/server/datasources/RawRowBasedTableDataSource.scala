@@ -104,9 +104,9 @@ object RawRowBasedTableDataSource {
           newCounter = fieldsValueCounter(fieldsValueCounterIndex) + 1
           fieldsValueCounter(fieldsValueCounterIndex) = newCounter
           lookUp.put(value, newCounter)
-          rowHeaderValues.array(rowHeaderCounter) = newCounter
+          rowHeaderValues(rowHeaderCounter) = newCounter
         } else {
-          rowHeaderValues.array(rowHeaderCounter) = intForValue
+          rowHeaderValues(rowHeaderCounter) = intForValue
         }
         rowHeaderCounter += 1
       }
@@ -131,9 +131,9 @@ object RawRowBasedTableDataSource {
               newCounter = fieldsValueCounter(fieldsValueCounterIndex) + 1
               fieldsValueCounter(fieldsValueCounterIndex) = newCounter
               lookUp.put(value, newCounter)
-              colHeaderValues.array(colHeaderColCounter) = newCounter
+              colHeaderValues(colHeaderColCounter) = newCounter
             } else {
-              colHeaderValues.array(colHeaderColCounter) = intForValue
+              colHeaderValues(colHeaderColCounter) = intForValue
             }
           }
           colHeaderColCounter += 1
