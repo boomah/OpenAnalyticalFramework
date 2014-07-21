@@ -10,23 +10,29 @@ trait TableDataSource {
 }
 
 case class Result(rowHeaderValues:Array[Array[Int]], pathData:Array[PathData], valueLookUp:Map[FieldID,Array[Any]],
-                  resultDetails:ResultDetails)
+                  resultState:ResultState)
 
 object Result {
-  val Empty = Result(Array.empty, Array.empty, Map.empty, ResultDetails.Default)
+  val Empty = Result(Array.empty, Array.empty, Map.empty, ResultState.Default)
 }
 
 case class PathData(colHeaderValues:Array[Array[Int]], data:Map[IntArrayWrapperKey,Any])
 
-case class ResultDetails(sortDetails:SortDetails)
+case class ResultState(filterState:FilterState, sortState:SortState)
 
-object ResultDetails {
-  val Default = ResultDetails(SortDetails.Default)
+object ResultState {
+  val Default = ResultState(FilterState.Default, SortState.Default)
 }
 
-case class SortDetails(rowHeadersSorted:Boolean, pathDataSorted:Array[Boolean])
+case class FilterState(isFiltered:Boolean)
 
-object SortDetails {
-  val Default = SortDetails(rowHeadersSorted=false, Array.empty)
-  def allUnsorted(numPaths:Int) = SortDetails(rowHeadersSorted=false, pathDataSorted=Array.fill(numPaths)(false))
+object FilterState {
+  val Default = FilterState(isFiltered=false)
+}
+
+case class SortState(rowHeadersSorted:Boolean, pathDataSorted:Array[Boolean])
+
+object SortState {
+  val Default = SortState(rowHeadersSorted=false, Array.empty)
+  def allUnsorted(numPaths:Int) = SortState(rowHeadersSorted=false, pathDataSorted=Array.fill(numPaths)(false))
 }

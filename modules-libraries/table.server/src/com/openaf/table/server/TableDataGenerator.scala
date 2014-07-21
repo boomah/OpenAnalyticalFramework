@@ -17,7 +17,7 @@ object TableDataGenerator {
     val rowHeaderLookUps = rowHeaderFieldIDs.map(result.valueLookUp).toArray
 
     val rowHeaderValues = result.rowHeaderValues
-    if (!result.resultDetails.sortDetails.rowHeadersSorted) {
+    if (!result.resultState.sortState.rowHeadersSorted) {
       util.Arrays.sort(
         rowHeaderValues,
         new TableDataGeneratorComparator(tableState.tableLayout.rowHeaderFields.toArray, rowHeaderFieldDefinitions,
@@ -35,7 +35,7 @@ object TableDataGenerator {
     val allColHeaderValues = paths.zipWithIndex.map{case (path,pathIndex) => {
       val pathData = allPathData(pathIndex)
       val colHeaderValues = pathData.colHeaderValues
-      if (!result.resultDetails.sortDetails.pathDataSorted(pathIndex)) {
+      if (!result.resultState.sortState.pathDataSorted(pathIndex)) {
         val colHeaderFieldDefinitions = path.fields.map(field => {
           tableDataSource.fieldDefinitionGroups.fieldDefinition(field.id)
         }).toArray

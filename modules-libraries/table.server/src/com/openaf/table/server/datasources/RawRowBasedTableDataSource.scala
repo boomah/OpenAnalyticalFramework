@@ -220,7 +220,7 @@ object RawRowBasedTableDataSource {
       pathData(pathsCounter) = PathData(colHeadersArray, dataForPath.toMap)
       pathsCounter += 1
     }
-    val resultDetails = ResultDetails(SortDetails.allUnsorted(pathData.length))
+    val resultDetails = ResultState(FilterState(isFiltered=false), SortState.allUnsorted(pathData.length))
     Result(rowHeadersToUse, pathData, valueLookUp, resultDetails)
   }
 }
