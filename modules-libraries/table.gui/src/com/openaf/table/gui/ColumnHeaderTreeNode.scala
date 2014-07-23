@@ -1,13 +1,13 @@
 package com.openaf.table.gui
 
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.Property
 import javafx.scene.layout.{Priority, VBox}
 import javafx.geometry.Side
 import com.openaf.table.lib.api._
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
 
-class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataProperty:SimpleObjectProperty[TableData],
+class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataProperty:Property[TableData],
                            dragAndDrop:DragAndDrop, dragAndDropContainer:DragAndDropContainer,
                            fieldBindings:ObservableMap[FieldID,StringBinding]) extends VBox {
   private val topNode = columnHeaderTree.columnHeaderTreeType match {

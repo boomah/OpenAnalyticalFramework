@@ -1,7 +1,7 @@
 package com.openaf.table.gui
 
 import javafx.scene.control.Label
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.Property
 import javafx.scene.layout.HBox
 import com.openaf.table.lib.api.{FieldID, TableData, Field}
 import javafx.collections.ObservableMap
@@ -10,7 +10,7 @@ import javafx.scene.SnapshotParameters
 import javafx.scene.paint.Color
 
 class FieldNode(val field:Field[_], val dragAndDrop:DragAndDrop, val dragAndDropContainer:DragAndDropContainer,
-                val tableData:SimpleObjectProperty[TableData], fieldBindings:ObservableMap[FieldID,StringBinding])
+                val tableData:Property[TableData], fieldBindings:ObservableMap[FieldID,StringBinding])
   extends HBox with Draggable {
 
   getStyleClass.add("field-node")

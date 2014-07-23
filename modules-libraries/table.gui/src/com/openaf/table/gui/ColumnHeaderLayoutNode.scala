@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.Property
 import javafx.scene.layout.{Priority, HBox}
 import javafx.geometry.Side
 import scala.collection.JavaConversions._
@@ -8,7 +8,7 @@ import com.openaf.table.lib.api._
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
 
-class ColumnHeaderLayoutNode(columnHeaderLayout:ColumnHeaderLayout, tableDataProperty:SimpleObjectProperty[TableData],
+class ColumnHeaderLayoutNode(columnHeaderLayout:ColumnHeaderLayout, tableDataProperty:Property[TableData],
                             dragAndDrop:DragAndDrop, dragAndDropContainer:DragAndDropContainer,
                             fieldBindings:ObservableMap[FieldID,StringBinding]) extends HBox {
   private val columnHeaderTreeNodes = columnHeaderLayout.columnHeaderTrees.map(columnHeaderTree => {

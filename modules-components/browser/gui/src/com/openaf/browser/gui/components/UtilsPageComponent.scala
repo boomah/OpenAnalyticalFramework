@@ -41,11 +41,11 @@ class UtilsPageComponent extends BorderPane with BrowserPageComponent {
   private val localePane = new FlowPane
   private val englishButton = new Button("English")
   englishButton.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {
-    context.cache(BrowserCacheKey.LocaleKey).set(Locale.UK)
+    context.cache(BrowserCacheKey.LocaleKey).setValue(Locale.UK)
   }})
   private val frenchButton = new Button("French")
   frenchButton.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {
-    context.cache(BrowserCacheKey.LocaleKey).set(Locale.FRANCE)
+    context.cache(BrowserCacheKey.LocaleKey).setValue(Locale.FRANCE)
   }})
   localePane.getChildren.addAll(englishButton, frenchButton)
 

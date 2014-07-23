@@ -9,7 +9,7 @@ class ApplicationLocaleStringBinding(id:String, application:OpenAFApplication, c
   bind(localeProperty)
   def computeValue = {
     ResourceBundle.getBundle(
-      application.resourceLocation, localeProperty.get, application.getClass.getClassLoader
+      application.resourceLocation, localeProperty.getValue, application.getClass.getClassLoader
     ).getString(id)
   }
 }

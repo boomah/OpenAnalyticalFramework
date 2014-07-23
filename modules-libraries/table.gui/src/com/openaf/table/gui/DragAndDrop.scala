@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.{Property, SimpleObjectProperty}
 import javafx.scene.{Cursor, Node}
 import javafx.event.EventHandler
 import javafx.scene.input.{MouseButton, MouseEvent}
@@ -120,7 +120,7 @@ trait Draggable extends Region {
   // When dropped here, nothing will happen. Usually just the Draggable itself, but in the case of a Draggable being
   // dragged from the AllFieldsArea, the AllFieldsArea scene bounds are used.
   def noOpSceneBounds = localToScene(getBoundsInLocal)
-  def tableData:SimpleObjectProperty[TableData]
+  def tableData:Property[TableData]
   def dragImage:Image
   def isParent = false
 
@@ -167,14 +167,14 @@ trait Draggable extends Region {
       dragAndDrop.fieldsBeingDraggedInfo.get.foreach(draggableFieldsInfo => {
         updateClosestDropTarget(event)
         val newTableDataOption = dragAndDrop.closestDropTarget.get.map(dropTarget => {
-          val tableDataWithFieldsRemoved = draggableFieldsInfo.dragAndDropContainer.removeFields(draggableFieldsInfo, tableData.get)
+          val tableDataWithFieldsRemoved = draggableFieldsInfo.dragAndDropContainer.removeFields(draggableFieldsInfo, tableData.getValue)
           dropTarget.fieldsDropped(draggableFieldsInfo, tableDataWithFieldsRemoved)
         })
         getScene.setCursor(Cursor.DEFAULT)
         dragAndDrop.clearDragPane()
         dragAndDrop.closestDropTarget.set(None)
         dragAndDrop.fieldsBeingDraggedInfo.set(None)
-        newTableDataOption.foreach(newTableData => tableData.set(newTableData))
+        newTableDataOption.foreach(newTableData => tableData.setValue(newTableData))
       })
     }
   })
@@ -186,7 +186,7 @@ trait Draggable extends Region {
   })
 
   private def moveField() {
-    val currentTableData = tableData.get
+    val currentTableData = tableData.getValue
     val draggableFieldsInfo = DraggableFieldsInfo(Draggable.this, dragAndDropContainer)
     val tableDataWithRemoved = dragAndDropContainer.removeFields(draggableFieldsInfo, currentTableData)
     val tableDataToUse = if (tableDataWithRemoved == currentTableData) {
@@ -201,7 +201,7 @@ trait Draggable extends Region {
     } else {
       tableDataWithRemoved
     }
-    tableData.set(tableDataToUse)
+    tableData.setValue(tableDataToUse)
   }
 }
 
@@ -233,9 +233,9 @@ case class DraggableFieldsInfo(draggable:Draggable, dragAndDropContainer:DragAnd
 
 trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
   getStyleClass.add("drag-and-drop-container-node")
-  def tableDataProperty:SimpleObjectProperty[TableData]
+  def tableDataProperty:Property[TableData]
   def descriptionID:String
-  def locale:SimpleObjectProperty[Locale]
+  def locale:Property[Locale]
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = dropTargetMap.keySet.toList
   def removeDropTargets() {
     dropTargetPane.getChildren.clear()

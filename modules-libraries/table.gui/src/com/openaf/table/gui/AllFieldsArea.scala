@@ -2,7 +2,7 @@ package com.openaf.table.gui
 
 import javafx.scene.layout.StackPane
 import javafx.scene.control.{TreeCell, TreeItem, TreeView}
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.Property
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.util.Callback
 import com.openaf.table.lib.api._
@@ -18,7 +18,7 @@ case class TreeGroup(fieldGroup:String, allChildFields:List[Field[_]])
 
 import AllFieldsArea._
 
-class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragAndDrop:DragAndDrop,
+class AllFieldsArea(tableDataProperty:Property[TableData], val dragAndDrop:DragAndDrop,
                     fieldBindings:ObservableMap[FieldID,StringBinding])
   extends StackPane with DropTarget with DragAndDropContainer with ConfigAreaNode {
 
@@ -73,7 +73,7 @@ class AllFieldsArea(tableDataProperty:SimpleObjectProperty[TableData], val dragA
 }
 
 class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsArea,
-                           val tableData:SimpleObjectProperty[TableData],
+                           val tableData:Property[TableData],
                            fieldBindings:ObservableMap[FieldID,StringBinding])
   extends TreeCell[TreeItemType] with Draggable {
 

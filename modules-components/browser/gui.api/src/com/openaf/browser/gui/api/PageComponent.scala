@@ -22,7 +22,7 @@ trait PageComponent extends Region {
   protected def resourceLocation = application0.resourceLocation
   protected def textFromResource(id:String, location:String=resourceLocation,
                                  classLoader:ClassLoader=getClass.getClassLoader) = {
-    ResourceBundle.getBundle(location, context.cache(BrowserCacheKey.LocaleKey).get, classLoader).getString(id)
+    ResourceBundle.getBundle(location, context.cache(BrowserCacheKey.LocaleKey).getValue, classLoader).getString(id)
   }
   protected def stringBindingFromResource(id:String, location:String=resourceLocation,
                                           classLoader:ClassLoader=getClass.getClassLoader) = {

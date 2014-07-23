@@ -2,7 +2,7 @@ package com.openaf.browser.gui.api
 
 import collection.mutable
 import javafx.application.Platform
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.{Property, SimpleObjectProperty}
 import java.util.Locale
 
 class BrowserCache {
@@ -34,7 +34,7 @@ class SimpleBrowserCacheKeyWithDefault[T](browserCacheKey0:BrowserCacheKey[T], v
 
 object BrowserCacheKey {
   val LocaleKey = {
-    val key = BrowserCacheKey[SimpleObjectProperty[Locale]]("Locale")
+    val key = BrowserCacheKey[Property[Locale]]("Locale")
     new SimpleBrowserCacheKeyWithDefault(key, new SimpleObjectProperty[Locale](Locale.getDefault))
   }
 }
