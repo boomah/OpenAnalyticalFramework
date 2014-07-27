@@ -14,7 +14,6 @@ case class TableState(tableLayout:TableLayout) {
   def withFilterFields(newFilterFields:List[Field[_]]) = {
     copy(tableLayout = tableLayout.withFilterFields(newFilterFields))
   }
-  def remove(fields:Field[_]*) = copy(tableLayout = tableLayout.remove(fields:_*))
 }
 object TableState {
   val Blank = TableState(TableLayout.Blank)
