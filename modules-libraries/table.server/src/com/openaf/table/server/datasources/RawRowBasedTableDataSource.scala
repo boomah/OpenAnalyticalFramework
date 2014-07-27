@@ -1,8 +1,8 @@
 package com.openaf.table.server.datasources
 
-import com.openaf.table.lib.api.{FieldID, TableState}
+import com.openaf.table.lib.api.{Field, FieldID, TableState}
 import com.openaf.table.lib.api.StandardFields._
-import com.openaf.table.server.{FieldDefinitionGroups, NullFieldDefinition}
+import com.openaf.table.server.{FieldDefinition, FieldDefinitionGroups, NullFieldDefinition}
 import java.util.{HashMap => JMap}
 import scala.collection.{JavaConversions, mutable}
 
@@ -24,7 +24,9 @@ object RawRowBasedTableDataSource {
     })(collection.breakOut)
     val fieldsValueCounter = new Array[Int](allFieldIDs.size)
 
+    val rowHeaderFields = tableState.rowHeaderFields.toArray
     val rowHeaderFieldIDs = tableState.tableLayout.rowHeaderFieldIDs
+    val rowHeaderFieldDefinitions = rowHeaderFieldIDs.map(id => fieldDefinitionGroup.fieldDefinition(id)).toArray
     val numRowHeaderCols = rowHeaderFieldIDs.length
     var rowHeaderCounter = 0
     val rowHeaderFieldPositions = rowHeaderFieldIDs.map(fieldIDs.indexOf(_)).toArray
@@ -67,6 +69,10 @@ object RawRowBasedTableDataSource {
       case Some(field) => fieldDefinitionGroup.fieldDefinition(field.id)
       case _ => NullFieldDefinition
     }
+    val columnHeaderPathsFields = columnHeaderPaths.map(_.fields.toArray).toArray
+    val columnHeaderPathsFieldDefinitions = columnHeaderPathsFields.map(_.map(field => {
+      fieldDefinitionGroup.fieldDefinition(field.id)
+    }))
 
     val aggregatedDataForPath = Array.fill(numPaths)(new JMap[IntArrayWrapperKey,Any])
 
@@ -90,13 +96,20 @@ object RawRowBasedTableDataSource {
     var key:IntArrayWrapperKey = null
     var currentValue:Any = -1
     var aggregatedData:JMap[IntArrayWrapperKey,Any] = null
+    var matchesFilter = true
+    var columnHeaderFields:Array[Field[_]] = null
+    var columnHeaderFieldDefinitions:Array[FieldDefinition] = null
 
     while (dataCounter < dataLength) {
       dataRow = data(dataCounter)
+      matchesFilter = true
 
       rowHeaderValues = new Array[Int](numRowHeaderCols)
-      while (rowHeaderCounter < numRowHeaderCols) {
+      while (matchesFilter && rowHeaderCounter < numRowHeaderCols) {
         value = dataRow(rowHeaderFieldPositions(rowHeaderCounter))
+        val fieldDefinition = rowHeaderFieldDefinitions(rowHeaderCounter)
+        matchesFilter = rowHeaderFields(rowHeaderCounter).asInstanceOf[Field[fieldDefinition.V]]
+          .filter.matches(value.asInstanceOf[fieldDefinition.V])
         lookUp = rowHeadersLookUp(rowHeaderCounter)
         intForValue = lookUp.get(value)
         if (intForValue == 0) {
@@ -111,9 +124,11 @@ object RawRowBasedTableDataSource {
         rowHeaderCounter += 1
       }
       rowHeaderCounter = 0
-      rowHeaders += new IntArrayWrapper(rowHeaderValues)
+      if (matchesFilter) {
+        rowHeaders += new IntArrayWrapper(rowHeaderValues)
+      }
 
-      while (pathsCounter < numPaths) {
+      while (matchesFilter && pathsCounter < numPaths) {
         aggregatedData = aggregatedDataForPath(pathsCounter)
         measureFieldIndex = columnHeaderMeasureFieldPositions(pathsCounter)
         columnHeaderFieldPositions = colHeaderFieldsPositions(pathsCounter)
@@ -121,9 +136,15 @@ object RawRowBasedTableDataSource {
         columnHeaderValueCounter = colHeadersValuesCounter(pathsCounter)
         numColumnHeaderCols = numColumnHeaderColsPerPath(pathsCounter)
         colHeaderValues = new Array[Int](numColumnHeaderCols)
-        while (colHeaderColCounter < numColumnHeaderCols) {
+        columnHeaderFields = columnHeaderPathsFields(pathsCounter)
+        columnHeaderFieldDefinitions = columnHeaderPathsFieldDefinitions(pathsCounter)
+        matchesFilter = true
+        while (matchesFilter && colHeaderColCounter < numColumnHeaderCols) {
           if (colHeaderColCounter != measureFieldIndex) {
             value = dataRow(columnHeaderFieldPositions(colHeaderColCounter))
+            val fieldDefinition = columnHeaderFieldDefinitions(colHeaderColCounter)
+            matchesFilter = columnHeaderFields(colHeaderColCounter).asInstanceOf[Field[fieldDefinition.V]]
+              .filter.matches(value.asInstanceOf[fieldDefinition.V])
             lookUp = columnHeaderLookUp(colHeaderColCounter)
             intForValue = lookUp.get(value)
             if (intForValue == 0) {
@@ -139,46 +160,49 @@ object RawRowBasedTableDataSource {
           colHeaderColCounter += 1
         }
         colHeaderColCounter = 0
-        colHeaders(pathsCounter) += new IntArrayWrapper(colHeaderValues)
+        if (matchesFilter) {
+          colHeaders(pathsCounter) += new IntArrayWrapper(colHeaderValues)
 
-        measureFieldPosition = measureFieldPositions(pathsCounter)
-        // If there isn't a measure field there is no need to update the aggregated data
-        if (measureFieldPosition >= 0) {
-          value = dataRow(measureFieldPosition)
-          key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
-          currentValue = aggregatedData.get(key)
-          val fieldDefinition = measureFieldDefinitions(pathsCounter)
-          if (currentValue == null) {
-            newDataValue = fieldDefinition.combiner.combine(
-              fieldDefinition.combiner.initialCombinedValue,
-              value.asInstanceOf[fieldDefinition.V]
-            )
-          } else {
-            newDataValue = fieldDefinition.combiner.combine(
-              currentValue.asInstanceOf[fieldDefinition.C],
-              value.asInstanceOf[fieldDefinition.V]
-            )
+          measureFieldPosition = measureFieldPositions(pathsCounter)
+          // If there isn't a measure field there is no need to update the aggregated data
+          if (measureFieldPosition >= 0) {
+            value = dataRow(measureFieldPosition)
+            key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
+            currentValue = aggregatedData.get(key)
+            val fieldDefinition = measureFieldDefinitions(pathsCounter)
+            if (currentValue == null) {
+              newDataValue = fieldDefinition.combiner.combine(
+                fieldDefinition.combiner.initialCombinedValue,
+                value.asInstanceOf[fieldDefinition.V]
+              )
+            } else {
+              newDataValue = fieldDefinition.combiner.combine(
+                currentValue.asInstanceOf[fieldDefinition.C],
+                value.asInstanceOf[fieldDefinition.V]
+              )
+            }
+            aggregatedData.put(key, newDataValue)
+          } else if (measureFieldPosition == -2) {
+            // Count field
+            value = 1
+            key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
+            currentValue = aggregatedData.get(key)
+            val fieldDefinition = measureFieldDefinitions(pathsCounter)
+            if (currentValue == null) {
+              newDataValue = fieldDefinition.combiner.combine(
+                fieldDefinition.combiner.initialCombinedValue,
+                value.asInstanceOf[fieldDefinition.V]
+              )
+            } else {
+              newDataValue = fieldDefinition.combiner.combine(
+                currentValue.asInstanceOf[fieldDefinition.C],
+                value.asInstanceOf[fieldDefinition.V]
+              )
+            }
+            aggregatedData.put(key, newDataValue)
           }
-          aggregatedData.put(key, newDataValue)
-        } else if (measureFieldPosition == -2) {
-          // Count field
-          value = 1
-          key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
-          currentValue = aggregatedData.get(key)
-          val fieldDefinition = measureFieldDefinitions(pathsCounter)
-          if (currentValue == null) {
-            newDataValue = fieldDefinition.combiner.combine(
-              fieldDefinition.combiner.initialCombinedValue,
-              value.asInstanceOf[fieldDefinition.V]
-            )
-          } else {
-            newDataValue = fieldDefinition.combiner.combine(
-              currentValue.asInstanceOf[fieldDefinition.C],
-              value.asInstanceOf[fieldDefinition.V]
-            )
-          }
-          aggregatedData.put(key, newDataValue)
         }
+
         pathsCounter += 1
       }
       pathsCounter = 0
@@ -220,7 +244,7 @@ object RawRowBasedTableDataSource {
       pathData(pathsCounter) = PathData(colHeadersArray, dataForPath.toMap)
       pathsCounter += 1
     }
-    val resultDetails = ResultState(FilterState(isFiltered=false), SortState.allUnsorted(pathData.length))
+    val resultDetails = ResultState(FilterState(isFiltered=true), SortState.allUnsorted(pathData.length))
     Result(rowHeadersToUse, pathData, valueLookUp, resultDetails)
   }
 }

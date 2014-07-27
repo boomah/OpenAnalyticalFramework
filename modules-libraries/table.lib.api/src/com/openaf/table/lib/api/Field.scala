@@ -5,6 +5,7 @@ import SortOrder._
 case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=NoFilter[T](),
                     rendererID:RendererID=DefaultRendererID, sortOrder:SortOrder=Ascending) {
   def flipSortOrder = copy(sortOrder = if (sortOrder == Ascending) Descending else Ascending)
+  def filterSingleValue(value:T) = copy(filter = SpecifiedFilter[T](Set(value)))
 }
 
 object Field {
