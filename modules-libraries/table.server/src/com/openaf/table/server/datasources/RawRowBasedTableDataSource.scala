@@ -138,7 +138,6 @@ object RawRowBasedTableDataSource {
         colHeaderValues = new Array[Int](numColumnHeaderCols)
         columnHeaderFields = columnHeaderPathsFields(pathsCounter)
         columnHeaderFieldDefinitions = columnHeaderPathsFieldDefinitions(pathsCounter)
-        matchesFilter = true
         while (matchesFilter && colHeaderColCounter < numColumnHeaderCols) {
           if (colHeaderColCounter != measureFieldIndex) {
             value = dataRow(columnHeaderFieldPositions(colHeaderColCounter))
@@ -202,7 +201,7 @@ object RawRowBasedTableDataSource {
             aggregatedData.put(key, newDataValue)
           }
         }
-
+        matchesFilter = true
         pathsCounter += 1
       }
       pathsCounter = 0

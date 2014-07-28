@@ -27,7 +27,7 @@ object DataSourceTestData {
   val Josie = "Josie"
   val Nick = "Nick"
   val Paul = "Paul"
-  val Ally = "Edinburgh"
+  val Ally = "Ally"
 
   val F = "F"
   val M = "M"
