@@ -64,7 +64,6 @@ class AllFieldsArea(tableDataProperty:Property[TableData], val dragAndDrop:DragA
   def removeDropTargets() {}
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = if (getParent != null) List(this) else Nil
   def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
-  def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
   def setDefaultFocus() = {treeView.requestFocus()}
   def isConfigAreaNodeFocused = treeView.isFocused
@@ -102,7 +101,7 @@ class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsA
   }
   override def noOpSceneBounds = allFieldsArea.localToScene(allFieldsArea.getBoundsInLocal)
   def dragAndDropContainer = allFieldsArea
-  def fields = fields0
+  def fields = fields0.map(_.duplicate) // The AllFieldsArea needs to create new fields so always duplicate them
   def dragImage = snapshot(new SnapshotParameters, null)
   override def isParent = getTreeItem.getValue.isLeft
 }

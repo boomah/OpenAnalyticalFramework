@@ -167,7 +167,8 @@ trait Draggable extends Region {
       dragAndDrop.fieldsBeingDraggedInfo.get.foreach(draggableFieldsInfo => {
         updateClosestDropTarget(event)
         val newTableDataOption = dragAndDrop.closestDropTarget.get.map(dropTarget => {
-          val tableDataWithFieldsRemoved = draggableFieldsInfo.dragAndDropContainer.removeFields(draggableFieldsInfo, tableData.getValue)
+          val tableDataWithFieldsRemoved = draggableFieldsInfo.dragAndDropContainer
+            .removeFields(tableData.getValue, draggableFieldsInfo.fields)
           dropTarget.fieldsDropped(draggableFieldsInfo, tableDataWithFieldsRemoved)
         })
         getScene.setCursor(Cursor.DEFAULT)
@@ -187,8 +188,7 @@ trait Draggable extends Region {
 
   private def moveField() {
     val currentTableData = tableData.getValue
-    val draggableFieldsInfo = DraggableFieldsInfo(Draggable.this, dragAndDropContainer)
-    val tableDataWithRemoved = dragAndDropContainer.removeFields(draggableFieldsInfo, currentTableData)
+    val tableDataWithRemoved = dragAndDropContainer.removeFields(currentTableData, fields)
     val tableDataToUse = if (tableDataWithRemoved == currentTableData) {
       val field = fields.head
       if (field.fieldType.isDimension) {
@@ -226,10 +226,14 @@ trait DragAndDropContainer {
       }
     }
   })
-  def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
+  def removeFields(tableData:TableData, fields:List[Field[_]]) = {
+    tableData.copy(tableState = tableData.tableState.remove(fields))
+  }
 }
 
-case class DraggableFieldsInfo(draggable:Draggable, dragAndDropContainer:DragAndDropContainer)
+case class DraggableFieldsInfo(draggable:Draggable, dragAndDropContainer:DragAndDropContainer) {
+  def fields = draggable.fields
+}
 
 trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
   getStyleClass.add("drag-and-drop-container-node")

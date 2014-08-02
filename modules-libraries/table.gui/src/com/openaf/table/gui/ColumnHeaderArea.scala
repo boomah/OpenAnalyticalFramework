@@ -15,13 +15,9 @@ class ColumnHeaderArea(val tableDataProperty:Property[TableData], val dragAndDro
   def descriptionID = "columnHeaderDescription"
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo) = dropTargetsHelper.dropTargetsToNodeSide(draggableFieldsInfo)
   private def parentColumnHeaderLayoutNode = mainContent.getChildren.get(0).asInstanceOf[ColumnHeaderLayoutNode]
-  def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
-    val newColumnHeaderLayout = parentColumnHeaderLayoutNode.generateColumnHeaderLayoutWithRemoval(draggableFieldsInfo.draggable)
-    tableData.withColumnHeaderLayout(newColumnHeaderLayout)
-  }
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
     val newColumnHeaderLayout = if (tableData.tableState.tableLayout.columnHeaderLayout.allFields.isEmpty) {
-      ColumnHeaderLayout.fromFields(draggableFieldsInfo.draggable.fields)
+      ColumnHeaderLayout.fromFields(draggableFieldsInfo.fields)
     } else {
       val nodeSide = dropTargetMap(dropTarget)
       parentColumnHeaderLayoutNode.generateColumnHeaderLayoutWithAddition(nodeSide, draggableFieldsInfo)

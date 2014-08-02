@@ -67,7 +67,7 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
         val index = children.indexOf(nodeSide.node)
         currentFields.zipWithIndex.flatMap{case (field,i) => {
           if (index == i) {
-            field :: draggableFieldsInfo.draggable.fields
+            field :: draggableFieldsInfo.fields
           } else {
             List(field)
           }
@@ -81,15 +81,9 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
       }.toArray
       generateFields(childrenToUse)
     } else {
-      draggableFieldsInfo.draggable.fields ::: currentFields
+      draggableFieldsInfo.fields ::: currentFields
     }
     withNewFields(newFields, tableData)
-  }
-
-  def removeFields(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
-    val updatedFields = mainContent.getChildren.toArray.flatMap(child => if (child == draggableFieldsInfo.draggable) None else Some(child))
-      .collect{case (draggable:Draggable) => draggable.fields}.flatten.toList
-    withNewFields(updatedFields, tableData)
   }
 
   private def fullSetup(fields:List[Field[_]]) {

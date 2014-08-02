@@ -84,7 +84,7 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
 
   test("0 row, 1 measure, 2 column (same, same filter)") {
     val tableState = TableState.Blank.withColumnHeaderLayout(
-      ColumnHeaderLayout(ScoreField, List(GenderField.withSingleFilter(F), GenderField.withSingleFilter(F)))
+      ColumnHeaderLayout(ScoreField, List(GenderField.withSingleFilter(F), GenderField.duplicate.withSingleFilter(F)))
     )
 
     val expectedColHeaderValues = List(Set(List(0,1)), Set(List(0,1)))

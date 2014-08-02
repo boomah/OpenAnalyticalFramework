@@ -239,7 +239,7 @@ class OpenAFTableViewTest extends FunSuite {
   }
 
   test("0 column, 2 measure (same next to each other)") {
-    val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout.fromFields(ScoreField, ScoreField))
+    val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout.fromFields(ScoreField, ScoreFieldDuplicate))
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
       columnHeaders = Array(Array(Array(0)), Array(Array(0))),
@@ -260,7 +260,7 @@ class OpenAFTableViewTest extends FunSuite {
   }
 
   test("2 column (same (with two values) next to each other") {
-    val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout.fromFields(GenderField, GenderField))
+    val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout.fromFields(GenderField, GenderFieldDuplicate))
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
       columnHeaders = Array(Array(Array(1), Array(2)), Array(Array(1), Array(2))),
@@ -286,7 +286,7 @@ class OpenAFTableViewTest extends FunSuite {
   }
 
   test("2 column (same (with one value) next to each other") {
-    val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout.fromFields(GroupField, GroupField))
+    val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout.fromFields(GroupField, GroupFieldDuplicate))
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
       columnHeaders = Array(Array(Array(1)), Array(Array(1))),
@@ -324,7 +324,7 @@ class OpenAFTableViewTest extends FunSuite {
   }
 
   test("2 column, 2 measure (both measures over the columns and the same, one value for column fields)") {
-    val layout = ColumnHeaderLayout(List(ScoreField, ScoreField), List(GroupField, GroupField))
+    val layout = ColumnHeaderLayout(List(ScoreField, ScoreFieldDuplicate), List(GroupField, GroupFieldDuplicate))
     val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = layout)
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
@@ -336,25 +336,26 @@ class OpenAFTableViewTest extends FunSuite {
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
-    assert(columns.size === 1)
+    assert(columns.size === 2)
     assert(columns.get(0).getText === Score)
-    assert(columns.get(0).getColumns.size === 4)
+    assert(columns.get(0).getColumns.size === 2)
     assert(columns.get(0).getColumns.get(0).getText === Friends)
     assert(columns.get(0).getColumns.get(1).getText === Friends)
-    assert(columns.get(0).getColumns.get(2).getText === Friends)
-    assert(columns.get(0).getColumns.get(3).getText === Friends)
     assert(columns.get(0).getColumns.get(0).getColumns.size === 0)
     assert(columns.get(0).getColumns.get(1).getColumns.size === 0)
-    assert(columns.get(0).getColumns.get(2).getColumns.size === 0)
-    assert(columns.get(0).getColumns.get(3).getColumns.size === 0)
+    assert(columns.get(1).getColumns.size === 2)
+    assert(columns.get(1).getColumns.get(0).getText === Friends)
+    assert(columns.get(1).getColumns.get(1).getText === Friends)
+    assert(columns.get(1).getColumns.get(0).getColumns.size === 0)
+    assert(columns.get(1).getColumns.get(1).getColumns.size === 0)
     assert(columns.get(0).getColumns.get(0).getCellData(0) === 98)
     assert(columns.get(0).getColumns.get(1).getCellData(0) === 98)
-    assert(columns.get(0).getColumns.get(2).getCellData(0) === 98)
-    assert(columns.get(0).getColumns.get(3).getCellData(0) === 98)
+    assert(columns.get(1).getColumns.get(0).getCellData(0) === 98)
+    assert(columns.get(1).getColumns.get(1).getCellData(0) === 98)
   }
 
   test("2 column (columns the same, with one value), 1 measure (on top of both columns)") {
-    val layout = ColumnHeaderLayout(ScoreField, List(GroupField, GroupField))
+    val layout = ColumnHeaderLayout(ScoreField, List(GroupField, GroupFieldDuplicate))
     val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = layout)
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
@@ -374,7 +375,7 @@ class OpenAFTableViewTest extends FunSuite {
   }
 
   test("3 column (2 on top of them other, 2 left ones the same)") {
-    val layout = ColumnHeaderLayout(List(GroupField, LocationField), List(GroupField))
+    val layout = ColumnHeaderLayout(List(GroupField, LocationField), List(GroupFieldDuplicate))
     val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = layout)
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(

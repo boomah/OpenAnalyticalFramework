@@ -21,11 +21,6 @@ class ColumnHeaderLayoutNode(columnHeaderLayout:ColumnHeaderLayout, tableDataPro
 
   def childColumnAreaTreeNodes = getChildren.collect{case (columnHeaderTreeNode:ColumnHeaderTreeNode) => columnHeaderTreeNode}
 
-  def generateColumnHeaderLayoutWithRemoval(draggableToRemove:Draggable) = {
-    val columnHeaderTrees = columnHeaderTreeNodes.flatMap(_.generateWithRemovalOption(draggableToRemove))
-    ColumnHeaderLayout(columnHeaderTrees)
-  }
-
   def allFieldNodes:Seq[FieldNode] = columnHeaderTreeNodes.flatMap(_.topFieldNodes)
 
   def generateColumnHeaderLayoutWithAddition(nodeSide:NodeSide, draggableFieldsInfo:DraggableFieldsInfo) = {
@@ -33,7 +28,7 @@ class ColumnHeaderLayoutNode(columnHeaderLayout:ColumnHeaderLayout, tableDataPro
     if (nodeSide.node == this) {
       nodeSide.side match {
         case Side.TOP => {
-          val columnHeaderTreeType = draggableFieldsInfo.draggable.fields match {
+          val columnHeaderTreeType = draggableFieldsInfo.fields match {
             case field :: Nil => Left(field)
             case manyFields => Right(ColumnHeaderLayout.fromFields(manyFields))
           }
@@ -43,7 +38,7 @@ class ColumnHeaderLayoutNode(columnHeaderLayout:ColumnHeaderLayout, tableDataPro
         }
         case Side.BOTTOM => {
           val newColumnAreaTreeType = Right(ColumnHeaderLayout(columnHeaderTrees))
-          val newChildColumnHeaderLayout = ColumnHeaderLayout.fromFields(draggableFieldsInfo.draggable.fields)
+          val newChildColumnHeaderLayout = ColumnHeaderLayout.fromFields(draggableFieldsInfo.fields)
           val newColumnAreaTree = ColumnHeaderTree(newColumnAreaTreeType, newChildColumnHeaderLayout)
           ColumnHeaderLayout(newColumnAreaTree)
         }

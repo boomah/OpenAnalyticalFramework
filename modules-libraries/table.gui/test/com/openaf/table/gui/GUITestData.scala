@@ -5,10 +5,13 @@ import com.openaf.table.lib.api._
 object GUITestData {
   val NameField = Field[String]("name")
   val GenderField = Field[String]("gender")
+  val GenderFieldDuplicate = GenderField.duplicate
   val LocationField = Field[String]("location")
   val AgeField = Field[Int]("age")
   val ScoreField = Field[Int]("score", Measure)
+  val ScoreFieldDuplicate = ScoreField.duplicate
   val GroupField = Field[String]("group")
+  val GroupFieldDuplicate = GroupField.duplicate
 
   val Fields = List(NameField, GenderField, LocationField, AgeField, ScoreField, GroupField)
 
@@ -39,9 +42,12 @@ object GUITestData {
 
   val DefaultRenderers:Map[Field[_],Renderer[_]] = Map(
     GenderField -> StringRenderer,
+    GenderFieldDuplicate -> StringRenderer,
     LocationField -> StringRenderer,
     AgeField -> IntRenderer,
     ScoreField -> IntRenderer,
-    GroupField -> StringRenderer
+    ScoreFieldDuplicate -> IntRenderer,
+    GroupField -> StringRenderer,
+    GroupFieldDuplicate -> StringRenderer
   )
 }

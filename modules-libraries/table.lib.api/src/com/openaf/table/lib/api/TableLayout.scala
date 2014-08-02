@@ -2,6 +2,10 @@ package com.openaf.table.lib.api
 
 case class TableLayout(rowHeaderFields:List[Field[_]], columnHeaderLayout:ColumnHeaderLayout,
                        filterFields:List[Field[_]]) {
+  // All fields need to be unique
+  require(rowHeaderFields.size == rowHeaderFields.toSet.size, "Duplicate fields in the Row Header Area")
+  require(columnHeaderLayout.allFields.size == columnHeaderLayout.allFields.toSet.size, "Duplicate fields in the Column Header Area")
+  require(filterFields.size == filterFields.toSet.size, "Duplicate fields in the Filter Fields Area")
   def rowHeaderFieldIDs = rowHeaderFields.map(_.id)
   def columnHeaderLayoutFieldIDs = columnHeaderLayout.allFields.map(_.id)
   def filterFieldIDs = filterFields.map(_.id)
@@ -12,6 +16,15 @@ case class TableLayout(rowHeaderFields:List[Field[_]], columnHeaderLayout:Column
     copy(columnHeaderLayout = newColumnHeaderLayout.normalise)
   }
   def withFilterFields(newFilterFields:List[Field[_]]) = copy(filterFields = newFilterFields)
+  def remove(fields:List[Field[_]]) = {
+    val fieldsSet = fields.toSet
+    TableLayout(
+      rowHeaderFields.filterNot(fieldsSet.contains),
+      columnHeaderLayout.remove(fields:_*),
+      filterFields.filterNot(fieldsSet.contains)
+    )
+  }
+  def remove(field:Field[_]):TableLayout = remove(field::Nil)
 }
 
 object TableLayout {
