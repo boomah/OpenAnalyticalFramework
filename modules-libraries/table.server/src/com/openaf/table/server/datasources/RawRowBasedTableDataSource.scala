@@ -1,10 +1,10 @@
 package com.openaf.table.server.datasources
 
-import com.openaf.table.lib.api.{Field, FieldID, TableState}
+import com.openaf.table.lib.api.{FieldValues, Field, FieldID, TableState}
 import com.openaf.table.lib.api.StandardFields._
 import com.openaf.table.server.{FieldDefinition, FieldDefinitionGroups, NullFieldDefinition}
 import java.util.{HashMap => JMap}
-import scala.collection.{JavaConversions, mutable}
+import scala.collection.{mutable, JavaConversions}
 
 case class RawRowBasedTableDataSource(data:Array[Array[Any]], fieldIDs:Array[FieldID],
                                       fieldDefinitionGroups:FieldDefinitionGroups) extends TableDataSource {
@@ -76,6 +76,8 @@ object RawRowBasedTableDataSource {
 
     val aggregatedDataForPath = Array.fill(numPaths)(new JMap[IntArrayWrapperKey,Any])
 
+    val fieldValuesBitSets:Map[Field[_],mutable.BitSet] = tableState.allFields.map(_ -> new mutable.BitSet).toMap
+
     val dataLength = data.length
     var dataCounter = 0
 
@@ -108,8 +110,8 @@ object RawRowBasedTableDataSource {
       while (matchesFilter && rowHeaderCounter < numRowHeaderCols) {
         value = dataRow(rowHeaderFieldPositions(rowHeaderCounter))
         val fieldDefinition = rowHeaderFieldDefinitions(rowHeaderCounter)
-        matchesFilter = rowHeaderFields(rowHeaderCounter).asInstanceOf[Field[fieldDefinition.V]]
-          .filter.matches(value.asInstanceOf[fieldDefinition.V])
+        val field = rowHeaderFields(rowHeaderCounter).asInstanceOf[Field[fieldDefinition.V]]
+        matchesFilter = field.filter.matches(value.asInstanceOf[fieldDefinition.V])
         lookUp = rowHeadersLookUp(rowHeaderCounter)
         intForValue = lookUp.get(value)
         if (intForValue == 0) {
@@ -118,8 +120,10 @@ object RawRowBasedTableDataSource {
           fieldsValueCounter(fieldsValueCounterIndex) = newCounter
           lookUp.put(value, newCounter)
           rowHeaderValues(rowHeaderCounter) = newCounter
+          fieldValuesBitSets(field) += newCounter
         } else {
           rowHeaderValues(rowHeaderCounter) = intForValue
+          fieldValuesBitSets(field) += intForValue
         }
         rowHeaderCounter += 1
       }
@@ -142,8 +146,8 @@ object RawRowBasedTableDataSource {
           if (colHeaderColCounter != measureFieldIndex) {
             value = dataRow(columnHeaderFieldPositions(colHeaderColCounter))
             val fieldDefinition = columnHeaderFieldDefinitions(colHeaderColCounter)
-            matchesFilter = columnHeaderFields(colHeaderColCounter).asInstanceOf[Field[fieldDefinition.V]]
-              .filter.matches(value.asInstanceOf[fieldDefinition.V])
+            val field = columnHeaderFields(colHeaderColCounter).asInstanceOf[Field[fieldDefinition.V]]
+            matchesFilter = field.filter.matches(value.asInstanceOf[fieldDefinition.V])
             lookUp = columnHeaderLookUp(colHeaderColCounter)
             intForValue = lookUp.get(value)
             if (intForValue == 0) {
@@ -152,8 +156,10 @@ object RawRowBasedTableDataSource {
               fieldsValueCounter(fieldsValueCounterIndex) = newCounter
               lookUp.put(value, newCounter)
               colHeaderValues(colHeaderColCounter) = newCounter
+              fieldValuesBitSets(field) += newCounter
             } else {
               colHeaderValues(colHeaderColCounter) = intForValue
+              fieldValuesBitSets(field) += intForValue
             }
           }
           colHeaderColCounter += 1
@@ -243,7 +249,8 @@ object RawRowBasedTableDataSource {
       pathData(pathsCounter) = PathData(colHeadersArray, dataForPath.toMap)
       pathsCounter += 1
     }
+    val fieldValues = FieldValues(fieldValuesBitSets.mapValues(_.toArray))
     val resultDetails = ResultState(FilterState(isFiltered=true), SortState.allUnsorted(pathData.length))
-    Result(rowHeadersToUse, pathData, valueLookUp, resultDetails)
+    Result(rowHeadersToUse, pathData, fieldValues, valueLookUp, resultDetails)
   }
 }

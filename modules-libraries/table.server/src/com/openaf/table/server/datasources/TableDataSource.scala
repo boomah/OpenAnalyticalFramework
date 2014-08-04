@@ -1,6 +1,6 @@
 package com.openaf.table.server.datasources
 
-import com.openaf.table.lib.api.{FieldID, TableState}
+import com.openaf.table.lib.api.{FieldValues, FieldID, TableState}
 import com.openaf.table.server.FieldDefinitionGroups
 
 trait TableDataSource {
@@ -9,11 +9,11 @@ trait TableDataSource {
   def defaultTableState = TableState.Blank
 }
 
-case class Result(rowHeaderValues:Array[Array[Int]], pathData:Array[PathData], valueLookUp:Map[FieldID,Array[Any]],
-                  resultState:ResultState)
+case class Result(rowHeaderValues:Array[Array[Int]], pathData:Array[PathData], fieldValues:FieldValues,
+                  valueLookUp:Map[FieldID,Array[Any]], resultState:ResultState)
 
 object Result {
-  val Empty = Result(Array.empty, Array.empty, Map.empty, ResultState.Default)
+  val Empty = Result(Array.empty, Array.empty, FieldValues.Empty, Map.empty, ResultState.Default)
 }
 
 case class PathData(colHeaderValues:Array[Array[Int]], data:Map[IntArrayWrapperKey,Any])

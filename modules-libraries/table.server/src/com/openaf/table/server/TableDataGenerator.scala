@@ -81,7 +81,7 @@ object TableDataGenerator {
 
     val fieldGroup = tableDataSource.fieldDefinitionGroups.fieldGroup
 
-    val tableValues = TableValues(result.rowHeaderValues, allColHeaderValues, data, result.valueLookUp)
+    val tableValues = TableValues(result.rowHeaderValues, allColHeaderValues, data, result.fieldValues, result.valueLookUp)
 
     val defaultRenderers:Map[Field[_],Renderer[_]] = tableState.tableLayout.allFields.map(field => {
       val fieldDefinition = tableDataSource.fieldDefinitionGroups.fieldDefinition(field.id)

@@ -64,8 +64,14 @@ object TableData {
 case object NoValue
 
 case class TableValues(rowHeaders:Array[Array[Int]], columnHeaders:Array[Array[Array[Int]]],
-                       data:Array[Array[Array[Any]]], valueLookUp:Map[FieldID,Array[Any]])
+                       data:Array[Array[Array[Any]]], fieldValues:FieldValues, valueLookUp:Map[FieldID,Array[Any]])
 
 object TableValues {
-  val Empty = TableValues(Array.empty, Array.empty, Array.empty, Map.empty)
+  val Empty = TableValues(Array.empty, Array.empty, Array.empty, FieldValues.Empty, Map.empty)
+}
+
+case class FieldValues(values:Map[Field[_],Array[Int]])
+
+object FieldValues {
+  val Empty = FieldValues(Map.empty)
 }

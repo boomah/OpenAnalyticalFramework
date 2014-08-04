@@ -44,4 +44,8 @@ object DataSourceTestData {
     Array(Paul,  M, Manchester, 32, 90),
     Array(Ally,  M, Edinburgh,  34, 75)
   )
+
+  def nameFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2,3,4,5,6))
+  def genderFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2))
+  val ScoreFieldValues:Map[Field[_],List[Int]] = Map(ScoreField -> Nil)
 }
