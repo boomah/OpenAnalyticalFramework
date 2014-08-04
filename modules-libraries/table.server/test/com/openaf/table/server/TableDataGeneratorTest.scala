@@ -207,7 +207,7 @@ class TableDataGeneratorTest extends FunSuite {
   test("1 row (key), 0 measure, 1 column (key, same as row)") {
     val tableState = TableState.Blank
       .withRowHeaderFields(List(NameField))
-      .withColumnHeaderLayout(ColumnHeaderLayout(NameField))
+      .withColumnHeaderLayout(ColumnHeaderLayout(NameField.duplicate))
 
     val expectedRowHeaderValues = List(List(6), List(3), List(2), List(4), List(5), List(1))
     val expectedColHeaderValues = List(List(List(6), List(3), List(2), List(4), List(5), List(1)))
