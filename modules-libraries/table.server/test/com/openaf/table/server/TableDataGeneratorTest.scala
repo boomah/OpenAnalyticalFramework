@@ -220,7 +220,7 @@ class TableDataGeneratorTest extends FunSuite {
   test("1 row (key, reversed), 0 measure, 1 column (key, same as row)") {
     val tableState = TableState.Blank
       .withRowHeaderFields(List(NameField.flipSortOrder))
-      .withColumnHeaderLayout(ColumnHeaderLayout(NameField))
+      .withColumnHeaderLayout(ColumnHeaderLayout(NameField.duplicate))
 
     val expectedRowHeaderValues = List(List(1), List(5), List(4), List(2), List(3), List(6))
     val expectedColHeaderValues = List(List(List(6), List(3), List(2), List(4), List(5), List(1)))
@@ -233,7 +233,7 @@ class TableDataGeneratorTest extends FunSuite {
   test("1 row (key), 0 measure, 1 column (key, same as row but reversed)") {
     val tableState = TableState.Blank
       .withRowHeaderFields(List(NameField))
-      .withColumnHeaderLayout(ColumnHeaderLayout(NameField.flipSortOrder))
+      .withColumnHeaderLayout(ColumnHeaderLayout(NameField.duplicate.flipSortOrder))
 
     val expectedRowHeaderValues = List(List(6), List(3), List(2), List(4), List(5), List(1))
     val expectedColHeaderValues = List(List(List(1), List(5), List(4), List(2), List(3), List(6)))
@@ -246,7 +246,7 @@ class TableDataGeneratorTest extends FunSuite {
   test("1 row (key), 1 measure, 1 column (key, same as row but reversed)") {
     val tableState = TableState.Blank
       .withRowHeaderFields(List(NameField))
-      .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField, List(NameField.flipSortOrder)))
+      .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField, List(NameField.duplicate.flipSortOrder)))
 
     val expectedRowHeaderValues = List(List(6), List(3), List(2), List(4), List(5), List(1))
     val expectedColHeaderValues = List(List(List(0,1), List(0,5), List(0,4), List(0,2), List(0,3), List(0,6)))

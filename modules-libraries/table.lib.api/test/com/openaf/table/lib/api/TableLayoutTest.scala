@@ -35,6 +35,9 @@ class TableLayoutTest extends FunSuite {
       TableLayout.Blank.withRowHeaderFields(List(dimensionField1)).withFilterFields(List(dimensionField2))
         .withColumnHeaderLayout(ColumnHeaderLayout.fromFields(measureField1, dimensionField1))
     }
+    intercept[IllegalArgumentException] {
+      TableLayout.Blank.withColumnHeaderLayout(ColumnHeaderLayout.fromFields(dimensionField1, dimensionField1.flipSortOrder))
+    }
   }
 
   test("remove") {

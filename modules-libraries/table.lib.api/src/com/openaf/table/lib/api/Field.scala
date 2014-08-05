@@ -3,21 +3,22 @@ package com.openaf.table.lib.api
 import SortOrder._
 
 case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=NoFilter[T](),
-                    rendererID:RendererID=DefaultRendererID, sortOrder:SortOrder=Ascending, key:Int=0) {
+                    rendererID:RendererID=DefaultRendererID, sortOrder:SortOrder=Ascending, key:Int=Field.nextKey) {
   def flipSortOrder = copy(sortOrder = if (sortOrder == Ascending) Descending else Ascending)
   def withSingleFilter(value:T) = copy(filter = SpecifiedFilter[T](Set(value)))
   def withFilter(filter:Filter[T]) = copy(filter = filter)
-  def duplicate:Field[T] = {
-    Field.keyCounter += 1
-    copy(key = Field.keyCounter)
-  }
+  def duplicate:Field[T] = copy(key = Field.nextKey)
 }
 
 object Field {
   val Null = Field[Null](FieldID.Null)
   def apply[T](id:String) = new Field[T](FieldID(id))
   def apply[T](id:String, fieldType:FieldType) = new Field[T](FieldID(id), fieldType)
-  private[api] var keyCounter = 0
+  private var keyCounter = 0
+  private[api] def nextKey = {
+    keyCounter += 1
+    keyCounter
+  }
 }
 
 case class FieldID(id:String)

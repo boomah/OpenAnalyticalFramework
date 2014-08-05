@@ -2,11 +2,13 @@ package com.openaf.table.lib.api
 
 case class TableLayout(rowHeaderFields:List[Field[_]], columnHeaderLayout:ColumnHeaderLayout,
                        filterFields:List[Field[_]]) {
-  // All fields need to be unique
-  require(rowHeaderFields.size == rowHeaderFields.toSet.size, "Duplicate fields in the rowHeaderFields")
-  require(columnHeaderLayout.allFields.size == columnHeaderLayout.allFields.toSet.size, "Duplicate fields in the ColumnHeaderLayout")
-  require(filterFields.size == filterFields.toSet.size, "Duplicate fields in the filterFields")
-  require(rowHeaderFields.size + columnHeaderLayout.allFields.size + filterFields.size == allFields.size, "There are duplicate fields in the TableLayout")
+  {
+    // All fields must have unique keys
+    val allKeys = rowHeaderFields.map(_.key).toSet ++ columnHeaderLayout.allFields.map(_.key).toSet ++ filterFields.map(_.key).toSet
+    val numFields = rowHeaderFields.size + columnHeaderLayout.allFields.size + filterFields.size
+    require(allKeys.size == numFields, "Fields in TableLayout must all have a unique key")
+  }
+
   def rowHeaderFieldIDs = rowHeaderFields.map(_.id)
   def columnHeaderLayoutFieldIDs = columnHeaderLayout.allFields.map(_.id)
   def filterFieldIDs = filterFields.map(_.id)
