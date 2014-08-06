@@ -15,7 +15,7 @@ import GUIServlet._
 class GUIServlet(serverName:String, externalURL:String, guiUpdatePort:String, servicePort:String) extends HttpServlet {
   private val programArgsConfigLine = serverName + " com.openaf.start.GUI " + guiUpdatePort + " " + servicePort
 
-  private val scalaLibraryJAR = new File("common-bundles/scala-library.jar")
+  private val scalaLibraryJAR = new File("common-bundles").listFiles.find(_.getName.startsWith("scala-library")).get
   private val scalaLibraryName = scalaLibraryJAR.getName
 
   private val bootstrapperName = "bootstrapper.jar"
