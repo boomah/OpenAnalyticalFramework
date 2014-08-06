@@ -249,7 +249,7 @@ object RawRowBasedTableDataSource {
       pathData(pathsCounter) = PathData(colHeadersArray, dataForPath.toMap)
       pathsCounter += 1
     }
-    val fieldValues = FieldValues(fieldValuesBitSets.mapValues(_.toArray))
+    val fieldValues = FieldValues(fieldValuesBitSets.map{case (field,bitSet) => field -> bitSet.toArray}.toMap)
     val resultDetails = ResultState(FilterState(isFiltered=true), SortState.allUnsorted(pathData.length))
     Result(rowHeadersToUse, pathData, fieldValues, valueLookUp, resultDetails)
   }
