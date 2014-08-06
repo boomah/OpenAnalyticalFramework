@@ -23,6 +23,14 @@ object TableDataGenerator {
         new TableDataGeneratorComparator(tableState.tableLayout.rowHeaderFields.toArray, rowHeaderFieldDefinitions,
           rowHeaderLookUps)
       )
+
+      tableState.rowHeaderFields.zipWithIndex.foreach{case (field,i) => {
+        val fieldValues = result.fieldValues.values(field)
+        val fieldDefinition = rowHeaderFieldDefinitions(i)
+        val ordering = fieldDefinition.ordering
+        val lookUp = rowHeaderLookUps(i).asInstanceOf[Array[fieldDefinition.V]]
+        FieldValuesSorting.sort(fieldValues, ordering, lookUp, field.sortOrder)
+      }}
     }
     val numRowHeaderValues = rowHeaderValues.length
     var rowHeaderCounter = 0
@@ -44,6 +52,14 @@ object TableDataGenerator {
           colHeaderValues,
           new TableDataGeneratorComparator(path.fields.toArray, colHeaderFieldDefinitions, colHeaderLookUps)
         )
+
+        path.fields.zipWithIndex.foreach{case (field,i) => {
+          val fieldValues = result.fieldValues.values(field)
+          val fieldDefinition = colHeaderFieldDefinitions(i)
+          val ordering = fieldDefinition.ordering
+          val lookUp = colHeaderLookUps(i).asInstanceOf[Array[fieldDefinition.V]]
+          FieldValuesSorting.sort(fieldValues, ordering, lookUp, field.sortOrder)
+        }}
       }
       colHeaderValues
     }}.toArray
