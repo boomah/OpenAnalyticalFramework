@@ -1,4 +1,4 @@
-package com.openaf.browser.gui.utils
+package com.openaf.gui.utils
 
 sealed trait OS {
   def windows = true

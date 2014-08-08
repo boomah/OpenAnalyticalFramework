@@ -4,8 +4,8 @@ import org.osgi.framework.{ServiceReference, BundleContext}
 import com.openaf.osgi.OpenAFBundleActivator
 import com.google.common.eventbus.EventBus
 import org.osgi.util.tracker.{ServiceTrackerCustomizer, ServiceTracker}
-import com.openaf.browser.gui.utils.BrowserUtils
 import com.openaf.browser.gui.api.OpenAFApplication
+import com.openaf.gui.utils.GuiUtils
 
 class BrowserBundleActivator extends OpenAFBundleActivator {
   protected def startUp(context:BundleContext) {
@@ -28,7 +28,7 @@ class BrowserBundleActivator extends OpenAFBundleActivator {
         eventBus.post(OpenAFApplicationRemoved(openAFApplication))
       }
     }).open()
-    BrowserUtils.runLater({
+    GuiUtils.runLater({
       val pageBuilder = new PageBuilder(new OSGIServerContext(context))
       browserStageManager.start(pageBuilder)
     })

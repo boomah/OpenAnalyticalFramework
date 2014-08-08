@@ -8,10 +8,10 @@ import collection.JavaConversions._
 import ref.SoftReference
 import com.openaf.pagemanager.api._
 import javafx.scene.Node
-import com.openaf.browser.gui.utils.BrowserUtils._
 import com.openaf.browser.gui.api.{BrowserCacheKey, BrowserContext, PageComponent}
 import com.openaf.browser.gui.animation.{BackOnePageTransition, ForwardOnePageTransition}
 import com.openaf.browser.gui.components.PageComponentCache
+import com.openaf.gui.utils.GuiUtils._
 
 class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:BrowserStage, manager:BrowserStageManager)
   extends BorderPane with BrowserContext {

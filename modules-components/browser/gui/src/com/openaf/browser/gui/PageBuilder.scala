@@ -3,7 +3,7 @@ package com.openaf.browser.gui
 import java.util.concurrent.{ThreadFactory, Executors}
 import com.openaf.cache.CacheFactory
 import com.openaf.pagemanager.api._
-import com.openaf.browser.gui.utils.BrowserUtils
+import com.openaf.gui.utils.GuiUtils
 
 class PageBuilder(serverContext:ServerContext) {
   private val pageDataCache = CacheFactory.cache("browser.pageData", soft = true)
@@ -24,7 +24,7 @@ class PageBuilder(serverContext:ServerContext) {
         } catch {
           case e:Exception => ProblemPageResponse(e)
         }
-        BrowserUtils.runLater(withResult(pageResponse))
+        GuiUtils.runLater(withResult(pageResponse))
       }
     })
   }

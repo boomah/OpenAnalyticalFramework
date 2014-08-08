@@ -8,9 +8,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import java.lang.Boolean
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.{Boolean => JBoolean}
-import javafx.beans.{Observable, InvalidationListener}
-import com.openaf.browser.gui.utils.{FontAwesomeText, FontAwesome}
-import com.openaf.browser.gui.utils.FontAwesome._
+import com.openaf.gui.utils.{GuiUtils, FontAwesomeText, FontAwesome},GuiUtils._,FontAwesome._
 import com.openaf.browser.gui.utils.BrowserUtils._
 import com.openaf.browser.gui.pages.{UtilsPage, HomePage}
 import com.openaf.browser.gui.binding.ApplicationLocaleStringBinding

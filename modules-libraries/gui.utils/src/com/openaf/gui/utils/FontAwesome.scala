@@ -1,11 +1,11 @@
-package com.openaf.browser.gui.utils
+package com.openaf.gui.utils
 
 import javafx.scene.text.{TextBoundsType, Text, Font}
 
 object FontAwesome extends Enumeration {
   type classOf[FontAwesome] = Value
 
-  Font.loadFont(BrowserUtils.resource("/com/openaf/browser/gui/resources/fontawesome-webfont.ttf"), 12)
+  Font.loadFont(GuiUtils.resource("/com/openaf/gui/utils/resources/fontawesome-webfont.ttf"), 12)
 
   val Home = FontAwesome("\uf015")
   val ArrowLeft = FontAwesome("\uf060")

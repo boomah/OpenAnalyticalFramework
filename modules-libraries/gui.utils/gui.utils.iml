@@ -20,10 +20,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="scala-library" level="project" />
-    <orderEntry type="module" module-name="browser.gui.api" />
-    <orderEntry type="module" module-name="osgi" />
-    <orderEntry type="module" module-name="cache" />
-    <orderEntry type="module" module-name="gui.utils" />
   </component>
 </module>
 

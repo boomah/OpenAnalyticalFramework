@@ -1,6 +1,6 @@
 package com.openaf.browser.gui.shortcutkeys
 
-import javafx.scene.input.{KeyEvent, KeyCombination}
+import com.openaf.gui.utils.EnhancedKeyEvent
 
 abstract class GenericShortCutKeys {
   protected def keyEvent(name:String) = new EnhancedKeyEvent(name)
@@ -21,16 +21,4 @@ abstract class GenericShortCutKeys {
   def nextTab:EnhancedKeyEvent
   def previousTab:EnhancedKeyEvent
   def utilsPage = shortCutShift("U")
-}
-
-class EnhancedKeyEvent(private val names:String*) {
-  private val keyCombinations = names.map(name => KeyCombination.keyCombination(name))
-  assert(keyCombinations.nonEmpty)
-  def matches(e:KeyEvent) = keyCombinations.exists(keyCombination =>keyCombination.`match`(e))
-  def accelerator = keyCombinations.head
-  def +(enhancedKeyEvent:EnhancedKeyEvent) = new EnhancedKeyEvent((names ++ enhancedKeyEvent.names).toArray:_*)
-}
-
-object EnhancedKeyEvent {
-  val Null = new EnhancedKeyEvent("Null")
 }

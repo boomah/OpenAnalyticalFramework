@@ -13,6 +13,7 @@ import com.openaf.browser.gui.pages.HomePage
 import javafx.scene.Scene
 import scala.collection.JavaConversions._
 import com.openaf.browser.gui.api.{OpenAFApplication, BrowserCache}
+import com.openaf.gui.utils.GuiUtils._
 
 object BrowserStageManager {
   private val browserCountDownLatch = new CountDownLatch(1)

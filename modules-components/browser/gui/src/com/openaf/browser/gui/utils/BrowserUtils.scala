@@ -5,11 +5,11 @@ import javafx.stage.{Stage, Screen}
 import collection.mutable
 import javafx.scene.image.{ImageView, Image}
 import com.openaf.browser.gui.shortcutkeys.{LinuxShortCutKeys, WindowsShortCutKeys, OSXShortCutKeys}
-import javafx.application.Platform
 import javafx.scene.Node
-import javafx.scene.control.SeparatorMenuItem
 import javafx.geometry.Insets
 import com.openaf.browser.gui.FrameLocation
+import com.openaf.gui.utils._
+import com.openaf.gui.utils.GuiUtils._
 
 object BrowserUtils {
   val ApplicationName = "applicationName"
@@ -30,13 +30,6 @@ object BrowserUtils {
   private def resourceAsInputStream(name:String) = getClass.getResourceAsStream(name)
   def resource(resource:String) = getClass.getResource(resource).toExternalForm
 
-  lazy val OS = {
-    val osName = System.getProperty("os.name").toLowerCase
-    if (osName.startsWith("mac")) OSX
-    else if (osName.startsWith("linux")) Linux
-    else if (osName.startsWith("windows")) WindowsUnknown
-  }
-
   lazy val keyMap = {
     OS match {
       case OSX => new OSXShortCutKeys
@@ -45,18 +38,10 @@ object BrowserUtils {
     }
   }
 
-  def runLater(function: =>Unit) {
-    Platform.runLater(new Runnable {def run() {function}})
-  }
-
-  def checkFXThread() {require(Platform.isFxApplicationThread, "This must be called on the FX Application Thread")}
-
   def imageViewOfNode(node:Node) = {
     val image = node.snapshot(null, null)
     new ImageView(image)
   }
-
-  def separatorMenuItem = new SeparatorMenuItem
 
   def standardInsets = new Insets(5)
 }

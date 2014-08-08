@@ -8,6 +8,7 @@ import javafx.collections.FXCollections
 import javafx.beans.binding.StringBinding
 import javafx.event.EventHandler
 import javafx.scene.input.{KeyCombination, KeyCodeCombination, KeyCode, KeyEvent}
+import com.openaf.gui.utils.{OSX, GuiUtils}
 
 object OpenAFTable {
   def styleSheets = List(getClass.getResource("/com/openaf/table/gui/resources/table.css").toExternalForm)
@@ -55,7 +56,7 @@ class OpenAFTable extends StackPane {
   }
 
   addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler[KeyEvent] {
-    val isMac = System.getProperty("os.name").toLowerCase.startsWith("mac")
+    val isMac = GuiUtils.OS == OSX
     import KeyCode._
     val escapeKeyCombination = new KeyCodeCombination(ESCAPE)
     val mac1KeyCombination = KeyCombination.keyCombination("Shortcut+1")
