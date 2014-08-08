@@ -7,7 +7,7 @@ import com.openaf.table.lib.api.{FieldID, TableData}
 import javafx.collections.FXCollections
 import javafx.beans.binding.StringBinding
 import javafx.event.EventHandler
-import javafx.scene.input.{KeyCombination, KeyCodeCombination, KeyCode, KeyEvent}
+import javafx.scene.input.KeyEvent
 import com.openaf.gui.utils.{OSX, GuiUtils}
 
 object OpenAFTable {
@@ -57,15 +57,15 @@ class OpenAFTable extends StackPane {
 
   addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler[KeyEvent] {
     val isMac = GuiUtils.OS == OSX
-    import KeyCode._
-    val escapeKeyCombination = new KeyCodeCombination(ESCAPE)
-    val mac1KeyCombination = KeyCombination.keyCombination("Shortcut+1")
-    val gen1KeyCombination = KeyCombination.keyCombination("Alt+1")
+    import com.openaf.gui.utils.EnhancedKeyEvent._
+    val escapeKeyCombination = keyEvent("Esc")
+    val mac1KeyCombination = shortCut("1")
+    val gen1KeyCombination = alt("1")
 
     def handle(e:KeyEvent) {
-      if (isMac && mac1KeyCombination.`match`(e) || !isMac && gen1KeyCombination.`match`(e)) {
+      if (isMac && mac1KeyCombination.matches(e) || !isMac && gen1KeyCombination.matches(e)) {
         configArea.toggleSelected(1)
-      } else if (escapeKeyCombination.`match`(e) && configArea.isConfigAreaNodeFocused) {
+      } else if (escapeKeyCombination.matches(e) && configArea.isConfigAreaNodeFocused) {
         tableView.requestFocus()
       }
     }
