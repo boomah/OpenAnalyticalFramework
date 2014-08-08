@@ -175,12 +175,14 @@ class TableDataGeneratorTest extends FunSuite {
   }
 
   test("0 row, 0 measure, 1 column (key, reversed)") {
-    val tableState = TableState.Blank.withColumnHeaderLayout(ColumnHeaderLayout(NameField.flipSortOrder))
+    val nameField = NameField.flipSortOrder
+    val tableState = TableState.Blank.withColumnHeaderLayout(ColumnHeaderLayout(nameField))
 
     val expectedColHeaderValues = List(List(List(1), List(5), List(4), List(2), List(3), List(6)))
-    val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
+    val expectedValueLookUp = Map(nameField.id -> List(nameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
+    val expectedFieldValues = reversedNameFieldValues(nameField)
 
-    check(tableState, Nil, expectedColHeaderValues, List(Nil), expectedValueLookUp)
+    check(tableState, Nil, expectedColHeaderValues, List(Nil), expectedValueLookUp, expectedFieldValues)
   }
 
   test("0 row, 1 measure, 1 column (key)") {
@@ -192,8 +194,9 @@ class TableDataGeneratorTest extends FunSuite {
       NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
       ScoreField.id -> List(ScoreField.id)
     )
+    val expectedFieldValues = orderedNameFieldValues(NameField) ++ ScoreFieldValues
 
-    check(tableState, List(Nil), expectedColHeaderValues, expectedData, expectedValueLookUp)
+    check(tableState, List(Nil), expectedColHeaderValues, expectedData, expectedValueLookUp, expectedFieldValues)
   }
 
   test("0 row, 1 measure, 1 column (right of measure)") {
@@ -205,8 +208,9 @@ class TableDataGeneratorTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       ScoreField.id -> List(ScoreField.id)
     )
+    val expectedFieldValues = orderedGenderFieldValues(GenderField) ++ ScoreFieldValues
 
-    check(tableState, List(Nil), expectedColHeaderValues, expectedData, expectedValueLookUp)
+    check(tableState, List(Nil), expectedColHeaderValues, expectedData, expectedValueLookUp, expectedFieldValues)
   }
 
   test("0 row, 1 measure, 1 column (left of measure)") {
@@ -218,53 +222,62 @@ class TableDataGeneratorTest extends FunSuite {
       ScoreField.id -> List(ScoreField.id),
       GenderField.id -> List(GenderField.id, F, M)
     )
+    val expectedFieldValues = orderedGenderFieldValues(GenderField) ++ ScoreFieldValues
 
-    check(tableState, List(Nil), expectedColHeaderValues, expectedData, expectedValueLookUp)
+    check(tableState, List(Nil), expectedColHeaderValues, expectedData, expectedValueLookUp, expectedFieldValues)
   }
 
   test("1 row (key), 0 measure, 1 column (key, same as row)") {
+    val nameField = NameField.duplicate
     val tableState = TableState.Blank
       .withRowHeaderFields(List(NameField))
-      .withColumnHeaderLayout(ColumnHeaderLayout(NameField.duplicate))
+      .withColumnHeaderLayout(ColumnHeaderLayout(nameField))
 
     val expectedRowHeaderValues = List(List(6), List(3), List(2), List(4), List(5), List(1))
     val expectedColHeaderValues = List(List(List(6), List(3), List(2), List(4), List(5), List(1)))
     val expectedData = List(List.fill(6)(List.fill(6)(NoValue)))
     val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
+    val expectedFieldValues = orderedNameFieldValues(nameField) ++ orderedNameFieldValues(NameField)
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp, expectedFieldValues)
   }
 
   test("1 row (key, reversed), 0 measure, 1 column (key, same as row)") {
+    val nameField1 = NameField.flipSortOrder
+    val nameField2 = NameField.duplicate
     val tableState = TableState.Blank
-      .withRowHeaderFields(List(NameField.flipSortOrder))
-      .withColumnHeaderLayout(ColumnHeaderLayout(NameField.duplicate))
+      .withRowHeaderFields(List(nameField1))
+      .withColumnHeaderLayout(ColumnHeaderLayout(nameField2))
 
     val expectedRowHeaderValues = List(List(1), List(5), List(4), List(2), List(3), List(6))
     val expectedColHeaderValues = List(List(List(6), List(3), List(2), List(4), List(5), List(1)))
     val expectedData = List(List.fill(6)(List.fill(6)(NoValue)))
     val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
+    val expectedFieldValues = reversedNameFieldValues(nameField1) ++ orderedNameFieldValues(nameField2)
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp, expectedFieldValues)
   }
 
   test("1 row (key), 0 measure, 1 column (key, same as row but reversed)") {
+    val nameField = NameField.duplicate.flipSortOrder
     val tableState = TableState.Blank
       .withRowHeaderFields(List(NameField))
-      .withColumnHeaderLayout(ColumnHeaderLayout(NameField.duplicate.flipSortOrder))
+      .withColumnHeaderLayout(ColumnHeaderLayout(nameField))
 
     val expectedRowHeaderValues = List(List(6), List(3), List(2), List(4), List(5), List(1))
     val expectedColHeaderValues = List(List(List(1), List(5), List(4), List(2), List(3), List(6)))
     val expectedData = List(List.fill(6)(List.fill(6)(NoValue)))
     val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
+    val expectedFieldValues = orderedNameFieldValues(NameField) ++ reversedNameFieldValues(nameField)
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp, expectedFieldValues)
   }
 
   test("1 row (key), 1 measure, 1 column (key, same as row but reversed)") {
+    val nameField = NameField.duplicate.flipSortOrder
     val tableState = TableState.Blank
       .withRowHeaderFields(List(NameField))
-      .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField, List(NameField.duplicate.flipSortOrder)))
+      .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField, List(nameField)))
 
     val expectedRowHeaderValues = List(List(6), List(3), List(2), List(4), List(5), List(1))
     val expectedColHeaderValues = List(List(List(0,1), List(0,5), List(0,4), List(0,2), List(0,3), List(0,6)))
@@ -280,8 +293,9 @@ class TableDataGeneratorTest extends FunSuite {
       NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
       ScoreField.id -> List(ScoreField.id)
     )
+    val expectedFieldValues = orderedNameFieldValues(NameField) ++ reversedNameFieldValues(nameField) ++ ScoreFieldValues
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedValueLookUp, expectedFieldValues)
   }
 
   test("0 row, 0 measure, 2 column (one under the other)") {
@@ -294,13 +308,15 @@ class TableDataGeneratorTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh)
     )
+    val expectedFieldValues = orderedGenderFieldValues(GenderField) ++ orderedLocationFieldValues(LocationField)
 
-    check(tableState, Nil, expectedColHeaderValues, List(Nil), expectedValueLookUp)
+    check(tableState, Nil, expectedColHeaderValues, List(Nil), expectedValueLookUp, expectedFieldValues)
   }
 
   test("0 row, 0 measure, 2 column (one under the other and reversed)") {
+    val locationField = LocationField.flipSortOrder
     val tableState = TableState.Blank.withColumnHeaderLayout(
-      ColumnHeaderLayout(GenderField, List(LocationField.flipSortOrder)))
+      ColumnHeaderLayout(GenderField, List(locationField)))
 
     val expectedColHeaderValues = List(
       List(List(1,2), List(1,1), List(2,2), List(2,1), List(2,3))
@@ -309,8 +325,9 @@ class TableDataGeneratorTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh)
     )
+    val expectedFieldValues = orderedGenderFieldValues(GenderField) ++ reversedLocationFieldValues(locationField)
 
-    check(tableState, Nil, expectedColHeaderValues, List(Nil), expectedValueLookUp)
+    check(tableState, Nil, expectedColHeaderValues, List(Nil), expectedValueLookUp, expectedFieldValues)
   }
 
   private def check(tableState:TableState, expectedRowHeaderValues:List[List[Int]],
