@@ -13,6 +13,7 @@ object FontAwesome extends Enumeration {
   val Remove = FontAwesome("\uf00d")
   val Refresh = FontAwesome("\uf021")
   val Cog = FontAwesome("\uf013")
+  val Filter = FontAwesome("\uf0b0")
 }
 
 case class FontAwesome(text:String)

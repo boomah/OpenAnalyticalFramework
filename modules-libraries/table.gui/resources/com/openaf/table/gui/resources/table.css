@@ -53,6 +53,20 @@
         linear-gradient(#eaf6fd 0%, #d9f0fc 49%, #bee6fd 50%, #a7d9f5 100%);
 }
 
+.field-node .filter-button {
+    -fx-padding: 3;
+    -fx-font-size: 1;
+    -fx-content-display: CENTER;
+    -fx-graphic-text-gap: 0;
+    -fx-alignment: CENTER;
+}
+
+.field-node .filter-button .font-awesome{
+    -fx-font-size: 10;
+    -fx-fill: red;
+    -fx-fill: grey;
+}
+
 #drag-image-view{
     -fx-opacity: 0.7;
 }
