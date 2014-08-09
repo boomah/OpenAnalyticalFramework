@@ -182,7 +182,7 @@ trait Draggable extends Region {
 
   setOnMouseClicked(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
-      if (event.getButton == MouseButton.PRIMARY && event.getClickCount == 2 && !isParent) {moveField()}
+      if (event.getButton == MouseButton.PRIMARY && event.getClickCount == 2 && fields.nonEmpty && !isParent) {moveField()}
     }
   })
 
