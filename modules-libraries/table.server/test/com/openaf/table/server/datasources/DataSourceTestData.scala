@@ -55,4 +55,5 @@ object DataSourceTestData {
   def orderedLocationFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(3,1,2))
   def reversedLocationFieldValues(field:Field[_]):Map[Field[_],List[Int]] = orderedLocationFieldValues(field).mapValues(_.reverse)
   val ScoreFieldValues:Map[Field[_],List[Int]] = Map(ScoreField -> Nil)
+  def measureFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
 }
