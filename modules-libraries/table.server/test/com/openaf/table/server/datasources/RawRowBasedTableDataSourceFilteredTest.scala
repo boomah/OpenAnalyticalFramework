@@ -5,8 +5,6 @@ import DataSourceTestData._
 import com.openaf.table.lib.api._
 
 class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
-  val dataSource = RawRowBasedTableDataSource(data, FieldIDs, Groups)
-
   test("1 row (filtered), 0 measure, 0 column") {
     val genderField = GenderField.withSingleFilter(F)
     val tableState = TableState.Blank.withRowHeaderFields(List(genderField))
@@ -91,7 +89,7 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
     )
     val expectedFieldValues = genderFieldValues(genderField) ++ ScoreFieldValues
 
-    check(tableState, Set(Nil), expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, EmptyListSet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("0 row, 1 measure, 2 column (same, same filter)") {
@@ -112,7 +110,7 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
     )
     val expectedFieldValues = genderFieldValues(genderField1) ++ genderFieldValues(genderField2) ++ ScoreFieldValues
 
-    check(tableState, Set(Nil), expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, EmptyListSet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("0 row, 1 measure, 2 column (same, different filter)") {
@@ -133,7 +131,7 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
     )
     val expectedFieldValues = genderFieldValues(genderField1) ++ genderFieldValues(genderField2) ++ ScoreFieldValues
 
-    check(tableState, Set(Nil), expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, EmptyListSet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("1 row (filtered), 1 measure, 1 column (filtered)") {
@@ -173,17 +171,5 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
     val expectedFieldValues = nameFieldValues(nameField) ++ ScoreFieldValues
 
     check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
-  }
-
-  private def check(tableState:TableState, expectedRowHeaderValues:Set[List[Int]],
-                    expectedColHeaderValues:List[Set[List[Int]]], expectedData:List[Map[(List[Int],List[Int]),Int]],
-                    expectedFieldValues:Map[Field[_],List[Int]], expectedValueLookUp:Map[FieldID,List[Any]]) {
-    val result = dataSource.result(tableState)
-    assert(result.rowHeaderValues.map(_.toList).toSet === expectedRowHeaderValues)
-    assert(result.pathData.map(_.colHeaderValues.map(_.toList).toSet).toList === expectedColHeaderValues)
-    val convertedData = result.pathData.map(_.data.map{case (key,value) => (key.array1.toList, key.array2.toList) -> value}).toList
-    assert(convertedData === expectedData)
-    assert(result.fieldValues.values.mapValues(_.toList) === expectedFieldValues)
-    assert(result.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
   }
 }

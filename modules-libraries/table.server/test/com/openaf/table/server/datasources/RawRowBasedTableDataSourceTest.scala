@@ -5,8 +5,6 @@ import DataSourceTestData._
 import com.openaf.table.lib.api._
 
 class RawRowBasedTableDataSourceTest extends FunSuite {
-  val dataSource = RawRowBasedTableDataSource(data, FieldIDs, Groups)
-
   test("1 row (key), 0 measure, 0 column") {
     val tableState = TableState.Blank.withRowHeaderFields(List(NameField))
 
@@ -106,7 +104,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
     val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
     val expectedFieldValues = nameFieldValues(NameField)
 
-    check(tableState, Set.empty, expectedColHeaderValues, List(Map.empty), expectedFieldValues, expectedValueLookUp)
+    check(tableState, EmptySet, expectedColHeaderValues, EmptyMapList, expectedFieldValues, expectedValueLookUp)
   }
 
   test("0 row, 0 measure, 2 column") {
@@ -116,13 +114,14 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       Set(List(1), List(2)),
       Set(List(1), List(2), List(3))
     )
+    val expectedData:List[Map[(List[Int],List[Int]),Int]] = List(Map.empty, Map.empty)
     val expectedValueLookUp = Map(
       GenderField.id -> List(GenderField.id, F, M),
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh)
     )
     val expectedFieldValues = locationFieldValues(LocationField) ++ genderFieldValues(GenderField)
 
-    check(tableState, Set.empty, expectedColHeaderValues, List(Map.empty, Map.empty), expectedFieldValues, expectedValueLookUp)
+    check(tableState, EmptySet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("0 row, 1 measure, 1 column (key)") {
@@ -143,7 +142,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
     )
     val expectedFieldValues = nameFieldValues(NameField) ++ ScoreFieldValues
 
-    check(tableState, Set(Nil), expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, EmptyListSet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("0 row, 1 measure, 2 column") {
@@ -172,7 +171,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
     )
     val expectedFieldValues = locationFieldValues(LocationField) ++ genderFieldValues(GenderField) ++ ScoreFieldValues
 
-    check(tableState, Set(Nil), expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, EmptyListSet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("1 row, 1 measure, 1 column (key)") {
@@ -246,7 +245,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
     val expectedValueLookUp = Map(ScoreField.id -> List(ScoreField.id))
     val expectedFieldValues = ScoreFieldValues
 
-    check(tableState, Set(Nil), expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, EmptyListSet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("1 row (key), 2 measure, 2 column (1 under each measure)") {
@@ -291,17 +290,5 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       genderFieldValues(GenderField) ++ ScoreFieldValues ++ measureFieldValues(ageField)
 
       check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
-  }
-
-  private def check(tableState:TableState, expectedRowHeaderValues:Set[List[Int]],
-                    expectedColHeaderValues:List[Set[List[Int]]], expectedData:List[Map[(List[Int],List[Int]),Int]],
-                    expectedFieldValues:Map[Field[_],List[Int]], expectedValueLookUp:Map[FieldID,List[Any]]) {
-    val result = dataSource.result(tableState)
-    assert(result.rowHeaderValues.map(_.toList).toSet === expectedRowHeaderValues)
-    assert(result.pathData.map(_.colHeaderValues.map(_.toList).toSet).toList === expectedColHeaderValues)
-    val convertedData = result.pathData.map(_.data.map{case (key,value) => (key.array1.toList, key.array2.toList) -> value}).toList
-    assert(convertedData === expectedData)
-    assert(result.fieldValues.values.mapValues(_.toList) === expectedFieldValues)
-    assert(result.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
   }
 }
