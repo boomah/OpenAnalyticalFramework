@@ -87,7 +87,7 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
   }
 
   private def fullSetup(fields:List[Field[_]]) {
-    val nodes = fields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty, fieldBindings))
+    val nodes = fields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty, fieldBindings, locale))
     mainContent.getChildren.clear()
     mainContent.getChildren.addAll(nodes.toArray:_*)
   }

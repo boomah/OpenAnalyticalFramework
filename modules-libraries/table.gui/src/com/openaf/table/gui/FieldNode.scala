@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.scene.control.{Button, Label}
+import javafx.scene.control.Label
 import javafx.beans.property.Property
 import javafx.scene.layout.HBox
 import com.openaf.table.lib.api.{FieldID, TableData, Field}
@@ -9,12 +9,11 @@ import javafx.beans.binding.StringBinding
 import javafx.scene.SnapshotParameters
 import javafx.scene.paint.Color
 import javafx.geometry.{Insets, Pos}
-import com.openaf.gui.utils.{FontAwesome, FontAwesomeText}
-import javafx.event.EventHandler
-import javafx.scene.input.MouseEvent
+import java.util.Locale
 
 class FieldNode(val field:Field[_], val dragAndDrop:DragAndDrop, val dragAndDropContainer:DragAndDropContainer,
-                val tableData:Property[TableData], fieldBindings:ObservableMap[FieldID,StringBinding])
+                val tableData:Property[TableData], fieldBindings:ObservableMap[FieldID,StringBinding],
+                locale:Property[Locale])
   extends HBox with Draggable {
   getStyleClass.add("field-node")
   setFillHeight(false)
@@ -33,14 +32,7 @@ class FieldNode(val field:Field[_], val dragAndDrop:DragAndDrop, val dragAndDrop
   getChildren.add(nameLabel)
 
   if (field.fieldType.isDimension) {
-    val filterButton = new Button
-    filterButton.getStyleClass.add("filter-button")
-    filterButton.setFocusTraversable(false)
-    filterButton.setGraphic(new FontAwesomeText(FontAwesome.Filter))
-    filterButton.setOnMousePressed(new EventHandler[MouseEvent] {
-      def handle(e:MouseEvent) {println("Filter button mouse pressed")}
-    })
-
+    val filterButton = new FilterButton(tableData, locale)
     HBox.setMargin(filterButton, new Insets(0,0,0,3))
     getChildren.add(filterButton)
   }

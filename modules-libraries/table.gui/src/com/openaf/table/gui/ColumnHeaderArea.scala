@@ -26,7 +26,7 @@ class ColumnHeaderArea(val tableDataProperty:Property[TableData], val dragAndDro
   }
 
   private def fullSetup(columnHeaderLayout:ColumnHeaderLayout) {
-    val node = new ColumnHeaderLayoutNode(columnHeaderLayout, tableDataProperty, dragAndDrop, this, fieldBindings)
+    val node = new ColumnHeaderLayoutNode(columnHeaderLayout, tableDataProperty, dragAndDrop, this, fieldBindings, locale)
     mainContent.getChildren.clear()
     mainContent.getChildren.add(node)
   }

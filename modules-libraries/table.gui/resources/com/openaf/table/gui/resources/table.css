@@ -63,8 +63,20 @@
 
 .field-node .filter-button .font-awesome{
     -fx-font-size: 10;
-    -fx-fill: red;
     -fx-fill: grey;
+}
+
+.filter-button-node{
+    -fx-background-color: white;
+    -fx-padding: 2;
+    -fx-border-width: 1;
+    -fx-border-color: -fx-box-border;
+    -fx-spacing: 2;
+}
+
+.filter-button-node .button-box{
+    -fx-spacing: 2;
+    -fx-alignment: center-right;
 }
 
 #drag-image-view{
