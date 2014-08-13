@@ -19,7 +19,7 @@ class FieldNode(val field:Field[_], val dragAndDrop:DragAndDrop, val dragAndDrop
   setFillHeight(false)
   setAlignment(Pos.CENTER)
 
-  def fields = List(field)
+  def fields:List[Field[_]] = List(field)
 
   private val nameLabel = {
     val label = new Label
