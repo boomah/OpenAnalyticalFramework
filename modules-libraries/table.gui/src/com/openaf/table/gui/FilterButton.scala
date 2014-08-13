@@ -5,13 +5,13 @@ import com.openaf.gui.utils.{FontAwesome, FontAwesomeText}
 import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
 import javafx.beans.property.Property
-import com.openaf.table.lib.api.TableData
+import com.openaf.table.lib.api.{Field, TableData}
 import javafx.stage.Popup
 import java.util.Locale
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.{Boolean => JBoolean}
 
-class FilterButton(tableData:Property[TableData], locale:Property[Locale]) extends ToggleButton {
+class FilterButton(field:Field[_], tableData:Property[TableData], locale:Property[Locale]) extends ToggleButton {
   getStyleClass.add("filter-button")
   setFocusTraversable(false)
   setGraphic(new FontAwesomeText(FontAwesome.Filter))
@@ -20,7 +20,7 @@ class FilterButton(tableData:Property[TableData], locale:Property[Locale]) exten
     popup.setAutoFix(true)
     popup.setAutoHide(true)
     popup.setHideOnEscape(true)
-    popup.getContent.add(new FilterButtonNode(tableData, locale, cancel))
+    popup.getContent.add(new FilterButtonNode(field, tableData, locale, cancel))
     popup.showingProperty.addListener(new ChangeListener[JBoolean] {
       def changed(observableValue:ObservableValue[_<:JBoolean], oldValue:JBoolean, newValue:JBoolean) {
         if (!newValue) {setSelected(false)}

@@ -32,7 +32,7 @@ class FieldNode(val field:Field[_], val dragAndDrop:DragAndDrop, val dragAndDrop
   getChildren.add(nameLabel)
 
   if (field.fieldType.isDimension) {
-    val filterButton = new FilterButton(tableData, locale)
+    val filterButton = new FilterButton(field, tableData, locale)
     HBox.setMargin(filterButton, new Insets(0,0,0,3))
     getChildren.add(filterButton)
   }
