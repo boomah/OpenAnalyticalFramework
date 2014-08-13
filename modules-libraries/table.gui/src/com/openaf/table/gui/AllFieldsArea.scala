@@ -77,10 +77,10 @@ class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsA
   extends TreeCell[TreeItemType] with Draggable {
 
   private var fields0:List[Field[_]] = Nil
-  override def updateItem(treeItemType:TreeItemType, empty:Boolean) {
-    super.updateItem(treeItemType, empty)
+  override def updateItem(treeItemType:TreeItemType, isEmpty:Boolean) {
+    super.updateItem(treeItemType, isEmpty)
     textProperty.unbind()
-    if (empty) {
+    if (isEmpty) {
       setText(null)
       fields0 = Nil
     } else {
