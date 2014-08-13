@@ -5,7 +5,6 @@ import javafx.scene.control._
 import javafx.scene.layout.{StackPane, Priority, HBox}
 import javafx.beans.binding.{StringBinding, BooleanBinding}
 import javafx.beans.property.SimpleBooleanProperty
-import java.lang.Boolean
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.{Boolean => JBoolean}
 import com.openaf.gui.utils.{GuiUtils, FontAwesomeText, FontAwesome},GuiUtils._,FontAwesome._
