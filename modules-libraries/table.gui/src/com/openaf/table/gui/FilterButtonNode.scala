@@ -1,7 +1,7 @@
 package com.openaf.table.gui
 
 import javafx.beans.property.{SimpleBooleanProperty, Property}
-import com.openaf.table.lib.api.{Renderer, Filter, Field, TableData}
+import com.openaf.table.lib.api._
 import java.util.Locale
 import javafx.scene.layout.{HBox, VBox}
 import javafx.scene.control._
@@ -10,6 +10,7 @@ import javafx.event.{ActionEvent, EventHandler}
 import javafx.collections.FXCollections
 import javafx.scene.input.{MouseEvent, KeyCode, KeyEvent}
 import javafx.util.Callback
+import scala.collection.mutable
 
 class FilterButtonNode(field:Field[_], tableData:Property[TableData], locale:Property[Locale], cancel:()=>Unit) extends VBox {
   getStyleClass.add("filter-button-node")
@@ -71,7 +72,27 @@ class FilterButtonNode(field:Field[_], tableData:Property[TableData], locale:Pro
 
   okButton.setOnAction(new EventHandler[ActionEvent] {
     def handle(e:ActionEvent) {
-      println("UPDATE FILTER")
+      cancel()
+      val numProperties = booleanProperties.length
+      var i = 0
+      var noFilter = true // TODO - this should known by looking at the All boolean property once I put it in
+      var booleanProperty:SimpleBooleanProperty = null
+      val filteredValues = new mutable.HashSet[Any]
+      while (i < numProperties) {
+        booleanProperty = booleanProperties(i)
+        if (booleanProperty != null) {
+          if (booleanProperty.get) {
+            filteredValues += lookup(i)
+          } else {
+            noFilter = false
+          }
+        }
+        i += 1
+      }
+      val filter = (if (noFilter) NoFilter() else SpecifiedFilter(filteredValues.toSet)).asInstanceOf[Filter[Any]]
+      val newField = field.asInstanceOf[Field[Any]].withFilter(filter)
+      val newTableData = tableData.getValue.replaceField(field, newField)
+      tableData.setValue(newTableData)
     }
   })
   cancelButton.setOnAction(new EventHandler[ActionEvent] {

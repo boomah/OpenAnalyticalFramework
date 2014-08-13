@@ -28,6 +28,11 @@ case class TableLayout(rowHeaderFields:List[Field[_]], columnHeaderLayout:Column
     )
   }
   def remove(field:Field[_]):TableLayout = remove(field::Nil)
+  // TODO - make replace field work for all areas of the layout - at the moment it just works in the row area
+  def replaceField(oldField:Field[_], newField:Field[_]) = {
+    val newRowHeaderFields = rowHeaderFields.map(field => {if (field == oldField) newField else field})
+    withRowHeaderFields(newRowHeaderFields)
+  }
 }
 
 object TableLayout {

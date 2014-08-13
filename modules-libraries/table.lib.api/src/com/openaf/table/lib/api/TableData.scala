@@ -12,6 +12,7 @@ case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:T
   def withColumnHeaderLayout(newColumnHeaderLayout:ColumnHeaderLayout) = {
     withTableState(tableState.withColumnHeaderLayout(newColumnHeaderLayout))
   }
+  def replaceField(oldField:Field[_], newField:Field[_]) = withTableState(tableState.replaceField(oldField, newField))
 
   def rowHeadersAsString = {
     val rowHeaderFields = tableState.tableLayout.rowHeaderFields.toArray
