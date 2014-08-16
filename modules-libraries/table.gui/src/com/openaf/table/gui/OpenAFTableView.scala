@@ -272,8 +272,9 @@ class DefaultRowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T])
     }
 
     override def updateItem(intValue:Int, isEmpty:Boolean) {
+      super.updateItem(intValue, isEmpty)
       val shouldRender = !isEmpty && (Option(getTableRow).map(_.getIndex) match {
-        case None => false
+        case None => true
         case Some(rowIndex) => {
           if (rowIndex == 0) {
             true // Always render the value in the first row
@@ -309,6 +310,7 @@ class DefaultCellValueFactory(index:Int) extends Callback[CellDataFeatures[OpenA
 class DefaultCellFactory[T](renderer:Renderer[T]) extends Callback[TableColumn[OpenAFTableRow,Any],TableCell[OpenAFTableRow,Any]] {
   def call(tableColumn:TableColumn[OpenAFTableRow,Any]) = new TableCell[OpenAFTableRow,Any] {
     override def updateItem(anyValue:Any, isEmpty:Boolean) {
+      super.updateItem(anyValue, isEmpty)
       if (isEmpty) {
         setText(null)
       } else {
