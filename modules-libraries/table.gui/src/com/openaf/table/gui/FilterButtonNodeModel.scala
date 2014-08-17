@@ -43,13 +43,13 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
     allShouldChange = true
   }
 
-  def flipIndices(items:ObservableList[Int]) {
-    if (items.size == 1 && items.get(0) == 0) {
+  def flipValues(selectedValues:ObservableList[Int]) {
+    if (selectedValues.size == 1 && selectedValues.get(0) == 0) {
       allBooleanProperty.set(!allBooleanProperty.get)
     } else {
       import scala.collection.JavaConversions._
       var allSelected = true
-      items.foreach(intValue => {
+      selectedValues.foreach(intValue => {
         if (intValue != 0) {
           val booleanProperty = propertyLookUp(intValue)
           val newValue = !booleanProperty.get
@@ -60,6 +60,20 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
       updateAllProperty(allSelected)
     }
   }
+  
+  def selectValues(selectedValues:ObservableList[Int]) {
+    if ((selectedValues.size == 1 && selectedValues.get(0) == 0) || selectedValues.size == values.size) {
+      allBooleanProperty.set(true)
+    } else {
+      import scala.collection.JavaConversions._
+      val selectedValuesSet = selectedValues.toSet
+      propertyLookUp.foreach{case (intValue,property) => {
+        property.set(selectedValuesSet.contains(intValue))
+      }}
+      setAllProperty(false)
+    }
+    updateTableData()
+  }
 
   def updateAllProperty(selected:Boolean) {
     if (selected) {
@@ -68,6 +82,12 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
     } else {
       setAllProperty(false)
     }
+  }
+
+  def updateTableData() {
+    val newField = field.withFilter(filter)
+    val newTableData = tableData.getValue.replaceField(field, newField)
+    tableData.setValue(newTableData)
   }
 
   def property(index:Int) = if (index == 0) allBooleanProperty else propertyLookUp(index)
