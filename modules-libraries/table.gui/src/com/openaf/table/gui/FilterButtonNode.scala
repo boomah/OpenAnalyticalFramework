@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.beans.property.{SimpleBooleanProperty, Property}
+import javafx.beans.property.Property
 import com.openaf.table.lib.api._
 import java.util.Locale
 import javafx.scene.layout.{HBox, VBox}
@@ -10,9 +10,8 @@ import javafx.event.{ActionEvent, EventHandler}
 import javafx.collections.FXCollections
 import javafx.scene.input.{MouseEvent, KeyCode, KeyEvent}
 import javafx.util.Callback
-import scala.collection.mutable
 
-class FilterButtonNode(field:Field[_], tableData:Property[TableData], locale:Property[Locale], cancel:()=>Unit) extends VBox {
+class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], locale:Property[Locale], cancel:()=>Unit) extends VBox {
   getStyleClass.add("filter-button-node")
 
   private val buttonBox = new HBox
@@ -25,23 +24,7 @@ class FilterButtonNode(field:Field[_], tableData:Property[TableData], locale:Pro
   okButton.setDefaultButton(true)
   cancelButton.setCancelButton(true)
 
-  private val values = tableData.getValue.tableValues.fieldValues.values(field)
-  private val lookup = tableData.getValue.tableValues.valueLookUp(field.id)
-  private val booleanProperties = {
-    val maxValue = if (values.length == 0) 0 else values.max
-    val filter = field.filter.asInstanceOf[Filter[Any]]
-    val numValues = values.length
-    val array = new Array[SimpleBooleanProperty](maxValue + 1)
-    var i = 0
-    var intValue = -1
-    while (i < numValues) {
-      intValue = values(i)
-      array(intValue) = new SimpleBooleanProperty(filter.matches(lookup(intValue)))
-      i+= 1
-    }
-    array
-  }
-  private val defaultRenderer = tableData.getValue.defaultRenderers(field)
+  private val filterButtonNodeModel = new FilterButtonNodeModel[T](field, tableData, locale)
   private val listView = new ListView[Int]
   listView.getSelectionModel.setSelectionMode(SelectionMode.MULTIPLE)
   listView.setOnKeyPressed(new EventHandler[KeyEvent] {
@@ -53,44 +36,25 @@ class FilterButtonNode(field:Field[_], tableData:Property[TableData], locale:Pro
       if (escapeKeyEvent.matches(event)) {
         cancel()
       } else if (spaceKeyEvent.matches(event)) {
-        import scala.collection.JavaConversions._
-        listView.getSelectionModel.getSelectedItems.foreach(intValue => {
-          val booleanProperty = booleanProperties(intValue)
-          booleanProperty.set(!booleanProperty.get)
-        })
+        filterButtonNodeModel.flipIndices(listView.getSelectionModel.getSelectedItems)
       } else if (enterKeyEvent.matches(event)) {
         okButton.fire()
       }
     }
   })
   listView.setCellFactory(new Callback[ListView[Int],ListCell[Int]] {
-    def call(listView:ListView[Int]) = new FilterButtonNodeListCell(booleanProperties, defaultRenderer, lookup)
+    def call(listView:ListView[Int]) = new FilterButtonNodeListCell[T](filterButtonNodeModel)
   })
-  listView.setItems(FXCollections.observableArrayList(values:_*))
+  private val observableProperties = FXCollections.observableArrayList(filterButtonNodeModel.values:_*)
+  observableProperties.add(0, 0) // 0 represents All
+  listView.setItems(observableProperties)
 
   buttonBox.getChildren.addAll(okButton, cancelButton)
 
   okButton.setOnAction(new EventHandler[ActionEvent] {
     def handle(e:ActionEvent) {
       cancel()
-      val numProperties = booleanProperties.length
-      var i = 0
-      var noFilter = true // TODO - this should known by looking at the All boolean property once I put it in
-      var booleanProperty:SimpleBooleanProperty = null
-      val filteredValues = new mutable.HashSet[Any]
-      while (i < numProperties) {
-        booleanProperty = booleanProperties(i)
-        if (booleanProperty != null) {
-          if (booleanProperty.get) {
-            filteredValues += lookup(i)
-          } else {
-            noFilter = false
-          }
-        }
-        i += 1
-      }
-      val filter = (if (noFilter) NoFilter() else SpecifiedFilter(filteredValues.toSet)).asInstanceOf[Filter[Any]]
-      val newField = field.asInstanceOf[Field[Any]].withFilter(filter)
+      val newField = field.withFilter(filterButtonNodeModel.filter)
       val newTableData = tableData.getValue.replaceField(field, newField)
       tableData.setValue(newTableData)
     }
@@ -102,14 +66,15 @@ class FilterButtonNode(field:Field[_], tableData:Property[TableData], locale:Pro
   getChildren.addAll(listView, buttonBox)
 }
 
-class FilterButtonNodeListCell[T](booleanProperties:Array[SimpleBooleanProperty], renderer:Renderer[T],
-                               lookup:Array[Any]) extends ListCell[Int] {
+class FilterButtonNodeListCell[T](filterButtonNodeModel:FilterButtonNodeModel[T]) extends ListCell[Int] {
+  getStyleClass.add("filter-button-node-list-cell")
   private val checkBox = new CheckBox
   checkBox.setMouseTransparent(true)
   setOnMousePressed(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
       if (!event.isShortcutDown && !event.isShiftDown && !event.isControlDown && !event.isAltDown) {
         checkBox.fire()
+        filterButtonNodeModel.updateAllProperty(checkBox.isSelected)
       }
     }
   })
@@ -118,10 +83,16 @@ class FilterButtonNodeListCell[T](booleanProperties:Array[SimpleBooleanProperty]
     setText(null)
     checkBox.selectedProperty.unbind()
     if (isEmpty) {
+      setId(null)
       setGraphic(null)
     } else {
-      checkBox.selectedProperty.bindBidirectional(booleanProperties(intValue))
-      checkBox.setText(renderer.render(lookup(intValue).asInstanceOf[T]))
+      if (intValue == 0) {
+        setId("all-filter-button-node-list-cell")
+      } else {
+        setId(null)
+      }
+      checkBox.selectedProperty.bindBidirectional(filterButtonNodeModel.property(intValue))
+      checkBox.setText(filterButtonNodeModel.text(intValue))
       setGraphic(checkBox)
     }
   }

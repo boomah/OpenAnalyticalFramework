@@ -79,6 +79,18 @@
     -fx-alignment: center-right;
 }
 
+.filter-button-node-list-cell{
+    -fx-padding: 1 2 1 16;
+}
+
+#all-filter-button-node-list-cell{
+    -fx-padding: 1 2 1 8;
+}
+
+.filter-button-node-list-cell > .check-box > .box > .mark{
+    -fx-padding: 5
+}
+
 #drag-image-view{
     -fx-opacity: 0.7;
 }
