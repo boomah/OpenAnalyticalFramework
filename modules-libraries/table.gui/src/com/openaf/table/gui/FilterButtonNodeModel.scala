@@ -98,7 +98,7 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
       val values = propertyLookUp.collect{case (intValue,property) if property.get => {
         valueLookUp(intValue.toInt).asInstanceOf[T]
       }}.toSet
-      SpecifiedFilter[T](values)
+      ContainsFilter[T](values)
     }
   }
 }
