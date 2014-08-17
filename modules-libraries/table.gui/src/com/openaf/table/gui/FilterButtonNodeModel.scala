@@ -60,19 +60,16 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
       updateAllProperty(allSelected)
     }
   }
-  
-  def selectValues(selectedValues:ObservableList[Int]) {
-    if ((selectedValues.size == 1 && selectedValues.get(0) == 0) || selectedValues.size == values.size) {
+
+  def selectOneValue(intValue:Int) {
+    if (intValue == 0) {
       allBooleanProperty.set(true)
     } else {
-      import scala.collection.JavaConversions._
-      val selectedValuesSet = selectedValues.toSet
-      propertyLookUp.foreach{case (intValue,property) => {
-        property.set(selectedValuesSet.contains(intValue))
+      updateAllProperty(false)
+      propertyLookUp.foreach{case (value,property) => {
+        property.set(intValue == value)
       }}
-      setAllProperty(false)
     }
-    updateTableData()
   }
 
   def updateAllProperty(selected:Boolean) {

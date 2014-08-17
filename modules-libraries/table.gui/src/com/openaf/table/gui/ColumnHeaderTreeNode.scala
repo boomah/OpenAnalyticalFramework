@@ -27,7 +27,7 @@ class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataPrope
 
   def topFieldNodeOption = {
     topNode match {
-      case fieldNode:FieldNode => Some(fieldNode)
+      case fieldNode:FieldNode[_] => Some(fieldNode)
       case _ => None
     }
   }
@@ -44,14 +44,14 @@ class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataPrope
     if (children.size == 2) Some(children.get(1).asInstanceOf[ColumnHeaderLayoutNode]) else None
   }
 
-  def topFieldNodes:Seq[FieldNode] = {
+  def topFieldNodes:Seq[FieldNode[_]] = {
     topNode match {
-      case fieldNode:FieldNode => List(fieldNode)
+      case fieldNode:FieldNode[_] => List(fieldNode)
       case columnHeaderLayoutNode:ColumnHeaderLayoutNode => columnHeaderLayoutNode.allFieldNodes
     }
   }
 
-  def childFieldNodes:Seq[FieldNode] = {
+  def childFieldNodes:Seq[FieldNode[_]] = {
     childColumnHeaderLayoutNodeOption.map(_.allFieldNodes).getOrElse(Nil)
   }
 
@@ -62,7 +62,7 @@ class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataPrope
   def generateWithAdditionOption(nodeSide:NodeSide, draggableFieldsInfo:DraggableFieldsInfo):Option[ColumnHeaderTree] = {
     // If we're adding a node that has been moved from this ColumnHeaderTreeNode, exclude it from the generation.
     val columnHeaderTreeTypeOption = topNode match {
-      case fieldNode:FieldNode if fieldNode == nodeSide.node => {
+      case fieldNode:FieldNode[_] if fieldNode == nodeSide.node => {
         nodeSide.side match {
           case Side.LEFT => Some(Right(ColumnHeaderLayout.fromFields(draggableFieldsInfo.fields ::: fieldNode.fields)))
           case Side.RIGHT => Some(Right(ColumnHeaderLayout.fromFields(fieldNode.fields ::: draggableFieldsInfo.fields)))
@@ -70,7 +70,7 @@ class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataPrope
           case Side.BOTTOM => Some(Right(ColumnHeaderLayout(fieldNode.field, draggableFieldsInfo.fields)))
         }
       }
-      case fieldNode:FieldNode if fieldNode != draggableFieldsInfo.draggable => Some(Left(fieldNode.field))
+      case fieldNode:FieldNode[_] if fieldNode != draggableFieldsInfo.draggable => Some(Left(fieldNode.field))
       case columnHeaderLayoutNode:ColumnHeaderLayoutNode => Some(Right(columnHeaderLayoutNode.generateColumnHeaderLayoutWithAddition(nodeSide, draggableFieldsInfo)))
       case _ => None
     }

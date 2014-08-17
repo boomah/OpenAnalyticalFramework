@@ -29,7 +29,7 @@ class ColumnHeaderAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, d
       case currentColumnHeaderLayoutNode:ColumnHeaderLayoutNode => {
         allNodes(currentColumnHeaderLayoutNode).flatMap(node => {
           node match {
-            case fieldNode:FieldNode if fieldNode != draggableFieldsInfo.draggable => fieldNodeDropTargetsHelper.dropTargetsForFieldNode(fieldNode, draggableFieldsInfo)
+            case fieldNode:FieldNode[_] if fieldNode != draggableFieldsInfo.draggable => fieldNodeDropTargetsHelper.dropTargetsForFieldNode(fieldNode, draggableFieldsInfo)
             case columnHeaderTreeNode:ColumnHeaderTreeNode => dropTargetsForColumnHeaderTreeNode(columnHeaderTreeNode, draggableFieldsInfo)
             case columnHeaderLayoutNode:ColumnHeaderLayoutNode => dropTargetsForColumnHeaderLayoutNode(columnHeaderLayoutNode, draggableFieldsInfo, currentColumnHeaderLayoutNode)
             case _ => Nil
@@ -112,7 +112,7 @@ class ColumnHeaderAreaDropTargetsHelper(mainContent:Pane, dropTargetPane:Pane, d
     val multipleChildrenAbove = (!isTopLevelParent && {
       val parentColumnAreaTreeNode = columnHeaderLayoutNodeParent.asInstanceOf[ColumnHeaderTreeNode]
       val children = parentColumnAreaTreeNode.getChildren
-      ((children.size == 2) && (children.get(1) == columnHeaderLayoutNode) && !children.get(0).isInstanceOf[FieldNode])
+      ((children.size == 2) && (children.get(1) == columnHeaderLayoutNode) && !children.get(0).isInstanceOf[FieldNode[_]])
     })
     val shouldCreateTopDropTargetNode = (multipleChildren && (isTopLevelParent || multipleChildrenAbove))
 

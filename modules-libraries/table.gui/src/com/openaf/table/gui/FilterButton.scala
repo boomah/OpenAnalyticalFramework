@@ -11,7 +11,7 @@ import java.util.Locale
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.{Boolean => JBoolean}
 
-class FilterButton(field:Field[_], tableData:Property[TableData], locale:Property[Locale]) extends ToggleButton {
+class FilterButton[T](field:Field[T], tableData:Property[TableData], locale:Property[Locale]) extends ToggleButton {
   getStyleClass.add("filter-button")
   setFocusTraversable(false)
   setGraphic(new FontAwesomeText(FontAwesome.Filter))
@@ -20,7 +20,7 @@ class FilterButton(field:Field[_], tableData:Property[TableData], locale:Propert
     popup.setAutoFix(true)
     popup.setAutoHide(true)
     popup.setHideOnEscape(true)
-    popup.getContent.add(new FilterButtonNode(field, tableData, locale, cancel))
+    popup.getContent.add(new FilterButtonNode[T](field, tableData, locale, cancel))
     popup.showingProperty.addListener(new ChangeListener[JBoolean] {
       def changed(observableValue:ObservableValue[_<:JBoolean], oldValue:JBoolean, newValue:JBoolean) {
         if (!newValue) {setSelected(false)}

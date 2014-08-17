@@ -2,6 +2,7 @@ package com.openaf.gui.utils
 
 import javafx.application.Platform
 import javafx.scene.control.SeparatorMenuItem
+import javafx.scene.input.MouseEvent
 
 object GuiUtils {
   def resource(resource:String) = getClass.getResource(resource).toExternalForm
@@ -17,4 +18,8 @@ object GuiUtils {
   def checkFXThread() {require(Platform.isFxApplicationThread, "This must be called on the FX Application Thread")}
 
   def separatorMenuItem = new SeparatorMenuItem
+
+  def isSpecialKeyDown(event:MouseEvent) = {
+    event.isShortcutDown || event.isShiftDown || event.isControlDown || event.isAltDown
+  }
 }

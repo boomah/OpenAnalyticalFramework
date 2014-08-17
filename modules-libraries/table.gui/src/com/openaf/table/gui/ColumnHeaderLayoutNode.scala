@@ -22,7 +22,7 @@ class ColumnHeaderLayoutNode(columnHeaderLayout:ColumnHeaderLayout, tableDataPro
 
   def childColumnAreaTreeNodes = getChildren.collect{case (columnHeaderTreeNode:ColumnHeaderTreeNode) => columnHeaderTreeNode}
 
-  def allFieldNodes:Seq[FieldNode] = columnHeaderTreeNodes.flatMap(_.topFieldNodes)
+  def allFieldNodes:Seq[FieldNode[_]] = columnHeaderTreeNodes.flatMap(_.topFieldNodes)
 
   def generateColumnHeaderLayoutWithAddition(nodeSide:NodeSide, draggableFieldsInfo:DraggableFieldsInfo) = {
     val columnHeaderTrees = columnHeaderTreeNodes.flatMap(_.generateWithAdditionOption(nodeSide, draggableFieldsInfo))

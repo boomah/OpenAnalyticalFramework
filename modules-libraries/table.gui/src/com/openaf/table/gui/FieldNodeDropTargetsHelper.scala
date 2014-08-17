@@ -4,7 +4,7 @@ import javafx.geometry.Side
 import javafx.scene.layout.Pane
 
 class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dragAndDropContainer:DragAndDropContainer) {
-  def dropTargetsForFieldNode(fieldNode:FieldNode, draggableFieldsInfo:DraggableFieldsInfo) = {
+  def dropTargetsForFieldNode(fieldNode:FieldNode[_], draggableFieldsInfo:DraggableFieldsInfo) = {
     val parentColumnAreaTreeNode = fieldNode.getParent.asInstanceOf[ColumnHeaderTreeNode]
     val parentColumnHeaderLayoutNode = parentColumnAreaTreeNode.getParent.asInstanceOf[ColumnHeaderLayoutNode]
 

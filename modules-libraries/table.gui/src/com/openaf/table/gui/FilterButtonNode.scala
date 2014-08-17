@@ -10,6 +10,7 @@ import javafx.event.{ActionEvent, EventHandler}
 import javafx.collections.FXCollections
 import javafx.scene.input.{MouseButton, MouseEvent, KeyCode, KeyEvent}
 import javafx.util.Callback
+import com.openaf.gui.utils.GuiUtils
 
 class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], locale:Property[Locale], cancel:()=>Unit) extends VBox {
   getStyleClass.add("filter-button-node")
@@ -43,7 +44,7 @@ class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], locale:
     }
   })
   listView.setCellFactory(new Callback[ListView[Int],ListCell[Int]] {
-    def call(listView:ListView[Int]) = new FilterButtonNodeListCell[T](filterButtonNodeModel, cancel)
+    def call(listView:ListView[Int]) = new FilterButtonNodeListCell[T](filterButtonNodeModel)
   })
   private val observableProperties = FXCollections.observableArrayList(filterButtonNodeModel.values:_*)
   observableProperties.add(0, 0) // 0 represents All
@@ -64,14 +65,13 @@ class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], locale:
   getChildren.addAll(listView, buttonBox)
 }
 
-class FilterButtonNodeListCell[T](filterButtonNodeModel:FilterButtonNodeModel[T], cancel:()=>Unit) extends ListCell[Int] {
+class FilterButtonNodeListCell[T](filterButtonNodeModel:FilterButtonNodeModel[T]) extends ListCell[Int] {
   getStyleClass.add("filter-button-node-list-cell")
   private val checkBox = new CheckBox
   checkBox.setMouseTransparent(true)
   setOnMousePressed(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
-      if (event.getButton == MouseButton.PRIMARY && !event.isShortcutDown && !event.isShiftDown &&
-        !event.isControlDown && !event.isAltDown) {
+      if (event.getButton == MouseButton.PRIMARY && !GuiUtils.isSpecialKeyDown(event)) {
         checkBox.fire()
         filterButtonNodeModel.updateAllProperty(checkBox.isSelected)
       }
@@ -80,8 +80,7 @@ class FilterButtonNodeListCell[T](filterButtonNodeModel:FilterButtonNodeModel[T]
   setOnMouseClicked(new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
       if (event.getButton == MouseButton.PRIMARY && event.getClickCount == 2) {
-        cancel()
-        filterButtonNodeModel.selectValues(getListView.getSelectionModel.getSelectedItems)
+        filterButtonNodeModel.selectOneValue(getListView.getSelectionModel.getSelectedItem)
       }
     }
   })
