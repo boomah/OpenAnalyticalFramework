@@ -16,8 +16,8 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
       if (allShouldChange) {propertyLookUp.values.foreach(_.setValue(newValue))}
     }
   })
-  val values = tableData.getValue.tableValues.fieldValues.values(field)
-  val numValues = values.length
+  private[gui] val values = tableData.getValue.tableValues.fieldValues.values(field)
+  private[gui] val numValues = values.length
   private val defaultRenderer = tableData.getValue.defaultRenderers(field).asInstanceOf[Renderer[T]]
   private val valueLookUp = tableData.getValue.tableValues.valueLookUp(field.id)
   private val propertyLookUp = {
@@ -58,7 +58,7 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
     allShouldChange = true
   }
 
-  def flipValues(selectedValues:ObservableList[Int]) {
+  private[gui] def flipValues(selectedValues:ObservableList[Int]) {
     if (selectedValues.size == 1 && selectedValues.get(0) == 0) {
       allBooleanProperty.set(!allBooleanProperty.get)
     } else {
@@ -76,7 +76,7 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
     }
   }
 
-  def selectOneValue(intValue:Int) {
+  private[gui] def selectOneValue(intValue:Int) {
     if (intValue == 0) {
       allBooleanProperty.set(true)
     } else {
@@ -87,7 +87,7 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
     }
   }
 
-  def updateAllProperty(selected:Boolean) {
+  private[gui] def updateAllProperty(selected:Boolean) {
     if (selected) {
       val allSet = propertyLookUp.forall{case (_,property) => property.get}
       setAllProperty(allSet)
@@ -97,17 +97,17 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
     resetRequired = true
   }
 
-  def updateTableData() {
+  private[gui] def updateTableData() {
     val newField = field.withFilter(filter)
     val newTableData = tableData.getValue.replaceField(field, newField)
     tableData.setValue(newTableData)
   }
 
-  def property(index:Int) = if (index == 0) allBooleanProperty else propertyLookUp(index)
+  private[gui] def property(index:Int) = if (index == 0) allBooleanProperty else propertyLookUp(index)
   // TODO - All should be a binding that uses locale
-  def text(index:Int) = if (index == 0) "All" else defaultRenderer.render(valueLookUp(index).asInstanceOf[T])
+  private[gui] def text(index:Int) = if (index == 0) "All" else defaultRenderer.render(valueLookUp(index).asInstanceOf[T])
 
-  def filter:Filter[T] = {
+  private[gui] def filter:Filter[T] = {
     if (allBooleanProperty.get) {
       NoFilter[T]()
     } else {
