@@ -6,7 +6,7 @@ import javafx.event.EventHandler
 import javafx.scene.input.MouseEvent
 import javafx.beans.property.Property
 import com.openaf.table.lib.api.{Field, TableData}
-import javafx.stage.Popup
+import javafx.stage.{WindowEvent, Popup}
 import java.util.Locale
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.{Boolean => JBoolean}
@@ -20,11 +20,15 @@ class FilterButton[T](field:Field[T], tableData:Property[TableData], locale:Prop
     popup.setAutoFix(true)
     popup.setAutoHide(true)
     popup.setHideOnEscape(true)
-    popup.getContent.add(new FilterButtonNode[T](field, tableData, locale, cancel))
+    val filterButtonNode = new FilterButtonNode[T](field, tableData, locale, cancel)
+    popup.getContent.add(filterButtonNode)
     popup.showingProperty.addListener(new ChangeListener[JBoolean] {
       def changed(observableValue:ObservableValue[_<:JBoolean], oldValue:JBoolean, newValue:JBoolean) {
         if (!newValue) {setSelected(false)}
       }
+    })
+    popup.setOnShowing(new EventHandler[WindowEvent] {
+      def handle(event:WindowEvent) {filterButtonNode.reset()}
     })
     popup
   }

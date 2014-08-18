@@ -37,6 +37,21 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
     lookup
   }
 
+  private var resetRequired = false // We don't need to reset on the very first showing or if nothing has changed
+  private[gui] def reset() {
+    if (resetRequired) {
+      resetRequired = false
+      var allSelected = true
+      var selected = false
+      propertyLookUp.foreach{case (value,property) => {
+        selected = field.filter.matches(valueLookUp(value.toInt).asInstanceOf[T])
+        allSelected = allSelected & selected
+        property.set(selected)
+      }}
+      setAllProperty(allSelected)
+    }
+  }
+
   private def setAllProperty(selected:Boolean) {
     allShouldChange = false
     allBooleanProperty.set(selected)
@@ -79,6 +94,7 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
     } else {
       setAllProperty(false)
     }
+    resetRequired = true
   }
 
   def updateTableData() {

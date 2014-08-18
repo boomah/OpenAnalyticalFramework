@@ -62,6 +62,8 @@ class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], locale:
     def handle(e:ActionEvent) {cancel()}
   })
 
+  private[gui] def reset() {filterButtonNodeModel.reset()}
+
   getChildren.addAll(listView, buttonBox)
 }
 
