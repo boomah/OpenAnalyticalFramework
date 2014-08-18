@@ -12,8 +12,8 @@ import javafx.geometry.{Insets, Pos}
 import java.util.Locale
 
 class FieldNode[T](val field:Field[T], val dragAndDrop:DragAndDrop, val dragAndDropContainer:DragAndDropContainer,
-                val tableData:Property[TableData], fieldBindings:ObservableMap[FieldID,StringBinding],
-                locale:Property[Locale])
+                   val tableData:Property[TableData], fieldBindings:ObservableMap[FieldID,StringBinding],
+                   locale:Property[Locale])
   extends HBox with Draggable {
   getStyleClass.add("field-node")
   setFillHeight(false)

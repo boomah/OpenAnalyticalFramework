@@ -12,7 +12,7 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
   private val allBooleanProperty = new SimpleBooleanProperty
   private var allShouldChange = true
   allBooleanProperty.addListener(new ChangeListener[JBoolean] {
-    def changed(value:ObservableValue[_ <:JBoolean], oldValue:JBoolean, newValue:JBoolean) {
+    def changed(value:ObservableValue[_<:JBoolean], oldValue:JBoolean, newValue:JBoolean) {
       if (allShouldChange) {propertyLookUp.values.foreach(_.setValue(newValue))}
     }
   })
