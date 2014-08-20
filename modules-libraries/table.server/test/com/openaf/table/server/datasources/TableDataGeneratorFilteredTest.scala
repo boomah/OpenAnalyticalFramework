@@ -29,4 +29,13 @@ class TableDataGeneratorFilteredTest extends FunSuite {
 
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }
+
+  test("0 row, 0 measure, 0 column, 1 filter (not filtered)") {
+    val tableState = TableState.Blank.withFilterFields(List(NameField))
+
+    val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
+    val expectedFieldValues = orderedNameFieldValues(NameField)
+
+    check(tableState, Nil, Nil, Nil, expectedFieldValues, expectedValueLookUp)
+  }
 }

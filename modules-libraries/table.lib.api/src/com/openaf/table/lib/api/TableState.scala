@@ -11,6 +11,7 @@ case class TableState(tableLayout:TableLayout) {
   def withColumnHeaderLayout(newColumnHeaderLayout:ColumnHeaderLayout) = {
     copy(tableLayout = tableLayout.withColumnHeaderLayout(newColumnHeaderLayout))
   }
+  def filterFields = tableLayout.filterFields
   def withFilterFields(newFilterFields:List[Field[_]]) = {
     copy(tableLayout = tableLayout.withFilterFields(newFilterFields))
   }

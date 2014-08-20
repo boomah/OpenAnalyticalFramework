@@ -24,6 +24,15 @@ object RawRowBasedTableDataSource {
     })(collection.breakOut)
     val fieldsValueCounter = new Array[Int](allFieldIDs.size)
 
+    val filterFields = tableState.filterFields.toArray
+    val filterFieldIDs = tableState.tableLayout.filterFieldIDs
+    val filterFieldDefinitions = filterFieldIDs.map(id => fieldDefinitionGroup.fieldDefinition(id)).toArray
+    val numFilterCols = filterFieldIDs.length
+    var filterCounter = 0
+    val filterFieldPositions = filterFieldIDs.map(fieldIDs.indexOf(_)).toArray
+    val filtersLookUp = filterFieldIDs.map(fieldIDToLookUp).toArray
+    val filtersValueCounter = filterFieldIDs.map(allFieldIDs.indexOf(_)).toArray
+
     val rowHeaderFields = tableState.rowHeaderFields.toArray
     val rowHeaderFieldIDs = tableState.tableLayout.rowHeaderFieldIDs
     val rowHeaderFieldDefinitions = rowHeaderFieldIDs.map(id => fieldDefinitionGroup.fieldDefinition(id)).toArray
@@ -105,6 +114,26 @@ object RawRowBasedTableDataSource {
     while (dataCounter < dataLength) {
       dataRow = data(dataCounter)
       matchesFilter = true
+
+      while (matchesFilter && filterCounter < numFilterCols) {
+        value = dataRow(filterFieldPositions(filterCounter))
+        val fieldDefinition = filterFieldDefinitions(filterCounter)
+        val field = filterFields(filterCounter).asInstanceOf[Field[fieldDefinition.V]]
+        matchesFilter = field.filter.matches(value.asInstanceOf[fieldDefinition.V])
+        lookUp = filtersLookUp(filterCounter)
+        intForValue = lookUp.get(value)
+        if (intForValue == 0) {
+          fieldsValueCounterIndex = filtersValueCounter(filterCounter)
+          newCounter = fieldsValueCounter(fieldsValueCounterIndex) + 1
+          fieldsValueCounter(fieldsValueCounterIndex) = newCounter
+          lookUp.put(value, newCounter)
+          fieldValuesBitSets(field) += newCounter
+        } else {
+          fieldValuesBitSets(field) += intForValue
+        }
+        filterCounter += 1
+      }
+      filterCounter = 0
 
       rowHeaderValues = new Array[Int](numRowHeaderCols)
       while (matchesFilter && rowHeaderCounter < numRowHeaderCols) {

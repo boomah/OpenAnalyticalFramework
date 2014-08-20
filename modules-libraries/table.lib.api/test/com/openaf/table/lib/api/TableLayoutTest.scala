@@ -70,4 +70,24 @@ class TableLayoutTest extends FunSuite {
     assert(layout6.remove(List(dimensionField1, measureField1)) === TableLayout.Blank.withFilterFields(List(dimensionField2)))
     assert(layout6.remove(List(dimensionField1, dimensionField2, measureField1)) === TableLayout.Blank)
   }
+
+  test("replaceField") {
+    val layout1 = TableLayout.Blank.withRowHeaderFields(List(dimensionField1))
+    val expectedResult1 = TableLayout.Blank.withRowHeaderFields(List(dimensionField2))
+    assert(layout1.replaceField(dimensionField1, dimensionField2) === expectedResult1)
+
+    val layout2 = TableLayout.Blank.withFilterFields(List(dimensionField1))
+    val expectedResult2 = TableLayout.Blank.withFilterFields(List(dimensionField2))
+    assert(layout2.replaceField(dimensionField1, dimensionField2) === expectedResult2)
+
+    val layout3 = TableLayout.Blank.withRowHeaderFields(List(dimensionField1, dimensionField2))
+    val expectedResult3 = TableLayout.Blank.withRowHeaderFields(List(dimensionField3, dimensionField2))
+    assert(layout3.replaceField(dimensionField1, dimensionField3) === expectedResult3)
+
+    val layout4 = TableLayout.Blank.withColumnHeaderLayout(ColumnHeaderLayout(measureField1))
+    val expectedLayout4 = TableLayout.Blank.withColumnHeaderLayout(ColumnHeaderLayout(measureField2))
+    assert(layout4.replaceField(measureField1, measureField2) === expectedLayout4)
+
+    // TODO - do more complicated column layouts
+  }
 }

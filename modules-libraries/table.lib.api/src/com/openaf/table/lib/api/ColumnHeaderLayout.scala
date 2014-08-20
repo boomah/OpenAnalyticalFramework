@@ -11,6 +11,9 @@ case class ColumnHeaderLayout(columnHeaderTrees:List[ColumnHeaderTree]) {
   def addFieldToRight(field:Field[_]) = {
     copy(columnHeaderTrees = columnHeaderTrees ++ List(ColumnHeaderTree(field))).normalise
   }
+  def replaceField(oldField:Field[_], newField:Field[_]):ColumnHeaderLayout = {
+    copy(columnHeaderTrees = columnHeaderTrees.map(_.replaceField(oldField, newField)))
+  }
 
   def normalise:ColumnHeaderLayout = {
     val normalisedTrees = columnHeaderTrees.flatMap(_.normalise).flatMap(tree => {

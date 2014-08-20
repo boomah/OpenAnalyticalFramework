@@ -10,6 +10,22 @@ object TableDataGenerator {
   def tableData(tableState:TableState, tableDataSource:TableDataSource) = {
     val result = tableDataSource.result(tableState)
 
+    if (!result.resultState.sortState.filtersSorted) {
+      val filterFieldIDs = tableState.tableLayout.filterFieldIDs
+      val filterFieldDefinitions = filterFieldIDs.map(fieldID => {
+        tableDataSource.fieldDefinitionGroups.fieldDefinition(fieldID)
+      }).toArray
+      val filterLookUps = filterFieldIDs.map(result.valueLookUp).toArray
+
+      tableState.filterFields.zipWithIndex.foreach{case (field,i) => {
+        val fieldValues = result.fieldValues.values(field)
+        val fieldDefinition = filterFieldDefinitions(i)
+        val ordering = fieldDefinition.ordering
+        val lookUp = filterLookUps(i).asInstanceOf[Array[fieldDefinition.V]]
+        FieldValuesSorting.sort(fieldValues, ordering, lookUp, field.sortOrder)
+      }}
+    }
+
     val rowHeaderFieldIDs = tableState.tableLayout.rowHeaderFieldIDs
     val rowHeaderFieldDefinitions = rowHeaderFieldIDs.map(fieldID => {
       tableDataSource.fieldDefinitionGroups.fieldDefinition(fieldID)

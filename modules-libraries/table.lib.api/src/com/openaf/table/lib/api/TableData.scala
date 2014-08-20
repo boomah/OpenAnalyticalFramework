@@ -7,6 +7,7 @@ case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:T
   def withRowHeaderFields(newRowHeaderFields:List[Field[_]]) = {
     withTableState(tableState.withRowHeaderFields(newRowHeaderFields))
   }
+  def filterFields = tableState.filterFields
   def withFilterFields(newFilterFields:List[Field[_]]) = withTableState(tableState.withFilterFields(newFilterFields))
   def columnHeaderLayout = tableState.columnHeaderLayout
   def withColumnHeaderLayout(newColumnHeaderLayout:ColumnHeaderLayout) = {

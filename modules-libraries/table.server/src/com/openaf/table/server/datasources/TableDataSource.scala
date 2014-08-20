@@ -30,9 +30,10 @@ object FilterState {
   val Default = FilterState(isFiltered=false)
 }
 
-case class SortState(rowHeadersSorted:Boolean, pathDataSorted:Array[Boolean])
+case class SortState(filtersSorted:Boolean, rowHeadersSorted:Boolean, pathDataSorted:Array[Boolean])
 
 object SortState {
-  val Default = SortState(rowHeadersSorted=false, Array.empty)
-  def allUnsorted(numPaths:Int) = SortState(rowHeadersSorted=false, pathDataSorted=Array.fill(numPaths)(false))
+  val Default = SortState(filtersSorted=false, rowHeadersSorted=false, Array.empty)
+  def allUnsorted(numPaths:Int) = SortState(filtersSorted=false, rowHeadersSorted=false,
+    pathDataSorted=Array.fill(numPaths)(false))
 }

@@ -25,35 +25,8 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
       getColumns.clear()
       setItems(null)
     } else {
-      oldTableDataOption match {
-        case None => fullSetup(newTableData)
-        case Some(oldTableData) if oldTableData.rowHeaderFields.isEmpty && oldTableData.columnHeaderLayout.isEmpty => {
-          fullSetup(newTableData)
-        }
-        case Some(oldTableData) => {
-          if (oldTableData.rowHeaderFields == newTableData.rowHeaderFields &&
-            oldTableData.columnHeaderLayout == newTableData.columnHeaderLayout) {
-            // None of the columns haven't changed so just populate the data in the table
-            // TODO - if the data that is used to populate the table hasn't changed, don't bother with this
-            populateTable(newTableData)
-          } else if (oldTableData.rowHeaderFields == newTableData.rowHeaderFields) {
-            // Just the column header layout has changed
-            val columnHeaderColumns = createColumnHeaderTableColumns(newTableData)
-            getColumns.remove(newTableData.rowHeaderFields.size, getColumns.size)
-            getColumns.addAll(columnHeaderColumns)
-            populateTable(newTableData)
-          } else if (oldTableData.columnHeaderLayout == newTableData.columnHeaderLayout) {
-            // Just the row fields have changed
-            val rowHeaderColumns = createRowHeaderTableColumns(newTableData)
-            getColumns.remove(0, oldTableData.rowHeaderFields.size)
-            getColumns.addAll(0, rowHeaderColumns)
-            populateTable(newTableData)
-          } else {
-            // Both the column header layout and the row fields have changed
-            fullSetup(newTableData)
-          }
-        }
-      }
+      // TODO - should update the columns rather than recreating them
+      fullSetup(newTableData)
     }
   }
   

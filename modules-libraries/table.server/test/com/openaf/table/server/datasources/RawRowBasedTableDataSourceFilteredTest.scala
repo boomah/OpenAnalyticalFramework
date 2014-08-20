@@ -172,4 +172,25 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
 
     check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
+
+  test("0 row, 0 measure, 0 column, 1 filter (not filtered)") {
+    val tableState = TableState.Blank.withFilterFields(List(GenderField))
+    val expectedValueLookUp = Map(GenderField.id -> List(GenderField.id, F, M))
+    val expectedFieldValues = genderFieldValues(GenderField)
+
+    check(tableState, EmptySet, Nil, Nil, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("1 row (not filtered), 0 measure, 0 column, 1 filter (filtered)") {
+    val genderField = GenderField.withSingleFilter(M)
+    val tableState = TableState.Blank.withFilterFields(List(genderField)).withRowHeaderFields(List(NameField))
+    val expectedRowHeaderValues = Set(List(1),List(2),List(3))
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      NameField.id -> List(NameField.id, Nick, Paul, Ally)
+    )
+    val expectedFieldValues = genderFieldValues(genderField) ++ Map(NameField -> List(1,2,3))
+
+    check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
+  }
 }

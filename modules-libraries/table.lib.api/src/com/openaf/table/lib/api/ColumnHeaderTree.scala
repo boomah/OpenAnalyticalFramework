@@ -59,6 +59,16 @@ case class ColumnHeaderTree(columnHeaderTreeType:ColumnHeaderTreeType,
     val newChildColumnHeaderLayout = childColumnHeaderLayout.remove(fields:_*)
     copy(columnHeaderTreeType = newColumnHeaderTreeType, childColumnHeaderLayout = newChildColumnHeaderLayout)
   }
+
+  def replaceField(oldField:Field[_], newField:Field[_]) = {
+    val newColumnHeaderTreeType = columnHeaderTreeType match {
+      case Left(field) if field == oldField => Left(newField)
+      case field@Left(_) => field
+      case Right(columnHeaderLayout) => Right(columnHeaderLayout.replaceField(oldField, newField))
+    }
+    val newChildColumnHeaderLayout = childColumnHeaderLayout.replaceField(oldField, newField)
+    copy(columnHeaderTreeType = newColumnHeaderTreeType, childColumnHeaderLayout = newChildColumnHeaderLayout)
+  }
 }
 
 object ColumnHeaderTree {
