@@ -7,28 +7,28 @@ class FilterTest extends FunSuite {
   val paul = "Paul"
   val ally = "Ally"
 
-  test("NoFilter") {
-    val noFilter = NoFilter[String]()
+  test("RetainAllFilter") {
+    val noFilter = RetainAllFilter[String]()
     assert(noFilter.matches(nick) === true)
     assert(noFilter.matches("Anything") === true)
   }
 
-  test("AlwaysFilter") {
-    val alwaysFilter = AlwaysFilter[String]()
+  test("RejectAllFilter") {
+    val alwaysFilter = RejectAllFilter[String]()
     assert(alwaysFilter.matches(nick) === false)
     assert(alwaysFilter.matches("Anything") === false)
   }
 
-  test("ContainsFilter") {
-    val containsFilter = ContainsFilter[String](Set(nick, paul, ally))
+  test("RetainFilter") {
+    val containsFilter = RetainFilter[String](Set(nick, paul, ally))
     assert(containsFilter.matches(nick) === true)
     assert(containsFilter.matches(paul) === true)
     assert(containsFilter.matches(ally) === true)
     assert(containsFilter.matches("Other") === false)
   }
 
-  test("NotContainsFilter") {
-    val notContainsFilter = NotContainsFilter[String](Set(nick, paul, ally))
+  test("RejectFilter") {
+    val notContainsFilter = RejectFilter[String](Set(nick, paul, ally))
     assert(notContainsFilter.matches(nick) === false)
     assert(notContainsFilter.matches(paul) === false)
     assert(notContainsFilter.matches(ally) === false)

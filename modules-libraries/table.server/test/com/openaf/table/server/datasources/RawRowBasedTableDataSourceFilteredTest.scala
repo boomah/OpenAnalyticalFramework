@@ -154,7 +154,7 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
   }
 
   test("1 row (multiple filters) 1 measure, 0 column") {
-    val nameFilter = ContainsFilter[String](Set(Laura, Nick, Ally))
+    val nameFilter = RetainFilter[String](Set(Laura, Nick, Ally))
     val nameField = NameField.withFilter(nameFilter)
     val tableState = TableState.Blank.withRowHeaderFields(List(nameField))
       .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))

@@ -2,10 +2,10 @@ package com.openaf.table.lib.api
 
 import SortOrder._
 
-case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=NoFilter[T](),
+case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=RetainAllFilter[T](),
                     rendererID:RendererID=DefaultRendererID, sortOrder:SortOrder=Ascending, key:Int=Field.nextKey) {
   def flipSortOrder = copy(sortOrder = if (sortOrder == Ascending) Descending else Ascending)
-  def withSingleFilter(value:T) = copy(filter = ContainsFilter[T](Set(value)))
+  def withSingleFilter(value:T) = copy(filter = RetainFilter[T](Set(value)))
   def withFilter(filter:Filter[T]) = copy(filter = filter)
   def duplicate:Field[T] = copy(key = Field.nextKey)
 }

@@ -109,12 +109,12 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
 
   private[gui] def filter:Filter[T] = {
     if (allBooleanProperty.get) {
-      NoFilter[T]()
+      RetainAllFilter[T]()
     } else {
       val values = propertyLookUp.collect{case (intValue,property) if property.get => {
         valueLookUp(intValue.toInt).asInstanceOf[T]
       }}.toSet
-      ContainsFilter[T](values)
+      RetainFilter[T](values)
     }
   }
 }

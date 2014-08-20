@@ -17,14 +17,14 @@ class FilterButtonNodeModelTest extends FunSuite {
   val tableDataProperty = new SimpleObjectProperty[TableData](tableData)
   val locale = new SimpleObjectProperty[Locale](Locale.UK)
 
-  test("NoFilter") {
+  test("RetainAllFilter") {
     val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, locale)
-    assert(model.filter === NoFilter[String]())
+    assert(model.filter === RetainAllFilter[String]())
   }
 
-  test("Single contains filter") {
+  test("RetainFilter single value") {
     val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, locale)
     model.selectOneValue(1)
-    assert(model.filter === ContainsFilter[String](Set(Rosie)))
+    assert(model.filter === RetainFilter[String](Set(Rosie)))
   }
 }
