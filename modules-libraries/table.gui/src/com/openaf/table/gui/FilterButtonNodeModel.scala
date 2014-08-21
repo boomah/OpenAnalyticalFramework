@@ -13,7 +13,10 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
   private var allShouldChange = true
   allBooleanProperty.addListener(new ChangeListener[JBoolean] {
     def changed(value:ObservableValue[_<:JBoolean], oldValue:JBoolean, newValue:JBoolean) {
-      if (allShouldChange) {propertyLookUp.values.foreach(_.setValue(newValue))}
+      if (allShouldChange) {
+        propertyLookUp.values.foreach(_.setValue(newValue))
+        retainFilterType = !newValue
+      }
     }
   })
   private[gui] val values = tableData.getValue.tableValues.fieldValues.values(field)
@@ -58,11 +61,6 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
     allShouldChange = true
   }
 
-  // Determines whether we want the filter to be retaining or rejecting. Updated based on what a user clicks on. e.g. if
-  // a user selects just one value then we are in retain mode. If a user deselects one value when everything is selected
-  // then we are in reject mode.
-  private var retainFilterType = false
-
   private[gui] def flipValues(selectedValues:ObservableList[Int]) {
     if (selectedValues.size == 1 && selectedValues.get(0) == 0) {
       allBooleanProperty.set(!allBooleanProperty.get)
@@ -81,6 +79,11 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
     }
   }
 
+  // Determines whether we want the filter to be retaining or rejecting. Updated based on what a user clicks on. e.g. if
+  // a user selects just one value then we are in retain mode. If a user deselects one value when everything is selected
+  // then we are in reject mode.
+  private var retainFilterType = field.filter.isInstanceOf[RejectAllFilter[_]]
+
   private[gui] def selectOneValue(intValue:Int) {
     if (intValue == 0) {
       allBooleanProperty.set(true)
@@ -96,7 +99,6 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
   private[gui] def updateAllProperty(selected:Boolean) {
     if (selected) {
       val allSet = propertyLookUp.forall{case (_,property) => property.get}
-      retainFilterType = !allSet
       setAllProperty(allSet)
     } else {
       setAllProperty(false)
@@ -121,7 +123,7 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
       val filteredValues = propertyLookUp.collect{case (intValue,property) if property.get == retainFilterType => {
         valueLookUp(intValue.toInt)
       }}.toSet
-      if (!retainFilterType && filteredValues.size == values.size) {
+      if ((retainFilterType && filteredValues.isEmpty) || (!retainFilterType && (filteredValues.size == values.size))) {
         RejectAllFilter[T]()
       } else {
         if (retainFilterType) {
