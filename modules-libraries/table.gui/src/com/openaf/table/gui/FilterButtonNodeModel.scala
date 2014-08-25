@@ -47,7 +47,7 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
       var allSelected = true
       var selected = false
       propertyLookUp.foreach{case (value,property) => {
-        selected = field.filter.matches(valueLookUp(value.toInt).asInstanceOf[T])
+        selected = field.filter.matches(valueLookUp(value.toInt))
         allSelected = allSelected & selected
         property.set(selected)
       }}
@@ -106,15 +106,18 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
     resetRequired = true
   }
 
-  private[gui] def updateTableData() {
+  private[gui] def updateTableData() {updateTableData(filter)}
+
+  private[gui] def updateTableData(filter:Filter[T]) {
     val newField = field.withFilter(filter)
     val newTableData = tableData.getValue.replaceField(field, newField)
     tableData.setValue(newTableData)
   }
 
-  private[gui] def property(index:Int) = if (index == 0) allBooleanProperty else propertyLookUp(index)
+  private[gui] def property(intValue:Int) = if (intValue == 0) allBooleanProperty else propertyLookUp(intValue)
   // TODO - All should be a binding that uses locale
-  private[gui] def text(index:Int) = if (index == 0) "All" else defaultRenderer.render(valueLookUp(index))
+  private[gui] def text(intValue:Int) = if (intValue == 0) "All" else defaultRenderer.render(value(intValue))
+  private[gui] def value(intValue:Int) = valueLookUp(intValue)
 
   private[gui] def filter:Filter[T] = {
     if (allBooleanProperty.get) {
@@ -134,4 +137,8 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
       }
     }
   }
+}
+
+object FilterButtonNodeModel {
+  val AllValue = 0
 }

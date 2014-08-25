@@ -20,7 +20,7 @@ class FilterButton[T](field:Field[T], tableData:Property[TableData], locale:Prop
     popup.setAutoFix(true)
     popup.setAutoHide(true)
     popup.setHideOnEscape(true)
-    val filterButtonNode = new FilterButtonNode[T](field, tableData, locale, cancel)
+    val filterButtonNode = new FilterButtonNode[T](field, tableData, locale, hidePopup)
     popup.getContent.add(filterButtonNode)
     popup.showingProperty.addListener(new ChangeListener[JBoolean] {
       def changed(observableValue:ObservableValue[_<:JBoolean], oldValue:JBoolean, newValue:JBoolean) {
@@ -38,5 +38,5 @@ class FilterButton[T](field:Field[T], tableData:Property[TableData], locale:Prop
       filterButtonNodePopup.show(getScene.getWindow, bounds.getMinX, bounds.getMaxY)
     }
   })
-  private def cancel() {filterButtonNodePopup.hide()}
+  private def hidePopup() {filterButtonNodePopup.hide()}
 }

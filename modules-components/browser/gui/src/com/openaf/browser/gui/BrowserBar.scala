@@ -32,7 +32,7 @@ class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage, ca
 
   override def layoutChildren() {
     // Because the icons on the buttons are actually from a font the buttons are all slightly different sizes. We want
-    // them to all be the same size and square. Set here we set them to the same size as the height of the addressBar.
+    // them to all be the same size and square. This sets them to the same size as the height of the addressBar.
     val length = addressBar.prefHeight(Double.MaxValue)
     navigationButtons.foreach(_.setPrefSize(length, length))
     super.layoutChildren()

@@ -79,12 +79,30 @@
     -fx-alignment: center-right;
 }
 
+.filter-button-node .graphic-button{
+   -fx-padding: 0;
+   -fx-content-display: CENTER;
+   -fx-graphic-text-gap: 0;
+   -fx-alignment: CENTER;
+}
+
+.filter-button-node .font-awesome{
+    -fx-font-size: null;
+    -fx-fill: grey;
+}
+
+.filter-button-node .plus-text{
+    -fx-font-size: 20;
+    -fx-fill: grey;
+    -fx-font-smoothing-type: lcd;
+}
+
 .filter-button-node-list-cell{
-    -fx-padding: 1 2 1 16;
+    -fx-padding: 1 2 1 10;
 }
 
 #all-filter-button-node-list-cell{
-    -fx-padding: 1 2 1 8;
+    -fx-padding: 2;
 }
 
 .filter-button-node-list-cell > .check-box > .box > .mark{
@@ -104,4 +122,8 @@
     -fx-padding: 1;
     -fx-border-width: 0 1 0 0;
     -fx-border-color: -fx-box-border;
+}
+
+.small-spacing{
+    -fx-spacing: 2;
 }
