@@ -11,7 +11,7 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
 
     val expectedRowHeaderValues = Set(List(1))
     val expectedValueLookUp = Map(GenderField.id -> List(GenderField.id, F, M))
-    val expectedFieldValues = genderFieldValues(genderField)
+    val expectedFieldValues = genderFieldValues(genderField.withKey(RowHeaderFieldKey(0)))
 
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }
@@ -25,7 +25,8 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       NameField.id -> List(NameField.id, Rosie, Laura, Josie)
     )
-    val expectedFieldValues = genderFieldValues(genderField) + (NameField -> List(1,2,3))
+    val expectedFieldValues = genderFieldValues(genderField.withKey(RowHeaderFieldKey(0))) +
+      (NameField.withKey(RowHeaderFieldKey(1)) -> List(1,2,3))
 
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }
@@ -39,7 +40,8 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       NameField.id -> List(NameField.id, Nick, Paul, Ally)
     )
-    val expectedFieldValues = genderFieldValues(genderField) + (NameField -> List(1,2,3))
+    val expectedFieldValues = genderFieldValues(genderField.withKey(RowHeaderFieldKey(0))) +
+      (NameField.withKey(RowHeaderFieldKey(1)) -> List(1,2,3))
 
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }
@@ -53,7 +55,8 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally)
     )
-    val expectedFieldValues = genderFieldValues(GenderField) ++ nameFieldValues(nameField)
+    val expectedFieldValues = genderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
+      nameFieldValues(nameField.withKey(RowHeaderFieldKey(1)))
 
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }
@@ -70,7 +73,8 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       ScoreField.id -> List(ScoreField.id)
     )
-    val expectedFieldValues = genderFieldValues(genderField) ++ ScoreFieldValues
+    val expectedFieldValues = genderFieldValues(genderField.withKey(RowHeaderFieldKey(0))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
@@ -87,14 +91,15 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       ScoreField.id -> List(ScoreField.id)
     )
-    val expectedFieldValues = genderFieldValues(genderField) ++ ScoreFieldValues
+    val expectedFieldValues = genderFieldValues(genderField.withKey(ColumnHeaderFieldKey(1))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, EmptyListSet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("0 row, 1 measure, 2 column (same, same filter)") {
     val genderField1 = GenderField.withSingleFilter(F)
-    val genderField2 = GenderField.duplicate.withSingleFilter(F)
+    val genderField2 = GenderField.withSingleFilter(F)
     val tableState = TableState.Blank.withColumnHeaderLayout(
       ColumnHeaderLayout(ScoreField, List(genderField1, genderField2))
     )
@@ -108,14 +113,16 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       ScoreField.id -> List(ScoreField.id)
     )
-    val expectedFieldValues = genderFieldValues(genderField1) ++ genderFieldValues(genderField2) ++ ScoreFieldValues
+    val expectedFieldValues = genderFieldValues(genderField1.withKey(ColumnHeaderFieldKey(1))) ++
+      genderFieldValues(genderField2.withKey(ColumnHeaderFieldKey(2))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, EmptyListSet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("0 row, 1 measure, 2 column (same, different filter)") {
     val genderField1 = GenderField.withSingleFilter(M)
-    val genderField2 = GenderField.duplicate.withSingleFilter(F)
+    val genderField2 = GenderField.withSingleFilter(F)
     val tableState = TableState.Blank.withColumnHeaderLayout(
       ColumnHeaderLayout(ScoreField, List(genderField1, genderField2))
     )
@@ -129,7 +136,9 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       ScoreField.id -> List(ScoreField.id)
     )
-    val expectedFieldValues = genderFieldValues(genderField1) ++ genderFieldValues(genderField2) ++ ScoreFieldValues
+    val expectedFieldValues = genderFieldValues(genderField1.withKey(ColumnHeaderFieldKey(1))) ++
+      genderFieldValues(genderField2.withKey(ColumnHeaderFieldKey(2))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, EmptyListSet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
@@ -148,7 +157,9 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
       LocationField.id -> List(LocationField.id, London, Manchester),
       ScoreField.id -> List(ScoreField.id)
     )
-    val expectedFieldValues = genderFieldValues(genderField) ++ Map(locationField -> List(1,2)) ++ ScoreFieldValues
+    val expectedFieldValues = genderFieldValues(genderField.withKey(RowHeaderFieldKey(0))) ++
+      Map(locationField.withKey(ColumnHeaderFieldKey(1)) -> List(1,2)) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
@@ -168,7 +179,8 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
       NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
       ScoreField.id -> List(ScoreField.id)
     )
-    val expectedFieldValues = nameFieldValues(nameField) ++ ScoreFieldValues
+    val expectedFieldValues = nameFieldValues(nameField.withKey(RowHeaderFieldKey(0))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
@@ -176,7 +188,7 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
   test("0 row, 0 measure, 0 column, 1 filter (not filtered)") {
     val tableState = TableState.Blank.withFilterFields(List(GenderField))
     val expectedValueLookUp = Map(GenderField.id -> List(GenderField.id, F, M))
-    val expectedFieldValues = genderFieldValues(GenderField)
+    val expectedFieldValues = genderFieldValues(GenderField.withKey(FilterFieldKey(0)))
 
     check(tableState, EmptySet, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }
@@ -189,7 +201,8 @@ class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       NameField.id -> List(NameField.id, Nick, Paul, Ally)
     )
-    val expectedFieldValues = genderFieldValues(genderField) ++ Map(NameField -> List(1,2,3))
+    val expectedFieldValues = genderFieldValues(genderField.withKey(FilterFieldKey(0))) ++
+      Map(NameField.withKey(RowHeaderFieldKey(0)) -> List(1,2,3))
 
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }

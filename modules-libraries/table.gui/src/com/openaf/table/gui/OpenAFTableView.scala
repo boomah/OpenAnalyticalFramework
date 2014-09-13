@@ -103,7 +103,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
       }
       tableColumn.setCellValueFactory(new DefaultRowHeaderCellValueFactory)
       val values = tableData.tableValues.valueLookUp(field.id)
-      val defaultRenderer = tableData.defaultRenderers(field)
+      val defaultRenderer = tableData.defaultRenderers(field.id)
       val cellFactory = new DefaultRowHeaderCellFactory(values, defaultRenderer)
       tableColumn.setCellFactory(cellFactory)
       columns.add(tableColumn)
@@ -142,7 +142,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
       val numRows = pathFields.size
       val measureFieldOption = path.measureFieldOption
       val defaultRenderer = measureFieldOption match {
-        case Some(measureField) => tableData.defaultRenderers(measureField)
+        case Some(measureField) => tableData.defaultRenderers(measureField.id)
         case None => BlankRenderer
       }
       val numColumns = pathColumnHeaders.length

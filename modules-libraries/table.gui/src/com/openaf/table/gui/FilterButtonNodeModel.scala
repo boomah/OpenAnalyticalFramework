@@ -21,7 +21,7 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
   })
   private[gui] val values = tableData.getValue.tableValues.fieldValues.values(field)
   private[gui] val numValues = values.length
-  private val defaultRenderer = tableData.getValue.defaultRenderers(field).asInstanceOf[Renderer[T]]
+  private val defaultRenderer = tableData.getValue.defaultRenderers(field.id).asInstanceOf[Renderer[T]]
   private val valueLookUp = tableData.getValue.tableValues.valueLookUp(field.id).asInstanceOf[Array[T]]
   private val propertyLookUp = {
     val lookup = new mutable.LongMap[SimpleBooleanProperty]

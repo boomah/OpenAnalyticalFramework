@@ -1,7 +1,7 @@
 package com.openaf.table.server.datasources
 
 import org.scalatest.FunSuite
-import com.openaf.table.lib.api.TableState
+import com.openaf.table.lib.api.{FilterFieldKey, RowHeaderFieldKey, TableState}
 import com.openaf.table.server.datasources.DataSourceTestData._
 
 class TableDataGeneratorFilteredTest extends FunSuite {
@@ -11,7 +11,7 @@ class TableDataGeneratorFilteredTest extends FunSuite {
 
     val expectedRowHeaderValues = List(List(1))
     val expectedValueLookUp = Map(genderField.id -> List(genderField.id, F, M))
-    val expectedFieldValues = orderedGenderFieldValues(genderField)
+    val expectedFieldValues = orderedGenderFieldValues(genderField.withKey(RowHeaderFieldKey(0)))
 
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }
@@ -25,7 +25,8 @@ class TableDataGeneratorFilteredTest extends FunSuite {
       genderField.id -> List(genderField.id, F, M),
       NameField.id -> List(NameField.id, Rosie, Laura, Josie)
     )
-    val expectedFieldValues = orderedGenderFieldValues(genderField) ++ Map(NameField -> List(3,2,1))
+    val expectedFieldValues = orderedGenderFieldValues(genderField.withKey(RowHeaderFieldKey(0))) ++
+      Map(NameField.withKey(RowHeaderFieldKey(1)) -> List(3,2,1))
 
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }
@@ -34,7 +35,7 @@ class TableDataGeneratorFilteredTest extends FunSuite {
     val tableState = TableState.Blank.withFilterFields(List(NameField))
 
     val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
-    val expectedFieldValues = orderedNameFieldValues(NameField)
+    val expectedFieldValues = orderedNameFieldValues(NameField.withKey(FilterFieldKey(0)))
 
     check(tableState, Nil, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }

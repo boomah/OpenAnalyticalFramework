@@ -1,7 +1,7 @@
 package com.openaf.table.lib.api
 
 case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:TableValues,
-                     defaultRenderers:Map[Field[_],Renderer[_]]) {
+                     defaultRenderers:Map[FieldID,Renderer[_]]) {
   def withTableState(newTableState:TableState) = copy(tableState = newTableState)
   def rowHeaderFields = tableState.rowHeaderFields
   def withRowHeaderFields(newRowHeaderFields:List[Field[_]]) = {
@@ -14,6 +14,7 @@ case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:T
     withTableState(tableState.withColumnHeaderLayout(newColumnHeaderLayout))
   }
   def replaceField(oldField:Field[_], newField:Field[_]) = withTableState(tableState.replaceField(oldField, newField))
+  def generateFieldKeys = withTableState(tableState.generateFieldKeys)
 
   def rowHeadersAsString = {
     val rowHeaderFields = tableState.tableLayout.rowHeaderFields.toArray
@@ -22,7 +23,7 @@ case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:T
     val arraysOfStrings = tableValues.rowHeaders.map(row => {
       row.zipWithIndex.map{case (rowValue, column) => {
         val field = rowHeaderFields(column)
-        val renderer = defaultRenderers(field).asInstanceOf[Renderer[Any]]
+        val renderer = defaultRenderers(field.id).asInstanceOf[Renderer[Any]]
         val value = tableValues.valueLookUp(field.id)(rowValue)
         renderer.render(value)
       }}

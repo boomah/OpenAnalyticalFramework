@@ -101,7 +101,7 @@ class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsA
   }
   override def noOpSceneBounds = allFieldsArea.localToScene(allFieldsArea.getBoundsInLocal)
   def dragAndDropContainer = allFieldsArea
-  def fields = fields0.map(_.duplicate) // The AllFieldsArea needs to create new fields so always duplicate them
+  def fields = fields0
   def dragImage = snapshot(new SnapshotParameters, null)
   override def isParent = getTreeItem.getValue.isLeft
 }

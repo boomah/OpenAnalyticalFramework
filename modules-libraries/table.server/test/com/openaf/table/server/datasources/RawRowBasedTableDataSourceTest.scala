@@ -10,18 +10,18 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
 
     val expectedRowHeaderValues = Set(List(1), List(2), List(3), List(4), List(5), List(6))
     val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
-    val expectedFieldValues = nameFieldValues(NameField)
+    val expectedFieldValues = nameFieldValues(NameField.withKey(RowHeaderFieldKey(0)))
 
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }
 
   test("2 row (key - duplicate), 0 measure, 0 column") {
-    val nameField2 = NameField.duplicate
-    val tableState = TableState.Blank.withRowHeaderFields(List(NameField, nameField2))
+    val tableState = TableState.Blank.withRowHeaderFields(List(NameField, NameField))
 
     val expectedRowHeaderValues = Set(List(1,1), List(2,2), List(3,3), List(4,4), List(5,5), List(6,6))
     val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
-    val expectedFieldValues = nameFieldValues(NameField) ++ nameFieldValues(nameField2)
+    val expectedFieldValues = nameFieldValues(NameField.withKey(RowHeaderFieldKey(0))) ++
+      nameFieldValues(NameField.withKey(RowHeaderFieldKey(1)))
 
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }
@@ -31,7 +31,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
 
     val expectedRowHeaderValues = Set(List(1), List(2))
     val expectedValueLookUp = Map(GenderField.id -> List(GenderField.id, F, M))
-    val expectedFieldValues = genderFieldValues(GenderField)
+    val expectedFieldValues = genderFieldValues(GenderField.withKey(RowHeaderFieldKey(0)))
 
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }
@@ -55,7 +55,8 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
       ScoreField.id -> List(ScoreField.id)
     )
-    val expectedFieldValues = nameFieldValues(NameField) ++ ScoreFieldValues
+    val expectedFieldValues = nameFieldValues(NameField.withKey(RowHeaderFieldKey(0))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
@@ -68,7 +69,8 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh)
     )
-    val expectedFieldValues = locationFieldValues(LocationField) ++ genderFieldValues(GenderField)
+    val expectedFieldValues = genderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
+      locationFieldValues(LocationField.withKey(RowHeaderFieldKey(1)))
 
     check(tableState, expectedRowHeaderValues, Nil, Nil, expectedFieldValues, expectedValueLookUp)
   }
@@ -92,7 +94,9 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh),
       ScoreField.id -> List(ScoreField.id)
     )
-    val expectedFieldValues = locationFieldValues(LocationField) ++ genderFieldValues(GenderField) ++ ScoreFieldValues
+    val expectedFieldValues = genderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
+      locationFieldValues(LocationField.withKey(RowHeaderFieldKey(1))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
@@ -102,7 +106,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
 
     val expectedColHeaderValues = List(Set(List(1), List(2), List(3), List(4), List(5), List(6)))
     val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
-    val expectedFieldValues = nameFieldValues(NameField)
+    val expectedFieldValues = nameFieldValues(NameField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, EmptySet, expectedColHeaderValues, EmptyMapList, expectedFieldValues, expectedValueLookUp)
   }
@@ -119,7 +123,8 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       GenderField.id -> List(GenderField.id, F, M),
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh)
     )
-    val expectedFieldValues = locationFieldValues(LocationField) ++ genderFieldValues(GenderField)
+    val expectedFieldValues = genderFieldValues(GenderField.withKey(ColumnHeaderFieldKey(0))) ++
+      locationFieldValues(LocationField.withKey(ColumnHeaderFieldKey(1)))
 
     check(tableState, EmptySet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
@@ -140,7 +145,8 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
       ScoreField.id -> List(ScoreField.id)
     )
-    val expectedFieldValues = nameFieldValues(NameField) ++ ScoreFieldValues
+    val expectedFieldValues = nameFieldValues(NameField.withKey(ColumnHeaderFieldKey(1))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, EmptyListSet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
@@ -169,7 +175,9 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh),
       ScoreField.id -> List(ScoreField.id)
     )
-    val expectedFieldValues = locationFieldValues(LocationField) ++ genderFieldValues(GenderField) ++ ScoreFieldValues
+    val expectedFieldValues = genderFieldValues(GenderField.withKey(ColumnHeaderFieldKey(1))) ++
+      locationFieldValues(LocationField.withKey(ColumnHeaderFieldKey(2))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, EmptyListSet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
@@ -194,7 +202,9 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
       ScoreField.id -> List(ScoreField.id)
     )
-    val expectedFieldValues = nameFieldValues(NameField) ++ genderFieldValues(GenderField) ++ ScoreFieldValues
+    val expectedFieldValues = nameFieldValues(NameField.withKey(ColumnHeaderFieldKey(1))) ++
+      genderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
@@ -231,8 +241,10 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       ScoreField.id -> List(ScoreField.id),
       AgeField.id -> List(AgeField.id)
     )
-    val expectedFieldValues = locationFieldValues(LocationField) ++ genderFieldValues(GenderField) ++
-      ScoreFieldValues ++ measureFieldValues(ageField)
+    val expectedFieldValues = locationFieldValues(LocationField.withKey(ColumnHeaderFieldKey(1))) ++
+      genderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0))) ++
+      measureFieldValues(ageField.withKey(ColumnHeaderFieldKey(2)))
 
     check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
@@ -243,7 +255,7 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
     val expectedColHeaderValues = List(Set(List(0)))
     val expectedData = List(Map((List[Int](), List(0)) -> 425))
     val expectedValueLookUp = Map(ScoreField.id -> List(ScoreField.id))
-    val expectedFieldValues = ScoreFieldValues
+    val expectedFieldValues = scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, EmptyListSet, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }
@@ -286,8 +298,11 @@ class RawRowBasedTableDataSourceTest extends FunSuite {
       ScoreField.id -> List(ScoreField.id),
       AgeField.id -> List(AgeField.id)
     )
-    val expectedFieldValues = nameFieldValues(NameField) ++ locationFieldValues(LocationField) ++
-      genderFieldValues(GenderField) ++ ScoreFieldValues ++ measureFieldValues(ageField)
+    val expectedFieldValues = nameFieldValues(NameField.withKey(RowHeaderFieldKey(0))) ++
+      locationFieldValues(LocationField.withKey(ColumnHeaderFieldKey(1))) ++
+      genderFieldValues(GenderField.withKey(ColumnHeaderFieldKey(3))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0))) ++
+      measureFieldValues(ageField.withKey(ColumnHeaderFieldKey(2)))
 
       check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
   }

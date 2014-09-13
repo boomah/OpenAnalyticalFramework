@@ -7,7 +7,8 @@ import java.util
 
 object TableDataGenerator {
   // This is far from idiomatic Scala. Written this way for speed.
-  def tableData(tableState:TableState, tableDataSource:TableDataSource) = {
+  def tableData(tableStateNoKeys:TableState, tableDataSource:TableDataSource) = {
+    val tableState = tableStateNoKeys.generateFieldKeys
     val result = tableDataSource.result(tableState)
 
     if (!result.resultState.sortState.filtersSorted) {
@@ -115,10 +116,10 @@ object TableDataGenerator {
 
     val tableValues = TableValues(result.rowHeaderValues, allColHeaderValues, data, result.fieldValues, result.valueLookUp)
 
-    val defaultRenderers:Map[Field[_],Renderer[_]] = tableState.tableLayout.allFields.map(field => {
+    val defaultRenderers:Map[FieldID,Renderer[_]] = tableState.tableLayout.allFields.map(field => {
       val fieldDefinition = tableDataSource.fieldDefinitionGroups.fieldDefinition(field.id)
       val renderer = if (field.fieldType.isDimension) fieldDefinition.renderer else fieldDefinition.combinedRenderer
-      field -> NoValueAwareDelegatingRenderer(renderer)
+      field.id -> NoValueAwareDelegatingRenderer(renderer)
     }).toMap
 
     TableData(fieldGroup, tableState, tableValues, defaultRenderers)

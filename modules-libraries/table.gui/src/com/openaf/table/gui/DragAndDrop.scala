@@ -175,7 +175,7 @@ trait Draggable extends Region {
         dragAndDrop.clearDragPane()
         dragAndDrop.closestDropTarget.set(None)
         dragAndDrop.fieldsBeingDraggedInfo.set(None)
-        newTableDataOption.foreach(newTableData => tableData.setValue(newTableData))
+        newTableDataOption.foreach(newTableData => tableData.setValue(newTableData.generateFieldKeys))
       })
     }
   })
@@ -201,7 +201,7 @@ trait Draggable extends Region {
     } else {
       tableDataWithRemoved
     }
-    tableData.setValue(tableDataToUse)
+    tableData.setValue(tableDataToUse.generateFieldKeys)
   }
 }
 

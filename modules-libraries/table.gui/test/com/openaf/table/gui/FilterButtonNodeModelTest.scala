@@ -10,7 +10,7 @@ import javafx.collections.FXCollections
 class FilterButtonNodeModelTest extends FunSuite {
   val tableData = {
     val tableLayout = TableLayout.Blank.copy(rowHeaderFields = List(NameField))
-    val tableState = TableState(tableLayout)
+    val tableState = TableState(tableLayout).generateFieldKeys
     val fieldValues = FieldValues(nameFieldValues(NameField))
     val tableValues = TableValues.Empty.copy(fieldValues = fieldValues, valueLookUp = NameValuesLookUp)
     TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
@@ -71,7 +71,7 @@ class FilterButtonNodeModelTest extends FunSuite {
       val tableState = TableState(tableLayout)
       val fieldValues = FieldValues(nameFieldValues(nameField))
       val tableValues = TableValues.Empty.copy(fieldValues = fieldValues, valueLookUp = NameValuesLookUp)
-      TableData(FieldGroupData, tableState, tableValues, DefaultRenderers + (nameField -> StringRenderer))
+      TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
     }
     val newTableDataProperty = new SimpleObjectProperty[TableData](newTableData)
     val model = new FilterButtonNodeModel[String](nameField, newTableDataProperty, locale)

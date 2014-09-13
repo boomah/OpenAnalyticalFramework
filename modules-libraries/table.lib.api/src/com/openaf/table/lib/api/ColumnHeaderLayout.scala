@@ -1,5 +1,7 @@
 package com.openaf.table.lib.api
 
+import java.util.concurrent.atomic.AtomicInteger
+
 case class ColumnHeaderLayout(columnHeaderTrees:List[ColumnHeaderTree]) {
   def allFields = columnHeaderTrees.flatMap(_.allFields)
   def isEmpty = columnHeaderTrees.isEmpty
@@ -23,7 +25,13 @@ case class ColumnHeaderLayout(columnHeaderTrees:List[ColumnHeaderTree]) {
         List(tree)
       }
     })
-    ColumnHeaderLayout(normalisedTrees)
+    copy(columnHeaderTrees = normalisedTrees)
+  }
+
+  // TODO - probably shouldn't be using an AtomicInteger here. Should probably be using a more functional approach
+  // TODO - to generate the field keys
+  def generateFieldKeys(number:AtomicInteger):ColumnHeaderLayout = {
+    copy(columnHeaderTrees = columnHeaderTrees.map(_.generateFieldKeys(number)))
   }
 }
 

@@ -61,13 +61,13 @@ object DataSourceTestData {
   def locationFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2,3))
   def orderedLocationFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(3,1,2))
   def reversedLocationFieldValues(field:Field[_]):Map[Field[_],List[Int]] = orderedLocationFieldValues(field).mapValues(_.reverse)
-  val ScoreFieldValues:Map[Field[_],List[Int]] = Map(ScoreField -> Nil)
+  def scoreFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
   def measureFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
 
   def check(tableState:TableState, expectedRowHeaderValues:Set[List[Int]],
             expectedColHeaderValues:List[Set[List[Int]]], expectedData:List[Map[(List[Int],List[Int]),Int]],
             expectedFieldValues:Map[Field[_],List[Int]], expectedValueLookUp:Map[FieldID,List[Any]]) {
-    val result = dataSource.result(tableState)
+    val result = dataSource.result(tableState.generateFieldKeys)
     assert(result.rowHeaderValues.map(_.toList).toSet === expectedRowHeaderValues)
     assert(result.pathData.map(_.colHeaderValues.map(_.toList).toSet).toList === expectedColHeaderValues)
     val convertedData = result.pathData.map(_.data.map{case (key,value) => (key.array1.toList, key.array2.toList) -> value}).toList
@@ -81,7 +81,7 @@ object DataSourceTestData {
             expectedData:List[List[List[Any]]],
             expectedFieldValues:Map[Field[_],List[Int]],
             expectedValueLookUp:Map[FieldID,List[Any]]) {
-    val tableData = TableDataGenerator.tableData(tableState, dataSource)
+    val tableData = TableDataGenerator.tableData(tableState.generateFieldKeys, dataSource)
     assert(tableData.tableValues.rowHeaders.map(_.toList).toList === expectedRowHeaderValues)
     assert(tableData.tableValues.columnHeaders.map(_.map(_.toList).toList).toList === expectedColHeaderValues)
     assert(tableData.tableValues.data.map(_.map(_.toList).toList).toList === expectedData)

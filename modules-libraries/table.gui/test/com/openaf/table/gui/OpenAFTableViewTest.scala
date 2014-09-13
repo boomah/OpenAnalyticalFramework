@@ -20,7 +20,7 @@ class OpenAFTableViewTest extends FunSuite {
       columnHeaders = Array(Array(Array(1), Array(2))),
       valueLookUp = GenderValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -38,7 +38,7 @@ class OpenAFTableViewTest extends FunSuite {
       columnHeaders = Array(Array(Array(1,1), Array(1,2))),
       valueLookUp = GenderValuesLookUp ++ GroupValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -58,7 +58,7 @@ class OpenAFTableViewTest extends FunSuite {
       columnHeaders = Array(Array(Array(1,1), Array(2,1))),
       valueLookUp = GenderValuesLookUp ++ GroupValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -82,7 +82,7 @@ class OpenAFTableViewTest extends FunSuite {
       columnHeaders = Array(Array(Array(1,1), Array(1,2)), Array(Array(1,1), Array(1,2), Array(1,3))),
       valueLookUp = GenderValuesLookUp ++ LocationValuesLookUp ++ GroupValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -105,7 +105,7 @@ class OpenAFTableViewTest extends FunSuite {
       data = Array(Array(Array(34))),
       valueLookUp = ScoreValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -122,7 +122,7 @@ class OpenAFTableViewTest extends FunSuite {
       data = Array(Array(Array(98, 78))),
       valueLookUp = ScoreValuesLookUp ++ GenderValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -143,7 +143,7 @@ class OpenAFTableViewTest extends FunSuite {
       data = Array(Array(Array(98, 78))),
       valueLookUp = GenderValuesLookUp ++ ScoreValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -166,7 +166,7 @@ class OpenAFTableViewTest extends FunSuite {
       data = Array(Array(Array(176)), Array(Array(NoValue, NoValue))),
       valueLookUp = ScoreValuesLookUp ++ GenderValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -191,7 +191,7 @@ class OpenAFTableViewTest extends FunSuite {
       data = Array(Array(Array(98,78))),
       valueLookUp = GenderValuesLookUp ++ ScoreValuesLookUp ++ GroupValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -221,7 +221,7 @@ class OpenAFTableViewTest extends FunSuite {
       data = Array(Array(Array(98,78))),
       valueLookUp = GenderValuesLookUp ++ ScoreValuesLookUp ++ GroupValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -239,14 +239,14 @@ class OpenAFTableViewTest extends FunSuite {
   }
 
   test("0 column, 2 measure (same next to each other)") {
-    val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout.fromFields(ScoreField, ScoreFieldDuplicate))
+    val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout.fromFields(ScoreField, ScoreField))
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
       columnHeaders = Array(Array(Array(0)), Array(Array(0))),
       data = Array(Array(Array(176)), Array(Array(176))),
       valueLookUp = ScoreValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -260,13 +260,13 @@ class OpenAFTableViewTest extends FunSuite {
   }
 
   test("2 column (same (with two values) next to each other") {
-    val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout.fromFields(GenderField, GenderFieldDuplicate))
+    val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout.fromFields(GenderField, GenderField))
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
       columnHeaders = Array(Array(Array(1), Array(2)), Array(Array(1), Array(2))),
       valueLookUp = GenderValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -286,13 +286,13 @@ class OpenAFTableViewTest extends FunSuite {
   }
 
   test("2 column (same (with one value) next to each other") {
-    val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout.fromFields(GroupField, GroupFieldDuplicate))
+    val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout.fromFields(GroupField, GroupField))
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
       columnHeaders = Array(Array(Array(1)), Array(Array(1))),
       valueLookUp = GroupValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -314,7 +314,7 @@ class OpenAFTableViewTest extends FunSuite {
       data = Array(Array(Array(98,78), Array(Array(49,49,78)))),
       valueLookUp = ScoreValuesLookUp ++ GenderValuesLookUp ++ LocationValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -324,7 +324,7 @@ class OpenAFTableViewTest extends FunSuite {
   }
 
   test("2 column, 2 measure (both measures over the columns and the same, one value for column fields)") {
-    val layout = ColumnHeaderLayout(List(ScoreField, ScoreFieldDuplicate), List(GroupField, GroupFieldDuplicate))
+    val layout = ColumnHeaderLayout(List(ScoreField, ScoreField), List(GroupField, GroupField))
     val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = layout)
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
@@ -332,7 +332,7 @@ class OpenAFTableViewTest extends FunSuite {
       data = Array(Array(Array(98)), Array(Array(98)), Array(Array(98)), Array(Array(98))),
       valueLookUp = ScoreValuesLookUp ++ GroupValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -355,7 +355,7 @@ class OpenAFTableViewTest extends FunSuite {
   }
 
   test("2 column (columns the same, with one value), 1 measure (on top of both columns)") {
-    val layout = ColumnHeaderLayout(ScoreField, List(GroupField, GroupFieldDuplicate))
+    val layout = ColumnHeaderLayout(ScoreField, List(GroupField, GroupField))
     val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = layout)
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
@@ -363,7 +363,7 @@ class OpenAFTableViewTest extends FunSuite {
       data = Array(Array(Array(176)), Array(Array(176))),
       valueLookUp = ScoreValuesLookUp ++ GroupValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
@@ -375,14 +375,14 @@ class OpenAFTableViewTest extends FunSuite {
   }
 
   test("3 column (2 on top of them other, 2 left ones the same)") {
-    val layout = ColumnHeaderLayout(List(GroupField, LocationField), List(GroupFieldDuplicate))
+    val layout = ColumnHeaderLayout(List(GroupField, LocationField), List(GroupField))
     val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = layout)
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
       columnHeaders = Array(Array(Array(1,1)), Array(Array(1,1))),
       valueLookUp = GroupValuesLookUp ++ LocationValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns

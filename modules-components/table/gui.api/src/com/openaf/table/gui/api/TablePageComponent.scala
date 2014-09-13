@@ -47,7 +47,7 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
 
   goingToTableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observable:ObservableValue[_<:TableData], oldValue:TableData, newValue:TableData) {
-      if (!doingSetup) {context.goToPage(page.withTableData(newValue))}
+      if (!doingSetup) {context.goToPage(page.withTableData(newValue.generateFieldKeys))}
     }
   })
 
