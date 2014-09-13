@@ -16,10 +16,10 @@ object TravelPage {
 }
 
 case class HotelsPage(tableState:TableState) extends TravelPage {
-  def withTableData(tableData:TableData) = HotelsPage(tableData.tableState)
+  def withTableState(tableState:TableState) = HotelsPage(tableState)
 }
 case class FlightsAndHotelsPage() extends TravelPage {
-  def withTableData(tableData:TableData) = this
+  def withTableState(tableState:TableState) = this
 }
 
 object HotelsPageFactory extends PageFactory {

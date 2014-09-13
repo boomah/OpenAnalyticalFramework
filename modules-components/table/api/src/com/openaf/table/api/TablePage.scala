@@ -1,8 +1,8 @@
 package com.openaf.table.api
 
 import com.openaf.pagemanager.api.Page
-import com.openaf.table.lib.api.TableData
+import com.openaf.table.lib.api.TableState
 
 trait TablePage extends Page {
-  def withTableData(tableData:TableData):TablePage
+  def withTableState(tableState:TableState):TablePage
 }

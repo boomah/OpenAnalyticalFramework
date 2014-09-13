@@ -20,7 +20,7 @@ object SportPage {
 }
 
 case class GoalsPage(tableState:TableState) extends SportPage {
-  def withTableData(tableData:TableData) = GoalsPage(tableData.tableState)
+  def withTableState(tableState:TableState) = GoalsPage(tableState)
 }
 
 object GoalsPageFactory extends PageFactory {
