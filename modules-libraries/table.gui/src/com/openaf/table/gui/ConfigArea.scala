@@ -8,11 +8,12 @@ import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.beans.property.Property
 import java.util.Locale
 import com.openaf.table.gui.binding.TableLocaleStringBinding
-import com.openaf.table.lib.api.{FieldID, TableData}
+import com.openaf.table.lib.api.{TableState, FieldID, TableData}
 import javafx.beans.binding.StringBinding
 
-class ConfigArea(tableDataProperty:Property[TableData], dragAndDrop:DragAndDrop,
-                 locale:Property[Locale], fieldBindings:ObservableMap[FieldID,StringBinding]) extends HBox {
+class ConfigArea(tableDataProperty:Property[TableData], requestTableStateProperty:Property[TableState],
+                 dragAndDrop:DragAndDrop, locale:Property[Locale],
+                 fieldBindings:ObservableMap[FieldID,StringBinding]) extends HBox {
   getStyleClass.add("config-area")
   private val configAreaEmptyText = "config-area-empty"
   setId(configAreaEmptyText)
@@ -21,7 +22,7 @@ class ConfigArea(tableDataProperty:Property[TableData], dragAndDrop:DragAndDrop,
   fieldsButton.setFocusTraversable(false)
 
   private val fieldsToConfigAreaNode = Map[Toggle,ConfigAreaNode](
-    fieldsButton -> new AllFieldsArea(tableDataProperty, dragAndDrop, fieldBindings)
+    fieldsButton -> new AllFieldsArea(tableDataProperty, requestTableStateProperty, dragAndDrop, fieldBindings)
   )
 
   private val toggleGroup = new ToggleGroup

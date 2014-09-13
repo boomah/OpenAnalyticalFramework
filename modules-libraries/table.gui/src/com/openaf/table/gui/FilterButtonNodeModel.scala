@@ -8,7 +8,8 @@ import scala.collection.mutable
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.{Boolean => JBoolean}
 
-class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], locale:Property[Locale]) {
+class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData],
+                               requestTableStateProperty:Property[TableState], locale:Property[Locale]) {
   private val allBooleanProperty = new SimpleBooleanProperty
   private var allShouldChange = true
   allBooleanProperty.addListener(new ChangeListener[JBoolean] {
@@ -106,12 +107,12 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData], lo
     resetRequired = true
   }
 
-  private[gui] def updateTableData() {updateTableData(filter)}
+  private[gui] def updateTableState() {updateTableState(filter)}
 
-  private[gui] def updateTableData(filter:Filter[T]) {
+  private[gui] def updateTableState(filter:Filter[T]) {
     val newField = field.withFilter(filter)
-    val newTableData = tableData.getValue.replaceField(field, newField)
-    tableData.setValue(newTableData)
+    val newTableState = requestTableStateProperty.getValue.replaceField(field, newField)
+    requestTableStateProperty.setValue(newTableState)
   }
 
   private[gui] def property(intValue:Int) = if (intValue == 0) allBooleanProperty else propertyLookUp(intValue)

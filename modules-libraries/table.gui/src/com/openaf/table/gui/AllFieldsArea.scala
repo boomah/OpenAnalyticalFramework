@@ -18,8 +18,8 @@ case class TreeGroup(fieldGroup:String, allChildFields:List[Field[_]])
 
 import AllFieldsArea._
 
-class AllFieldsArea(tableDataProperty:Property[TableData], val dragAndDrop:DragAndDrop,
-                    fieldBindings:ObservableMap[FieldID,StringBinding])
+class AllFieldsArea(tableDataProperty:Property[TableData], requestTableStateProperty:Property[TableState],
+                    val dragAndDrop:DragAndDrop, fieldBindings:ObservableMap[FieldID,StringBinding])
   extends StackPane with DropTarget with DragAndDropContainer with ConfigAreaNode {
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
@@ -35,7 +35,7 @@ class AllFieldsArea(tableDataProperty:Property[TableData], val dragAndDrop:DragA
   treeView.setShowRoot(false)
   treeView.setCellFactory(new Callback[TreeView[TreeItemType],TreeCell[TreeItemType]] {
     def call(treeView:TreeView[TreeItemType]) = new TreeItemTypeTreeCell(dragAndDrop, AllFieldsArea.this,
-      tableDataProperty, fieldBindings)
+      requestTableStateProperty, fieldBindings)
   })
 
   private def updateTreeItem(treeItem:TreeItem[TreeItemType], fieldGroup:FieldGroup) {
@@ -63,8 +63,8 @@ class AllFieldsArea(tableDataProperty:Property[TableData], val dragAndDrop:DragA
   def addDropTargets(draggableFieldsInfo:DraggableFieldsInfo) {}
   def removeDropTargets() {}
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = if (getParent != null) List(this) else Nil
-  def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
-  def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = tableData
+  def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableState:TableState) = tableState
+  def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableState:TableState) = tableState
   def setDefaultFocus() = {treeView.requestFocus()}
   def isConfigAreaNodeFocused = treeView.isFocused
 
@@ -72,10 +72,8 @@ class AllFieldsArea(tableDataProperty:Property[TableData], val dragAndDrop:DragA
 }
 
 class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsArea,
-                           val tableData:Property[TableData],
-                           fieldBindings:ObservableMap[FieldID,StringBinding])
-  extends TreeCell[TreeItemType] with Draggable {
-
+                           val requestTableStateProperty:Property[TableState],
+                           fieldBindings:ObservableMap[FieldID,StringBinding]) extends TreeCell[TreeItemType] with Draggable {
   private var fields0:List[Field[_]] = Nil
   override def updateItem(treeItemType:TreeItemType, isEmpty:Boolean) {
     super.updateItem(treeItemType, isEmpty)

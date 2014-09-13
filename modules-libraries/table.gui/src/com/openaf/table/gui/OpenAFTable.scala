@@ -3,7 +3,7 @@ package com.openaf.table.gui
 import javafx.scene.layout._
 import javafx.beans.property.SimpleObjectProperty
 import java.util.Locale
-import com.openaf.table.lib.api.{FieldID, TableData}
+import com.openaf.table.lib.api.{TableState, FieldID, TableData}
 import javafx.collections.FXCollections
 import javafx.beans.binding.StringBinding
 import javafx.event.EventHandler
@@ -16,7 +16,7 @@ object OpenAFTable {
 
 class OpenAFTable extends StackPane {
   val tableDataProperty = new SimpleObjectProperty[TableData]
-  val goingToTableDataProperty = new SimpleObjectProperty[TableData]
+  val requestTableStateProperty = new SimpleObjectProperty[TableState]
 
   private val dragAndDrop = new DragAndDrop
 
@@ -24,14 +24,14 @@ class OpenAFTable extends StackPane {
   val fieldBindings = FXCollections.observableHashMap[FieldID,StringBinding]
   val unmodifiableFieldBindings = FXCollections.unmodifiableObservableMap(fieldBindings)
 
-  private val configArea = new ConfigArea(goingToTableDataProperty, dragAndDrop, localeProperty,
-    unmodifiableFieldBindings)
-  private val filterFieldsArea = new FilterFieldsArea(goingToTableDataProperty, dragAndDrop, localeProperty,
-    unmodifiableFieldBindings)
-  private val rowHeaderFieldsArea = new RowHeaderFieldsArea(goingToTableDataProperty, dragAndDrop, localeProperty,
-    unmodifiableFieldBindings)
-  private val columnHeaderArea = new ColumnHeaderArea(goingToTableDataProperty, dragAndDrop, localeProperty,
-    unmodifiableFieldBindings)
+  private val configArea = new ConfigArea(tableDataProperty, requestTableStateProperty, dragAndDrop,
+    localeProperty, unmodifiableFieldBindings)
+  private val filterFieldsArea = new FilterFieldsArea(tableDataProperty, requestTableStateProperty, dragAndDrop,
+    localeProperty, unmodifiableFieldBindings)
+  private val rowHeaderFieldsArea = new RowHeaderFieldsArea(tableDataProperty, requestTableStateProperty,
+    dragAndDrop, localeProperty, unmodifiableFieldBindings)
+  private val columnHeaderArea = new ColumnHeaderArea(tableDataProperty, requestTableStateProperty, dragAndDrop,
+    localeProperty, unmodifiableFieldBindings)
   private val tableView = new OpenAFTableView(tableDataProperty, unmodifiableFieldBindings)
 
   {

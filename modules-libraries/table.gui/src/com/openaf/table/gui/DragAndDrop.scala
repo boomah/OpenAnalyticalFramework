@@ -11,7 +11,7 @@ import javafx.scene.control.Label
 import javafx.geometry.Side
 import com.openaf.table.gui.binding.TableLocaleStringBinding
 import java.util.Locale
-import com.openaf.table.lib.api.{TableData, Field}
+import com.openaf.table.lib.api.{TableState, Field}
 import javafx.scene.image.{Image, ImageView}
 
 class DragAndDrop {
@@ -120,7 +120,7 @@ trait Draggable extends Region {
   // When dropped here, nothing will happen. Usually just the Draggable itself, but in the case of a Draggable being
   // dragged from the AllFieldsArea, the AllFieldsArea scene bounds are used.
   def noOpSceneBounds = localToScene(getBoundsInLocal)
-  def tableData:Property[TableData]
+  def requestTableStateProperty:Property[TableState]
   def dragImage:Image
   def isParent = false
 
@@ -166,16 +166,15 @@ trait Draggable extends Region {
       event.consume()
       dragAndDrop.fieldsBeingDraggedInfo.get.foreach(draggableFieldsInfo => {
         updateClosestDropTarget(event)
-        val newTableDataOption = dragAndDrop.closestDropTarget.get.map(dropTarget => {
-          val tableDataWithFieldsRemoved = draggableFieldsInfo.dragAndDropContainer
-            .removeFields(tableData.getValue, draggableFieldsInfo.fields)
-          dropTarget.fieldsDropped(draggableFieldsInfo, tableDataWithFieldsRemoved)
+        val newTableStateOption = dragAndDrop.closestDropTarget.get.map(dropTarget => {
+          val tableStateWithFieldsRemoved = requestTableStateProperty.getValue.remove(draggableFieldsInfo.fields)
+          dropTarget.fieldsDropped(draggableFieldsInfo, tableStateWithFieldsRemoved)
         })
         getScene.setCursor(Cursor.DEFAULT)
         dragAndDrop.clearDragPane()
         dragAndDrop.closestDropTarget.set(None)
         dragAndDrop.fieldsBeingDraggedInfo.set(None)
-        newTableDataOption.foreach(newTableData => tableData.setValue(newTableData.generateFieldKeys))
+        newTableStateOption.foreach(newTableState => requestTableStateProperty.setValue(newTableState.generateFieldKeys))
       })
     }
   })
@@ -187,33 +186,33 @@ trait Draggable extends Region {
   })
 
   private def moveField() {
-    val currentTableData = tableData.getValue
-    val tableDataWithRemoved = dragAndDropContainer.removeFields(currentTableData, fields)
-    val tableDataToUse = if (tableDataWithRemoved == currentTableData) {
+    val currentTableState = requestTableStateProperty.getValue
+    val tableStateWithRemoved = currentTableState.remove(fields)
+    val tableStateToUse = if (tableStateWithRemoved == currentTableState) {
       val field = fields.head
       if (field.fieldType.isDimension) {
-        val newRowHeaderFields = currentTableData.tableState.tableLayout.rowHeaderFields :+ field
-        currentTableData.withRowHeaderFields(newRowHeaderFields)
+        val newRowHeaderFields = currentTableState.tableLayout.rowHeaderFields :+ field
+        currentTableState.withRowHeaderFields(newRowHeaderFields)
       } else {
-        val newColumnHeaderLayout = currentTableData.tableState.tableLayout.columnHeaderLayout.addFieldToRight(field)
-        currentTableData.withColumnHeaderLayout(newColumnHeaderLayout)
+        val newColumnHeaderLayout = currentTableState.tableLayout.columnHeaderLayout.addFieldToRight(field)
+        currentTableState.withColumnHeaderLayout(newColumnHeaderLayout)
       }
     } else {
-      tableDataWithRemoved
+      tableStateWithRemoved
     }
-    tableData.setValue(tableDataToUse.generateFieldKeys)
+    requestTableStateProperty.setValue(tableStateToUse.generateFieldKeys)
   }
 }
 
 trait DropTarget extends Node {
-  def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
+  def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableState:TableState):TableState
 }
 
 trait DragAndDropContainer {
   def dragAndDrop:DragAndDrop
   dragAndDrop.register(this)
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo):List[DropTarget]
-  def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData):TableData
+  def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableState:TableState):TableState
   def addDropTargets(draggableFieldsInfo:DraggableFieldsInfo)
   def removeDropTargets()
 
@@ -226,9 +225,6 @@ trait DragAndDropContainer {
       }
     }
   })
-  def removeFields(tableData:TableData, fields:List[Field[_]]) = {
-    tableData.copy(tableState = tableData.tableState.remove(fields))
-  }
 }
 
 case class DraggableFieldsInfo(draggable:Draggable, dragAndDropContainer:DragAndDropContainer) {
@@ -237,7 +233,7 @@ case class DraggableFieldsInfo(draggable:Draggable, dragAndDropContainer:DragAnd
 
 trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
   getStyleClass.add("drag-and-drop-container-node")
-  def tableDataProperty:Property[TableData]
+  def requestTableStateProperty:Property[TableState]
   def descriptionID:String
   def locale:Property[Locale]
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = dropTargetMap.keySet.toList
@@ -250,11 +246,11 @@ trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
     dropTargetMap = dropTargetsToNodeSide(draggableFieldsInfo)
     dropTargetPane.getChildren.addAll(dropTargetMap.keySet.toArray :_*)
   }
-  def setup(oldTableDataOption:Option[TableData], newTableData:TableData)
+  def setup(oldTableStateOption:Option[TableState], newTableState:TableState)
 
-  tableDataProperty.addListener(new ChangeListener[TableData] {
-    def changed(observable:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
-      setup(Option(oldTableData), newTableData)
+  requestTableStateProperty.addListener(new ChangeListener[TableState] {
+    def changed(observable:ObservableValue[_<:TableState], oldTableState:TableState, newTableState:TableState) {
+      setup(Option(oldTableState), newTableState)
     }
   })
 

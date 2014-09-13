@@ -3,7 +3,7 @@ package com.openaf.table.gui.api
 import com.openaf.browser.gui.api.{BrowserCacheKey, PageComponent}
 import com.openaf.table.gui.OpenAFTable
 import javafx.beans.value.{ObservableValue, ChangeListener}
-import com.openaf.table.lib.api.{StandardFields, FieldID, TableData}
+import com.openaf.table.lib.api.{TableState, StandardFields, FieldID}
 import com.openaf.table.api.{TablePage, TablePageData}
 import javafx.beans.binding.StringBinding
 import javafx.event.EventHandler
@@ -19,12 +19,8 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
     localeProperty.bind(context.cache(BrowserCacheKey.LocaleKey))
   }
 
-  private var doingSetup = false
-
   def setup() {
-    doingSetup = true
-
-    goingToTableDataProperty.set(pageData.tableData)
+    requestTableStateProperty.set(pageData.tableData.tableState)
     tableDataProperty.set(pageData.tableData)
 
     val fieldBindingsToAdd:Map[FieldID,StringBinding] = pageData.tableData.fieldGroup.fields.map(field => {
@@ -41,13 +37,11 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
     fieldBindings.clear()
     import collection.JavaConversions._
     fieldBindings.putAll(fieldBindingsToAdd)
-
-    doingSetup = false
   }
 
-  goingToTableDataProperty.addListener(new ChangeListener[TableData] {
-    def changed(observable:ObservableValue[_<:TableData], oldValue:TableData, newValue:TableData) {
-      if (!doingSetup) {context.goToPage(page.withTableState(newValue.generateFieldKeys.tableState))}
+  requestTableStateProperty.addListener(new ChangeListener[TableState] {
+    def changed(observable:ObservableValue[_<:TableState], oldValue:TableState, newValue:TableState) {
+      context.goToPage(page.withTableState(newValue.generateFieldKeys))
     }
   })
 

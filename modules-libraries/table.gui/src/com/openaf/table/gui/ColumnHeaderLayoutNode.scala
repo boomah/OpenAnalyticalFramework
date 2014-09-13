@@ -10,11 +10,12 @@ import javafx.beans.binding.StringBinding
 import java.util.Locale
 
 class ColumnHeaderLayoutNode(columnHeaderLayout:ColumnHeaderLayout, tableDataProperty:Property[TableData],
-                            dragAndDrop:DragAndDrop, dragAndDropContainer:DragAndDropContainer,
-                            fieldBindings:ObservableMap[FieldID,StringBinding], locale:Property[Locale]) extends HBox {
+                             requestTableStateProperty:Property[TableState], dragAndDrop:DragAndDrop,
+                             dragAndDropContainer:DragAndDropContainer,
+                             fieldBindings:ObservableMap[FieldID,StringBinding], locale:Property[Locale]) extends HBox {
   private val columnHeaderTreeNodes = columnHeaderLayout.columnHeaderTrees.map(columnHeaderTree => {
-    val columnHeaderTreeNode = new ColumnHeaderTreeNode(columnHeaderTree, tableDataProperty, dragAndDrop,
-      dragAndDropContainer, fieldBindings, locale)
+    val columnHeaderTreeNode = new ColumnHeaderTreeNode(columnHeaderTree, tableDataProperty, requestTableStateProperty,
+      dragAndDrop, dragAndDropContainer, fieldBindings, locale)
     HBox.setHgrow(columnHeaderTreeNode, Priority.ALWAYS)
     columnHeaderTreeNode
   })

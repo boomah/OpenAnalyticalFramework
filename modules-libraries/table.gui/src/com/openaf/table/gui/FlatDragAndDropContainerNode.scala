@@ -3,14 +3,16 @@ package com.openaf.table.gui
 import javafx.geometry.Side
 import scala.collection.JavaConversions._
 import javafx.scene.control.Label
-import com.openaf.table.lib.api.{FieldID, TableData, Field}
+import com.openaf.table.lib.api.{TableData, TableState, FieldID, Field}
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
+import javafx.beans.property.Property
 
 trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
+  def tableDataProperty:Property[TableData]
   def fieldBindings:ObservableMap[FieldID,StringBinding]
-  def withNewFields(fields:List[Field[_]], tableData:TableData):TableData
-  def fields(tableDataOption:Option[TableData]):List[Field[_]]
+  def withNewFields(fields:List[Field[_]], tableState:TableState):TableState
+  def fields(tableStateOption:Option[TableState]):List[Field[_]]
   protected def fields:List[Field[_]] = fields(None)
 
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo) = {
@@ -59,8 +61,8 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
     }
   }
 
-  def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
-    val currentFields = fields(Some(tableData))
+  def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableState:TableState) = {
+    val currentFields = fields(Some(tableState))
     val nodeSide = dropTargetMap(dropTarget)
     val newFields = if (nodeSide.side == Side.RIGHT) {
       def generateFields(children:Array[_]) = {
@@ -83,24 +85,25 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
     } else {
       draggableFieldsInfo.fields ::: currentFields
     }
-    withNewFields(newFields, tableData)
+    withNewFields(newFields, tableState)
   }
 
   private def fullSetup(fields:List[Field[_]]) {
-    val nodes = fields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty, fieldBindings, locale))
+    val nodes = fields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty,
+      requestTableStateProperty, fieldBindings, locale))
     mainContent.getChildren.clear()
     mainContent.getChildren.addAll(nodes.toArray:_*)
   }
 
-  def setup(oldTableDataOption:Option[TableData], newTableData:TableData) {
-    val newFields = fields(Some(newTableData))
+  def setup(oldTableStateOption:Option[TableState], newTableState:TableState) {
+    val newFields = fields(Some(newTableState))
     if (newFields.isEmpty) {
       setupForEmpty()
     } else {
-      oldTableDataOption match {
+      oldTableStateOption match {
         case None => fullSetup(newFields)
-        case oldTableDataSome@Some(oldTableData) => {
-          val oldFields = fields(oldTableDataSome)
+        case oldTableStateSome@Some(oldTableState) => {
+          val oldFields = fields(oldTableStateSome)
           if (oldFields != newFields) {
             fullSetup(newFields)
           }

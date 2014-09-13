@@ -16,8 +16,8 @@ import javafx.scene.text.{TextBoundsType, Text}
 import java.util.function.Predicate
 import javafx.beans.value.{ObservableValue, ChangeListener}
 
-class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], locale:Property[Locale],
-                          hidePopup:()=>Unit) extends VBox {
+class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], requestTableStateProperty:Property[TableState],
+                          locale:Property[Locale], hidePopup:()=>Unit) extends VBox {
   getStyleClass.add("filter-button-node")
 
   private def stringBinding(id:String) = new TableLocaleStringBinding(id, locale)
@@ -32,7 +32,7 @@ class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], locale:
   okButton.setOnAction(new EventHandler[ActionEvent] {
     def handle(e:ActionEvent) {
       hidePopup()
-      filterButtonNodeModel.updateTableData()
+      filterButtonNodeModel.updateTableState()
     }
   })
   cancelButton.setOnAction(new EventHandler[ActionEvent] {
@@ -46,7 +46,7 @@ class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], locale:
 
   private val filterTextAreaTextField = new TextField
 
-  private val filterButtonNodeModel = new FilterButtonNodeModel[T](field, tableData, locale)
+  private val filterButtonNodeModel = new FilterButtonNodeModel[T](field, tableData, requestTableStateProperty, locale)
   private val listView = new ListView[Int]
   listView.getSelectionModel.setSelectionMode(SelectionMode.MULTIPLE)
   listView.setOnKeyPressed(new EventHandler[KeyEvent] {
@@ -129,7 +129,7 @@ class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], locale:
         } else {
           RetainFilter[T](valuesToRetain)
         }
-        filterButtonNodeModel.updateTableData(newFilter)
+        filterButtonNodeModel.updateTableState(newFilter)
       }
     })
 

@@ -9,18 +9,20 @@ import javafx.beans.binding.StringBinding
 import java.util.Locale
 
 class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataProperty:Property[TableData],
-                           dragAndDrop:DragAndDrop, dragAndDropContainer:DragAndDropContainer,
+                           requestTableStateProperty:Property[TableState], dragAndDrop:DragAndDrop,
+                           dragAndDropContainer:DragAndDropContainer,
                            fieldBindings:ObservableMap[FieldID,StringBinding], locale:Property[Locale]) extends VBox {
   private val topNode = columnHeaderTree.columnHeaderTreeType match {
-    case Left(field) => new FieldNode(field, dragAndDrop, dragAndDropContainer, tableDataProperty, fieldBindings, locale)
-    case Right(columnHeaderLayout) => new ColumnHeaderLayoutNode(columnHeaderLayout, tableDataProperty, dragAndDrop,
-      dragAndDropContainer, fieldBindings, locale)
+    case Left(field) => new FieldNode(field, dragAndDrop, dragAndDropContainer, tableDataProperty,
+      requestTableStateProperty, fieldBindings, locale)
+    case Right(columnHeaderLayout) => new ColumnHeaderLayoutNode(columnHeaderLayout, tableDataProperty,
+      requestTableStateProperty, dragAndDrop, dragAndDropContainer, fieldBindings, locale)
   }
   VBox.setVgrow(topNode, Priority.ALWAYS)
   getChildren.add(topNode)
   if (columnHeaderTree.hasChildren) {
     val childColumnHeaderNode = new ColumnHeaderLayoutNode(columnHeaderTree.childColumnHeaderLayout, tableDataProperty,
-      dragAndDrop, dragAndDropContainer, fieldBindings, locale)
+      requestTableStateProperty, dragAndDrop, dragAndDropContainer, fieldBindings, locale)
     VBox.setVgrow(childColumnHeaderNode, Priority.ALWAYS)
     getChildren.add(childColumnHeaderNode)
   }

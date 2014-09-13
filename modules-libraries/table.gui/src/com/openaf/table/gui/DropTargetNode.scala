@@ -2,11 +2,11 @@ package com.openaf.table.gui
 
 import javafx.scene.layout.FlowPane
 import javafx.scene.control.Label
-import com.openaf.table.lib.api.TableData
+import com.openaf.table.lib.api.TableState
 
 class DropTargetNode(dragAndDropContainer:DragAndDropContainer) extends FlowPane with DropTarget {
-  def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
-    dragAndDropContainer.childFieldsDropped(this, draggableFieldsInfo, tableData)
+  def fieldsDropped(draggableFieldsInfo:DraggableFieldsInfo, tableState:TableState) = {
+    dragAndDropContainer.childFieldsDropped(this, draggableFieldsInfo, tableState)
   }
   getStyleClass.add("drop-target-node")
   setPrefWidth(DropTargetNode.size)

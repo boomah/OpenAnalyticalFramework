@@ -2,44 +2,45 @@ package com.openaf.table.gui
 
 import javafx.beans.property.Property
 import java.util.Locale
-import com.openaf.table.lib.api.{FieldID, TableData, ColumnHeaderLayout}
+import com.openaf.table.lib.api.{TableState, FieldID, TableData, ColumnHeaderLayout}
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
 
-class ColumnHeaderArea(val tableDataProperty:Property[TableData], val dragAndDrop:DragAndDrop,
-                        val locale:Property[Locale],
-                        fieldBindings:ObservableMap[FieldID,StringBinding]) extends DragAndDropContainerNode {
+class ColumnHeaderArea(tableDataProperty:Property[TableData], val requestTableStateProperty:Property[TableState],
+                       val dragAndDrop:DragAndDrop, val locale:Property[Locale],
+                       fieldBindings:ObservableMap[FieldID,StringBinding]) extends DragAndDropContainerNode {
   getStyleClass.add("column-header-area")
   private val dropTargetsHelper = new ColumnHeaderAreaDropTargetsHelper(mainContent, dropTargetPane, this)
 
   def descriptionID = "columnHeaderDescription"
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo) = dropTargetsHelper.dropTargetsToNodeSide(draggableFieldsInfo)
   private def parentColumnHeaderLayoutNode = mainContent.getChildren.get(0).asInstanceOf[ColumnHeaderLayoutNode]
-  def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableData:TableData) = {
-    val newColumnHeaderLayout = if (tableData.tableState.tableLayout.columnHeaderLayout.allFields.isEmpty) {
+  def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableState:TableState) = {
+    val newColumnHeaderLayout = if (tableState.tableLayout.columnHeaderLayout.allFields.isEmpty) {
       ColumnHeaderLayout.fromFields(draggableFieldsInfo.fields)
     } else {
       val nodeSide = dropTargetMap(dropTarget)
       parentColumnHeaderLayoutNode.generateColumnHeaderLayoutWithAddition(nodeSide, draggableFieldsInfo)
     }
-    tableData.withColumnHeaderLayout(newColumnHeaderLayout)
+    tableState.withColumnHeaderLayout(newColumnHeaderLayout)
   }
 
   private def fullSetup(columnHeaderLayout:ColumnHeaderLayout) {
-    val node = new ColumnHeaderLayoutNode(columnHeaderLayout, tableDataProperty, dragAndDrop, this, fieldBindings, locale)
+    val node = new ColumnHeaderLayoutNode(columnHeaderLayout, tableDataProperty, requestTableStateProperty, dragAndDrop,
+      this, fieldBindings, locale)
     mainContent.getChildren.clear()
     mainContent.getChildren.add(node)
   }
 
-  def setup(oldTableDataOption:Option[TableData], newTableData:TableData) {
-    val newColumnHeaderLayout = newTableData.tableState.tableLayout.columnHeaderLayout
+  def setup(oldTableStateOption:Option[TableState], newTableState:TableState) {
+    val newColumnHeaderLayout = newTableState.tableLayout.columnHeaderLayout
     if (newColumnHeaderLayout.allFields.isEmpty) {
       setupForEmpty()
     } else {
-      oldTableDataOption match {
+      oldTableStateOption match {
         case None => fullSetup(newColumnHeaderLayout)
-        case Some(oldTableData) => {
-          if (oldTableData.tableState.tableLayout.columnHeaderLayout != newColumnHeaderLayout) {
+        case Some(oldTableState) => {
+          if (oldTableState.tableLayout.columnHeaderLayout != newColumnHeaderLayout) {
             fullSetup(newColumnHeaderLayout)
           }
         }

@@ -4,15 +4,7 @@ case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:T
                      defaultRenderers:Map[FieldID,Renderer[_]]) {
   def withTableState(newTableState:TableState) = copy(tableState = newTableState)
   def rowHeaderFields = tableState.rowHeaderFields
-  def withRowHeaderFields(newRowHeaderFields:List[Field[_]]) = {
-    withTableState(tableState.withRowHeaderFields(newRowHeaderFields))
-  }
-  def filterFields = tableState.filterFields
-  def withFilterFields(newFilterFields:List[Field[_]]) = withTableState(tableState.withFilterFields(newFilterFields))
   def columnHeaderLayout = tableState.columnHeaderLayout
-  def withColumnHeaderLayout(newColumnHeaderLayout:ColumnHeaderLayout) = {
-    withTableState(tableState.withColumnHeaderLayout(newColumnHeaderLayout))
-  }
   def replaceField(oldField:Field[_], newField:Field[_]) = withTableState(tableState.replaceField(oldField, newField))
   def generateFieldKeys = withTableState(tableState.generateFieldKeys)
 

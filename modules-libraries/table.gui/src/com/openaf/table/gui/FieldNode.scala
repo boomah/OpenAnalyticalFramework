@@ -3,7 +3,7 @@ package com.openaf.table.gui
 import javafx.scene.control.Label
 import javafx.beans.property.Property
 import javafx.scene.layout.HBox
-import com.openaf.table.lib.api.{FieldID, TableData, Field}
+import com.openaf.table.lib.api.{TableState, FieldID, TableData, Field}
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
 import javafx.scene.SnapshotParameters
@@ -12,8 +12,8 @@ import javafx.geometry.{Insets, Pos}
 import java.util.Locale
 
 class FieldNode[T](val field:Field[T], val dragAndDrop:DragAndDrop, val dragAndDropContainer:DragAndDropContainer,
-                   val tableData:Property[TableData], fieldBindings:ObservableMap[FieldID,StringBinding],
-                   locale:Property[Locale])
+                   tableData:Property[TableData], val requestTableStateProperty:Property[TableState],
+                   fieldBindings:ObservableMap[FieldID,StringBinding], locale:Property[Locale])
   extends HBox with Draggable {
   getStyleClass.add("field-node")
   setFillHeight(false)
@@ -32,7 +32,7 @@ class FieldNode[T](val field:Field[T], val dragAndDrop:DragAndDrop, val dragAndD
   getChildren.add(nameLabel)
 
   if (field.fieldType.isDimension) {
-    val filterButton = new FilterButton[T](field, tableData, locale)
+    val filterButton = new FilterButton[T](field, tableData, requestTableStateProperty, locale)
     HBox.setMargin(filterButton, new Insets(0,0,0,3))
     getChildren.add(filterButton)
   }

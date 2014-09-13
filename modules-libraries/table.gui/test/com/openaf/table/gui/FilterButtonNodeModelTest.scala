@@ -16,34 +16,35 @@ class FilterButtonNodeModelTest extends FunSuite {
     TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
   }
   val tableDataProperty = new SimpleObjectProperty[TableData](tableData)
+  val requestTableStateProperty = new SimpleObjectProperty[TableState](tableData.tableState)
   val locale = new SimpleObjectProperty[Locale](Locale.UK)
 
   test("RetainAllFilter") {
-    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, locale)
+    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, requestTableStateProperty, locale)
     assert(model.filter === RetainAllFilter[String]())
   }
 
   test("RetainFilter single value") {
-    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, locale)
+    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, requestTableStateProperty, locale)
     model.selectOneValue(1)
     assert(model.filter === RetainFilter[String](Set(Rosie)))
   }
 
   test("RejectFilter single value") {
-    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, locale)
+    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, requestTableStateProperty, locale)
     model.flipValues(FXCollections.observableArrayList(1))
     assert(model.filter === RejectFilter[String](Set(Rosie)))
   }
 
   test("RetainFilter after all flip") {
-    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, locale)
+    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, requestTableStateProperty, locale)
     model.flipValues(FXCollections.observableArrayList(0))
     model.flipValues(FXCollections.observableArrayList(2))
     assert(model.filter === RetainFilter[String](Set(Laura)))
   }
 
   test("RejectFilter after all flip") {
-    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, locale)
+    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, requestTableStateProperty, locale)
     model.flipValues(FXCollections.observableArrayList(0))
     model.flipValues(FXCollections.observableArrayList(0))
     model.flipValues(FXCollections.observableArrayList(1,6))
@@ -51,13 +52,13 @@ class FilterButtonNodeModelTest extends FunSuite {
   }
 
   test("RejectAllFilter") {
-    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, locale)
+    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, requestTableStateProperty, locale)
     model.flipValues(FXCollections.observableArrayList(0))
     assert(model.filter === RejectAllFilter[String]())
   }
 
   test("Stays as RejectFilter") {
-    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, locale)
+    val model = new FilterButtonNodeModel[String](NameField, tableDataProperty, requestTableStateProperty, locale)
     model.flipValues(FXCollections.observableArrayList(1,2))
     assert(model.filter === RejectFilter[String](Set(Rosie, Laura)))
     model.flipValues(FXCollections.observableArrayList(2))
@@ -74,7 +75,7 @@ class FilterButtonNodeModelTest extends FunSuite {
       TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
     }
     val newTableDataProperty = new SimpleObjectProperty[TableData](newTableData)
-    val model = new FilterButtonNodeModel[String](nameField, newTableDataProperty, locale)
+    val model = new FilterButtonNodeModel[String](nameField, newTableDataProperty, requestTableStateProperty, locale)
     model.flipValues(FXCollections.observableArrayList(1))
     assert(model.filter === RetainFilter[String](Set(Rosie)))
   }
