@@ -1,7 +1,6 @@
 package com.openaf.table.lib.api
 
 import ColumnHeaderLayout._
-import java.util.concurrent.atomic.AtomicInteger
 
 case class ColumnHeaderTree(columnHeaderTreeType:ColumnHeaderTreeType, 
                             childColumnHeaderLayout:ColumnHeaderLayout=ColumnHeaderLayout.Blank) {
@@ -71,12 +70,12 @@ case class ColumnHeaderTree(columnHeaderTreeType:ColumnHeaderTreeType,
     copy(columnHeaderTreeType = newColumnHeaderTreeType, childColumnHeaderLayout = newChildColumnHeaderLayout)
   }
 
-  def generateFieldKeys(number:AtomicInteger):ColumnHeaderTree = {
+  def generateFieldKeys(keyIterator:Iterator[Int]):ColumnHeaderTree = {
     val newColumnHeaderTreeType = columnHeaderTreeType match {
-      case Left(field) => Left(field.withKey(ColumnHeaderFieldKey(number.getAndIncrement)))
-      case Right(columnHeaderLayout) => Right(columnHeaderLayout.generateFieldKeys(number))
+      case Left(field) => Left(field.withKey(ColumnHeaderFieldKey(keyIterator.next)))
+      case Right(columnHeaderLayout) => Right(columnHeaderLayout.generateFieldKeys(keyIterator))
     }
-    val newChildColumnHeaderLayout = childColumnHeaderLayout.generateFieldKeys(number)
+    val newChildColumnHeaderLayout = childColumnHeaderLayout.generateFieldKeys(keyIterator)
     copy(columnHeaderTreeType = newColumnHeaderTreeType, childColumnHeaderLayout = newChildColumnHeaderLayout)
   }
 }

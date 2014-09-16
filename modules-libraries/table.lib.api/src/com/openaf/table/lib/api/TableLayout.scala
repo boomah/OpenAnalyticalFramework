@@ -1,7 +1,5 @@
 package com.openaf.table.lib.api
 
-import java.util.concurrent.atomic.AtomicInteger
-
 case class TableLayout(rowHeaderFields:List[Field[_]], columnHeaderLayout:ColumnHeaderLayout,
                        filterFields:List[Field[_]]) {
   def rowHeaderFieldIDs = rowHeaderFields.map(_.id)
@@ -36,7 +34,7 @@ case class TableLayout(rowHeaderFields:List[Field[_]], columnHeaderLayout:Column
   }
   def generateFieldKeys = {
     val newRowHeaderFields = rowHeaderFields.zipWithIndex.map{case (field,number) => field.withKey(RowHeaderFieldKey(number))}
-    val newColumnHeaderLayout = columnHeaderLayout.generateFieldKeys(new AtomicInteger(0))
+    val newColumnHeaderLayout = columnHeaderLayout.generateFieldKeys
     val newFilterFields = filterFields.zipWithIndex.map{case (field,number) => field.withKey(FilterFieldKey(number))}
     withRowHeaderFields(newRowHeaderFields).withColumnHeaderLayout(newColumnHeaderLayout).withFilterFields(newFilterFields)
   }
