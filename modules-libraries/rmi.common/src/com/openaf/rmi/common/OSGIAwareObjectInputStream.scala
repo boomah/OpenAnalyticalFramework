@@ -8,23 +8,23 @@ class OSGIAwareObjectInputStream(inputStream:InputStream, topLevelClassLoader:Cl
   classLoaders += topLevelClassLoader
 
   override def resolveClass(desc:ObjectStreamClass):Class[_] = {
-    var classAndClassLoader:Option[ClassAndClassLoader] = None
-    for (classLoader <- classLoaders if classAndClassLoader == None) {
+    var classAndClassLoaderOption:Option[ClassAndClassLoader] = None
+    for (classLoader <- classLoaders if classAndClassLoaderOption == None) {
       try {
         val klass = classLoader.loadClass(desc.getName)
-        classAndClassLoader = Some(ClassAndClassLoader(klass, klass.getClassLoader))
+        classAndClassLoaderOption = Some(new ClassAndClassLoader(klass, klass.getClassLoader))
       } catch {
         case e:Exception => //println("Can't find " + (desc.getName, classLoader))
       }
     }
-    classAndClassLoader match {
-      case Some(ClassAndClassLoader(klass, classLoader)) => {
-        classLoaders += classLoader
-        klass
+    classAndClassLoaderOption match {
+      case Some(classAndClassLoader) => {
+        classLoaders += classAndClassLoader.classLoader
+        classAndClassLoader.klass
       }
       case _ => super.resolveClass(desc)
     }
   }
 }
 
-case class ClassAndClassLoader(klass:Class[_], classLoader:ClassLoader)
+class ClassAndClassLoader(val klass:Class[_], val classLoader:ClassLoader)
