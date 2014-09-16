@@ -79,4 +79,19 @@ class FilterButtonNodeModelTest extends FunSuite {
     model.flipValues(FXCollections.observableArrayList(1))
     assert(model.filter === RetainFilter[String](Set(Rosie)))
   }
+
+  test("First RetainFilter should stay as RetainFilter") {
+    val nameField = NameField.withFilter(RetainFilter[String](Set(Rosie)))
+    val newTableData = {
+      val tableLayout = TableLayout.Blank.copy(rowHeaderFields = List(nameField))
+      val tableState = TableState(tableLayout)
+      val fieldValues = FieldValues(nameFieldValues(nameField))
+      val tableValues = TableValues.Empty.copy(fieldValues = fieldValues, valueLookUp = NameValuesLookUp)
+      TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    }
+    val newTableDataProperty = new SimpleObjectProperty[TableData](newTableData)
+    val model = new FilterButtonNodeModel[String](nameField, newTableDataProperty, requestTableStateProperty, locale)
+    model.flipValues(FXCollections.observableArrayList(2))
+    assert(model.filter === RetainFilter[String](Set(Rosie, Laura)))
+  }
 }

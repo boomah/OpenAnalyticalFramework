@@ -83,7 +83,7 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData],
   // Determines whether we want the filter to be retaining or rejecting. Updated based on what a user clicks on. e.g. if
   // a user selects just one value then we are in retain mode. If a user deselects one value when everything is selected
   // then we are in reject mode.
-  private var retainFilterType = field.filter.isInstanceOf[RejectAllFilter[_]]
+  private var retainFilterType = field.filter.isInstanceOf[RetainFilter[_]] || field.filter.isInstanceOf[RejectAllFilter[_]]
 
   private[gui] def selectOneValue(intValue:Int) {
     if (intValue == 0) {
