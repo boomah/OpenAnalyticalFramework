@@ -1,11 +1,11 @@
 package com.openaf.table.gui
 
 import javafx.scene.control.ToggleButton
-import com.openaf.gui.utils.{FontAwesome, FontAwesomeText}
+import com.openaf.gui.utils.{GuiUtils, FontAwesome, FontAwesomeText}
 import javafx.event.EventHandler
 import javafx.scene.input.{MouseButton, MouseEvent}
 import javafx.beans.property.Property
-import com.openaf.table.lib.api.{TableState, Field, TableData}
+import com.openaf.table.lib.api._
 import javafx.stage.{WindowEvent, Popup}
 import java.util.Locale
 import javafx.beans.value.{ObservableValue, ChangeListener}
@@ -15,7 +15,9 @@ class FilterButton[T](field:Field[T], tableData:Property[TableData], requestTabl
                       locale:Property[Locale]) extends ToggleButton {
   getStyleClass.add("filter-button")
   setFocusTraversable(false)
-  setGraphic(new FontAwesomeText(FontAwesome.Filter))
+  private val filterIcon = new FontAwesomeText(FontAwesome.Filter)
+  filterIcon.getStyleClass.add("font-awesome-" + GuiUtils.cssFromClassName(field.filter.getClass))
+  setGraphic(filterIcon)
   private lazy val filterButtonNodePopup = {
     val popup = new Popup
     popup.setAutoFix(true)

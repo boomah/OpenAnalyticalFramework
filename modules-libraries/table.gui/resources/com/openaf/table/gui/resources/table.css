@@ -66,6 +66,18 @@
     -fx-fill: grey;
 }
 
+.field-node .filter-button .font-awesome-reject-all-filter{
+    -fx-fill: crimson;
+}
+
+.field-node .filter-button .font-awesome-retain-filter{
+    -fx-fill: green;
+}
+
+.field-node .filter-button .font-awesome-reject-filter{
+    -fx-fill: green;
+}
+
 .filter-button-node{
     -fx-background-color: white;
     -fx-padding: 2;

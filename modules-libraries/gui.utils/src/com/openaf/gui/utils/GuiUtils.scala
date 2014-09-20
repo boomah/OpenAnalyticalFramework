@@ -22,4 +22,10 @@ object GuiUtils {
   def isSpecialKeyDown(event:MouseEvent) = {
     event.isShortcutDown || event.isShiftDown || event.isControlDown || event.isAltDown
   }
+
+  def cssFromClassName(klass:Class[_]) = {
+    klass.getSimpleName.replaceAll(String.format("%s|%s|%s",
+      "(?<=[A-Z])(?=[A-Z][a-z])", "(?<=[^A-Z])(?=[A-Z])", "(?<=[A-Za-z])(?=[^A-Za-z])"), "-"
+    ).toLowerCase
+  }
 }
