@@ -113,6 +113,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
     while (rowHeaderFieldCounter < numRowHeaderFields) {
       field = rowHeaderFields(rowHeaderFieldCounter)
       val tableColumn = new TableColumn[OpenAFTableRow,Int]
+      tableColumn.setSortable(false)
       Option(fieldBindings.get(field.id)) match {
         case Some(binding) => tableColumn.textProperty.bind(binding)
         case None => tableColumn.setText(field.id.id)
@@ -130,6 +131,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
 
   private def createColumnHeaderTableColumn(value:Any) = {
     val tableColumn = new TableColumn[OpenAFTableRow,Any]
+    tableColumn.setSortable(false)
     value match {
       case fieldID:FieldID => {
         Option(fieldBindings.get(fieldID)) match {
