@@ -3,6 +3,7 @@ package com.openaf.gui.utils
 import javafx.application.Platform
 import javafx.scene.control.SeparatorMenuItem
 import javafx.scene.input.MouseEvent
+import java.util.Locale
 
 object GuiUtils {
   def resource(resource:String) = getClass.getResource(resource).toExternalForm
@@ -24,8 +25,11 @@ object GuiUtils {
   }
 
   def cssFromClassName(klass:Class[_]) = {
-    klass.getSimpleName.replaceAll(String.format("%s|%s|%s",
-      "(?<=[A-Z])(?=[A-Z][a-z])", "(?<=[^A-Z])(?=[A-Z])", "(?<=[A-Za-z])(?=[^A-Za-z])"), "-"
-    ).toLowerCase
+    val stringFormat = String.format(
+      Locale.UK,
+      "%s|%s|%s",
+      "(?<=[A-Z])(?=[A-Z][a-z])", "(?<=[^A-Z])(?=[A-Z])", "(?<=[A-Za-z])(?=[^A-Za-z])"
+    )
+    klass.getSimpleName.replaceAll(stringFormat, "-").toLowerCase
   }
 }
