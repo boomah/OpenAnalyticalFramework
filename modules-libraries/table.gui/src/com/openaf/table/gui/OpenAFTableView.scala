@@ -10,10 +10,26 @@ import javafx.scene.control.TableColumn.CellDataFeatures
 import scala.annotation.tailrec
 import javafx.beans.binding.StringBinding
 import java.util
+import javafx.scene.input.MouseEvent
+import javafx.event.EventHandler
+import javafx.scene.shape.Rectangle
 
 class OpenAFTableView(tableDataProperty:Property[TableData],
                       fieldBindings:ObservableMap[FieldID,StringBinding]) extends TableView[OpenAFTableRow] {
   getStyleClass.add("openaf-table-view")
+
+  // This is a hack to stop a user from dragging columns about using the column headers. Resizing of columns is still
+  // allowed so this lets those events through. There should be a proper api for this in future versions of JavaFX. Also
+  // maybe the column headers will become draggables at some stage and so this won't be required.
+  addEventFilter[MouseEvent](MouseEvent.MOUSE_DRAGGED, new EventHandler[MouseEvent] {
+    def handle(event:MouseEvent) {
+      event.getTarget match {
+        case resizeColumnArea:Rectangle =>
+        case _ => event.consume()
+      }
+    }
+  })
+
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
       setUpTableView(Option(oldTableData), newTableData)
