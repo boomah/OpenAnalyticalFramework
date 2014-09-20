@@ -71,7 +71,7 @@ case class ColumnHeaderTree(columnHeaderTreeType:ColumnHeaderTreeType,
   }
 
   def generateFieldKeys(keyIterator:Iterator[Int]):ColumnHeaderTree = {
-    val newColumnHeaderTreeType = columnHeaderTreeType match {
+    val newColumnHeaderTreeType:ColumnHeaderTreeType = columnHeaderTreeType match {
       case Left(field) => Left(field.withKey(ColumnHeaderFieldKey(keyIterator.next)))
       case Right(columnHeaderLayout) => Right(columnHeaderLayout.generateFieldKeys(keyIterator))
     }

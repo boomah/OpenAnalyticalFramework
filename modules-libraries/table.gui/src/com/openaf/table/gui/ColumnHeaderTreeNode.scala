@@ -7,6 +7,7 @@ import com.openaf.table.lib.api._
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
 import java.util.Locale
+import com.openaf.table.lib.api.ColumnHeaderLayout.ColumnHeaderTreeType
 
 class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataProperty:Property[TableData],
                            requestTableStateProperty:Property[TableState], dragAndDrop:DragAndDrop,
@@ -27,7 +28,7 @@ class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataPrope
     getChildren.add(childColumnHeaderNode)
   }
 
-  def topFieldNodeOption = {
+  def topFieldNodeOption:Option[FieldNode[_]] = {
     topNode match {
       case fieldNode:FieldNode[_] => Some(fieldNode)
       case _ => None
@@ -63,7 +64,7 @@ class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataPrope
 
   def generateWithAdditionOption(nodeSide:NodeSide, draggableFieldsInfo:DraggableFieldsInfo):Option[ColumnHeaderTree] = {
     // If we're adding a node that has been moved from this ColumnHeaderTreeNode, exclude it from the generation.
-    val columnHeaderTreeTypeOption = topNode match {
+    val columnHeaderTreeTypeOption:Option[ColumnHeaderTreeType] = topNode match {
       case fieldNode:FieldNode[_] if fieldNode == nodeSide.node => {
         nodeSide.side match {
           case Side.LEFT => Some(Right(ColumnHeaderLayout.fromFields(draggableFieldsInfo.fields ::: fieldNode.fields)))

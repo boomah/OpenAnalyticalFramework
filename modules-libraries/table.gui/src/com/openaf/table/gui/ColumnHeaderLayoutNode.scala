@@ -8,6 +8,7 @@ import com.openaf.table.lib.api._
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
 import java.util.Locale
+import com.openaf.table.lib.api.ColumnHeaderLayout.ColumnHeaderTreeType
 
 class ColumnHeaderLayoutNode(columnHeaderLayout:ColumnHeaderLayout, tableDataProperty:Property[TableData],
                              requestTableStateProperty:Property[TableState], dragAndDrop:DragAndDrop,
@@ -30,7 +31,7 @@ class ColumnHeaderLayoutNode(columnHeaderLayout:ColumnHeaderLayout, tableDataPro
     if (nodeSide.node == this) {
       nodeSide.side match {
         case Side.TOP => {
-          val columnHeaderTreeType = draggableFieldsInfo.fields match {
+          val columnHeaderTreeType:ColumnHeaderTreeType = draggableFieldsInfo.fields match {
             case field :: Nil => Left(field)
             case manyFields => Right(ColumnHeaderLayout.fromFields(manyFields))
           }
