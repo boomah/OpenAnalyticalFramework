@@ -10,6 +10,8 @@ import javafx.scene.SnapshotParameters
 import javafx.scene.paint.Color
 import javafx.geometry.{Insets, Pos}
 import java.util.Locale
+import javafx.event.EventHandler
+import javafx.scene.input.{MouseButton, MouseEvent}
 
 class FieldNode[T](val field:Field[T], val dragAndDrop:DragAndDrop, val dragAndDropContainer:DragAndDropContainer,
                    tableData:Property[TableData], val requestTableStateProperty:Property[TableState],
@@ -36,6 +38,15 @@ class FieldNode[T](val field:Field[T], val dragAndDrop:DragAndDrop, val dragAndD
     HBox.setMargin(filterButton, new Insets(0,0,0,3))
     getChildren.add(filterButton)
   }
+
+  private lazy val contextMenu = new FieldNodeContextMenu[T](field, requestTableStateProperty, locale)
+  setOnMousePressed(new EventHandler[MouseEvent] {
+    def handle(event:MouseEvent) {
+      if (event.getButton == MouseButton.SECONDARY) {
+        contextMenu.show(getScene.getWindow, event.getScreenX, event.getScreenY)
+      }
+    }
+  })
 
   def dragImage = {
     val parameters = new SnapshotParameters
