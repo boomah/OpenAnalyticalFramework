@@ -10,25 +10,10 @@ import javafx.scene.control.TableColumn.CellDataFeatures
 import scala.annotation.tailrec
 import javafx.beans.binding.StringBinding
 import java.util
-import javafx.scene.input.MouseEvent
-import javafx.event.EventHandler
-import javafx.scene.shape.Rectangle
 
 class OpenAFTableView(tableDataProperty:Property[TableData],
                       fieldBindings:ObservableMap[FieldID,StringBinding]) extends TableView[OpenAFTableRow] {
   getStyleClass.add("openaf-table-view")
-
-  // This is a hack to stop a user from dragging columns about using the column headers. Resizing of columns is still
-  // allowed so this lets those events through. There should be a proper api for this in future versions of JavaFX. Also
-  // maybe the column headers will become draggables at some stage and so this won't be required.
-  addEventFilter[MouseEvent](MouseEvent.MOUSE_DRAGGED, new EventHandler[MouseEvent] {
-    def handle(event:MouseEvent) {
-      event.getTarget match {
-        case resizeColumnArea:Rectangle =>
-        case _ => event.consume()
-      }
-    }
-  })
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
@@ -103,7 +88,12 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
 
     setItems(FXCollections.observableArrayList[OpenAFTableRow](tableItems))
   }
-    
+
+  // This is a hack to stop a user from dragging columns about using the column headers. There should be a proper api
+  // for this in future versions of JavaFX. Also maybe the column headers will become draggables at some stage and so
+  // this won't be required.
+  private def disableReordering(tableColumn:TableColumn[_,_]) {tableColumn.impl_setReorderable(false)}
+
   private def createRowHeaderTableColumns(tableData:TableData):util.ArrayList[TableColumn[OpenAFTableRow,Int]] = {
     val rowHeaderFields = tableData.rowHeaderFields.toArray
     val numRowHeaderFields = rowHeaderFields.length
@@ -114,6 +104,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
       field = rowHeaderFields(rowHeaderFieldCounter)
       val tableColumn = new TableColumn[OpenAFTableRow,Int]
       tableColumn.getStyleClass.add("table-column-header-value")
+      disableReordering(tableColumn)
       tableColumn.setSortable(false)
       Option(fieldBindings.get(field.id)) match {
         case Some(binding) => tableColumn.textProperty.bind(binding)
@@ -132,6 +123,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
 
   private def createColumnHeaderTableColumn(value:Any) = {
     val tableColumn = new TableColumn[OpenAFTableRow,Any]
+    disableReordering(tableColumn)
     tableColumn.setSortable(false)
     value match {
       case fieldID:FieldID => {
