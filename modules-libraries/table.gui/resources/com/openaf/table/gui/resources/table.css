@@ -130,6 +130,10 @@
     /*-fx-background-insets: 0, 1;*/
 }
 
+.openaf-table-view > .column-header-background .table-column-header-value{
+    -fx-font-weight: normal;
+}
+
 .button-bar{
     -fx-padding: 1;
     -fx-border-width: 0 1 0 0;
