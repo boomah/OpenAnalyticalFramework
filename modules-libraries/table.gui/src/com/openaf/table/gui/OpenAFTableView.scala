@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.scene.control.{TableCell, TableColumn, TableView}
+import javafx.scene.control.{SelectionMode, TableCell, TableColumn, TableView}
 import javafx.beans.property.{ReadOnlyObjectWrapper, Property}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import com.openaf.table.lib.api._
@@ -14,6 +14,8 @@ import java.util
 class OpenAFTableView(tableDataProperty:Property[TableData],
                       fieldBindings:ObservableMap[FieldID,StringBinding]) extends TableView[OpenAFTableRow] {
   getStyleClass.add("openaf-table-view")
+  getSelectionModel.setCellSelectionEnabled(true)
+  getSelectionModel.setSelectionMode(SelectionMode.MULTIPLE)
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
@@ -103,7 +105,6 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
     while (rowHeaderFieldCounter < numRowHeaderFields) {
       field = rowHeaderFields(rowHeaderFieldCounter)
       val tableColumn = new TableColumn[OpenAFTableRow,Int]
-      tableColumn.getStyleClass.add("table-column-header-value")
       disableReordering(tableColumn)
       tableColumn.setSortable(false)
       Option(fieldBindings.get(field.id)) match {
