@@ -20,6 +20,13 @@
     -fx-border-color: -fx-box-border;
 }
 
+.all-fields-area .tree-view:focused{
+    /*Don't want any change in the border when focused*/
+    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 1;
+}
+
 .filter-fields-area{
     -fx-border-width: 1 0 0 0;
     -fx-border-color: -fx-box-border;
@@ -127,6 +134,17 @@
 
 .openaf-table-view{
     -fx-table-cell-border-color: rgb(208,215,229);
+
+    /*Don't want to show the border on the left hand side*/
+    -fx-background-insets: 0, 1 1 1 0;
+    -fx-padding: 1 1 1 0;
+}
+
+.openaf-table-view:focused{
+    /*Don't want any change in the border when focused*/
+    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1 1 1 0;
+    -fx-padding: 1 1 1 0;
 }
 
 .openaf-table-view .column-header{

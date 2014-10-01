@@ -21,6 +21,7 @@ import AllFieldsArea._
 class AllFieldsArea(tableDataProperty:Property[TableData], requestTableStateProperty:Property[TableState],
                     val dragAndDrop:DragAndDrop, fieldBindings:ObservableMap[FieldID,StringBinding])
   extends StackPane with DropTarget with DragAndDropContainer with ConfigAreaNode {
+  getStyleClass.add("all-fields-area")
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
