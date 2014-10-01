@@ -126,8 +126,28 @@
 }
 
 .openaf-table-view{
-    /*-fx-background-color: red, green;*/
-    /*-fx-background-insets: 0, 1;*/
+    -fx-table-cell-border-color: rgb(208,215,229);
+}
+
+.openaf-table-view .column-header{
+    -fx-font-size: 12;
+    -fx-size: 16;
+}
+
+.openaf-table-view .table-row-cell {
+    -fx-background: white;
+    -fx-cell-size: 16;
+    -fx-padding: 0;
+}
+
+.openaf-table-view .table-cell {
+    -fx-padding: 0;
+    -fx-font-size: 12;
+    -fx-cell-size: 16;
+}
+
+.openaf-table-view #table-cell-count{
+    -fx-alignment: CENTER_RIGHT;
 }
 
 .openaf-table-view > .column-header-background .table-column-header-value{

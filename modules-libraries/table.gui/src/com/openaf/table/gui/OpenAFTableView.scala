@@ -222,7 +222,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
             }
           }
           tableColumns(column).setCellValueFactory(new DefaultCellValueFactory(runningColumnCount + column))
-          tableColumns(column).setCellFactory(new DefaultCellFactory(defaultRenderer))
+          tableColumns(column).setCellFactory(new DefaultCellFactory(defaultRenderer, measureFieldOption))
         })
       })
       runningColumnCount += numColumns
@@ -295,8 +295,12 @@ class DefaultCellValueFactory(index:Int) extends Callback[CellDataFeatures[OpenA
   }
 }
 
-class DefaultCellFactory[T](renderer:Renderer[T]) extends Callback[TableColumn[OpenAFTableRow,Any],TableCell[OpenAFTableRow,Any]] {
+class DefaultCellFactory[T](renderer:Renderer[T], measureFieldOption:Option[Field[_]])
+  extends Callback[TableColumn[OpenAFTableRow,Any],TableCell[OpenAFTableRow,Any]] {
   def call(tableColumn:TableColumn[OpenAFTableRow,Any]) = new TableCell[OpenAFTableRow,Any] {
+    measureFieldOption.foreach(measureField => {
+      setId(s"table-cell-${measureField.id.id}")
+    })
     override def updateItem(anyValue:Any, isEmpty:Boolean) {
       super.updateItem(anyValue, isEmpty)
       if (isEmpty) {
