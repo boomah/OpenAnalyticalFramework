@@ -147,21 +147,8 @@
     -fx-padding: 1 1 1 0;
 }
 
-.openaf-table-view .column-header{
-    -fx-font-size: 12;
-    -fx-size: 16;
-}
-
 .openaf-table-view .table-row-cell {
     -fx-background: white;
-    -fx-cell-size: 16;
-    -fx-padding: 0;
-}
-
-.openaf-table-view .table-cell {
-    -fx-padding: 0;
-    -fx-font-size: 12;
-    -fx-cell-size: 16;
 }
 
 .openaf-table-view #table-cell-count{

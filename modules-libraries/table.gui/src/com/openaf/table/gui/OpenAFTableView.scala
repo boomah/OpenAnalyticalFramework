@@ -1,21 +1,35 @@
 package com.openaf.table.gui
 
-import javafx.scene.control.{SelectionMode, TableCell, TableColumn, TableView}
+import javafx.scene.control._
 import javafx.beans.property.{ReadOnlyObjectWrapper, Property}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import com.openaf.table.lib.api._
-import javafx.collections.{ObservableMap, FXCollections}
+import javafx.collections.{ListChangeListener, ObservableMap, FXCollections}
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
 import scala.annotation.tailrec
 import javafx.beans.binding.StringBinding
 import java.util
+import scala.Some
+import javafx.collections.ListChangeListener.Change
 
 class OpenAFTableView(tableDataProperty:Property[TableData],
                       fieldBindings:ObservableMap[FieldID,StringBinding]) extends TableView[OpenAFTableRow] {
   getStyleClass.add("openaf-table-view")
   getSelectionModel.setCellSelectionEnabled(true)
   getSelectionModel.setSelectionMode(SelectionMode.MULTIPLE)
+
+  // I have to override the skin because the default one adds an additional 10 pixels when figuring out how width each 
+  // column should be. This removes that padding. I have raised an issue so hopefully in some future JavaFX release this
+  // can be removed.
+  override def createDefaultSkin() = {
+    new com.sun.javafx.scene.control.skin.TableViewSkin[OpenAFTableRow](this) {
+      override def resizeColumnToFitContent(tableColumn:TableColumn[OpenAFTableRow,_], maxRows:Int) {
+        super.resizeColumnToFitContent(tableColumn, maxRows)
+        tableColumn.impl_setWidth(tableColumn.getWidth - 10)
+      }
+    }
+  }
 
   tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {

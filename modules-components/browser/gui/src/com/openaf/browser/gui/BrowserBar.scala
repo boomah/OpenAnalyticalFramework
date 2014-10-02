@@ -12,6 +12,7 @@ import com.openaf.browser.gui.utils.BrowserUtils._
 import com.openaf.browser.gui.pages.{UtilsPage, HomePage}
 import com.openaf.browser.gui.binding.ApplicationLocaleStringBinding
 import com.openaf.browser.gui.api.BrowserCache
+import javafx.scene.input.{ContextMenuEvent, MouseButton, MouseEvent}
 
 class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage, cache:BrowserCache) extends ToolBar {
   getStyleClass.add("browser-bar")
@@ -21,13 +22,15 @@ class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage, ca
   private val stopOrRefreshButton = new StopOrRefreshToolBarButton(Remove, (isStop) => browser.stopOrRefresh(isStop),
                                                                    browser.stopOrRefreshDisableProperty, browser.working)
   private val homeButton = new SingleActionToolBarButton(Home, browser.home, browser.homeDisableProperty)
-  private val navigationButtons = List(backButton, forwardButton, stopOrRefreshButton, homeButton)
+
+  private val settingsButton = new SettingsMenuButton(tabPane, stage, cache)
+  private val navigationButtons = List(backButton, forwardButton, stopOrRefreshButton, homeButton, settingsButton)
 
   private val addressBar = new AddressBar(browser.descriptionBinding)
   HBox.setHgrow(addressBar, Priority.ALWAYS)
-  private val settingsButton = new SettingsMenuButton(tabPane, stage, cache)
 
-  getItems.addAll(navigationButtons.toArray :_*)
+
+  getItems.addAll(navigationButtons.toArray.filterNot(_ == settingsButton) :_*)
   getItems.addAll(addressBar, settingsButton)
 
   override def layoutChildren() {
@@ -39,8 +42,10 @@ class BrowserBar(browser:Browser, tabPane:BrowserTabPane, stage:BrowserStage, ca
   }
 }
 
-class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage, cache:BrowserCache) extends MenuButton {
-  setGraphic(new StackPane(new FontAwesomeText(Cog)))
+class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage, cache:BrowserCache) extends ToggleButton {
+  getStyleClass.add("settings-menu-button")
+  setFocusTraversable(false)
+  setGraphic(new StackPane(new FontAwesomeText(Bars)))
   private val newTabMenuItem = new MenuItem
   newTabMenuItem.textProperty.bind(new ApplicationLocaleStringBinding("newTab", BrowserApplication, cache))
   newTabMenuItem.setAccelerator(keyMap.newTab.accelerator)
@@ -56,7 +61,37 @@ class SettingsMenuButton(tabPane:BrowserTabPane, stage:BrowserStage, cache:Brows
   utilsMenuItem.setAccelerator(keyMap.utilsPage.accelerator)
   utilsMenuItem.setOnAction(new EventHandler[ActionEvent] {def handle(e:ActionEvent) {tabPane.createTab(UtilsPage)}})
 
-  getItems.addAll(newTabMenuItem, newWindowMenuItem, separatorMenuItem, utilsMenuItem)
+  private lazy val popup = {
+    val popupMenu = new ContextMenu
+    popupMenu.setAutoFix(true)
+    popupMenu.setAutoHide(true)
+    popupMenu.setHideOnEscape(true)
+    popupMenu.showingProperty.addListener(new ChangeListener[JBoolean] {
+      def changed(observableValue:ObservableValue[_<:JBoolean], oldValue:JBoolean, newValue:JBoolean) {
+        if (!newValue) {setSelected(false)}
+      }
+    })
+    popupMenu.getItems.addAll(newTabMenuItem, newWindowMenuItem, separatorMenuItem, utilsMenuItem)
+    popupMenu
+  }
+
+  // The popup has to be added as the context menu otherwise the accelerators on the menu items won't work. Don't show
+  // it when right click happens though
+  setContextMenu(popup)
+  addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, new EventHandler[ContextMenuEvent] {
+    def handle(event:ContextMenuEvent) {
+      event.consume()
+    }
+  })
+
+  setOnMousePressed(new EventHandler[MouseEvent] {
+    def handle(e:MouseEvent) {
+      if (e.getButton == MouseButton.PRIMARY) {
+        val bounds = localToScreen(getBoundsInLocal)
+        popup.show(getScene.getWindow, bounds.getMinX, bounds.getMaxY)
+      }
+    }
+  })
 }
 
 class AddressBar(text:StringBinding) extends TextField {
