@@ -30,7 +30,8 @@ class UtilsPageComponent extends BorderPane with BrowserPageComponent {
   private val content = new VBox
   private val browserApplicationsPane = new FlowPane
   private def updateBrowserApplications(browserApplications:ObservableList[OpenAFApplication]) {
-    val utilButtons = browserApplications.filter(_.utilButtons(context).nonEmpty).map(application => {
+    val orderedApplications = browserApplications.sortBy(_.order)
+    val utilButtons = orderedApplications.filter(_.utilButtons(context).nonEmpty).map(application => {
       val nameBinding = new ApplicationLocaleStringBinding(BrowserUtils.ApplicationName, application, context.cache)
       new OpenAFApplicationComponent(context, nameBinding, application.utilButtons(context))
     })

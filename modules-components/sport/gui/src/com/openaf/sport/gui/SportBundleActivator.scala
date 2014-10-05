@@ -22,4 +22,5 @@ object SportBrowserApplication extends OpenAFApplication {
   }
   override def componentFactoryMap = Map(classOf[GoalsPage].getName -> GoalsPageComponentFactory)
   override def styleSheets = OpenAFTable.styleSheets
+  override def order = -1 // For now I want the sport application to be first
 }

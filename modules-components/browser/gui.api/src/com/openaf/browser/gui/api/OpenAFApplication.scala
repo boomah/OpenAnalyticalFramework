@@ -22,6 +22,11 @@ trait OpenAFApplication {
     newComponentFactoryMap
   }
   def styleSheets:List[String] = Nil
+
+  /**
+   * Relative order that the applications appear on the home screen.
+   */
+  def order:Int = 0
 }
 
 case class BrowserActionButton(name:String, pageFactory:PageFactory)
