@@ -24,7 +24,7 @@ trait OpenAFApplication {
   def styleSheets:List[String] = Nil
 
   /**
-   * Relative order that the applications appear on the home screen.
+   * Relative order that the applications. If the order matches, the simple class name of the application is used.
    */
   def order:Int = 0
 }

@@ -18,6 +18,14 @@ class BrowserCache {
       case _ => browserCacheKeyWithDefault.default
     }
   }
+  def apply[T](browserCacheKeyWithDefaultAndSimpleMap:BrowserCacheKeyWithDefaultAndSimpleMap[T]) = {
+    checkFXThread()
+    def map(value:T) = browserCacheKeyWithDefaultAndSimpleMap.map(value)
+    cache.get(browserCacheKeyWithDefaultAndSimpleMap.browserCacheKey) match {
+      case Some(value) => map(value.asInstanceOf[T])
+      case _ => map(browserCacheKeyWithDefaultAndSimpleMap.default)
+    }
+  }
   def update[T](browserCacheKey:BrowserCacheKey[T], value:T) = {
     checkFXThread()
     cache.put(browserCacheKey, value)
@@ -27,10 +35,14 @@ class BrowserCache {
 }
 
 case class BrowserCacheKey[T](description:String)
-abstract class BrowserCacheKeyWithDefault[T](val browserCacheKey:BrowserCacheKey[T]) {
+trait BrowserCacheKeyWithDefault[T] {
+  val browserCacheKey:BrowserCacheKey[T]
   def default:T
 }
-class SimpleBrowserCacheKeyWithDefault[T](browserCacheKey0:BrowserCacheKey[T], val default:T) extends BrowserCacheKeyWithDefault(browserCacheKey0)
+trait BrowserCacheKeyWithDefaultAndSimpleMap[T] extends BrowserCacheKeyWithDefault[T] {
+  def map(value:T):T
+}
+class SimpleBrowserCacheKeyWithDefault[T](val browserCacheKey:BrowserCacheKey[T], val default:T) extends BrowserCacheKeyWithDefault[T]
 
 object BrowserCacheKey {
   val LocaleKey = {
