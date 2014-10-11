@@ -59,7 +59,22 @@ object TableData {
 case object NoValue
 
 case class TableValues(rowHeaders:Array[Array[Int]], columnHeaders:Array[Array[Array[Int]]],
-                       data:Array[Array[Array[Any]]], fieldValues:FieldValues, valueLookUp:Map[FieldID,Array[Any]])
+                       data:Array[Array[Array[Any]]], fieldValues:FieldValues, valueLookUp:Map[FieldID,Array[Any]]) {
+  def numRowHeaderRows = rowHeaders.length
+  def numRowHeaderColumns = if (rowHeaders.nonEmpty) rowHeaders(0).length else 0
+  def numColumnHeaderRows = {
+    if (columnHeaders.nonEmpty) {
+      columnHeaders.map(path => {
+        if (path.isEmpty) 0 else path(0).length
+      }).max
+    } else {
+      0
+    }
+  }
+  def numColumnHeaderColumns = if (columnHeaders.isEmpty) 0 else columnHeaders.map(_.length).sum
+  def numRows = numColumnHeaderRows + numRowHeaderRows
+  def numColumns = numRowHeaderColumns + numColumnHeaderColumns
+}
 
 object TableValues {
   val Empty = TableValues(Array.empty, Array.empty, Array.empty, FieldValues.Empty, Map.empty)

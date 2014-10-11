@@ -4,14 +4,12 @@ import javafx.scene.control._
 import javafx.beans.property.{ReadOnlyObjectWrapper, Property}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import com.openaf.table.lib.api._
-import javafx.collections.{ListChangeListener, ObservableMap, FXCollections}
+import javafx.collections.{ObservableMap, FXCollections}
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
 import scala.annotation.tailrec
 import javafx.beans.binding.StringBinding
 import java.util
-import scala.Some
-import javafx.collections.ListChangeListener.Change
 
 class OpenAFTableView(tableDataProperty:Property[TableData],
                       fieldBindings:ObservableMap[FieldID,StringBinding]) extends TableView[OpenAFTableRow] {
