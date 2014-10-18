@@ -11,7 +11,7 @@ class OSGIAwareObjectInputStream(inputStream:InputStream, topLevelClassLoader:Cl
     var classAndClassLoaderOption:Option[ClassAndClassLoader] = None
     for (classLoader <- classLoaders if classAndClassLoaderOption == None) {
       try {
-        val klass = classLoader.loadClass(desc.getName)
+        val klass = Class.forName(desc.getName, false, classLoader)
         classAndClassLoaderOption = Some(new ClassAndClassLoader(klass, klass.getClassLoader))
       } catch {
         case e:Exception => //println("Can't find " + (desc.getName, classLoader))
