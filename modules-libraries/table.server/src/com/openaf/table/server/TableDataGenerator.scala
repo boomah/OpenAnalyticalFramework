@@ -49,26 +49,28 @@ object TableDataGenerator {
         FieldValuesSorting.sort(fieldValues, ordering, lookUp, field.sortOrder)
       }}
     }
-    val numRowHeaderValues = rowHeaderValues.length
-    var rowHeaderCounter = 0
 
     val paths = tableState.tableLayout.columnHeaderLayout.paths
     val allPathData = result.pathData
     val numPaths = allPathData.length
+    val allColHeaderValues = new Array[Array[Array[Int]]](numPaths)
+    var columnHeaderValuesForPath:Array[Array[Int]] = null
+    var path:ColumnHeaderLayoutPath = null
     var pathCounter = 0
 
-    val allColHeaderValues = paths.zipWithIndex.map{case (path,pathIndex) => {
-      val pathData = allPathData(pathIndex)
-      val colHeaderValues = pathData.colHeaderValues
-      if (!result.resultState.sortState.pathDataSorted(pathIndex)) {
+    while (pathCounter < numPaths) {
+      path = paths(pathCounter)
+      columnHeaderValuesForPath = allPathData(pathCounter).colHeaderValues
+      if (!result.resultState.sortState.pathDataSorted(pathCounter)) {
         val colHeaderFieldDefinitions = path.fields.map(field => {
           tableDataSource.fieldDefinitionGroups.fieldDefinition(field.id)
         }).toArray
         val colHeaderLookUps = path.fields.map(field => result.valueLookUp(field.id)).toArray
         util.Arrays.sort(
-          colHeaderValues,
+          columnHeaderValuesForPath,
           new TableDataGeneratorComparator(path.fields.toArray, colHeaderFieldDefinitions, colHeaderLookUps)
         )
+        allColHeaderValues(pathCounter) = columnHeaderValuesForPath
 
         path.fields.zipWithIndex.foreach{case (field,i) => {
           val fieldValues = result.fieldValues.values(field)
@@ -78,44 +80,97 @@ object TableDataGenerator {
           FieldValuesSorting.sort(fieldValues, ordering, lookUp, field.sortOrder)
         }}
       }
-      colHeaderValues
-    }}.toArray
-    val colHeaderValuesLengths = allColHeaderValues.map(_.length)
-    var colHeaderCounter = 0
 
-    var dataForPath:Map[IntArrayWrapperKey, Any] = null
-    var numColHeaders = -1
-    var colHeaderValues:Array[Array[Int]] = null
+      pathCounter += 1
+    }
+    pathCounter = 0
 
-    val dataForPaths = allPathData.map(_.data)
-
+    val extraRowForRowHeaderFields = tableState.rowHeaderFields.nonEmpty && (result.numColumnHeaderRows == 0)
+    val numRows = result.numRows + (if (extraRowForRowHeaderFields) 1 else 0)
+    val rows = new Array[OpenAFTableRow](numRows)
+    var rowCounter = 0
+    var columnCounter = 0
+    val blankRowHeaderValues = Array.fill(result.numRowHeaderColumns)(TableValues.NoValueInt)
+    var row:OpenAFTableRow = null
     var rowHeaderKey:Array[Int] = null
     var key:IntArrayWrapperKey = null
-    val data:Array[Array[Array[Any]]] = Array.fill(numPaths)(new Array(numRowHeaderValues))
+    var columnHeaderValues:Array[Int] = null
+    val dataForPaths = allPathData.map(_.data)
+    var dataForPath:Map[IntArrayWrapperKey, Any] = null
+    var numColumnsPerPath = 0
+    var columnsPerPathCounter = 0
 
-    while (rowHeaderCounter < numRowHeaderValues) {
-      rowHeaderKey = rowHeaderValues(rowHeaderCounter)
+    // Populate the rows from the column headers
+    while (rowCounter < result.numColumnHeaderRows) {
+      row = new OpenAFTableRow(rowCounter, blankRowHeaderValues, new Array[Any](result.numColumnHeaderColumns))
+      rows(rowCounter) = row
+
       while (pathCounter < numPaths) {
-        colHeaderValues = allColHeaderValues(pathCounter)
-        numColHeaders = colHeaderValuesLengths(pathCounter)
-        data(pathCounter)(rowHeaderCounter) = new Array[Any](numColHeaders)
-        dataForPath = dataForPaths(pathCounter)
-        while (colHeaderCounter < numColHeaders) {
-          key = new IntArrayWrapperKey(rowHeaderKey, colHeaderValues(colHeaderCounter))
-          data(pathCounter)(rowHeaderCounter)(colHeaderCounter) = dataForPath.getOrElse(key, NoValue)
-          colHeaderCounter += 1
+        columnHeaderValuesForPath = allColHeaderValues(pathCounter)
+        numColumnsPerPath = columnHeaderValuesForPath.length
+        while (columnsPerPathCounter < numColumnsPerPath) {
+          columnHeaderValues = columnHeaderValuesForPath(columnsPerPathCounter)
+          row.columnHeaderAndDataValues(columnCounter) = if (rowCounter < columnHeaderValues.length) {
+            columnHeaderValues(rowCounter)
+          } else {
+            TableValues.NoValueInt
+          }
+
+          columnCounter += 1
+          columnsPerPathCounter += 1
         }
-        colHeaderCounter = 0
+
+        columnsPerPathCounter = 0
         pathCounter += 1
       }
+
       pathCounter = 0
-      rowHeaderCounter += 1
+      columnCounter = 0
+      rowCounter += 1
+    }
+    
+    // Add the row header fields
+    val rowHeaderFieldsArray = Array.fill(tableState.rowHeaderFields.length)(0)
+    if (extraRowForRowHeaderFields) {
+      rows(0) = new OpenAFTableRow(0, rowHeaderFieldsArray, Array.empty)
+      rowCounter = 1
+    } else if (tableState.rowHeaderFields.nonEmpty) {
+      val row = rowCounter - 1
+      rows(row) = new OpenAFTableRow(row, rowHeaderFieldsArray, rows(row).columnHeaderAndDataValues)
+    }
+    val rowOffset = if (extraRowForRowHeaderFields) 1 + result.numColumnHeaderRows else result.numColumnHeaderRows
+    
+    // Populate the rows from the row header values and the data
+    while (rowCounter < numRows) {
+      rowHeaderKey = rowHeaderValues(rowCounter - rowOffset)
+      row = new OpenAFTableRow(rowCounter, rowHeaderKey, new Array[Any](result.numColumnHeaderColumns))
+      rows(rowCounter) = row
+
+      while (pathCounter < numPaths) {
+        columnHeaderValuesForPath = allColHeaderValues(pathCounter)
+        numColumnsPerPath = columnHeaderValuesForPath.length
+        dataForPath = dataForPaths(pathCounter)
+        while (columnsPerPathCounter < numColumnsPerPath) {
+          columnHeaderValues = columnHeaderValuesForPath(columnsPerPathCounter)
+          key = new IntArrayWrapperKey(rowHeaderKey, columnHeaderValues)
+          row.columnHeaderAndDataValues(columnCounter) = dataForPath.getOrElse(key, NoValue)
+
+          columnCounter += 1
+          columnsPerPathCounter += 1
+        }
+
+        columnsPerPathCounter = 0
+        pathCounter += 1
+      }
+
+      pathCounter = 0
+      columnCounter = 0
+      rowCounter += 1
     }
 
     val fieldGroup = tableDataSource.fieldDefinitionGroups.fieldGroup
-
-    val tableValues = TableValues(result.rowHeaderValues, allColHeaderValues, data, result.fieldValues, result.valueLookUp)
-
+    val columnsPerPath = allColHeaderValues.map(_.length)
+    val tableValues = TableValues(rows, columnsPerPath, result.fieldValues, result.valueLookUp)
     val defaultRenderers:Map[FieldID,Renderer[_]] = tableState.tableLayout.allFields.map(field => {
       val fieldDefinition = tableDataSource.fieldDefinitionGroups.fieldDefinition(field.id)
       val renderer = if (field.fieldType.isDimension) fieldDefinition.renderer else fieldDefinition.combinedRenderer

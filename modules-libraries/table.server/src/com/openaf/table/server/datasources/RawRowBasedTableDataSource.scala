@@ -59,7 +59,7 @@ object RawRowBasedTableDataSource {
     ).toArray
 
     val columnHeaderMeasureFieldPositions = columnHeaderPaths.map(_.measureFieldIndex).toArray
-    val columnHeaderPathsMeasureOptions = columnHeaderPaths.map(_.measureFieldOption).toArray
+    val columnHeaderPathsMeasureOptions = columnHeaderPaths.map(_.measureFieldOption)
     val measureFieldPositions = columnHeaderPathsMeasureOptions.map{
       case Some(field) => {
         val index = fieldIDs.indexOf(field.id)
@@ -257,7 +257,7 @@ object RawRowBasedTableDataSource {
     // If there are no row fields or measure fields there with be an empty row in the headers that isn't needed so
     // remove it
     val rowHeadersToUse = if (rowHeaderFieldIDs.nonEmpty || columnHeaderPathsMeasureOptions.exists(_.isDefined)) {
-      rowHeaders.toArray.map(_.array)
+      rowHeaders.map(_.array).toArray
     } else {
       Array.empty[Array[Int]]
     }

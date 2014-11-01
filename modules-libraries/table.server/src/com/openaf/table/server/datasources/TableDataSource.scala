@@ -10,7 +10,22 @@ trait TableDataSource {
 }
 
 case class Result(rowHeaderValues:Array[Array[Int]], pathData:Array[PathData], fieldValues:FieldValues,
-                  valueLookUp:Map[FieldID,Array[Any]], resultState:ResultState)
+                  valueLookUp:Map[FieldID,Array[Any]], resultState:ResultState) {
+  val numRowHeaderRows = rowHeaderValues.length
+  val numRowHeaderColumns = if (rowHeaderValues.nonEmpty) rowHeaderValues(0).length else 0
+  val numColumnHeaderRows = {
+    if (pathData.nonEmpty) {
+      pathData.map(path => {
+        if (path.colHeaderValues.isEmpty) 0 else path.colHeaderValues(0).length
+      }).max
+    } else {
+      0
+    }
+  }
+  val numColumnHeaderColumns = if (pathData.isEmpty) 0 else pathData.map(_.colHeaderValues.length).sum
+  val numRows = numColumnHeaderRows + numRowHeaderRows
+  val numColumns = numRowHeaderColumns + numColumnHeaderColumns
+}
 
 object Result {
   val Empty = Result(Array.empty, Array.empty, FieldValues.Empty, Map.empty, ResultState.Default)

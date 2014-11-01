@@ -16,22 +16,30 @@ class OpenAFTableViewTest extends FunSuite {
   test("1 column") {
     val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout(GenderField))
     val tableState = TableState(tableLayout)
+    val row = new OpenAFTableRow(0, Array.empty, Array(1,2))
     val tableValues = TableValues.Empty.copy(
-      columnHeaders = Array(Array(Array(1), Array(2))),
-      valueLookUp = GenderValuesLookUp
+      rows = Array(row),
+      valueLookUp = GenderValuesLookUp,
+      columnsPerPath = Array(2)
     )
     val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns
     assert(columns.size === 2)
-    assert(columns.get(0).getText === F)
+    assert(columns.get(0).getText === "A")
     assert(columns.get(0).getColumns.size === 0)
-    assert(columns.get(1).getText === M)
+    assert(columns.get(0).getCellData(0) === row)
+    assert(columns.get(1).getText === "B")
     assert(columns.get(1).getColumns.size === 0)
+    assert(columns.get(1).getCellData(0) === row)
   }
 
-  test("2 column (1 on top of the other, top one single value)") {
+  // TODO - these tests aren't quite as important as before now that the report has been completely moved into the table
+  // TODO - and so the columns are flat. Some should be migrated to a different test, probably TableDataGeneratorTest,
+  // TODO - so that the layouts specified are not lost.
+
+  /*test("2 column (1 on top of the other, top one single value)") {
     val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout(GroupField, List(GenderField)))
     val tableState = TableState(tableLayout)
     val tableValues = TableValues.Empty.copy(
@@ -395,6 +403,6 @@ class OpenAFTableViewTest extends FunSuite {
     assert(columns.get(1).getColumns.get(0).getText === Friends)
     assert(columns.get(0).getColumns.get(0).getColumns.size === 0)
     assert(columns.get(1).getColumns.get(0).getColumns.size === 0)
-  }
+  }*/
 }
 

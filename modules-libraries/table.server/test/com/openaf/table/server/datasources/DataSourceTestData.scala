@@ -1,10 +1,11 @@
 package com.openaf.table.server.datasources
 
-import com.openaf.table.lib.api.{FieldID, TableState, Measure, Field}
+import com.openaf.table.lib.api._
 import com.openaf.table.server._
-import com.openaf.table.server.StringFieldDefinition
-import com.openaf.table.server.IntFieldDefinition
 import org.scalatest.Assertions._
+import com.openaf.table.server.IntFieldDefinition
+import com.openaf.table.server.FieldDefinitionGroups
+import com.openaf.table.server.StringFieldDefinition
 
 object DataSourceTestData {
   val NameField = Field[String]("name")
@@ -64,6 +65,10 @@ object DataSourceTestData {
   def scoreFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
   def measureFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
 
+  def row(rowIndex:Int=0, rowHeaderValues:List[Int]=Nil, columnHeaderAndDataValues:List[Any]=Nil) = {
+    new OpenAFTableRow(rowIndex, rowHeaderValues.toArray, columnHeaderAndDataValues.toArray)
+  }
+
   def check(tableState:TableState, expectedRowHeaderValues:Set[List[Int]],
             expectedColHeaderValues:List[Set[List[Int]]], expectedData:List[Map[(List[Int],List[Int]),Int]],
             expectedFieldValues:Map[Field[_],List[Int]], expectedValueLookUp:Map[FieldID,List[Any]]) {
@@ -76,15 +81,15 @@ object DataSourceTestData {
     assert(result.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
   }
 
-  def check(tableState:TableState, expectedRowHeaderValues:List[List[Int]],
-            expectedColHeaderValues:List[List[List[Int]]],
-            expectedData:List[List[List[Any]]],
+  def check(tableState:TableState,
+            expectedRows:List[OpenAFTableRow],
             expectedFieldValues:Map[Field[_],List[Int]],
             expectedValueLookUp:Map[FieldID,List[Any]]) {
     val tableData = TableDataGenerator.tableData(tableState.generateFieldKeys, dataSource)
-    assert(tableData.tableValues.rowHeaders.map(_.toList).toList === expectedRowHeaderValues)
-    assert(tableData.tableValues.columnHeaders.map(_.map(_.toList).toList).toList === expectedColHeaderValues)
-    assert(tableData.tableValues.data.map(_.map(_.toList).toList).toList === expectedData)
+    val rows = tableData.tableValues.rows.toList
+    assert(rows.map(_.row).toList === expectedRows.map(_.row))
+    assert(rows.map(_.rowHeaderValues.toList) === expectedRows.map(_.rowHeaderValues.toList))
+    assert(rows.map(_.columnHeaderAndDataValues.toList) === expectedRows.map(_.columnHeaderAndDataValues.toList))
     assert(tableData.tableValues.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
     assert(tableData.tableValues.fieldValues.values.mapValues(_.toList) === expectedFieldValues)
   }
