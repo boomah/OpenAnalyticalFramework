@@ -7,7 +7,6 @@ import com.openaf.table.lib.api._
 import javafx.collections.{ObservableMap, FXCollections}
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
-import scala.annotation.tailrec
 import javafx.beans.binding.StringBinding
 import java.util
 
@@ -142,144 +141,10 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
   }
 }
 
+class OpenAFTableColumn(val column:Int) extends TableColumnType
+
 class CellValueFactory extends Callback[CellDataFeatures[OpenAFTableRow,OpenAFTableRow],ObservableValue[OpenAFTableRow]] {
   def call(cellDataFeatures:CellDataFeatures[OpenAFTableRow,OpenAFTableRow]) = {
     new ReadOnlyObjectWrapper[OpenAFTableRow](cellDataFeatures.getValue)
   }
 }
-
-class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBindings:ObservableMap[FieldID,StringBinding],
-                              startRowHeaderValuesIndex:Int) extends Callback[TableColumnType,OpenAFTableCell] {
-
-  def call(tableColumn:TableColumnType) = new OpenAFTableCell {
-    private val rowHeaderTableColumn = tableColumn.asInstanceOf[OpenAFTableColumn]
-    override def updateItem(row:OpenAFTableRow, isEmpty:Boolean) {
-      super.updateItem(row, isEmpty)
-      textProperty.unbind()
-      if (isEmpty) {
-        setText(null)
-      } else {
-        val intValue = row.rowHeaderValues(rowHeaderTableColumn.column)
-        if (intValue == TableValues.NoValueInt) {
-          setText(null)
-        } else if (intValue == TableValues.FieldInt) {
-          val fieldID = values(TableValues.FieldInt).asInstanceOf[FieldID]
-          Option(fieldBindings.get(fieldID)) match {
-            case Some(binding) => textProperty.bind(binding)
-            case None => setText(fieldID.id)
-          }
-        } else {
-          val shouldRender = {
-            if (row.row == startRowHeaderValuesIndex) {
-              true // Always render the top row header value
-            } else {
-              if (getTableColumn.getCellData(row.row - 1).rowHeaderValues(rowHeaderTableColumn.column) != intValue) {
-                true // The value in the row above is different so render this value
-              } else {
-                // Check the values in the previous column to see if we need to render. This is so if the values are the
-                // same in this column but split by the previous column we should render
-                shouldRenderDueToLeftColumn(row.row, rowHeaderTableColumn.column)
-              }
-            }
-          }
-          if (shouldRender) {
-            val value = values(intValue).asInstanceOf[T]
-            setText(renderer.render(value))
-          } else {
-            setText(null)
-          }
-        }
-      }
-    }
-
-    @tailrec private def shouldRenderDueToLeftColumn(rowIndex:Int, columnIndex:Int):Boolean = {
-      if (columnIndex == 0) {
-        false
-      } else {
-        val valueToTheLeft = getTableColumn.getCellData(rowIndex).rowHeaderValues(columnIndex - 1)
-        val valueAboveToTheLeft = getTableColumn.getCellData(rowIndex - 1).rowHeaderValues(columnIndex - 1)
-        if (valueToTheLeft != valueAboveToTheLeft) {
-          true
-        } else {
-          shouldRenderDueToLeftColumn(rowIndex, columnIndex - 1)
-        }
-      }
-    }
-  }
-}
-
-class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindings:ObservableMap[FieldID,StringBinding],
-                                     path:ColumnHeaderLayoutPath, maxPathLength:Int, pathRenderers:Array[Renderer[_]],
-                                     pathBoundaries:Set[Int]) extends Callback[TableColumnType,OpenAFTableCell] {
-  def call(tableColumn:TableColumnType) = new OpenAFTableCell {
-    private val columnHeaderTableColumn = tableColumn.asInstanceOf[OpenAFTableColumn]
-    override def updateItem(row:OpenAFTableRow, isEmpty:Boolean) {
-      super.updateItem(row, isEmpty)
-      textProperty.unbind()
-      setId(null)
-      if (isEmpty) {
-        setText(null)
-      } else {
-        if (row.row < maxPathLength) {
-          row.columnHeaderAndDataValues(columnHeaderTableColumn.column) match {
-            case TableValues.FieldInt => {
-              if (shouldRender(row, TableValues.FieldInt)) {
-                val fieldID = valueLookUps(row.row)(TableValues.FieldInt).asInstanceOf[FieldID]
-                Option(fieldBindings.get(fieldID)) match {
-                  case Some(binding) => textProperty.bind(binding)
-                  case None => setText(fieldID.id)
-                }
-              } else {
-                setText(null)
-              }
-            }
-            case intValue:Int if intValue != TableValues.NoValueInt => {
-              if (shouldRender(row, intValue)) {
-                val value = valueLookUps(row.row)(intValue)
-                val renderer = pathRenderers(row.row).asInstanceOf[Renderer[Any]]
-                setText(renderer.render(value))
-              } else {
-                setText(null)
-              }
-            }
-            case other => setText(null)
-          }
-        } else {
-          path.measureFieldOption.foreach(measureField => {
-            setId(s"table-cell-${measureField.id.id}")
-          })
-          val measureFieldIndex = path.measureFieldIndex
-          val renderer = if (measureFieldIndex == -1) BlankRenderer else pathRenderers(measureFieldIndex).asInstanceOf[Renderer[Any]]
-          setText(renderer.render(row.columnHeaderAndDataValues(columnHeaderTableColumn.column)))
-        }
-      }
-    }
-
-    @tailrec private def shouldRenderDueToRowAbove(rowIndex:Int, columnIndex:Int):Boolean = {
-      if (rowIndex == 0) {
-        false
-      } else {
-        val rowAbove = getTableColumn.getCellData(rowIndex - 1)
-        val valueAbove = rowAbove.columnHeaderAndDataValues(columnIndex)
-        val valueAboveToTheLeft = rowAbove.columnHeaderAndDataValues(columnIndex - 1)
-        if (valueAbove != valueAboveToTheLeft) {
-          true
-        } else {
-          shouldRenderDueToRowAbove(rowIndex - 1, columnIndex)
-        }
-      }
-    }
-
-    private def shouldRender(row:OpenAFTableRow, intValue:Int) = {
-      if (pathBoundaries.contains(columnHeaderTableColumn.column)) {
-        true // Always render the first column header value per path
-      } else if (row.columnHeaderAndDataValues(columnHeaderTableColumn.column - 1).asInstanceOf[Int] != intValue) {
-        true // The value in the column to the left is different so render this
-      } else {
-        shouldRenderDueToRowAbove(row.row, columnHeaderTableColumn.column)
-      }
-    }
-  }
-}
-
-class OpenAFTableColumn(val column:Int) extends TableColumnType
