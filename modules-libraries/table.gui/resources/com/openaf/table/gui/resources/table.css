@@ -132,6 +132,16 @@
     -fx-opacity: 0.7;
 }
 
+.button-bar{
+    -fx-padding: 1;
+    -fx-border-width: 0 1 0 0;
+    -fx-border-color: -fx-box-border;
+}
+
+.small-spacing{
+    -fx-spacing: 2;
+}
+
 .openaf-table-view{
     -fx-table-cell-border-color: rgb(208,215,229);
 
@@ -159,12 +169,13 @@
     -fx-font-weight: normal;
 }
 
-.button-bar{
-    -fx-padding: 1;
-    -fx-border-width: 0 1 0 0;
-    -fx-border-color: -fx-box-border;
+.openaf-table-view .standard-row-header-table-cell{
+    -fx-background-color: -fx-table-cell-border-color, rgb(220,230,241);
+    -fx-background-insets: 0, 0 0 1 0;
 }
 
-.small-spacing{
-    -fx-spacing: 2;
+.openaf-table-view .field-row-header-table-cell{
+    -fx-font-weight: bold;
+    -fx-background-color: rgb(149,179,215), rgb(220,230,241);
+    -fx-background-insets: 0, 0 0 1 0;
 }

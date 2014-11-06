@@ -4,24 +4,27 @@ import com.openaf.table.lib.api.{TableValues, OpenAFTableRow, FieldID, Renderer}
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
 import javafx.util.Callback
-import scala.annotation.tailrec
+import annotation.tailrec
 import com.openaf.table.gui.OpenAFTableView.{TableColumnType, OpenAFTableCell}
+import TableCellStyle._
 
 class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBindings:ObservableMap[FieldID,StringBinding],
                               startRowHeaderValuesIndex:Int) extends Callback[TableColumnType,OpenAFTableCell] {
-
   def call(tableColumn:TableColumnType) = new OpenAFTableCell {
     private val rowHeaderTableColumn = tableColumn.asInstanceOf[OpenAFTableColumn]
     override def updateItem(row:OpenAFTableRow, isEmpty:Boolean) {
       super.updateItem(row, isEmpty)
+      removeAllStyles(this)
       textProperty.unbind()
       if (isEmpty) {
         setText(null)
       } else {
+        getStyleClass.add(StandardRowHeader)
         val intValue = row.rowHeaderValues(rowHeaderTableColumn.column)
         if (intValue == TableValues.NoValueInt) {
           setText(null)
         } else if (intValue == TableValues.FieldInt) {
+          getStyleClass.add(FieldRowHeader)
           val fieldID = values(TableValues.FieldInt).asInstanceOf[FieldID]
           Option(fieldBindings.get(fieldID)) match {
             case Some(binding) => textProperty.bind(binding)
