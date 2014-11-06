@@ -1,5 +1,4 @@
 .root{
-    #-font-awesome-color: rgb(61,114,144);
     -font-awesome-color: grey;
 }
 
@@ -12,39 +11,18 @@
 }
 
 .browser-bar{
-    -fx-background-color: gainsboro;
+    -fx-background-color: -fx-background;
 }
 
 .tool-bar-button,
 .settings-menu-button{
-    -fx-background-color: transparent;
-    -fx-padding: 0;
-    -fx-border-radius: 4;
-    -fx-border-width: 1.5;
-    -fx-border-color: transparent;
-}
-
-.tool-bar-button:hover,
-.settings-menu-button:hover{
-    -fx-border-color: -font-awesome-color;
-    -fx-color: -fx-base;
+    -fx-padding: 4;
 }
 
 .settings-menu-button .font-awesome{
-    -fx-fill: -font-awesome-color;
+    -fx-fill: derive(-font-awesome-color,-20%);
     -fx-effect: null;
     -fx-font-smoothing-type: null;
-}
-
-.settings-menu-button:armed,
-.settings-menu-button:selected{
-    -fx-background-color:
-                linear-gradient(to bottom,
-                        derive(-fx-color, -22%) 0%,
-                        derive(-fx-color, -13%) 10%,
-                        derive(-fx-color, -11%) 30%);
-        -fx-background-insets: 1;
-        -fx-border-color: -font-awesome-color;
 }
 
 .tab-pane{
