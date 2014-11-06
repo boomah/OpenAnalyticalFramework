@@ -133,13 +133,13 @@ trait Draggable extends Region {
     }
   }
 
-  setOnMousePressed(new EventHandler[MouseEvent] {
+  addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
       if (event.getButton == MouseButton.PRIMARY) {dragAndDrop.dragOffset = (event.getX, event.getY)}
     }
   })
 
-  setOnDragDetected(new EventHandler[MouseEvent] {
+  addEventHandler(MouseEvent.DRAG_DETECTED, new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
       if (event.getButton == MouseButton.PRIMARY) {
         dragAndDrop.fieldsBeingDraggedInfo.set(Some(DraggableFieldsInfo(Draggable.this, dragAndDropContainer)))
@@ -151,7 +151,7 @@ trait Draggable extends Region {
     }
   })
 
-  setOnMouseDragged(new EventHandler[MouseEvent] {
+  addEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
       dragAndDrop.fieldsBeingDraggedInfo.get.foreach(_ => {
         dragAndDrop.updateDragImagePosition(event)
@@ -161,7 +161,7 @@ trait Draggable extends Region {
     }
   })
 
-  setOnMouseReleased(new EventHandler[MouseEvent] {
+  addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
       event.consume()
       dragAndDrop.fieldsBeingDraggedInfo.get.foreach(draggableFieldsInfo => {
@@ -179,7 +179,7 @@ trait Draggable extends Region {
     }
   })
 
-  setOnMouseClicked(new EventHandler[MouseEvent] {
+  addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
       if (event.getButton == MouseButton.PRIMARY && event.getClickCount == 2 && fields.nonEmpty && !isParent) {moveField()}
     }

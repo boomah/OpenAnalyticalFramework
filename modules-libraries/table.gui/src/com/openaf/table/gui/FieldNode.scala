@@ -40,7 +40,7 @@ class FieldNode[T](val field:Field[T], val dragAndDrop:DragAndDrop, val dragAndD
   }
 
   private lazy val contextMenu = new FieldNodeContextMenu[T](field, requestTableStateProperty, locale)
-  setOnMousePressed(new EventHandler[MouseEvent] {
+  addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
       if (event.getButton == MouseButton.SECONDARY) {
         contextMenu.show(getScene.getWindow, event.getScreenX, event.getScreenY)
