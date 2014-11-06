@@ -14,6 +14,7 @@ import javafx.scene.Scene
 import scala.collection.JavaConversions._
 import com.openaf.browser.gui.api.{OpenAFApplication, BrowserCache}
 import com.openaf.gui.utils.GuiUtils._
+import collection.immutable.Seq
 
 object BrowserStageManager {
   private val browserCountDownLatch = new CountDownLatch(1)
@@ -54,7 +55,7 @@ class BrowserStageManager extends JApplication {
 
   private def createStage(frameLocation:FrameLocation, initialPage:Page) {
     val stage = new BrowserStage(HomePage, initialPage, this)
-    val styleSheets = applications.flatMap(_.styleSheets)
+    val styleSheets = applications.flatMap(_.styleSheets).toList
     addStyleSheetsToScenes(styleSheets, stage.getScene)
     stages += stage
     stage.setTitle(frameTitle)

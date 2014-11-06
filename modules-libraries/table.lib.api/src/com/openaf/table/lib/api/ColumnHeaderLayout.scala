@@ -1,5 +1,7 @@
 package com.openaf.table.lib.api
 
+import collection.immutable.Seq
+
 case class ColumnHeaderLayout(columnHeaderTrees:List[ColumnHeaderTree]) {
   def allFields = columnHeaderTrees.flatMap(_.allFields)
   def isEmpty = columnHeaderTrees.isEmpty

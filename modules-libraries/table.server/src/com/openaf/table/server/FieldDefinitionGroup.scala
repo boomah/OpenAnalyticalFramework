@@ -1,6 +1,7 @@
 package com.openaf.table.server
 
 import com.openaf.table.lib.api.{FieldID, FieldGroup}
+import collection.immutable.Seq
 
 case class FieldDefinitionGroup(groupName:String, children:List[Either[FieldDefinitionGroup,FieldDefinition]]) {
   def fieldGroup:FieldGroup = {

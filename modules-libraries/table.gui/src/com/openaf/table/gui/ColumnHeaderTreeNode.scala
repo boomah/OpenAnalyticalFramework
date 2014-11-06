@@ -8,6 +8,7 @@ import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
 import java.util.Locale
 import com.openaf.table.lib.api.ColumnHeaderLayout.ColumnHeaderTreeType
+import collection.immutable.Seq
 
 class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataProperty:Property[TableData],
                            requestTableStateProperty:Property[TableState], dragAndDrop:DragAndDrop,
