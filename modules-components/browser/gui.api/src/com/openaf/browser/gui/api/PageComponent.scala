@@ -7,6 +7,8 @@ import java.util.ResourceBundle
 import javafx.beans.binding.StringBinding
 
 trait PageComponent extends Region {
+  getStyleClass.add("page-component")
+
   type P <: Page
   type PD <: PageData
 

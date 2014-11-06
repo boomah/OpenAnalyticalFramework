@@ -39,3 +39,7 @@
     -fx-border-width: null;
     -fx-border-color: null;
 }
+
+.page-component{
+    -fx-background-color: -fx-background;
+}

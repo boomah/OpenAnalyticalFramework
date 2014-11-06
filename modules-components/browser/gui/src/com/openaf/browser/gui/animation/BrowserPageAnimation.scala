@@ -19,7 +19,7 @@ import BrowserPageAnimation._
 
 object ForwardOnePageTransition extends BrowserPageAnimation {
   def animate(fromPageComponent:Region, toPageComponent:Region, onComplete: => Unit) {
-    toPageComponent.setTranslateX(fromPageComponent.getWidth)
+    toPageComponent.setTranslateX(fromPageComponent.getWidth / 3)
 
     val fromTransition = new TranslateTransition(PageSlideTime, fromPageComponent)
     fromTransition.setToX(-fromPageComponent.getWidth)
@@ -39,7 +39,7 @@ object ForwardOnePageTransition extends BrowserPageAnimation {
 
 object BackOnePageTransition extends BrowserPageAnimation {
   def animate(fromPageComponent:Region, toPageComponent:Region, onComplete: => Unit) {
-    toPageComponent.setTranslateX(-fromPageComponent.getWidth)
+    toPageComponent.setTranslateX(-fromPageComponent.getWidth / 3)
 
     val fromTransition = new TranslateTransition(PageSlideTime, fromPageComponent)
     fromTransition.setToX(fromPageComponent.getWidth)
