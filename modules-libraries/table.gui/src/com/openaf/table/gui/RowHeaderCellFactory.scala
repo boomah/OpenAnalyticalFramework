@@ -31,6 +31,9 @@ class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBind
             case None => setText(fieldID.id)
           }
         } else {
+          if (rowHeaderTableColumn.column == (row.rowHeaderValues.length - 1)) {
+            getStyleClass.add(RightRowHeader)
+          }
           val shouldRender = {
             if (row.row == startRowHeaderValuesIndex) {
               true // Always render the top row header value

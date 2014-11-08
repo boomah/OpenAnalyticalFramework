@@ -7,6 +7,7 @@ import javafx.util.Callback
 import com.openaf.table.lib.api.ColumnHeaderLayoutPath
 import scala.annotation.tailrec
 import com.openaf.table.gui.OpenAFTableView.{OpenAFTableCell, TableColumnType}
+import TableCellStyle._
 
 class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindings:ObservableMap[FieldID,StringBinding],
                                      path:ColumnHeaderLayoutPath, maxPathLength:Int, pathRenderers:Array[Renderer[_]],
@@ -15,14 +16,20 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
     private val columnHeaderTableColumn = tableColumn.asInstanceOf[OpenAFTableColumn]
     override def updateItem(row:OpenAFTableRow, isEmpty:Boolean) {
       super.updateItem(row, isEmpty)
+      removeAllStyles(this)
       textProperty.unbind()
-      setId(null)
       if (isEmpty) {
         setText(null)
       } else {
         if (row.row < maxPathLength) {
+          if (row.row == (maxPathLength - 1)) {
+            getStyleClass.add(BottomColumnHeader)
+          } else {
+            getStyleClass.add(StandardColumnHeader)
+          }
           row.columnHeaderAndDataValues(columnHeaderTableColumn.column) match {
             case TableValues.FieldInt => {
+              getStyleClass.add(FieldColumnHeader)
               if (shouldRender(row, TableValues.FieldInt)) {
                 val fieldID = valueLookUps(row.row)(TableValues.FieldInt).asInstanceOf[FieldID]
                 Option(fieldBindings.get(fieldID)) match {
