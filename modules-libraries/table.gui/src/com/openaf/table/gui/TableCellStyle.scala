@@ -1,19 +1,21 @@
 package com.openaf.table.gui
 
 import javafx.scene.control.TableCell
+import com.openaf.gui.utils.GuiUtils
 
-object TableCellStyle {
-  val StandardRowHeader = "standard-row-header-table-cell"
-  val RightRowHeader = "right-row-header-table-cell"
-  val FieldRowHeader = "field-row-header-table-cell"
+object TableCellStyle extends Enumeration {
+  type TableCellStyle = Value
 
-  val StandardColumnHeader = "standard-column-header-table-cell"
-  val FieldColumnHeader = "field-column-header-table-cell"
-  val BottomColumnHeader = "bottom-column-header-table-cell"
+  val StandardRowHeaderTableCell, RightRowHeaderTableCell, BottomRowHeaderTableCell, BottomRightRowHeaderTableCell = Value
+  val FieldRowHeaderTableCell, RightFieldRowHeaderTableCell = Value
+
+  val StandardColumnHeaderTableCell, RightColumnHeaderTableCell, BottomColumnHeaderTableCell, BottomRightColumnHeaderTableCell = Value
+  val FieldColumnHeaderTableCell, RightFieldColumnHeaderTableCell, BottomFieldColumnHeaderTableCell, BottomRightFieldColumnHeaderTableCell = Value
+  val RightDataTableCell, BottomDataTableCell, BottomRightDataTableCell = Value
 
   def removeAllStyles(tableCell:TableCell[_,_]) {
-    tableCell.getStyleClass.removeAll(StandardRowHeader, RightRowHeader, FieldRowHeader, FieldColumnHeader,
-      BottomColumnHeader)
+    val styles = values.map(value => GuiUtils.camelCaseToDashed(value.toString)).toArray
     tableCell.setId(null)
+    tableCell.getStyleClass.removeAll(styles:_*)
   }
 }

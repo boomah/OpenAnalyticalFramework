@@ -24,12 +24,10 @@ object GuiUtils {
     event.isShortcutDown || event.isShiftDown || event.isControlDown || event.isAltDown
   }
 
-  def cssFromClassName(klass:Class[_]) = {
-    val stringFormat = String.format(
-      Locale.UK,
-      "%s|%s|%s",
-      "(?<=[A-Z])(?=[A-Z][a-z])", "(?<=[^A-Z])(?=[A-Z])", "(?<=[A-Za-z])(?=[^A-Za-z])"
-    )
-    klass.getSimpleName.replaceAll(stringFormat, "-").toLowerCase
-  }
+  private val camelCaseToDashedStringFormat = String.format(
+    Locale.UK,
+    "%s|%s|%s",
+    "(?<=[A-Z])(?=[A-Z][a-z])", "(?<=[^A-Z])(?=[A-Z])", "(?<=[A-Za-z])(?=[^A-Za-z])"
+  )
+  def camelCaseToDashed(string:String) = string.replaceAll(camelCaseToDashedStringFormat, "-").toLowerCase
 }

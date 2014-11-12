@@ -16,7 +16,7 @@ class FilterButton[T](field:Field[T], tableData:Property[TableData], requestTabl
   getStyleClass.add("filter-button")
   setFocusTraversable(false)
   private val filterIcon = new FontAwesomeText(FontAwesome.Filter)
-  filterIcon.getStyleClass.add("font-awesome-" + GuiUtils.cssFromClassName(field.filter.getClass))
+  filterIcon.getStyleClass.add("font-awesome-" + GuiUtils.camelCaseToDashed(field.filter.getClass.getSimpleName))
   setGraphic(filterIcon)
   private lazy val filterButtonNodePopup = {
     val popup = new Popup

@@ -7,11 +7,13 @@ import javafx.util.Callback
 import annotation.tailrec
 import com.openaf.table.gui.OpenAFTableView.{TableColumnType, OpenAFTableCell}
 import TableCellStyle._
+import com.openaf.gui.utils.GuiUtils._
 
 class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBindings:ObservableMap[FieldID,StringBinding],
                               startRowHeaderValuesIndex:Int) extends Callback[TableColumnType,OpenAFTableCell] {
   def call(tableColumn:TableColumnType) = new OpenAFTableCell {
     private val rowHeaderTableColumn = tableColumn.asInstanceOf[OpenAFTableColumn]
+    private def addStyle(style:TableCellStyle) {getStyleClass.add(camelCaseToDashed(style.toString))}
     override def updateItem(row:OpenAFTableRow, isEmpty:Boolean) {
       super.updateItem(row, isEmpty)
       removeAllStyles(this)
@@ -19,20 +21,29 @@ class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBind
       if (isEmpty) {
         setText(null)
       } else {
-        getStyleClass.add(StandardRowHeader)
+        addStyle(StandardRowHeaderTableCell)
+        val rightTableCell = rowHeaderTableColumn.column == (row.rowHeaderValues.length - 1)
         val intValue = row.rowHeaderValues(rowHeaderTableColumn.column)
         if (intValue == TableValues.NoValueInt) {
+          if (rightTableCell) {addStyle(RightRowHeaderTableCell)}
           setText(null)
         } else if (intValue == TableValues.FieldInt) {
-          getStyleClass.add(FieldRowHeader)
+          if (rightTableCell) {
+            addStyle(RightFieldRowHeaderTableCell)
+          } else {
+            addStyle(FieldRowHeaderTableCell)
+          }
           val fieldID = values(TableValues.FieldInt).asInstanceOf[FieldID]
           Option(fieldBindings.get(fieldID)) match {
             case Some(binding) => textProperty.bind(binding)
             case None => setText(fieldID.id)
           }
         } else {
-          if (rowHeaderTableColumn.column == (row.rowHeaderValues.length - 1)) {
-            getStyleClass.add(RightRowHeader)
+          if (row.row == (getTableView.getItems.size - 1)) {
+            val style = if (rightTableCell) BottomRightRowHeaderTableCell else BottomRowHeaderTableCell
+            addStyle(style)
+          } else if (rightTableCell) {
+            addStyle(RightRowHeaderTableCell)
           }
           val shouldRender = {
             if (row.row == startRowHeaderValuesIndex) {
