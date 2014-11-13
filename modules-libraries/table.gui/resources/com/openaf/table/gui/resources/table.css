@@ -169,64 +169,71 @@
     -fx-alignment: CENTER_RIGHT;
 }
 
+.openaf-table-view .table-cell{
+    -fx-table-cell-background-color: white;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color;
+    -fx-table-cell-bottom-border-color: -fx-table-cell-border-color;
+
+    -fx-background-color: -fx-table-cell-bottom-border-color, -fx-table-cell-background-color;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-border-color: transparent -fx-table-cell-right-border-color transparent transparent;
+}
+
 /*Row Header Table Cells*/
 .openaf-table-view .standard-row-header-table-cell{
-    -fx-background-color: -fx-table-cell-border-color, -fx-table-cell-header-color;
-    -fx-background-insets: 0, 0 0 1 0;
+    -fx-table-cell-background-color: -fx-table-cell-header-color;
 }
 
 .openaf-table-view .right-row-header-table-cell{
-    -fx-background-color: -fx-table-cell-border-color, -fx-table-cell-header-color;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-border-color: transparent -fx-table-cell-border-color-highlight transparent transparent;
+    -fx-table-cell-background-color: -fx-table-cell-header-color;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .bottom-row-header-table-cell{
-    -fx-background-color: -fx-table-cell-border-color-highlight, -fx-table-cell-header-color;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-border-color: transparent -fx-table-cell-border-color-split-highlight transparent transparent;
+    -fx-table-cell-background-color: -fx-table-cell-header-color;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-split-highlight;
+    -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .bottom-right-row-header-table-cell{
-    -fx-background-color: -fx-table-cell-border-color-highlight, -fx-table-cell-header-color;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-border-color: transparent -fx-table-cell-border-color-highlight transparent transparent;
+    -fx-table-cell-background-color: -fx-table-cell-header-color;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-highlight;
+    -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .field-row-header-table-cell{
     -fx-font-weight: bold;
-    -fx-background-color: -fx-table-cell-border-color-highlight, -fx-table-cell-header-color;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-border-color: transparent -fx-table-cell-border-color-split-highlight transparent transparent;
+    -fx-table-cell-background-color: -fx-table-cell-header-color;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-split-highlight;
+    -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .right-field-row-header-table-cell{
     -fx-font-weight: bold;
-    -fx-background-color: -fx-table-cell-border-color-highlight, -fx-table-cell-header-color;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-border-color: transparent -fx-table-cell-border-color-highlight transparent transparent;
+    -fx-table-cell-background-color: -fx-table-cell-header-color;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-highlight;
+    -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
 }
 
 /*Column Header and Data Table Cells*/
 .openaf-table-view .standard-column-header-table-cell{
-    -fx-background-color: -fx-table-cell-border-color, -fx-table-cell-header-color;
-    -fx-background-insets: 0, 0 0 1 0;
+    -fx-table-cell-background-color: -fx-table-cell-header-color;
 }
 
 .openaf-table-view .right-column-header-table-cell{
-    -fx-border-color: transparent -fx-table-cell-border-color-highlight transparent transparent;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .bottom-column-header-table-cell{
-    -fx-background-color: -fx-table-cell-border-color-highlight, -fx-table-cell-header-color;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-border-color: transparent -fx-table-cell-border-color-split-highlight transparent transparent;
+    -fx-table-cell-background-color: -fx-table-cell-header-color;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-split-highlight;
+    -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .bottom-right-column-header-table-cell{
-    -fx-background-color: -fx-table-cell-border-color-highlight, -fx-table-cell-header-color;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-border-color: transparent -fx-table-cell-border-color-highlight transparent transparent;
+    -fx-table-cell-background-color: -fx-table-cell-header-color;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-highlight;
+    -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .field-column-header-table-cell{
@@ -235,36 +242,55 @@
 
 .openaf-table-view .right-field-column-header-table-cell{
     -fx-font-weight: bold;
-    -fx-background-color: -fx-table-cell-border-color, -fx-table-cell-header-color;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-border-color: transparent -fx-table-cell-border-color-highlight transparent transparent;
+    -fx-table-cell-background-color: -fx-table-cell-header-color;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .bottom-field-column-header-table-cell{
     -fx-font-weight: bold;
-    -fx-background-color: -fx-table-cell-border-color-highlight, -fx-table-cell-header-color;
-    -fx-background-insets: 0, 0 0 1 0;
+    -fx-table-cell-background-color: -fx-table-cell-header-color;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-split-highlight;
+    -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .bottom-right-field-column-header-table-cell{
     -fx-font-weight: bold;
-    -fx-background-color: -fx-table-cell-border-color-highlight, -fx-table-cell-header-color;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-border-color: transparent -fx-table-cell-border-color-highlight transparent transparent;
+    -fx-table-cell-background-color: -fx-table-cell-header-color;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-highlight;
+    -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .right-data-table-cell{
-    -fx-border-color: transparent -fx-table-cell-border-color-highlight transparent transparent;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .bottom-data-table-cell{
-    -fx-background-color: -fx-table-cell-border-color-highlight, white;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-border-color: transparent -fx-table-cell-border-color-split-highlight transparent transparent;
+    -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-split-highlight;
 }
 
 .openaf-table-view .bottom-right-data-table-cell{
-    -fx-background-color: -fx-table-cell-border-color-highlight, white;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-border-color: transparent -fx-table-cell-border-color-highlight transparent transparent;
+    -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
+    -fx-table-cell-right-border-color: -fx-table-cell-border-color-highlight;
+}
+
+/*Selected and focused table cells*/
+.openaf-table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected,
+.openaf-table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected{
+    -fx-table-cell-background-color: -fx-selection-bar;
+    -fx-table-cell-right-border-color: derive(-fx-selection-bar, 20%);
+    -fx-table-cell-bottom-border-color: derive(-fx-selection-bar, 20%);
+}
+
+.openaf-table-view .table-row-cell:filled:selected,
+.openaf-table-view .table-row-cell:filled > .table-cell:selected{
+    -fx-table-cell-background-color: -fx-selection-bar-non-focused;
+    -fx-table-cell-right-border-color: derive(-fx-selection-bar-non-focused, 20%);
+    -fx-table-cell-bottom-border-color: derive(-fx-selection-bar-non-focused, 20%);
+}
+
+.openaf-table-view:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell:focused,
+.openaf-table-view:focused:cell-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .table-cell:focused{
+    -fx-background-color: -fx-table-cell-background-color, -fx-cell-focus-inner-border, -fx-table-cell-background-color;
+    -fx-background-insets: 0, 1, 2;
 }
