@@ -1,18 +1,27 @@
 .drop-target-node{
-    /*-fx-background-color: #CCFF99AA;*/
-    -fx-background-color: red;
+    -fx-background-color: rgb(0,255,0);
 }
 
 #closest-drop-target-node{
-    -fx-background-color: #87ceebAA;
+    -fx-background-color: rgb(0,0,255);
 }
 
 .drag-and-drop-container-node{
     -fx-background-color: rgb(190,214,248);
-    -fx-padding: 1;
+    -fx-padding: 2;
 }
 .drag-and-drop-container-node .description-label{
-    -fx-padding: 3 5 3 5;
+    -fx-padding: 4;
+}
+
+.drag-and-drop-container-node .main-content{
+    -fx-hgap: 2;
+    -fx-vgap: 2;
+}
+
+.drag-and-drop-container-node .column-header-layout-node,
+.drag-and-drop-container-node .column-header-tree-node{
+    -fx-spacing: 2;
 }
 
 #config-area-empty{
@@ -43,25 +52,30 @@
 }
 
 .field-node{
-    -fx-background-color:
-        #3c7fb1,
-        linear-gradient(#fafdfe, #e8f5fc),
-        linear-gradient(#eaf6fd 0%, #d9f0fc 49%, #bee6fd 50%, #a7d9f5 100%);
-    -fx-background-insets: 0,1,2;
-    -fx-background-radius: 3,2,1;
-    -fx-padding: 3 5 3 5;
+    -fx-field-node-background-color: rgb(220,230,241);
+    -fx-field-node-border-color: rgb(149,179,215);
+    -fx-background-color: -fx-field-node-border-color, -fx-field-node-background-color;
+    -fx-background-insets: 0,1;
+    -fx-background-radius: 3,3;
+    -fx-padding: 3;
     -fx-text-fill: black;
 }
 
-.field-node:hover{
-    -fx-background-color:
-        blue,
-        linear-gradient(#fafdfe, #e8f5fc),
-        linear-gradient(#eaf6fd 0%, #d9f0fc 49%, #bee6fd 50%, #a7d9f5 100%);
+.field-node-measure{
+    -fx-field-node-background-color: rgb(188,218,203);
 }
 
-.field-node .filter-button {
-    -fx-padding: 3;
+.field-node-measure:hover,
+.field-node-dimension:hover{
+    -fx-field-node-border-color: derive(rgb(149,179,215), -30%);
+}
+
+.field-node .name-label{
+    -fx-padding: 1 2 1 2;
+}
+
+.field-node .filter-button{
+    -fx-padding: 4 3 3 3;
     -fx-font-size: 1;
     -fx-content-display: CENTER;
     -fx-graphic-text-gap: 0;
@@ -69,7 +83,7 @@
 }
 
 .field-node .filter-button .font-awesome{
-    -fx-font-size: 10;
+    -fx-font-size: 14;
     -fx-fill: grey;
 }
 
@@ -78,11 +92,11 @@
 }
 
 .field-node .filter-button .font-awesome-retain-filter{
-    -fx-fill: green;
+    -fx-fill: rgb(0,200,0);
 }
 
 .field-node .filter-button .font-awesome-reject-filter{
-    -fx-fill: green;
+    -fx-fill: rgb(0,200,0);
 }
 
 .filter-button-node{

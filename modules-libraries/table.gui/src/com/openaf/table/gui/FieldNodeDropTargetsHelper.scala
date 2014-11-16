@@ -26,7 +26,7 @@ class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dragAndDropContainer:DragA
     val moveTopDropTargetNode = showTopDropTargetNode && (outerNode match {
       case outerColumnAreaTreeNode:ColumnHeaderTreeNode => {
         val indexInOuterColumnAreaTreeNode = outerColumnAreaTreeNode.getChildren.indexOf(parentColumnHeaderLayoutNode)
-        val bottomInTree = (indexInOuterColumnAreaTreeNode == 1)
+        val bottomInTree = indexInOuterColumnAreaTreeNode == 1
         bottomInTree && (outerColumnAreaTreeNode.topFieldNodes.size == 1) && (parentColumnHeaderLayoutNode.childColumnAreaTreeNodes.size == 1)
       }
       case _ => false
@@ -45,20 +45,20 @@ class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dragAndDropContainer:DragA
       true
     } else {
       val columnHeaderTreeNodeToTheLeft = siblingColumnAreaTreeNodes(indexInSiblings - 1)
-      val onlyOneFieldToTheLeft = (columnHeaderTreeNodeToTheLeft.columnHeaderTree.allFields.size == 1)
+      val onlyOneFieldToTheLeft = columnHeaderTreeNodeToTheLeft.columnHeaderTree.allFields.size == 1
       if (onlyOneFieldToTheLeft) {
-        (columnHeaderTreeNodeToTheLeft.topFieldNodeOption.get != draggableFieldsInfo.draggable)
+        columnHeaderTreeNodeToTheLeft.topFieldNodeOption.get != draggableFieldsInfo.draggable
       } else {
         true
       }
     }
-    val fieldIsAlone = (parentColumnAreaTreeNode.columnHeaderTree.allFields.size == 1)
+    val fieldIsAlone = parentColumnAreaTreeNode.columnHeaderTree.allFields.size == 1
     val moveLeftDropTargetNode = showLeftDropTargetNode && fieldIsAlone && {
       if (indexInSiblings == 0) {
         false
       } else {
         val columnHeaderTreeNodeToTheLeft = siblingColumnAreaTreeNodes(indexInSiblings - 1)
-        val onlyOneFieldToTheLeft = (columnHeaderTreeNodeToTheLeft.columnHeaderTree.allFields.size == 1)
+        val onlyOneFieldToTheLeft = columnHeaderTreeNodeToTheLeft.columnHeaderTree.allFields.size == 1
         onlyOneFieldToTheLeft
       }
     }
@@ -67,7 +67,7 @@ class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dragAndDropContainer:DragA
         true
       } else {
         val columnHeaderTreeNodeToTheRight = siblingColumnAreaTreeNodes(indexInSiblings + 1)
-        val multipleFieldsToTheRight = (columnHeaderTreeNodeToTheRight.columnHeaderTree.allFields.size > 1)
+        val multipleFieldsToTheRight = columnHeaderTreeNodeToTheRight.columnHeaderTree.allFields.size > 1
         multipleFieldsToTheRight
       }
     }
@@ -76,11 +76,13 @@ class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dragAndDropContainer:DragA
     val fieldNodeSceneBounds = fieldNode.localToScene(fieldNode.getBoundsInLocal)
     val boundsForDropTarget = dropTargetPane.sceneToLocal(fieldNodeSceneBounds)
 
+    val yInset = 3
+
     val topDropTargetElementOption = if (showTopDropTargetNode) {
       val topDropTargetNode = new DropTargetNode(dragAndDropContainer)
-      val yDelta = -(topDropTargetNode.prefWidth(0) / 2)
+      val yDelta = -((DropTargetNode.Size + fieldNode.getParent.asInstanceOf[ColumnHeaderTreeNode].getSpacing) / 2)
       val topX = boundsForDropTarget.getMinX + ((fieldNodeWidth / 2) - (topDropTargetNode.prefWidth(0) / 2))
-      val topY = boundsForDropTarget.getMinY + (if (moveTopDropTargetNode) yDelta else (fieldNodeHeight / 4))
+      val topY = boundsForDropTarget.getMinY + (if (moveTopDropTargetNode) yDelta else yInset)
       topDropTargetNode.setLayoutX(topX)
       topDropTargetNode.setLayoutY(topY)
       Some(topDropTargetNode -> NodeSide(fieldNode, Side.TOP))
@@ -91,7 +93,7 @@ class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dragAndDropContainer:DragA
     val bottomDropTargetElementOption = if (showBottomDropTargetNode ) {
       val bottomDropTargetNode = new DropTargetNode(dragAndDropContainer)
       val bottomX = boundsForDropTarget.getMinX + ((fieldNodeWidth / 2) - (bottomDropTargetNode.prefWidth(0) / 2))
-      val bottomY = boundsForDropTarget.getMinY + (((fieldNodeHeight / 4) * 3) - bottomDropTargetNode.prefHeight(0))
+      val bottomY = boundsForDropTarget.getMinY + fieldNodeHeight - bottomDropTargetNode.prefHeight(0) - yInset
       bottomDropTargetNode.setLayoutX(bottomX)
       bottomDropTargetNode.setLayoutY(bottomY)
       Some(bottomDropTargetNode -> NodeSide(fieldNode, Side.BOTTOM))
@@ -101,8 +103,8 @@ class FieldNodeDropTargetsHelper(dropTargetPane:Pane, dragAndDropContainer:DragA
 
     val leftDropTargetElementOption = if (showLeftDropTargetNode) {
       val leftDropTargetNode = new DropTargetNode(dragAndDropContainer)
-      val xDelta = -(leftDropTargetNode.prefWidth(0) / 2)
-      val leftX = boundsForDropTarget.getMinX + (if (moveLeftDropTargetNode) xDelta else (fieldNodeWidth / 4))
+      val xDelta = -((DropTargetNode.Size + fieldNode.getParent.asInstanceOf[ColumnHeaderTreeNode].getSpacing) / 2)
+      val leftX = boundsForDropTarget.getMinX + (if (moveLeftDropTargetNode) xDelta else fieldNodeWidth / 4)
       val leftY = boundsForDropTarget.getMinY + ((fieldNodeHeight / 2) - (leftDropTargetNode.prefHeight(0) / 2))
       leftDropTargetNode.setLayoutX(leftX)
       leftDropTargetNode.setLayoutY(leftY)

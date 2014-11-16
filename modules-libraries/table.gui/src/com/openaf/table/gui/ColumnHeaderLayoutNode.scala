@@ -15,6 +15,7 @@ class ColumnHeaderLayoutNode(columnHeaderLayout:ColumnHeaderLayout, tableDataPro
                              requestTableStateProperty:Property[TableState], dragAndDrop:DragAndDrop,
                              dragAndDropContainer:DragAndDropContainer,
                              fieldBindings:ObservableMap[FieldID,StringBinding], locale:Property[Locale]) extends HBox {
+  getStyleClass.add("column-header-layout-node")
   private val columnHeaderTreeNodes = columnHeaderLayout.columnHeaderTrees.map(columnHeaderTree => {
     val columnHeaderTreeNode = new ColumnHeaderTreeNode(columnHeaderTree, tableDataProperty, requestTableStateProperty,
       dragAndDrop, dragAndDropContainer, fieldBindings, locale)

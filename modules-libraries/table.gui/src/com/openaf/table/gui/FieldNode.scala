@@ -8,7 +8,7 @@ import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
 import javafx.scene.SnapshotParameters
 import javafx.scene.paint.Color
-import javafx.geometry.{Insets, Pos}
+import javafx.geometry.Pos
 import java.util.Locale
 import javafx.event.EventHandler
 import javafx.scene.input.{MouseButton, MouseEvent}
@@ -31,12 +31,15 @@ class FieldNode[T](val field:Field[T], val dragAndDrop:DragAndDrop, val dragAndD
     }
     label
   }
+  nameLabel.getStyleClass.add("name-label")
   getChildren.add(nameLabel)
 
   if (field.fieldType.isDimension) {
+    getStyleClass.add("field-node-dimension")
     val filterButton = new FilterButton[T](field, tableData, requestTableStateProperty, locale)
-    HBox.setMargin(filterButton, new Insets(0,0,0,3))
     getChildren.add(filterButton)
+  } else {
+    getStyleClass.add("field-node-measure")
   }
 
   private lazy val contextMenu = new FieldNodeContextMenu[T](field, requestTableStateProperty, locale)

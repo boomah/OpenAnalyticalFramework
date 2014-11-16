@@ -14,6 +14,7 @@ class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataPrope
                            requestTableStateProperty:Property[TableState], dragAndDrop:DragAndDrop,
                            dragAndDropContainer:DragAndDropContainer,
                            fieldBindings:ObservableMap[FieldID,StringBinding], locale:Property[Locale]) extends VBox {
+  getStyleClass.add("column-header-tree-node")
   private val topNode = columnHeaderTree.columnHeaderTreeType match {
     case Left(field) => new FieldNode(field, dragAndDrop, dragAndDropContainer, tableDataProperty,
       requestTableStateProperty, fieldBindings, locale)

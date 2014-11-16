@@ -28,7 +28,7 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
         if (currentDraggable == draggableFieldsInfo.draggable) {
           Nil
         } else {
-          val xDelta = if (i == (currentChildren.length - 1)) 1 else 2
+          val xDelta = if (i == (currentChildren.length - 1)) DropTargetNode.Size else (DropTargetNode.Size - mainContent.getHgap) / 2
           if (i == 0) {
             val leftDropTarget = new DropTargetNode(this)
             leftDropTarget.layoutYProperty.bind(currentDraggable.heightProperty.divide(2).subtract(leftDropTarget.heightProperty.divide(2)))
@@ -40,7 +40,7 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
                 val rightDropTarget = new DropTargetNode(this)
                 rightDropTarget.layoutYProperty.bind(currentDraggable.heightProperty.divide(2).subtract(rightDropTarget.heightProperty.divide(2)))
                 rightDropTarget.layoutXProperty.bind(currentDraggable.layoutXProperty
-                  .add(currentDraggable.layoutBoundsProperty.get.getWidth).subtract(rightDropTarget.widthProperty.divide(xDelta)))
+                  .add(currentDraggable.layoutBoundsProperty.get.getWidth).subtract(xDelta))
                 List(leftDropTargetEntry, rightDropTarget -> NodeSide(currentDraggable, Side.RIGHT))
               }
             }
@@ -51,7 +51,7 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
                 val rightDropTarget = new DropTargetNode(this)
                 rightDropTarget.layoutYProperty.bind(currentDraggable.heightProperty.divide(2).subtract(rightDropTarget.heightProperty.divide(2)))
                 rightDropTarget.layoutXProperty.bind(currentDraggable.layoutXProperty
-                  .add(currentDraggable.layoutBoundsProperty.get.getWidth).subtract(rightDropTarget.widthProperty.divide(xDelta)))
+                  .add(currentDraggable.layoutBoundsProperty.get.getWidth).subtract(xDelta))
                 List(rightDropTarget -> NodeSide(currentDraggable, Side.RIGHT))
               }
             }

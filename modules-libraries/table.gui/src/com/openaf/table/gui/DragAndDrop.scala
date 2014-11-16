@@ -261,6 +261,7 @@ trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
   descriptionLabel.textProperty.bind(new TableLocaleStringBinding(descriptionID, locale))
 
   protected val mainContent = new FlowPane
+  mainContent.getStyleClass.add("main-content")
   protected val dropTargetPane = new Pane
   dropTargetPane.setMouseTransparent(true)
   getChildren.addAll(mainContent, dropTargetPane)

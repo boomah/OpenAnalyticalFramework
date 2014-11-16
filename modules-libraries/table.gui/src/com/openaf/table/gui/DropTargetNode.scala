@@ -9,12 +9,12 @@ class DropTargetNode(dragAndDropContainer:DragAndDropContainer) extends FlowPane
     dragAndDropContainer.childFieldsDropped(this, draggableFieldsInfo, tableState)
   }
   getStyleClass.add("drop-target-node")
-  setPrefWidth(DropTargetNode.size)
-  setPrefHeight(DropTargetNode.size)
+  setPrefWidth(DropTargetNode.Size)
+  setPrefHeight(DropTargetNode.Size)
 }
 
 object DropTargetNode {
-  val size = 3
+  val Size = 7
 
   def createDropTargetNodesForLabel(label:Label, dragAndDropContainer:DragAndDropContainer) = {
     val dropTarget1 = new DropTargetNode(dragAndDropContainer)
