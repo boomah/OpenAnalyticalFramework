@@ -56,7 +56,7 @@
     -fx-field-node-border-color: rgb(149,179,215);
     -fx-background-color: -fx-field-node-border-color, -fx-field-node-background-color;
     -fx-background-insets: 0,1;
-    -fx-background-radius: 3,3;
+    -fx-background-radius: 3,2;
     -fx-padding: 3;
     -fx-text-fill: black;
 }
