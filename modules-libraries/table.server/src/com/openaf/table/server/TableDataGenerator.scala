@@ -4,12 +4,21 @@ import com.openaf.table.lib.api._
 import com.openaf.table.server.datasources.{IntArrayWrapperKey, TableDataSource}
 import java.util.Comparator
 import java.util
+import TableValues._
 
 object TableDataGenerator {
   // This is far from idiomatic Scala. Written this way for speed.
   def tableData(tableStateNoKeys:TableState, tableDataSource:TableDataSource) = {
     val tableState = tableStateNoKeys.generateFieldKeys
     val result = tableDataSource.result(tableState)
+
+    if (!result.resultState.filterState.isFiltered) {
+      // TODO - filter here
+    }
+
+    if (!result.resultState.totalsState.totalsAdded) {
+      // TODO - add totals here
+    }
 
     if (!result.resultState.sortState.filtersSorted) {
       val filterFieldIDs = tableState.tableLayout.filterFieldIDs
@@ -201,18 +210,24 @@ class TableDataGeneratorComparator(fields:Array[Field[_]], fieldDefinitions:Arra
       value1 = array1(counter)
       value2 = array2(counter)
       result = if (value1 != value2) {
-        val fieldDefinition = fieldDefinitions(counter)
-        lookUp = lookUps(counter)
-        if (fields(counter).sortOrder == SortOrder.Ascending) {
-          fieldDefinition.ordering.compare(
-            lookUp(value1).asInstanceOf[fieldDefinition.V],
-            lookUp(value2).asInstanceOf[fieldDefinition.V]
-          )
+        if (value1 == TotalTopInt || value2 == TotalBottomInt) {
+          -1
+        } else if (value2 == TotalTopInt || value1 == TotalBottomInt) {
+          1
         } else {
-          fieldDefinition.ordering.compare(
-            lookUp(value2).asInstanceOf[fieldDefinition.V],
-            lookUp(value1).asInstanceOf[fieldDefinition.V]
-          )
+          val fieldDefinition = fieldDefinitions(counter)
+          lookUp = lookUps(counter)
+          if (fields(counter).sortOrder == SortOrder.Ascending) {
+            fieldDefinition.ordering.compare(
+              lookUp(value1).asInstanceOf[fieldDefinition.V],
+              lookUp(value2).asInstanceOf[fieldDefinition.V]
+            )
+          } else {
+            fieldDefinition.ordering.compare(
+              lookUp(value2).asInstanceOf[fieldDefinition.V],
+              lookUp(value1).asInstanceOf[fieldDefinition.V]
+            )
+          }
         }
       } else {
         0

@@ -8,6 +8,7 @@ object TableCellStyle extends Enumeration {
 
   val StandardRowHeaderTableCell, RightRowHeaderTableCell, BottomRowHeaderTableCell, BottomRightRowHeaderTableCell = Value
   val FieldRowHeaderTableCell, RightFieldRowHeaderTableCell = Value
+  val TotalRowHeaderTableCell = Value
 
   val StandardColumnHeaderTableCell, RightColumnHeaderTableCell, BottomColumnHeaderTableCell, BottomRightColumnHeaderTableCell = Value
   val FieldColumnHeaderTableCell, RightFieldColumnHeaderTableCell, BottomFieldColumnHeaderTableCell, BottomRightFieldColumnHeaderTableCell = Value

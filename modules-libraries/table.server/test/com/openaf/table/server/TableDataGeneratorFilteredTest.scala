@@ -1,4 +1,4 @@
-package com.openaf.table.server.datasources
+package com.openaf.table.server
 
 import org.scalatest.FunSuite
 import com.openaf.table.lib.api.{FilterFieldKey, RowHeaderFieldKey, TableState}

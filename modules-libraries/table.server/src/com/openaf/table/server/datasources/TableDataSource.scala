@@ -33,16 +33,22 @@ object Result {
 
 case class PathData(colHeaderValues:Array[Array[Int]], data:Map[IntArrayWrapperKey,Any])
 
-case class ResultState(filterState:FilterState, sortState:SortState)
+case class ResultState(filterState:FilterState, totalsState:TotalsState, sortState:SortState)
 
 object ResultState {
-  val Default = ResultState(FilterState.Default, SortState.Default)
+  val Default = ResultState(FilterState.Default, TotalsState.Default, SortState.Default)
 }
 
 case class FilterState(isFiltered:Boolean)
 
 object FilterState {
-  val Default = FilterState(isFiltered=false)
+  val Default = FilterState(isFiltered = false)
+}
+
+case class TotalsState(totalsAdded:Boolean)
+
+object TotalsState {
+  val Default = TotalsState(totalsAdded = true)
 }
 
 case class SortState(filtersSorted:Boolean, rowHeadersSorted:Boolean, pathDataSorted:Array[Boolean])

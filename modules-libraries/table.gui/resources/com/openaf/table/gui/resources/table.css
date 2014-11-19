@@ -187,6 +187,7 @@
     -fx-table-cell-background-color: white;
     -fx-table-cell-right-border-color: -fx-table-cell-border-color;
     -fx-table-cell-bottom-border-color: -fx-table-cell-border-color;
+    -fx-table-cell-total-color: rgb(188,218,203);
 
     -fx-background-color: -fx-table-cell-bottom-border-color, -fx-table-cell-background-color;
     -fx-background-insets: 0, 0 0 1 0;
@@ -286,6 +287,11 @@
 .openaf-table-view .bottom-right-data-table-cell{
     -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
     -fx-table-cell-right-border-color: -fx-table-cell-border-color-highlight;
+}
+
+/*Totals*/
+.openaf-table-view .total-row-header-table-cell{
+    -fx-table-cell-background-color: -fx-table-cell-total-color;
 }
 
 /*Selected and focused table cells*/

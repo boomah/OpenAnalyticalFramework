@@ -7,11 +7,13 @@ import javafx.embed.swing.JFXPanel
 import GUITestData._
 import javafx.collections.FXCollections
 import javafx.beans.binding.StringBinding
+import java.util.Locale
 
 class OpenAFTableViewTest extends FunSuite {
   javax.swing.SwingUtilities.invokeAndWait(new Runnable {def run() {new JFXPanel()}})
   val tableDataProperty = new SimpleObjectProperty[TableData]
-  val tableView = new OpenAFTableView(tableDataProperty, FXCollections.emptyObservableMap[FieldID,StringBinding])
+  val locale = new SimpleObjectProperty[Locale](Locale.getDefault)
+  val tableView = new OpenAFTableView(tableDataProperty, FXCollections.emptyObservableMap[FieldID,StringBinding], locale)
 
   test("1 column") {
     val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout(GenderField))

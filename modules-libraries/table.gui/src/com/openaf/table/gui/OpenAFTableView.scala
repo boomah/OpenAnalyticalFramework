@@ -9,6 +9,7 @@ import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
 import javafx.beans.binding.StringBinding
 import java.util
+import java.util.Locale
 
 object OpenAFTableView {
   type TableColumnType = TableColumn[OpenAFTableRow,OpenAFTableRow]
@@ -16,8 +17,8 @@ object OpenAFTableView {
 }
 import OpenAFTableView._
 
-class OpenAFTableView(tableDataProperty:Property[TableData],
-                      fieldBindings:ObservableMap[FieldID,StringBinding]) extends TableView[OpenAFTableRow] {
+class OpenAFTableView(tableDataProperty:Property[TableData], fieldBindings:ObservableMap[FieldID,StringBinding],
+                      locale:Property[Locale]) extends TableView[OpenAFTableRow] {
   getStyleClass.add("openaf-table-view")
   getSelectionModel.setCellSelectionEnabled(true)
   getSelectionModel.setSelectionMode(SelectionMode.MULTIPLE)
@@ -82,7 +83,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData],
       tableColumn.setSortable(false)
       tableColumn.setCellValueFactory(new CellValueFactory)
       tableColumn.setCellFactory(new RowHeaderCellFactory(valueLookUp(field.id), tableData.defaultRenderers(field.id),
-        fieldBindings, startRowHeaderValuesIndex))
+        fieldBindings, startRowHeaderValuesIndex, locale))
       columns.add(tableColumn)
 
       rowHeaderFieldCounter += 1

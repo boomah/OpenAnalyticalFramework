@@ -1,7 +1,8 @@
 package com.openaf.table.server.datasources
 
-import com.openaf.table.lib.api.{FieldValues, Field, FieldID, TableState}
+import com.openaf.table.lib.api._
 import com.openaf.table.lib.api.StandardFields._
+import com.openaf.table.lib.api.TableValues._
 import com.openaf.table.server.{FieldDefinition, FieldDefinitionGroups, NullFieldDefinition}
 import java.util.{HashMap => JMap}
 import scala.collection.{mutable, JavaConversions}
@@ -60,6 +61,7 @@ object RawRowBasedTableDataSource {
 
     val columnHeaderMeasureFieldPositions = columnHeaderPaths.map(_.measureFieldIndex).toArray
     val columnHeaderPathsMeasureOptions = columnHeaderPaths.map(_.measureFieldOption)
+    val countFieldPosition = -2
     val measureFieldPositions = columnHeaderPathsMeasureOptions.map{
       case Some(field) => {
         val index = fieldIDs.indexOf(field.id)
@@ -67,7 +69,7 @@ object RawRowBasedTableDataSource {
           index
         } else {
           field.id match {
-            case CountField.id => -2
+            case CountField.id => countFieldPosition
             case _ => -1
           }
         }
@@ -111,6 +113,10 @@ object RawRowBasedTableDataSource {
     var columnHeaderFields:Array[Field[_]] = null
     var columnHeaderFieldDefinitions:Array[FieldDefinition] = null
 
+    val rowTotals = new mutable.ArrayBuffer[IntArrayWrapper](numRowHeaderCols * 2)
+    var rowTotalsCounter = 0
+    var numRowTotals = 0
+
     while (dataCounter < dataLength) {
       dataRow = data(dataCounter)
       matchesFilter = true
@@ -136,6 +142,7 @@ object RawRowBasedTableDataSource {
       filterCounter = 0
 
       rowHeaderValues = new Array[Int](numRowHeaderCols)
+      rowTotals.clear()
       while (matchesFilter && rowHeaderCounter < numRowHeaderCols) {
         value = dataRow(rowHeaderFieldPositions(rowHeaderCounter))
         val fieldDefinition = rowHeaderFieldDefinitions(rowHeaderCounter)
@@ -154,11 +161,22 @@ object RawRowBasedTableDataSource {
           rowHeaderValues(rowHeaderCounter) = intForValue
           fieldValuesBitSets(field) += intForValue
         }
+
+        // Don't add totals for the last row header field
+        if (rowHeaderCounter < (numRowHeaderCols - 1)) {
+          if (field.totals.top) {
+            rowTotals += new IntArrayWrapper(generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalTopInt))
+          }
+          if (field.totals.bottom) {
+            rowTotals += new IntArrayWrapper(generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalBottomInt))
+          }
+        }
         rowHeaderCounter += 1
       }
       rowHeaderCounter = 0
       if (matchesFilter) {
         rowHeaders += new IntArrayWrapper(rowHeaderValues)
+        rowHeaders ++= rowTotals
       }
 
       while (matchesFilter && pathsCounter < numPaths) {
@@ -199,11 +217,18 @@ object RawRowBasedTableDataSource {
 
           measureFieldPosition = measureFieldPositions(pathsCounter)
           // If there isn't a measure field there is no need to update the aggregated data
-          if (measureFieldPosition >= 0) {
-            value = dataRow(measureFieldPosition)
-            key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
-            currentValue = aggregatedData.get(key)
+          if (measureFieldPosition != -1) {
             val fieldDefinition = measureFieldDefinitions(pathsCounter)
+            if (measureFieldPosition >= 0) {
+              value = dataRow(measureFieldPosition)
+              key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
+            } else if (measureFieldPosition == countFieldPosition) {
+              // Count field
+              value = 1
+              key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
+            }
+
+            currentValue = aggregatedData.get(key)
             if (currentValue == null) {
               newDataValue = fieldDefinition.combiner.combine(
                 fieldDefinition.combiner.initialCombinedValue,
@@ -216,24 +241,26 @@ object RawRowBasedTableDataSource {
               )
             }
             aggregatedData.put(key, newDataValue)
-          } else if (measureFieldPosition == -2) {
-            // Count field
-            value = 1
-            key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
-            currentValue = aggregatedData.get(key)
-            val fieldDefinition = measureFieldDefinitions(pathsCounter)
-            if (currentValue == null) {
-              newDataValue = fieldDefinition.combiner.combine(
-                fieldDefinition.combiner.initialCombinedValue,
-                value.asInstanceOf[fieldDefinition.V]
-              )
-            } else {
-              newDataValue = fieldDefinition.combiner.combine(
-                currentValue.asInstanceOf[fieldDefinition.C],
-                value.asInstanceOf[fieldDefinition.V]
-              )
+
+            rowTotalsCounter = 0
+            numRowTotals = rowTotals.size
+            while (rowTotalsCounter < numRowTotals) {
+              key = new IntArrayWrapperKey(rowTotals(rowTotalsCounter).array, colHeaderValues)
+              currentValue = aggregatedData.get(key)
+              if (currentValue == null) {
+                newDataValue = fieldDefinition.combiner.combine(
+                  fieldDefinition.combiner.initialCombinedValue,
+                  value.asInstanceOf[fieldDefinition.V]
+                )
+              } else {
+                newDataValue = fieldDefinition.combiner.combine(
+                  currentValue.asInstanceOf[fieldDefinition.C],
+                  value.asInstanceOf[fieldDefinition.V]
+                )
+              }
+              aggregatedData.put(key, newDataValue)
+              rowTotalsCounter += 1
             }
-            aggregatedData.put(key, newDataValue)
           }
         }
         matchesFilter = true
@@ -279,7 +306,25 @@ object RawRowBasedTableDataSource {
       pathsCounter += 1
     }
     val fieldValues = FieldValues(fieldValuesBitSets.map{case (field,bitSet) => field -> bitSet.toArray}.toMap)
-    val resultDetails = ResultState(FilterState(isFiltered=true), SortState.allUnsorted(pathData.length))
+    val resultDetails = ResultState(
+      FilterState(isFiltered = true),
+      TotalsState(totalsAdded = true),
+      SortState.allUnsorted(pathData.length)
+    )
     Result(rowHeadersToUse, pathData, fieldValues, valueLookUp, resultDetails)
+  }
+
+  @inline private def generateTotalArray(array:Array[Int], upTo:Int, totalInt:Int) = {
+    val totalsArray = new Array[Int](array.length)
+    var totalsCounter = 0
+    while (totalsCounter <= upTo) {
+      totalsArray(totalsCounter) = array(totalsCounter)
+      totalsCounter += 1
+    }
+    while (totalsCounter < totalsArray.length) {
+      totalsArray(totalsCounter) = totalInt
+      totalsCounter += 1
+    }
+    totalsArray
   }
 }

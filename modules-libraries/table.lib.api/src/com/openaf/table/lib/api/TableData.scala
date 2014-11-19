@@ -26,6 +26,8 @@ object TableValues {
 
   val FieldInt = 0
   val NoValueInt = -1
+  val TotalTopInt = -2
+  val TotalBottomInt = -3
 }
 
 case class FieldValues(values:Map[Field[_],Array[Int]])

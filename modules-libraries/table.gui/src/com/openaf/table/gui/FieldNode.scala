@@ -14,7 +14,7 @@ import javafx.event.EventHandler
 import javafx.scene.input.{MouseButton, MouseEvent}
 
 class FieldNode[T](val field:Field[T], val dragAndDrop:DragAndDrop, val dragAndDropContainer:DragAndDropContainer,
-                   tableData:Property[TableData], val requestTableStateProperty:Property[TableState],
+                   tableDataProperty:Property[TableData], val requestTableStateProperty:Property[TableState],
                    fieldBindings:ObservableMap[FieldID,StringBinding], locale:Property[Locale])
   extends HBox with Draggable {
   getStyleClass.add("field-node")
@@ -36,7 +36,7 @@ class FieldNode[T](val field:Field[T], val dragAndDrop:DragAndDrop, val dragAndD
 
   if (field.fieldType.isDimension) {
     getStyleClass.add("field-node-dimension")
-    val filterButton = new FilterButton[T](field, tableData, requestTableStateProperty, locale)
+    val filterButton = new FilterButton[T](field, tableDataProperty, requestTableStateProperty, locale)
     getChildren.add(filterButton)
   } else {
     getStyleClass.add("field-node-measure")
