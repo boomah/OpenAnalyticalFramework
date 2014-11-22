@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import com.openaf.table.lib.api.{TableState, Field}
+import com.openaf.table.lib.api._
 import javafx.beans.property.Property
 import javafx.scene.control._
 import java.util.Locale
@@ -26,7 +26,6 @@ class FieldNodeContextMenu[T](field:Field[T], requestTableStateProperty:Property
   }
   
   if (field.fieldType.isDimension) {
-    getItems.add(new SeparatorMenuItem)
     val reverseSortOrderMenuItem = new MenuItem
     reverseSortOrderMenuItem.textProperty.bind(stringBinding("reverseSortOrder"))
     reverseSortOrderMenuItem.setOnAction(new EventHandler[ActionEvent] {
@@ -35,10 +34,8 @@ class FieldNodeContextMenu[T](field:Field[T], requestTableStateProperty:Property
         requestTableStateProperty.setValue(newTableState)
       }
     })
-    getItems.add(reverseSortOrderMenuItem)
+    getItems.addAll(new SeparatorMenuItem, reverseSortOrderMenuItem)
 
-    val totalsMenu = new Menu
-    totalsMenu.textProperty.bind(stringBinding("totals"))
     val topTotalMenuItem = new CheckMenuItem
     topTotalMenuItem.textProperty.bind(stringBinding("topTotal"))
     topTotalMenuItem.selectedProperty.set(field.totals.top)
@@ -60,8 +57,27 @@ class FieldNodeContextMenu[T](field:Field[T], requestTableStateProperty:Property
         requestTableStateProperty.setValue(newTableState)
       }
     })
+    getItems.addAll(new SeparatorMenuItem, topTotalMenuItem, bottomTotalMenuItem)
 
-    totalsMenu.getItems.addAll(topTotalMenuItem, bottomTotalMenuItem)
-    getItems.add(totalsMenu)
+    val expandAllMenuItem = new MenuItem
+    expandAllMenuItem.textProperty.bind(stringBinding("expandAll"))
+    expandAllMenuItem.setOnAction(new EventHandler[ActionEvent] {
+      def handle(event:ActionEvent) {
+        val newTotals = field.totals.copy(collapsedState = AllExpanded())
+        val newTableState = requestTableStateProperty.getValue.replaceField(field, field.withTotals(newTotals))
+        requestTableStateProperty.setValue(newTableState)
+      }
+    })
+
+    val collapseAllMenuItem = new MenuItem
+    collapseAllMenuItem.textProperty.bind(stringBinding("collapseAll"))
+    collapseAllMenuItem.setOnAction(new EventHandler[ActionEvent] {
+      def handle(event:ActionEvent) {
+        val newTotals = field.totals.copy(collapsedState = AllCollapsed())
+        val newTableState = requestTableStateProperty.getValue.replaceField(field, field.withTotals(newTotals))
+        requestTableStateProperty.setValue(newTableState)
+      }
+    })
+    getItems.addAll(new SeparatorMenuItem, expandAllMenuItem, collapseAllMenuItem)
   }
 }

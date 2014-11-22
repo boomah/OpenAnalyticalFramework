@@ -117,9 +117,18 @@ object RawRowBasedTableDataSource {
     var rowTotalsCounter = 0
     var numRowTotals = 0
 
+    def generateCollapsedState(field:Field[_], fieldIndex:Int) = {
+      new RawRowBasedTableDataSourceCollapsedState(field, fieldIndex, rowHeadersLookUp, rowHeadersValueCounter, fieldsValueCounter)
+    }
+    val rowHeaderCollapsedStates = rowHeaderFields.zipWithIndex.map{case (field,fieldIndex) => {
+      generateCollapsedState(field, fieldIndex)
+    }}
+    var rowHeaderCollapsed = false
+
     while (dataCounter < dataLength) {
       dataRow = data(dataCounter)
       matchesFilter = true
+      rowHeaderCollapsed = false
 
       while (matchesFilter && filterCounter < numFilterCols) {
         value = dataRow(filterFieldPositions(filterCounter))
@@ -164,18 +173,25 @@ object RawRowBasedTableDataSource {
 
         // Don't add totals for the last row header field
         if (rowHeaderCounter < (numRowHeaderCols - 1)) {
-          if (field.totals.top) {
+          if (rowHeaderCollapsedStates(rowHeaderCounter).collapsed(rowHeaderValues)) {
+            rowHeaderCollapsed = true
             rowTotals += new IntArrayWrapper(generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalTopInt))
-          }
-          if (field.totals.bottom) {
-            rowTotals += new IntArrayWrapper(generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalBottomInt))
+          } else {
+            if (field.totals.top) {
+              rowTotals += new IntArrayWrapper(generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalTopInt))
+            }
+            if (field.totals.bottom) {
+              rowTotals += new IntArrayWrapper(generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalBottomInt))
+            }
           }
         }
         rowHeaderCounter += 1
       }
       rowHeaderCounter = 0
-      if (matchesFilter) {
+      if (matchesFilter && !rowHeaderCollapsed) {
         rowHeaders += new IntArrayWrapper(rowHeaderValues)
+        rowHeaders ++= rowTotals
+      } else if (matchesFilter && rowHeaderCollapsed) {
         rowHeaders ++= rowTotals
       }
 
@@ -218,29 +234,30 @@ object RawRowBasedTableDataSource {
           measureFieldPosition = measureFieldPositions(pathsCounter)
           // If there isn't a measure field there is no need to update the aggregated data
           if (measureFieldPosition != -1) {
-            val fieldDefinition = measureFieldDefinitions(pathsCounter)
             if (measureFieldPosition >= 0) {
               value = dataRow(measureFieldPosition)
-              key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
             } else if (measureFieldPosition == countFieldPosition) {
               // Count field
               value = 1
-              key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
             }
 
-            currentValue = aggregatedData.get(key)
-            if (currentValue == null) {
-              newDataValue = fieldDefinition.combiner.combine(
-                fieldDefinition.combiner.initialCombinedValue,
-                value.asInstanceOf[fieldDefinition.V]
-              )
-            } else {
-              newDataValue = fieldDefinition.combiner.combine(
-                currentValue.asInstanceOf[fieldDefinition.C],
-                value.asInstanceOf[fieldDefinition.V]
-              )
+            val fieldDefinition = measureFieldDefinitions(pathsCounter)
+            if (!rowHeaderCollapsed) {
+              key = new IntArrayWrapperKey(rowHeaderValues, colHeaderValues)
+              currentValue = aggregatedData.get(key)
+              if (currentValue == null) {
+                newDataValue = fieldDefinition.combiner.combine(
+                  fieldDefinition.combiner.initialCombinedValue,
+                  value.asInstanceOf[fieldDefinition.V]
+                )
+              } else {
+                newDataValue = fieldDefinition.combiner.combine(
+                  currentValue.asInstanceOf[fieldDefinition.C],
+                  value.asInstanceOf[fieldDefinition.V]
+                )
+              }
+              aggregatedData.put(key, newDataValue)
             }
-            aggregatedData.put(key, newDataValue)
 
             rowTotalsCounter = 0
             numRowTotals = rowTotals.size

@@ -57,7 +57,7 @@ class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBind
           addStyleBasedOnTableCellPosition()
           addStyle(TotalRowHeaderTableCell)
           val shouldRender = (rowHeaderTableColumn.column == 0) || (row.rowHeaderValues(rowHeaderTableColumn.column - 1) != intValue)
-          if (shouldRender) textProperty.bind(new TableLocaleStringBinding("total", locale)) else setText(null)
+          if (shouldRender) textProperty.bind(stringBinding("total")) else setText(null)
         } else {
           addStyleBasedOnTableCellPosition()
           val shouldRender = {
@@ -96,6 +96,8 @@ class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBind
         }
       }
     }
+
+    private def stringBinding(id:String) = new TableLocaleStringBinding(id, locale)
   }
 }
 
