@@ -15,14 +15,14 @@ object OpenAFTable {
 }
 
 class OpenAFTable extends StackPane {
-  val tableDataProperty = new SimpleObjectProperty[TableData]
-  val requestTableStateProperty = new SimpleObjectProperty[TableState]
+  protected val tableDataProperty = new SimpleObjectProperty[TableData]
+  protected val requestTableStateProperty = new SimpleObjectProperty[TableState]
 
   private val dragAndDrop = new DragAndDrop
 
-  val localeProperty = new SimpleObjectProperty[Locale](Locale.getDefault)
-  val fieldBindings = FXCollections.observableHashMap[FieldID,StringBinding]
-  val unmodifiableFieldBindings = FXCollections.unmodifiableObservableMap(fieldBindings)
+  protected val localeProperty = new SimpleObjectProperty[Locale](Locale.getDefault)
+  protected val fieldBindings = FXCollections.observableHashMap[FieldID,StringBinding]
+  protected val unmodifiableFieldBindings = FXCollections.unmodifiableObservableMap(fieldBindings)
 
   private val configArea = new ConfigArea(tableDataProperty, requestTableStateProperty, dragAndDrop,
     localeProperty, unmodifiableFieldBindings)
