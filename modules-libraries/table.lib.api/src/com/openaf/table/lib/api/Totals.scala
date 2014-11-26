@@ -12,12 +12,21 @@ object CollapsedState {
   val Default = AllExpanded(Set.empty)
 }
 
-sealed trait CollapsedState
+sealed trait CollapsedState {
+  def +(path:CollapsedStatePath):CollapsedState
+  def -(path:CollapsedStatePath):CollapsedState
+}
 
-case class AllExpanded(collapsed:Set[CollapsedStatePath]=Set.empty) extends CollapsedState
-case class AllCollapsed(expanded:Set[CollapsedStatePath]=Set.empty) extends CollapsedState
+case class AllExpanded(collapsed:Set[CollapsedStatePath]=Set.empty) extends CollapsedState {
+  def +(path:CollapsedStatePath) = copy(collapsed = collapsed - path)
+  def -(path:CollapsedStatePath) = copy(collapsed = collapsed + path)
+}
+case class AllCollapsed(expanded:Set[CollapsedStatePath]=Set.empty) extends CollapsedState {
+  def +(path:CollapsedStatePath) = copy(expanded = expanded + path)
+  def -(path:CollapsedStatePath) = copy(expanded = expanded - path)
+}
 
-class CollapsedStatePath(val pathValues:Array[Any]) {
+class CollapsedStatePath(val pathValues:Array[Any]) extends Serializable {
   override val hashCode = util.Arrays.hashCode(pathValues.asInstanceOf[Array[AnyRef]])
   override def equals(other:Any) = util.Arrays.equals(
     pathValues.asInstanceOf[Array[AnyRef]],

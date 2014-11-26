@@ -14,7 +14,7 @@ import javafx.beans.property.Property
 import java.util.Locale
 import javafx.scene.control.ContextMenu
 
-class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBindings:ObservableMap[FieldID,StringBinding],
+class RowHeaderCellFactory[T](valueLookUp:Map[FieldID,Array[Any]], renderer:Renderer[T], fieldBindings:ObservableMap[FieldID,StringBinding],
                               startRowHeaderValuesIndex:Int, requestTableStateProperty:Property[TableState],
                               field:Field[_], locale:Property[Locale]) extends Callback[TableColumnType,OpenAFTableCell] {
   def call(tableColumn:TableColumnType) = new OpenAFTableCell {
@@ -53,7 +53,7 @@ class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBind
           } else {
             addStyle(FieldRowHeaderTableCell)
           }
-          val fieldID = values(FieldInt).asInstanceOf[FieldID]
+          val fieldID = valueLookUp(field.id)(FieldInt).asInstanceOf[FieldID]
           Option(fieldBindings.get(fieldID)) match {
             case Some(binding) => textProperty.bind(binding)
             case None => setText(fieldID.id)
@@ -64,6 +64,7 @@ class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBind
           val shouldRender = (rowHeaderTableColumn.column == 0) || (row.rowHeaderValues(rowHeaderTableColumn.column - 1) != intValue)
           if (shouldRender) textProperty.bind(stringBinding("total")) else setText(null)
         } else {
+          populateContextMenuForCell(expandAndCollapse, row)
           addStyleBasedOnTableCellPosition()
           val shouldRender = {
             if (row.row == startRowHeaderValuesIndex) {
@@ -79,7 +80,7 @@ class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBind
             }
           }
           if (shouldRender) {
-            val value = values(intValue).asInstanceOf[T]
+            val value = valueLookUp(field.id)(intValue).asInstanceOf[T]
             setText(renderer.render(value))
           } else {
             setText(null)
@@ -106,6 +107,17 @@ class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBind
 
     private def populateContextMenuForColumn(expandAndCollapse:ExpandAndCollapse) {
       getContextMenu.getItems.addAll(expandAndCollapse.expandAllMenuItem, expandAndCollapse.collapseAllMenuItem)
+    }
+
+    private def populateContextMenuForCell(expandAndCollapse:ExpandAndCollapse, row:OpenAFTableRow) {
+      val values:Array[Array[Any]] = requestTableStateProperty.getValue.tableLayout.rowHeaderFieldIDs
+        .map(id => valueLookUp(id))(collection.breakOut)
+      val pathElements:Array[Any] = (0 to rowHeaderTableColumn.column)
+        .map(column => values(column)(row.rowHeaderValues(column)))(collection.breakOut)
+      val path = CollapsedStatePath(pathElements)
+      val expandMenuItem = expandAndCollapse.expandMenuItem(path)
+      val collapseMenuItem = expandAndCollapse.collapseMenuItem(path)
+      getContextMenu.getItems.addAll(expandMenuItem, collapseMenuItem)
     }
   }
 }

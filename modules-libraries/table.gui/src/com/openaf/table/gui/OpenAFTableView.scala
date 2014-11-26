@@ -82,7 +82,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData], requestTableStatePr
       disableReordering(tableColumn)
       tableColumn.setSortable(false)
       tableColumn.setCellValueFactory(new CellValueFactory)
-      tableColumn.setCellFactory(new RowHeaderCellFactory(valueLookUp(field.id), tableData.defaultRenderers(field.id),
+      tableColumn.setCellFactory(new RowHeaderCellFactory(valueLookUp, tableData.defaultRenderers(field.id),
         fieldBindings, startRowHeaderValuesIndex, requestTableStateProperty, field, locale))
       columns.add(tableColumn)
 
