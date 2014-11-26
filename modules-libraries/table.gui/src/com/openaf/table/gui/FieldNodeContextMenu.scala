@@ -59,25 +59,8 @@ class FieldNodeContextMenu[T](field:Field[T], requestTableStateProperty:Property
     })
     getItems.addAll(new SeparatorMenuItem, topTotalMenuItem, bottomTotalMenuItem)
 
-    val expandAllMenuItem = new MenuItem
-    expandAllMenuItem.textProperty.bind(stringBinding("expandAll"))
-    expandAllMenuItem.setOnAction(new EventHandler[ActionEvent] {
-      def handle(event:ActionEvent) {
-        val newTotals = field.totals.copy(collapsedState = AllExpanded())
-        val newTableState = requestTableStateProperty.getValue.replaceField(field, field.withTotals(newTotals))
-        requestTableStateProperty.setValue(newTableState)
-      }
-    })
+    val expandAndCollapse = new ExpandAndCollapse(field, requestTableStateProperty, locale)
 
-    val collapseAllMenuItem = new MenuItem
-    collapseAllMenuItem.textProperty.bind(stringBinding("collapseAll"))
-    collapseAllMenuItem.setOnAction(new EventHandler[ActionEvent] {
-      def handle(event:ActionEvent) {
-        val newTotals = field.totals.copy(collapsedState = AllCollapsed())
-        val newTableState = requestTableStateProperty.getValue.replaceField(field, field.withTotals(newTotals))
-        requestTableStateProperty.setValue(newTableState)
-      }
-    })
-    getItems.addAll(new SeparatorMenuItem, expandAllMenuItem, collapseAllMenuItem)
+    getItems.addAll(new SeparatorMenuItem, expandAndCollapse.expandAllMenuItem, expandAndCollapse.collapseAllMenuItem)
   }
 }
