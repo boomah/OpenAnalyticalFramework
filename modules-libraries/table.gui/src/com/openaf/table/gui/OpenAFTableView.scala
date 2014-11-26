@@ -17,8 +17,8 @@ object OpenAFTableView {
 }
 import OpenAFTableView._
 
-class OpenAFTableView(tableDataProperty:Property[TableData], fieldBindings:ObservableMap[FieldID,StringBinding],
-                      locale:Property[Locale]) extends TableView[OpenAFTableRow] {
+class OpenAFTableView(tableDataProperty:Property[TableData], requestTableStateProperty:Property[TableState],
+                      fieldBindings:ObservableMap[FieldID,StringBinding], locale:Property[Locale]) extends TableView[OpenAFTableRow] {
   getStyleClass.add("openaf-table-view")
   getSelectionModel.setCellSelectionEnabled(true)
   getSelectionModel.setSelectionMode(SelectionMode.MULTIPLE)
@@ -83,7 +83,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData], fieldBindings:Obser
       tableColumn.setSortable(false)
       tableColumn.setCellValueFactory(new CellValueFactory)
       tableColumn.setCellFactory(new RowHeaderCellFactory(valueLookUp(field.id), tableData.defaultRenderers(field.id),
-        fieldBindings, startRowHeaderValuesIndex, locale))
+        fieldBindings, startRowHeaderValuesIndex, requestTableStateProperty, field, locale))
       columns.add(tableColumn)
 
       rowHeaderFieldCounter += 1

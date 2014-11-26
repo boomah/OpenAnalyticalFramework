@@ -32,7 +32,8 @@ class OpenAFTable extends StackPane {
     dragAndDrop, localeProperty, unmodifiableFieldBindings)
   private val columnHeaderArea = new ColumnHeaderArea(tableDataProperty, requestTableStateProperty, dragAndDrop,
     localeProperty, unmodifiableFieldBindings)
-  private val tableView = new OpenAFTableView(tableDataProperty, unmodifiableFieldBindings, localeProperty)
+  private val tableView = new OpenAFTableView(tableDataProperty, requestTableStateProperty, unmodifiableFieldBindings,
+    localeProperty)
 
   {
     val mainContent = new GridPane

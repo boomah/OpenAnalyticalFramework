@@ -12,8 +12,10 @@ import java.util.Locale
 class OpenAFTableViewTest extends FunSuite {
   javax.swing.SwingUtilities.invokeAndWait(new Runnable {def run() {new JFXPanel()}})
   val tableDataProperty = new SimpleObjectProperty[TableData]
+  val requestTableStateProperty = new SimpleObjectProperty[TableState]
   val locale = new SimpleObjectProperty[Locale](Locale.getDefault)
-  val tableView = new OpenAFTableView(tableDataProperty, FXCollections.emptyObservableMap[FieldID,StringBinding], locale)
+  val tableView = new OpenAFTableView(tableDataProperty, requestTableStateProperty,
+    FXCollections.emptyObservableMap[FieldID,StringBinding], locale)
 
   test("1 column") {
     val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout(GenderField))

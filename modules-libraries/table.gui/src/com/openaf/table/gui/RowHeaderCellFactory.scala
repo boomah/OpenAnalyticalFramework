@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import com.openaf.table.lib.api.{TableValues, OpenAFTableRow, FieldID, Renderer}
+import com.openaf.table.lib.api._
 import TableValues._
 import javafx.collections.ObservableMap
 import javafx.beans.binding.StringBinding
@@ -12,17 +12,22 @@ import com.openaf.gui.utils.GuiUtils._
 import com.openaf.table.gui.binding.TableLocaleStringBinding
 import javafx.beans.property.Property
 import java.util.Locale
+import javafx.scene.control.ContextMenu
 
 class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBindings:ObservableMap[FieldID,StringBinding],
-                              startRowHeaderValuesIndex:Int,
-                              locale:Property[Locale]) extends Callback[TableColumnType,OpenAFTableCell] {
+                              startRowHeaderValuesIndex:Int, requestTableStateProperty:Property[TableState],
+                              field:Field[_], locale:Property[Locale]) extends Callback[TableColumnType,OpenAFTableCell] {
   def call(tableColumn:TableColumnType) = new OpenAFTableCell {
-    private val rowHeaderTableColumn = tableColumn.asInstanceOf[OpenAFTableColumn]
+    private def rowHeaderTableColumn = tableColumn.asInstanceOf[OpenAFTableColumn]
     private def addStyle(style:TableCellStyle) {getStyleClass.add(camelCaseToDashed(style.toString))}
+    setContextMenu(new ContextMenu)
     override def updateItem(row:OpenAFTableRow, isEmpty:Boolean) {
       super.updateItem(row, isEmpty)
       removeAllStyles(this)
       textProperty.unbind()
+      getContextMenu.getItems.clear()
+      val expandAndCollapse = new ExpandAndCollapse(field, requestTableStateProperty, locale)
+      populateContextMenuForColumn(expandAndCollapse)
       if (isEmpty) {
         setText(null)
       } else {
@@ -98,6 +103,10 @@ class RowHeaderCellFactory[T](values:Array[Any], renderer:Renderer[T], fieldBind
     }
 
     private def stringBinding(id:String) = new TableLocaleStringBinding(id, locale)
+
+    private def populateContextMenuForColumn(expandAndCollapse:ExpandAndCollapse) {
+      getContextMenu.getItems.addAll(expandAndCollapse.expandAllMenuItem, expandAndCollapse.collapseAllMenuItem)
+    }
   }
 }
 
