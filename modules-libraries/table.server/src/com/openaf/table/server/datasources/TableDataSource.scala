@@ -9,29 +9,27 @@ trait TableDataSource {
   def defaultTableState = TableState.Blank
 }
 
-case class Result(rowHeaderValues:Array[Array[Int]], pathData:Array[PathData], fieldValues:FieldValues,
-                  valueLookUp:Map[FieldID,Array[Any]], resultState:ResultState) {
+case class Result(rowHeaderValues:Array[Array[Int]], columnHeaderPaths:Array[ColumnHeaderPath], data:Map[DataPath,Any],
+                  fieldValues:FieldValues, valueLookUp:Map[FieldID,Array[Any]], resultState:ResultState) {
   val numRowHeaderRows = rowHeaderValues.length
   val numRowHeaderColumns = if (rowHeaderValues.nonEmpty) rowHeaderValues(0).length else 0
   val numColumnHeaderRows = {
-    if (pathData.nonEmpty) {
-      pathData.map(path => {
-        if (path.colHeaderValues.isEmpty) 0 else path.colHeaderValues(0).length
-      }).max
-    } else {
-      0
+    var maxLength = 0
+    var counter = 0
+    while (counter < columnHeaderPaths.length) {
+      maxLength = math.max(maxLength, columnHeaderPaths(counter).values.length)
+      counter += 1
     }
+    maxLength
   }
-  val numColumnHeaderColumns = if (pathData.isEmpty) 0 else pathData.map(_.colHeaderValues.length).sum
+  val numColumnHeaderColumns = columnHeaderPaths.length
   val numRows = numColumnHeaderRows + numRowHeaderRows
   val numColumns = numRowHeaderColumns + numColumnHeaderColumns
 }
 
 object Result {
-  val Empty = Result(Array.empty, Array.empty, FieldValues.Empty, Map.empty, ResultState.Default)
+  val Empty = Result(Array.empty, Array.empty, Map.empty, FieldValues.Empty, Map.empty, ResultState.Default)
 }
-
-case class PathData(colHeaderValues:Array[Array[Int]], data:Map[IntArrayWrapperKey,Any])
 
 case class ResultState(filterState:FilterState, totalsState:TotalsState, sortState:SortState)
 
@@ -51,10 +49,9 @@ object TotalsState {
   val Default = TotalsState(totalsAdded = true)
 }
 
-case class SortState(filtersSorted:Boolean, rowHeadersSorted:Boolean, pathDataSorted:Array[Boolean])
+case class SortState(filtersSorted:Boolean, rowHeadersSorted:Boolean, columnHeadersSorted:Boolean)
 
 object SortState {
-  val Default = SortState(filtersSorted=false, rowHeadersSorted=false, Array.empty)
-  def allUnsorted(numPaths:Int) = SortState(filtersSorted=false, rowHeadersSorted=false,
-    pathDataSorted=Array.fill(numPaths)(false))
+  val NoSorting = SortState(filtersSorted=false, rowHeadersSorted=false, columnHeadersSorted=false)
+  val Default = NoSorting
 }

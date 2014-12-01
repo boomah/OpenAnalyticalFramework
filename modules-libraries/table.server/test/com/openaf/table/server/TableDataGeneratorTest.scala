@@ -439,4 +439,48 @@ class TableDataGeneratorTest extends FunSuite {
 
     check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
   }
+
+  test("0 row, 0 measure, 3 column (one with multiple values on top of the other two)") {
+    val tableState = TableState.Blank.withColumnHeaderLayout(ColumnHeaderLayout(GenderField, List(NameField, LocationField)))
+
+    val expectedRows = List(
+      row(0, Nil, List(1,1,1,1,1,2,2,2,2,2,2)),
+      row(1, Nil, List(3,2,1,1,2,6,4,5,3,1,2))
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
+      LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh)
+    )
+    val expectedFieldValues = orderedGenderFieldValues(GenderField.withKey(ColumnHeaderFieldKey(0))) ++
+      orderedNameFieldValues(NameField.withKey(ColumnHeaderFieldKey(1))) ++
+      orderedLocationFieldValues(LocationField.withKey(ColumnHeaderFieldKey(2)))
+
+    check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("0 row, 0 measure, 4 column (one field repeated with different fields underneath)") {
+    val tableState = TableState.Blank.withColumnHeaderLayout(ColumnHeaderLayout(
+      List(
+        ColumnHeaderTree(List(GenderField), List(NameField)),
+        ColumnHeaderTree(List(GenderField), List(LocationField))
+      )
+    ))
+
+    val expectedRows = List(
+      row(0, Nil, List(1,1,1,2,2,2,1,1,2,2,2)),
+      row(1, Nil, List(3,2,1,6,4,5,1,2,3,1,2))
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
+      LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh)
+    )
+    val expectedFieldValues = orderedGenderFieldValues(GenderField.withKey(ColumnHeaderFieldKey(0))) ++
+      orderedNameFieldValues(NameField.withKey(ColumnHeaderFieldKey(1))) ++
+      orderedGenderFieldValues(GenderField.withKey(ColumnHeaderFieldKey(2))) ++
+      orderedLocationFieldValues(LocationField.withKey(ColumnHeaderFieldKey(3)))
+
+    check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
+  }
 }

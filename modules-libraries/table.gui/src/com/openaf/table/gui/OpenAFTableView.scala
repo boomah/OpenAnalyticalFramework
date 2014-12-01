@@ -92,52 +92,41 @@ class OpenAFTableView(tableDataProperty:Property[TableData], requestTableStatePr
   }
 
   private def createColumnHeaderTableColumns(tableData:TableData, columnNames:Iterator[String]) = {
-    val numColumns = tableData.tableValues.columnsPerPath.sum
+    val numColumns = tableData.tableValues.fieldPathsIndexes.length
     val columns = new util.ArrayList[TableColumnType](numColumns)
     val paths = tableData.columnHeaderLayout.paths
     val maxPathLength = if (paths.isEmpty) 0 else paths.map(_.fields.size).max
-    val numPaths = paths.length
-    var path:ColumnHeaderLayoutPath = null
+    val pathsArray = paths.toArray
+    val fieldPathIndexes = tableData.tableValues.fieldPathsIndexes
     val valueLookUp = tableData.tableValues.valueLookUp
     val allPathValueLookUps = paths.map(path => path.fields.map(field => valueLookUp(field.id)).toArray).toArray
-    var valueLookUps:Array[Array[Any]] = null
     val allPathRenderers:Array[Array[Renderer[_]]] = paths.map(path => path.fields.map(field => {
       tableData.defaultRenderers(field.id)
     }).toArray).toArray
-    var pathRenderers:Array[Renderer[_]] = null
-    var pathCounter = 0
-    var numColumnsPerPath = 0
-    var columnPathCounter = 0
+
     var tableColumn:OpenAFTableColumn = null
+    var valueLookUps:Array[Array[Any]] = null
+    var pathRenderers:Array[Renderer[_]] = null
+
     var columnCounter = 0
-    val pathBoundaries = tableData.tableValues.columnsPerPath.scanLeft(0)(_ + _).toSet
 
-    while (pathCounter < numPaths) {
-      path = paths(pathCounter)
-      pathRenderers = allPathRenderers(pathCounter)
-      numColumnsPerPath = tableData.tableValues.columnsPerPath(pathCounter)
-      valueLookUps = allPathValueLookUps(pathCounter)
+    while (columnCounter < numColumns) {
+      tableColumn = new OpenAFTableColumn(columnCounter)
+      tableColumn.setText(columnNames.next.toString)
+      disableReordering(tableColumn)
+      tableColumn.setSortable(false)
 
-      while (columnPathCounter < numColumnsPerPath) {
-        tableColumn = new OpenAFTableColumn(columnCounter)
-        tableColumn.setText(columnNames.next.toString)
-        disableReordering(tableColumn)
-        tableColumn.setSortable(false)
+      valueLookUps = allPathValueLookUps(fieldPathIndexes(columnCounter))
+      pathRenderers = allPathRenderers(fieldPathIndexes(columnCounter))
 
-        tableColumn.setCellValueFactory(new CellValueFactory)
-        tableColumn.setCellFactory(
-          new ColumnHeaderAndDataCellFactory(valueLookUps, fieldBindings, path, maxPathLength, pathRenderers, pathBoundaries)
-        )
-        columns.add(tableColumn)
+      tableColumn.setCellValueFactory(new CellValueFactory)
+      tableColumn.setCellFactory(
+        new ColumnHeaderAndDataCellFactory(valueLookUps, fieldBindings, fieldPathIndexes, pathsArray, maxPathLength, pathRenderers)
+      )
 
-        columnCounter += 1
-        columnPathCounter += 1
-      }
-
-      columnPathCounter = 0
-      pathCounter += 1
+      columns.add(tableColumn)
+      columnCounter += 1
     }
-
     columns
   }
 }

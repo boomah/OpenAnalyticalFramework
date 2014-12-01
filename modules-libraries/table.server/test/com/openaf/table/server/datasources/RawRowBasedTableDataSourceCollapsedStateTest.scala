@@ -13,13 +13,15 @@ class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
       .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
 
     val expectedRowHeaderValues = Set(List(1,TotalTopInt), List(2,1), List(2,2), List(2,3))
-    val expectedColHeaderValues = List(Set(List(0)))
-    val expectedData = List(Map(
-      (List(1,TotalTopInt), List(0)) -> 180,
-      (List(2,1          ), List(0)) -> 80,
-      (List(2,2          ), List(0)) -> 90,
-      (List(2,3          ), List(0)) -> 75
-    ))
+    val columnHeaderPath = new ColumnHeaderPath(0, Array(0))
+    def dp(rowHeaderValues:Int*) = new DataPath(rowHeaderValues.toArray, columnHeaderPath)
+    val expectedColHeaderPaths = Set(columnHeaderPath)
+    val expectedData = Map(
+      dp(1,TotalTopInt) -> 180,
+      dp(2,1          ) -> 80,
+      dp(2,2          ) -> 90,
+      dp(2,3          ) -> 75
+    )
     val expectedValueLookUp = Map(
       GenderField.id -> List(GenderField.id, F, M),
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh),
@@ -29,7 +31,7 @@ class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
       locationFieldValues(LocationField.withKey(RowHeaderFieldKey(1))) ++
       scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaderPaths, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("2 row (first row, second value collapsed), 1 measure, 0 column") {
@@ -39,12 +41,14 @@ class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
       .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
 
     val expectedRowHeaderValues = Set(List(2,1), List(2,2), List(1,TotalTopInt))
-    val expectedColHeaderValues = List(Set(List(0)))
-    val expectedData = List(Map(
-      (List(2,1          ), List(0)) -> 50,
-      (List(2,2          ), List(0)) -> 130,
-      (List(1,TotalTopInt), List(0)) -> 245
-    ))
+    val columnHeaderPath = new ColumnHeaderPath(0, Array(0))
+    def dp(rowHeaderValues:Int*) = new DataPath(rowHeaderValues.toArray, columnHeaderPath)
+    val expectedColHeaderPaths = Set(columnHeaderPath)
+    val expectedData = Map(
+      dp(2,1          ) -> 50,
+      dp(2,2          ) -> 130,
+      dp(1,TotalTopInt) -> 245
+    )
     val expectedValueLookUp = Map(
       GenderField.id -> List(GenderField.id, M, F),
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh),
@@ -54,7 +58,7 @@ class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
       locationFieldValues(LocationField.withKey(RowHeaderFieldKey(1))) ++
       scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaderPaths, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("2 row (first row, second value expanded), 1 measure, 0 column") {
@@ -64,13 +68,15 @@ class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
       .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
 
     val expectedRowHeaderValues = Set(List(2,TotalTopInt), List(1,1), List(1,2), List(1,3))
-    val expectedColHeaderValues = List(Set(List(0)))
-    val expectedData = List(Map(
-      (List(2,TotalTopInt), List(0)) -> 180,
-      (List(1,1          ), List(0)) -> 80,
-      (List(1,2          ), List(0)) -> 90,
-      (List(1,3          ), List(0)) -> 75
-    ))
+    val columnHeaderPath = new ColumnHeaderPath(0, Array(0))
+    def dp(rowHeaderValues:Int*) = new DataPath(rowHeaderValues.toArray, columnHeaderPath)
+    val expectedColHeaderPaths = Set(columnHeaderPath)
+    val expectedData = Map(
+      dp(2,TotalTopInt) -> 180,
+      dp(1,1          ) -> 80,
+      dp(1,2          ) -> 90,
+      dp(1,3          ) -> 75
+    )
     val expectedValueLookUp = Map(
       GenderField.id -> List(GenderField.id, M, F),
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh),
@@ -80,7 +86,7 @@ class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
       locationFieldValues(LocationField.withKey(RowHeaderFieldKey(1))) ++
       scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaderPaths, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("2 row (first row, first value collapsed, top total), 1 measure, 0 column") {
@@ -90,14 +96,16 @@ class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
       .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
 
     val expectedRowHeaderValues = Set(List(1,TotalTopInt), List(2,TotalTopInt), List(2,1), List(2,2), List(2,3))
-    val expectedColHeaderValues = List(Set(List(0)))
-    val expectedData = List(Map(
-      (List(1,TotalTopInt), List(0)) -> 180,
-      (List(2,TotalTopInt), List(0)) -> 245,
-      (List(2,1          ), List(0)) -> 80,
-      (List(2,2          ), List(0)) -> 90,
-      (List(2,3          ), List(0)) -> 75
-    ))
+    val columnHeaderPath = new ColumnHeaderPath(0, Array(0))
+    def dp(rowHeaderValues:Int*) = new DataPath(rowHeaderValues.toArray, columnHeaderPath)
+    val expectedColHeaderPaths = Set(columnHeaderPath)
+    val expectedData = Map(
+      dp(1,TotalTopInt) -> 180,
+      dp(2,TotalTopInt) -> 245,
+      dp(2,1          ) -> 80,
+      dp(2,2          ) -> 90,
+      dp(2,3          ) -> 75
+    )
     val expectedValueLookUp = Map(
       GenderField.id -> List(GenderField.id, F, M),
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh),
@@ -107,7 +115,7 @@ class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
       locationFieldValues(LocationField.withKey(RowHeaderFieldKey(1))) ++
       scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaderPaths, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("2 row (first row, first value collapsed, top and bottom total), 1 measure, 0 column") {
@@ -117,15 +125,17 @@ class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
       .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
 
     val expectedRowHeaderValues = Set(List(1,TotalTopInt), List(2,TotalTopInt), List(2,1), List(2,2), List(2,3), List(2,TotalBottomInt))
-    val expectedColHeaderValues = List(Set(List(0)))
-    val expectedData = List(Map(
-      (List(1,TotalTopInt   ), List(0)) -> 180,
-      (List(2,TotalTopInt   ), List(0)) -> 245,
-      (List(2,1             ), List(0)) -> 80,
-      (List(2,2             ), List(0)) -> 90,
-      (List(2,3             ), List(0)) -> 75,
-      (List(2,TotalBottomInt), List(0)) -> 245
-    ))
+    val columnHeaderPath = new ColumnHeaderPath(0, Array(0))
+    def dp(rowHeaderValues:Int*) = new DataPath(rowHeaderValues.toArray, columnHeaderPath)
+    val expectedColHeaderPaths = Set(columnHeaderPath)
+    val expectedData = Map(
+      dp(1,TotalTopInt   ) -> 180,
+      dp(2,TotalTopInt   ) -> 245,
+      dp(2,1             ) -> 80,
+      dp(2,2             ) -> 90,
+      dp(2,3             ) -> 75,
+      dp(2,TotalBottomInt) -> 245
+    )
     val expectedValueLookUp = Map(
       GenderField.id -> List(GenderField.id, F, M),
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh),
@@ -135,7 +145,7 @@ class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
       locationFieldValues(LocationField.withKey(RowHeaderFieldKey(1))) ++
       scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaderPaths, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   private def checkAllCollapsed(genderField:Field[_]) {
@@ -144,11 +154,13 @@ class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
       .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
 
     val expectedRowHeaderValues = Set(List(1,TotalTopInt), List(2,TotalTopInt))
-    val expectedColHeaderValues = List(Set(List(0)))
-    val expectedData = List(Map(
-      (List(1,TotalTopInt), List(0)) -> 180,
-      (List(2,TotalTopInt), List(0)) -> 245
-    ))
+    val columnHeaderPath = new ColumnHeaderPath(0, Array(0))
+    def dp(rowHeaderValues:Int*) = new DataPath(rowHeaderValues.toArray, columnHeaderPath)
+    val expectedColHeaderPaths = Set(columnHeaderPath)
+    val expectedData = Map(
+      dp(1,TotalTopInt) -> 180,
+      dp(2,TotalTopInt) -> 245
+    )
     val expectedValueLookUp = Map(
       GenderField.id -> List(GenderField.id, F, M),
       LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh),
@@ -158,7 +170,7 @@ class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
       locationFieldValues(LocationField.withKey(RowHeaderFieldKey(1))) ++
       scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderValues, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaderPaths, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("2 row (first row, all values collapsed), 1 measure, 0 column") {

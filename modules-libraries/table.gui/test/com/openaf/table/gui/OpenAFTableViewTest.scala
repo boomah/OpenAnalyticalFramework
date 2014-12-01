@@ -20,11 +20,11 @@ class OpenAFTableViewTest extends FunSuite {
   test("1 column") {
     val tableLayout = TableLayout.Blank.copy(columnHeaderLayout = ColumnHeaderLayout(GenderField))
     val tableState = TableState(tableLayout)
-    val row = new OpenAFTableRow(0, Array.empty, Array(1,2))
+    val row = new OpenAFTableRow(0, Array.empty, Array[Any](1,2))
     val tableValues = TableValues.Empty.copy(
       rows = Array(row),
-      valueLookUp = GenderValuesLookUp,
-      columnsPerPath = Array(2)
+      fieldPathsIndexes = Array(0,0),
+      valueLookUp = GenderValuesLookUp
     )
     val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
     tableDataProperty.set(tableData)

@@ -15,10 +15,11 @@ object TableData {
 case object NoValue
 
 class OpenAFTableRow(val row:Int, val rowHeaderValues:Array[Int], val columnHeaderAndDataValues:Array[Any]) extends Serializable {
+  def numColumnHeaderColumns = columnHeaderAndDataValues.length
   override def toString = s"${getClass.getSimpleName}($row,${rowHeaderValues.toList},${columnHeaderAndDataValues.toList})"
 }
 
-case class TableValues(rows:Array[OpenAFTableRow], columnsPerPath:Array[Int], fieldValues:FieldValues,
+case class TableValues(rows:Array[OpenAFTableRow], fieldPathsIndexes:Array[Int], fieldValues:FieldValues,
                        valueLookUp:Map[FieldID,Array[Any]])
 
 object TableValues {

@@ -70,13 +70,12 @@ object DataSourceTestData {
   }
 
   def check(tableState:TableState, expectedRowHeaderValues:Set[List[Int]],
-            expectedColHeaderValues:List[Set[List[Int]]], expectedData:List[Map[(List[Int],List[Int]),Int]],
+            expectedColumnHeaderPaths:Set[ColumnHeaderPath], expectedData:Map[DataPath,Any],
             expectedFieldValues:Map[Field[_],List[Int]], expectedValueLookUp:Map[FieldID,List[Any]]) {
     val result = dataSource.result(tableState.generateFieldKeys)
     assert(result.rowHeaderValues.map(_.toList).toSet === expectedRowHeaderValues)
-    assert(result.pathData.map(_.colHeaderValues.map(_.toList).toSet).toList === expectedColHeaderValues)
-    val convertedData = result.pathData.map(_.data.map{case (key,value) => (key.array1.toList, key.array2.toList) -> value}).toList
-    assert(convertedData === expectedData)
+    assert(result.columnHeaderPaths.toSet === expectedColumnHeaderPaths)
+    assert(result.data === expectedData)
     assert(result.fieldValues.values.mapValues(_.toList) === expectedFieldValues)
     assert(result.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
   }

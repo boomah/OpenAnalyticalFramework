@@ -11,12 +11,12 @@ import TableCellStyle._
 import com.openaf.gui.utils.GuiUtils._
 
 class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindings:ObservableMap[FieldID,StringBinding],
-                                     path:ColumnHeaderLayoutPath, maxPathLength:Int, pathRenderers:Array[Renderer[_]],
-                                     pathBoundaries:Set[Int]) extends Callback[TableColumnType,OpenAFTableCell] {
-  private val rightPathBoundaries = pathBoundaries.map(_ - 1).filter(_ >= 0)
+                                     fieldPathsIndexes:Array[Int], columnHeaderLayoutPaths:Array[ColumnHeaderLayoutPath],
+                                     maxPathLength:Int, pathRenderers:Array[Renderer[_]]) extends Callback[TableColumnType,OpenAFTableCell] {
+
   def call(tableColumn:TableColumnType) = new OpenAFTableCell {
     private val columnHeaderTableColumn = tableColumn.asInstanceOf[OpenAFTableColumn]
-    private def addStyle(style:TableCellStyle) {getStyleClass.add(camelCaseToDashed(style.toString))}
+
     override def updateItem(row:OpenAFTableRow, isEmpty:Boolean) {
       super.updateItem(row, isEmpty)
       removeAllStyles(this)
@@ -24,10 +24,11 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
       if (isEmpty) {
         setText(null)
       } else {
-        val rightBoundaryCell = rightPathBoundaries.contains(columnHeaderTableColumn.column)
+        val rightBoundaryCell = (column == (row.numColumnHeaderColumns - 1)) ||
+          (fieldOption(row.row, column) != fieldOption(row.row, column + 1))
         if (row.row < maxPathLength) {
           addStyle(StandardColumnHeaderTableCell)
-          row.columnHeaderAndDataValues(columnHeaderTableColumn.column) match {
+          row.columnHeaderAndDataValues(column) match {
             case TableValues.FieldInt => {
               if (row.row == (maxPathLength - 1)) {
                 val style = if (rightBoundaryCell) BottomRightFieldColumnHeaderTableCell else BottomFieldColumnHeaderTableCell
@@ -68,7 +69,7 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
             }
           }
         } else {
-          path.measureFieldOption.foreach(measureField => {
+          columnHeaderLayoutPaths(fieldPathsIndexes(column)).measureFieldOption.foreach(measureField => {
             setId(s"table-cell-${measureField.id.id}")
           })
           if (row.row == (getTableView.getItems.size - 1)) {
@@ -77,12 +78,23 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
           } else if (rightBoundaryCell) {
             addStyle(RightDataTableCell)
           }
-          val measureFieldIndex = path.measureFieldIndex
+          val measureFieldIndex = columnHeaderLayoutPaths(fieldPathsIndexes(column)).measureFieldIndex
           val renderer = if (measureFieldIndex == -1) BlankRenderer else pathRenderers(measureFieldIndex).asInstanceOf[Renderer[Any]]
           setText(renderer.render(row.columnHeaderAndDataValues(columnHeaderTableColumn.column)))
         }
       }
     }
+
+    private def column = columnHeaderTableColumn.column
+    private def fieldOption(rowIndex:Int, columnIndex:Int) = {
+      val fields = columnHeaderLayoutPaths(fieldPathsIndexes(columnIndex)).fields
+      if (rowIndex < fields.length) {
+        Some(fields(rowIndex))
+      } else {
+        None
+      }
+    }
+    private def addStyle(style:TableCellStyle) {getStyleClass.add(camelCaseToDashed(style.toString))}
 
     @tailrec private def shouldRenderDueToRowAbove(rowIndex:Int, columnIndex:Int):Boolean = {
       if (rowIndex == 0) {
@@ -100,12 +112,12 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
     }
 
     private def shouldRender(row:OpenAFTableRow, intValue:Int) = {
-      if (pathBoundaries.contains(columnHeaderTableColumn.column)) {
+      if ((column == 0) || (fieldOption(row.row, column) != fieldOption(row.row, column - 1))) {
         true // Always render the first column header value per path
-      } else if (row.columnHeaderAndDataValues(columnHeaderTableColumn.column - 1).asInstanceOf[Int] != intValue) {
+      } else if (row.columnHeaderAndDataValues(column - 1).asInstanceOf[Int] != intValue) {
         true // The value in the column to the left is different so render this
       } else {
-        shouldRenderDueToRowAbove(row.row, columnHeaderTableColumn.column)
+        shouldRenderDueToRowAbove(row.row, column)
       }
     }
   }

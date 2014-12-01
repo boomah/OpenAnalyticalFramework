@@ -10,6 +10,7 @@ case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=
   def flipSortOrder = copy(sortOrder = if (sortOrder == Ascending) Descending else Ascending)
   def withTotals(totals:Totals) = copy(totals = totals)
   def withKey(key:FieldKey) = copy(key = key)
+//  override def toString = id.id
 }
 
 object Field {
