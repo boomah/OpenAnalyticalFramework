@@ -12,15 +12,19 @@ case class RawRowBasedTableDataSource(data:Array[Array[Any]], fieldIDs:Array[Fie
   def result(tableState:TableState) = RawRowBasedTableDataSource.result(tableState, data, fieldIDs, fieldDefinitionGroups)
 }
 
+/**
+ * A Java style (while loops) TableDataSource mainly used for testing. Also used as a benchmark for best case single
+ * threaded performance.
+ */
 object RawRowBasedTableDataSource {
   // This is far from idiomatic Scala. Written this way for speed.
   def result(tableState:TableState, data:Array[Array[Any]], fieldIDs:Array[FieldID],
              fieldDefinitionGroups:FieldDefinitionGroups) = {
     val fieldDefinitionGroup = fieldDefinitionGroups.rootGroup
     val allFieldIDs = tableState.distinctFieldIDs
-    val fieldIDToLookUp:Map[FieldID,JMap[Any,Int]] = allFieldIDs.map(fieldID => {
-      val map = new JMap[Any,Int]
-      map.put(fieldID, 0)
+    val fieldIDToLookUp:Map[FieldID,JMap[Any,MutableInt]] = allFieldIDs.map(fieldID => {
+      val map = new JMap[Any,MutableInt]
+      map.put(fieldID, new MutableInt)
       fieldID -> map
     })(collection.breakOut)
     val fieldsValueCounter = new Array[Int](allFieldIDs.size)
@@ -96,13 +100,12 @@ object RawRowBasedTableDataSource {
     var rowHeaderValues:Array[Int] = null
     var value:Any = -1
     var newDataValue:Any = null
-    var lookUp:JMap[Any,Int] = null
-    var intForValue = -1
+    var lookUp:JMap[Any,MutableInt] = null
+    var intForValue:MutableInt = null
     var fieldsValueCounterIndex = -1
-    var newCounter = -1
     var measureFieldIndex = -1
     var columnHeaderFieldPositions:Array[Int] = null
-    var columnHeaderLookUp:Array[JMap[Any,Int]] = null
+    var columnHeaderLookUp:Array[JMap[Any,MutableInt]] = null
     var columnHeaderValueCounter:Array[Int] = null
     var colHeaderValues:Array[Int] = null
     var measureFieldPosition = -1
@@ -116,11 +119,8 @@ object RawRowBasedTableDataSource {
     var rowTotalsCounter = 0
     var numRowTotals = 0
 
-    def generateCollapsedState(field:Field[_], fieldIndex:Int) = {
-      new RawRowBasedTableDataSourceCollapsedState(field, fieldIndex, rowHeadersLookUp, rowHeadersValueCounter, fieldsValueCounter)
-    }
     val rowHeaderCollapsedStates = rowHeaderFields.zipWithIndex.map{case (field,fieldIndex) => {
-      generateCollapsedState(field, fieldIndex)
+      new RawTableDataSourceCollapsedState(field, fieldIndex, rowHeadersLookUp, rowHeadersValueCounter, fieldsValueCounter)
     }}
     var rowHeaderCollapsed = false
 
@@ -136,14 +136,15 @@ object RawRowBasedTableDataSource {
         matchesFilter = field.filter.matches(value.asInstanceOf[fieldDefinition.V])
         lookUp = filtersLookUp(filterCounter)
         intForValue = lookUp.get(value)
-        if (intForValue == 0) {
+        if (intForValue == null) {
+          intForValue = new MutableInt
           fieldsValueCounterIndex = filtersValueCounter(filterCounter)
-          newCounter = fieldsValueCounter(fieldsValueCounterIndex) + 1
-          fieldsValueCounter(fieldsValueCounterIndex) = newCounter
-          lookUp.put(value, newCounter)
-          fieldValuesBitSets(field) += newCounter
+          intForValue.int = fieldsValueCounter(fieldsValueCounterIndex) + 1
+          fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
+          lookUp.put(value, intForValue)
+          fieldValuesBitSets(field) += intForValue.int
         } else {
-          fieldValuesBitSets(field) += intForValue
+          fieldValuesBitSets(field) += intForValue.int
         }
         filterCounter += 1
       }
@@ -158,16 +159,17 @@ object RawRowBasedTableDataSource {
         matchesFilter = field.filter.matches(value.asInstanceOf[fieldDefinition.V])
         lookUp = rowHeadersLookUp(rowHeaderCounter)
         intForValue = lookUp.get(value)
-        if (intForValue == 0) {
+        if (intForValue == null) {
+          intForValue = new MutableInt
           fieldsValueCounterIndex = rowHeadersValueCounter(rowHeaderCounter)
-          newCounter = fieldsValueCounter(fieldsValueCounterIndex) + 1
-          fieldsValueCounter(fieldsValueCounterIndex) = newCounter
-          lookUp.put(value, newCounter)
-          rowHeaderValues(rowHeaderCounter) = newCounter
-          fieldValuesBitSets(field) += newCounter
+          intForValue.int = fieldsValueCounter(fieldsValueCounterIndex) + 1
+          fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
+          lookUp.put(value, intForValue)
+          rowHeaderValues(rowHeaderCounter) = intForValue.int
+          fieldValuesBitSets(field) += intForValue.int
         } else {
-          rowHeaderValues(rowHeaderCounter) = intForValue
-          fieldValuesBitSets(field) += intForValue
+          rowHeaderValues(rowHeaderCounter) = intForValue.int
+          fieldValuesBitSets(field) += intForValue.int
         }
 
         // Don't add totals for the last row header field
@@ -211,16 +213,17 @@ object RawRowBasedTableDataSource {
             matchesFilter = field.filter.matches(value.asInstanceOf[fieldDefinition.V])
             lookUp = columnHeaderLookUp(colHeaderColCounter)
             intForValue = lookUp.get(value)
-            if (intForValue == 0) {
+            if (intForValue == null) {
+              intForValue = new MutableInt
               fieldsValueCounterIndex = columnHeaderValueCounter(colHeaderColCounter)
-              newCounter = fieldsValueCounter(fieldsValueCounterIndex) + 1
-              fieldsValueCounter(fieldsValueCounterIndex) = newCounter
-              lookUp.put(value, newCounter)
-              colHeaderValues(colHeaderColCounter) = newCounter
-              fieldValuesBitSets(field) += newCounter
+              intForValue.int = fieldsValueCounter(fieldsValueCounterIndex) + 1
+              fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
+              lookUp.put(value, intForValue)
+              colHeaderValues(colHeaderColCounter) = intForValue.int
+              fieldValuesBitSets(field) += intForValue.int
             } else {
-              colHeaderValues(colHeaderColCounter) = intForValue
-              fieldValuesBitSets(field) += intForValue
+              colHeaderValues(colHeaderColCounter) = intForValue.int
+              fieldValuesBitSets(field) += intForValue.int
             }
           }
           colHeaderColCounter += 1
@@ -290,7 +293,7 @@ object RawRowBasedTableDataSource {
       var key:Any = null
       while (keyIterator.hasNext) {
         key = keyIterator.next
-        values(hashMap.get(key)) = key
+        values(hashMap.get(key).int) = key
       }
       fieldID -> values
     }}
@@ -325,4 +328,8 @@ object RawRowBasedTableDataSource {
     }
     totalsArray
   }
+}
+
+private class MutableInt {
+  var int = 0
 }

@@ -4,36 +4,38 @@ import com.openaf.table.lib.api._
 import java.util.{HashMap => JMap}
 
 /**
- * A more efficient class to determine whether a path is collapsed when used with the RawRowBasedTableDataSource
+ * Efficient way to determine whether a path is collapsed when used with the RawRowBasedTableDataSource
  */
-private[datasources] class RawRowBasedTableDataSourceCollapsedState(field:Field[_], fieldIndex:Int,
-                                                                    rowHeadersLookUp:Array[JMap[Any,Int]],
-                                                                    rowHeadersValueCounter:Array[Int],
-                                                                    fieldsValueCounter:Array[Int]) {
+private[datasources] class RawTableDataSourceCollapsedState(field:Field[_], fieldIndex:Int,
+                                                            rowHeadersLookUp:Array[JMap[Any,MutableInt]],
+                                                            rowHeadersValueCounter:Array[Int],
+                                                            fieldsValueCounter:Array[Int]) {
   private val (intPaths, isCollapsed) = {
     val (paths, isCollapsed) = field.totals.collapsedState match {
       case AllExpanded(collapsedPaths) => (collapsedPaths, false)
       case AllCollapsed(expandedPaths) => (expandedPaths, true)
     }
 
-    var lookUp:JMap[Any,Int] = null
-    var intForValue = 0
+    var lookUp:JMap[Any,MutableInt] = null
+    var intForValue:MutableInt = null
     var fieldsValueCounterIndex = 0
 
+    // TODO - maybe this should be converted into a while loop
     // Ignore paths of the wrong length and convert the path values to the appropriate int value
-    val intPaths = paths.filter(_.pathValues.length == (fieldIndex + 1)).map(path => {
+    val intPaths:Array[Array[Int]] = paths.filter(_.pathValues.length == (fieldIndex + 1)).map(path => {
       path.pathValues.zipWithIndex.map{case (value,rowHeaderCounter)  => {
         lookUp = rowHeadersLookUp(rowHeaderCounter)
         intForValue = lookUp.get(value)
-        if (intForValue == 0) {
+        if (intForValue == null) {
+          intForValue = new MutableInt
           fieldsValueCounterIndex = rowHeadersValueCounter(rowHeaderCounter)
-          intForValue = fieldsValueCounter(fieldsValueCounterIndex) + 1
-          fieldsValueCounter(fieldsValueCounterIndex) = intForValue
+          intForValue.int = fieldsValueCounter(fieldsValueCounterIndex) + 1
+          fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
           lookUp.put(value, intForValue)
         }
-        intForValue
+        intForValue.int
       }}
-    }).toArray
+    })(collection.breakOut)
 
     (intPaths, isCollapsed)
   }
