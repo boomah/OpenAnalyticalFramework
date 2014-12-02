@@ -13,8 +13,8 @@ case class RawRowBasedTableDataSource(data:Array[Array[Any]], fieldIDs:Array[Fie
 }
 
 /**
- * A Java style (while loops) TableDataSource mainly used for testing. Also used as a benchmark for best case single
- * threaded performance.
+ * A Java style (while loops) TableDataSource used for testing and also as a benchmark for best case single threaded
+ * performance.
  */
 object RawRowBasedTableDataSource {
   // This is far from idiomatic Scala. Written this way for speed.
@@ -22,9 +22,9 @@ object RawRowBasedTableDataSource {
              fieldDefinitionGroups:FieldDefinitionGroups) = {
     val fieldDefinitionGroup = fieldDefinitionGroups.rootGroup
     val allFieldIDs = tableState.distinctFieldIDs
-    val fieldIDToLookUp:Map[FieldID,JMap[Any,MutableInt]] = allFieldIDs.map(fieldID => {
-      val map = new JMap[Any,MutableInt]
-      map.put(fieldID, new MutableInt)
+    val fieldIDToLookUp:Map[FieldID,JMap[Any,WrappedInt]] = allFieldIDs.map(fieldID => {
+      val map = new JMap[Any,WrappedInt]
+      map.put(fieldID, new WrappedInt(0))
       fieldID -> map
     })(collection.breakOut)
     val fieldsValueCounter = new Array[Int](allFieldIDs.size)
@@ -100,12 +100,12 @@ object RawRowBasedTableDataSource {
     var rowHeaderValues:Array[Int] = null
     var value:Any = -1
     var newDataValue:Any = null
-    var lookUp:JMap[Any,MutableInt] = null
-    var intForValue:MutableInt = null
+    var lookUp:JMap[Any,WrappedInt] = null
+    var intForValue:WrappedInt = null
     var fieldsValueCounterIndex = -1
     var measureFieldIndex = -1
     var columnHeaderFieldPositions:Array[Int] = null
-    var columnHeaderLookUp:Array[JMap[Any,MutableInt]] = null
+    var columnHeaderLookUp:Array[JMap[Any,WrappedInt]] = null
     var columnHeaderValueCounter:Array[Int] = null
     var colHeaderValues:Array[Int] = null
     var measureFieldPosition = -1
@@ -137,9 +137,8 @@ object RawRowBasedTableDataSource {
         lookUp = filtersLookUp(filterCounter)
         intForValue = lookUp.get(value)
         if (intForValue == null) {
-          intForValue = new MutableInt
           fieldsValueCounterIndex = filtersValueCounter(filterCounter)
-          intForValue.int = fieldsValueCounter(fieldsValueCounterIndex) + 1
+          intForValue = new WrappedInt(fieldsValueCounter(fieldsValueCounterIndex) + 1)
           fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
           lookUp.put(value, intForValue)
           fieldValuesBitSets(field) += intForValue.int
@@ -160,9 +159,8 @@ object RawRowBasedTableDataSource {
         lookUp = rowHeadersLookUp(rowHeaderCounter)
         intForValue = lookUp.get(value)
         if (intForValue == null) {
-          intForValue = new MutableInt
           fieldsValueCounterIndex = rowHeadersValueCounter(rowHeaderCounter)
-          intForValue.int = fieldsValueCounter(fieldsValueCounterIndex) + 1
+          intForValue = new WrappedInt(fieldsValueCounter(fieldsValueCounterIndex) + 1)
           fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
           lookUp.put(value, intForValue)
           rowHeaderValues(rowHeaderCounter) = intForValue.int
@@ -214,9 +212,8 @@ object RawRowBasedTableDataSource {
             lookUp = columnHeaderLookUp(colHeaderColCounter)
             intForValue = lookUp.get(value)
             if (intForValue == null) {
-              intForValue = new MutableInt
               fieldsValueCounterIndex = columnHeaderValueCounter(colHeaderColCounter)
-              intForValue.int = fieldsValueCounter(fieldsValueCounterIndex) + 1
+              intForValue = new WrappedInt(fieldsValueCounter(fieldsValueCounterIndex) + 1)
               fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
               lookUp.put(value, intForValue)
               colHeaderValues(colHeaderColCounter) = intForValue.int
@@ -330,6 +327,4 @@ object RawRowBasedTableDataSource {
   }
 }
 
-private class MutableInt {
-  var int = 0
-}
+private class WrappedInt(val int:Int)

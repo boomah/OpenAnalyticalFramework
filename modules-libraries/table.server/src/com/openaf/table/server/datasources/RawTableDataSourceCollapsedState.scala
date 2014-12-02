@@ -7,7 +7,7 @@ import java.util.{HashMap => JMap}
  * Efficient way to determine whether a path is collapsed when used with the RawRowBasedTableDataSource
  */
 private[datasources] class RawTableDataSourceCollapsedState(field:Field[_], fieldIndex:Int,
-                                                            rowHeadersLookUp:Array[JMap[Any,MutableInt]],
+                                                            rowHeadersLookUp:Array[JMap[Any,WrappedInt]],
                                                             rowHeadersValueCounter:Array[Int],
                                                             fieldsValueCounter:Array[Int]) {
   private val (intPaths, isCollapsed) = {
@@ -16,8 +16,8 @@ private[datasources] class RawTableDataSourceCollapsedState(field:Field[_], fiel
       case AllCollapsed(expandedPaths) => (expandedPaths, true)
     }
 
-    var lookUp:JMap[Any,MutableInt] = null
-    var intForValue:MutableInt = null
+    var lookUp:JMap[Any,WrappedInt] = null
+    var intForValue:WrappedInt = null
     var fieldsValueCounterIndex = 0
 
     // TODO - maybe this should be converted into a while loop
@@ -27,9 +27,8 @@ private[datasources] class RawTableDataSourceCollapsedState(field:Field[_], fiel
         lookUp = rowHeadersLookUp(rowHeaderCounter)
         intForValue = lookUp.get(value)
         if (intForValue == null) {
-          intForValue = new MutableInt
           fieldsValueCounterIndex = rowHeadersValueCounter(rowHeaderCounter)
-          intForValue.int = fieldsValueCounter(fieldsValueCounterIndex) + 1
+          intForValue = new WrappedInt(fieldsValueCounter(fieldsValueCounterIndex) + 1)
           fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
           lookUp.put(value, intForValue)
         }
