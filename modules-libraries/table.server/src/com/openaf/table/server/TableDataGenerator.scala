@@ -33,14 +33,13 @@ object TableDataGenerator {
       }}
     }
 
-    val rowHeaderFieldIDs = tableState.tableLayout.rowHeaderFieldIDs
-    val rowHeaderFieldDefinitions = rowHeaderFieldIDs.map(fieldDefinition).toArray
-    val rowHeaderLookUps = rowHeaderFieldIDs.map(result.valueLookUp).toArray
-
-    val rowHeaderValues = result.rowHeaderValues
     if (!result.resultState.sortState.rowHeadersSorted) {
+      val rowHeaderFieldIDs = tableState.tableLayout.rowHeaderFieldIDs
+      val rowHeaderFieldDefinitions = rowHeaderFieldIDs.map(fieldDefinition).toArray
+      val rowHeaderLookUps = rowHeaderFieldIDs.map(result.valueLookUp).toArray
+
       util.Arrays.sort(
-        rowHeaderValues,
+        result.rowHeaderValues,
         new RowHeaderComparator(tableState.tableLayout.rowHeaderFields.toArray, rowHeaderFieldDefinitions,
           rowHeaderLookUps)
       )
@@ -121,7 +120,7 @@ object TableDataGenerator {
     
     // Populate the rows from the row header values and the data
     while (rowCounter < numRows) {
-      rowHeaderKey = rowHeaderValues(rowCounter - rowOffset)
+      rowHeaderKey = result.rowHeaderValues(rowCounter - rowOffset)
       row = new OpenAFTableRow(rowCounter, rowHeaderKey, new Array[Any](result.numColumnHeaderColumns))
       rows(rowCounter) = row
 
