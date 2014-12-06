@@ -34,24 +34,24 @@ object Result {
 case class ResultState(filterState:FilterState, totalsState:TotalsState, sortState:SortState)
 
 object ResultState {
-  val Default = ResultState(FilterState.Default, TotalsState.Default, SortState.Default)
+  val Default = ResultState(
+    FilterState(isFiltered = false),
+    TotalsState(totalsAdded = false),
+    SortState.NoSorting
+  )
 }
 
+/**
+ * Indicates whether the TableDataSource has done filtering or whether the TableDataGenerator needs to do it.
+ */
 case class FilterState(isFiltered:Boolean)
-
-object FilterState {
-  val Default = FilterState(isFiltered = false)
-}
 
 case class TotalsState(totalsAdded:Boolean)
 
-object TotalsState {
-  val Default = TotalsState(totalsAdded = true)
+case class SortState(filtersSorted:Boolean, rowHeadersSorted:Boolean, columnHeadersSorted:Boolean) {
+  def sortingRequired = !filtersSorted || !rowHeadersSorted || !columnHeadersSorted
 }
-
-case class SortState(filtersSorted:Boolean, rowHeadersSorted:Boolean, columnHeadersSorted:Boolean)
 
 object SortState {
   val NoSorting = SortState(filtersSorted=false, rowHeadersSorted=false, columnHeadersSorted=false)
-  val Default = NoSorting
 }

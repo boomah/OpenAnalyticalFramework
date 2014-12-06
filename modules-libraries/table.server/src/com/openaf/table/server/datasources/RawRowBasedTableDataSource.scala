@@ -7,15 +7,15 @@ import com.openaf.table.server.{FieldDefinition, FieldDefinitionGroups, NullFiel
 import java.util.{HashMap => JMap}
 import scala.collection.mutable
 
-case class RawRowBasedTableDataSource(data:Array[Array[Any]], fieldIDs:Array[FieldID],
-                                      fieldDefinitionGroups:FieldDefinitionGroups) extends TableDataSource {
-  def result(tableState:TableState) = RawRowBasedTableDataSource.result(tableState, data, fieldIDs, fieldDefinitionGroups)
-}
-
 /**
  * A Java style (while loops) TableDataSource used for testing and also as a benchmark for best case single threaded
  * performance.
  */
+class RawRowBasedTableDataSource(data:Array[Array[Any]], fieldIDs:Array[FieldID],
+                                 val fieldDefinitionGroups:FieldDefinitionGroups) extends TableDataSource {
+  def result(tableState:TableState) = RawRowBasedTableDataSource.result(tableState, data, fieldIDs, fieldDefinitionGroups)
+}
+
 object RawRowBasedTableDataSource {
   // This is far from idiomatic Scala. Written this way for speed.
   def result(tableState:TableState, data:Array[Array[Any]], fieldIDs:Array[FieldID],
@@ -92,6 +92,11 @@ object RawRowBasedTableDataSource {
     val aggregatedData = new mutable.AnyRefMap[DataPath,Any]
 
     val fieldValuesBitSets:Map[Field[_],mutable.BitSet] = tableState.allFields.map(_ -> new mutable.BitSet).toMap
+    val filterFieldsValuesBitSets = filterFields.map(field => fieldValuesBitSets(field))
+    val rowHeaderFieldsValuesBitSets = rowHeaderFields.map(field => fieldValuesBitSets(field))
+    val columnHeaderFields = tableState.columnHeaderLayout.allFields
+    val columnHeaderFieldsValuesBitSets = new Array[mutable.BitSet](columnHeaderFields.size)
+    columnHeaderFields.foreach(field => columnHeaderFieldsValuesBitSets(field.key.number) = fieldValuesBitSets(field))
 
     val dataLength = data.length
     var dataCounter = 0
@@ -111,7 +116,7 @@ object RawRowBasedTableDataSource {
     var measureFieldPosition = -1
     var key:DataPath = null
     var matchesFilter = true
-    var columnHeaderFields:Array[Field[_]] = null
+    var columnHeaderFieldsForPath:Array[Field[_]] = null
     var columnHeaderFieldDefinitions:Array[FieldDefinition] = null
     var columnHeaderPath:ColumnHeaderPath = null
 
@@ -141,9 +146,9 @@ object RawRowBasedTableDataSource {
           intForValue = new WrappedInt(fieldsValueCounter(fieldsValueCounterIndex) + 1)
           fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
           lookUp.put(value, intForValue)
-          fieldValuesBitSets(field) += intForValue.int
+          filterFieldsValuesBitSets(filterCounter) += intForValue.int
         } else {
-          fieldValuesBitSets(field) += intForValue.int
+          filterFieldsValuesBitSets(filterCounter) += intForValue.int
         }
         filterCounter += 1
       }
@@ -164,10 +169,10 @@ object RawRowBasedTableDataSource {
           fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
           lookUp.put(value, intForValue)
           rowHeaderValues(rowHeaderCounter) = intForValue.int
-          fieldValuesBitSets(field) += intForValue.int
+          rowHeaderFieldsValuesBitSets(rowHeaderCounter) += intForValue.int
         } else {
           rowHeaderValues(rowHeaderCounter) = intForValue.int
-          fieldValuesBitSets(field) += intForValue.int
+          rowHeaderFieldsValuesBitSets(rowHeaderCounter) += intForValue.int
         }
 
         // Don't add totals for the last row header field
@@ -201,13 +206,13 @@ object RawRowBasedTableDataSource {
         columnHeaderValueCounter = colHeadersValuesCounter(pathsCounter)
         numColumnHeaderCols = numColumnHeaderColsPerPath(pathsCounter)
         colHeaderValues = new Array[Int](numColumnHeaderCols)
-        columnHeaderFields = columnHeaderPathsFields(pathsCounter)
+        columnHeaderFieldsForPath = columnHeaderPathsFields(pathsCounter)
         columnHeaderFieldDefinitions = columnHeaderPathsFieldDefinitions(pathsCounter)
         while (matchesFilter && colHeaderColCounter < numColumnHeaderCols) {
           if (colHeaderColCounter != measureFieldIndex) {
             value = dataRow(columnHeaderFieldPositions(colHeaderColCounter))
             val fieldDefinition = columnHeaderFieldDefinitions(colHeaderColCounter)
-            val field = columnHeaderFields(colHeaderColCounter).asInstanceOf[Field[fieldDefinition.V]]
+            val field = columnHeaderFieldsForPath(colHeaderColCounter).asInstanceOf[Field[fieldDefinition.V]]
             matchesFilter = field.filter.matches(value.asInstanceOf[fieldDefinition.V])
             lookUp = columnHeaderLookUp(colHeaderColCounter)
             intForValue = lookUp.get(value)
@@ -217,10 +222,10 @@ object RawRowBasedTableDataSource {
               fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
               lookUp.put(value, intForValue)
               colHeaderValues(colHeaderColCounter) = intForValue.int
-              fieldValuesBitSets(field) += intForValue.int
+              columnHeaderFieldsValuesBitSets(field.key.number) += intForValue.int
             } else {
               colHeaderValues(colHeaderColCounter) = intForValue.int
-              fieldValuesBitSets(field) += intForValue.int
+              columnHeaderFieldsValuesBitSets(field.key.number) += intForValue.int
             }
           }
           colHeaderColCounter += 1

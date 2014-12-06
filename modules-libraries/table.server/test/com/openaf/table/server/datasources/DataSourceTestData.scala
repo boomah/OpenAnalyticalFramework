@@ -51,7 +51,7 @@ object DataSourceTestData {
   val EmptySet:Set[List[Int]] = Set.empty
   val EmptyMapList:List[Map[(List[Int],List[Int]),Int]] = List(Map.empty)
 
-  val dataSource = RawRowBasedTableDataSource(data, FieldIDs, Groups)
+  val dataSource = new RawRowBasedTableDataSource(data, FieldIDs, Groups)
 
   def nameFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2,3,4,5,6))
   def orderedNameFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(6,3,2,4,5,1))
