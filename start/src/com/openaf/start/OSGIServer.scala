@@ -3,7 +3,7 @@ package com.openaf.start
 import ServerOSGIInstanceStarter._
 import collection.mutable.ListBuffer
 
-object Server {
+object OSGIServer {
   def main(args:Array[String]) {
     System.setProperty("org.osgi.service.http.port", "7777")
     startOrTrigger(TopLevel, guiConfig _, serverConfig _)

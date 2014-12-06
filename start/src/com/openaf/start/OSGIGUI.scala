@@ -2,7 +2,7 @@ package com.openaf.start
 
 import java.net.{URL, Socket}
 
-object GUI {
+object OSGIGUI {
   def main(args:Array[String]) {
     import StartUtils._
     if (!javaVersionValid(MinimumJavaVersion)) {

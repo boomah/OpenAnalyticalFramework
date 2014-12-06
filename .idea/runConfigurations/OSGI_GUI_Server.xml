@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="GUI+Server" type="Application" factoryName="Application">
+  <configuration default="false" name="OSGI GUI+Server" type="Application" factoryName="Application">
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
       <pattern>
         <option name="PATTERN" value="com.openaf.bootstrapper.*" />
@@ -26,7 +26,7 @@
     <ConfigurationWrapper RunnerId="Debug" />
     <ConfigurationWrapper RunnerId="Run" />
     <method>
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Server" run_configuration_type="Application" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="OSGI Server" run_configuration_type="Application" />
     </method>
   </configuration>
 </component>
