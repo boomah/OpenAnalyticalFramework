@@ -4,41 +4,43 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/OpenAnalyticalFramework.iml" filepath="$PROJECT_DIR$/OpenAnalyticalFramework.iml" />
       <module fileurl="file://$PROJECT_DIR$/bootstrapper/bootstrapper.iml" filepath="$PROJECT_DIR$/bootstrapper/bootstrapper.iml" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/browser/gui/browser.gui.iml" filepath="$PROJECT_DIR$/modules-components/browser/gui/browser.gui.iml" group="browser" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/browser/gui.api/browser.gui.api.iml" filepath="$PROJECT_DIR$/modules-components/browser/gui.api/browser.gui.api.iml" group="browser" />
-      <module fileurl="file://$PROJECT_DIR$/modules-libraries/cache/cache.iml" filepath="$PROJECT_DIR$/modules-libraries/cache/cache.iml" />
-      <module fileurl="file://$PROJECT_DIR$/modules-libraries/gui.utils/gui.utils.iml" filepath="$PROJECT_DIR$/modules-libraries/gui.utils/gui.utils.iml" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/guiServlet/impl/guiServlet.impl.iml" filepath="$PROJECT_DIR$/modules-components/guiServlet/impl/guiServlet.impl.iml" />
-      <module fileurl="file://$PROJECT_DIR$/modules-libraries/osgi/osgi.iml" filepath="$PROJECT_DIR$/modules-libraries/osgi/osgi.iml" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/pageManager/api/pageManager.api.iml" filepath="$PROJECT_DIR$/modules-components/pageManager/api/pageManager.api.iml" group="pageManager" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/pageManager/impl/pageManager.impl.iml" filepath="$PROJECT_DIR$/modules-components/pageManager/impl/pageManager.impl.iml" group="pageManager" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/properties/api/properties.api.iml" filepath="$PROJECT_DIR$/modules-components/properties/api/properties.api.iml" group="properties" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/properties/impl/properties.impl.iml" filepath="$PROJECT_DIR$/modules-components/properties/impl/properties.impl.iml" group="properties" />
-      <module fileurl="file://$PROJECT_DIR$/modules-libraries/rmi.client/rmi.client.iml" filepath="$PROJECT_DIR$/modules-libraries/rmi.client/rmi.client.iml" group="rmi" />
-      <module fileurl="file://$PROJECT_DIR$/modules-libraries/rmi.common/rmi.common.iml" filepath="$PROJECT_DIR$/modules-libraries/rmi.common/rmi.common.iml" group="rmi" />
-      <module fileurl="file://$PROJECT_DIR$/modules-libraries/rmi.server/rmi.server.iml" filepath="$PROJECT_DIR$/modules-libraries/rmi.server/rmi.server.iml" group="rmi" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/rmiClientConnector/gui/rmiClientConnector.gui.iml" filepath="$PROJECT_DIR$/modules-components/rmiClientConnector/gui/rmiClientConnector.gui.iml" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/rmiServerConnector/impl/rmiServerConnector.impl.iml" filepath="$PROJECT_DIR$/modules-components/rmiServerConnector/impl/rmiServerConnector.impl.iml" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/sport/api/sport.api.iml" filepath="$PROJECT_DIR$/modules-components/sport/api/sport.api.iml" group="sport" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/sport/gui/sport.gui.iml" filepath="$PROJECT_DIR$/modules-components/sport/gui/sport.gui.iml" group="sport" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/sport/impl/sport.impl.iml" filepath="$PROJECT_DIR$/modules-components/sport/impl/sport.impl.iml" group="sport" />
-      <module fileurl="file://$PROJECT_DIR$/start/start.iml" filepath="$PROJECT_DIR$/start/start.iml" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/table/api/table.api.iml" filepath="$PROJECT_DIR$/modules-components/table/api/table.api.iml" group="table" />
-      <module fileurl="file://$PROJECT_DIR$/modules-libraries/table.gui/table.gui.iml" filepath="$PROJECT_DIR$/modules-libraries/table.gui/table.gui.iml" group="table/lib" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/table/gui.api/table.gui.api.iml" filepath="$PROJECT_DIR$/modules-components/table/gui.api/table.gui.api.iml" group="table" />
-      <module fileurl="file://$PROJECT_DIR$/modules-libraries/table.lib.api/table.lib.api.iml" filepath="$PROJECT_DIR$/modules-libraries/table.lib.api/table.lib.api.iml" group="table/lib" />
-      <module fileurl="file://$PROJECT_DIR$/modules-libraries/table.server/table.server.iml" filepath="$PROJECT_DIR$/modules-libraries/table.server/table.server.iml" group="table/lib" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/test/api/test.api.iml" filepath="$PROJECT_DIR$/modules-components/test/api/test.api.iml" group="test" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/test/impl/test.impl.iml" filepath="$PROJECT_DIR$/modules-components/test/impl/test.impl.iml" group="test" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/testConsumer/gui/testConsumer.gui.iml" filepath="$PROJECT_DIR$/modules-components/testConsumer/gui/testConsumer.gui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/browser.gui/browser.gui.iml" filepath="$PROJECT_DIR$/modules/browser.gui/browser.gui.iml" group="browser" />
+      <module fileurl="file://$PROJECT_DIR$/modules/browser.guiapi/browser.guiapi.iml" filepath="$PROJECT_DIR$/modules/browser.guiapi/browser.guiapi.iml" group="browser" />
+      <module fileurl="file://$PROJECT_DIR$/modules/cache.api/cache.api.iml" filepath="$PROJECT_DIR$/modules/cache.api/cache.api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/guiServlet.impl/guiServlet.impl.iml" filepath="$PROJECT_DIR$/modules/guiServlet.impl/guiServlet.impl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/osgi.api/osgi.api.iml" filepath="$PROJECT_DIR$/modules/osgi.api/osgi.api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/osgi.start/osgi.start.iml" filepath="$PROJECT_DIR$/osgi.start/osgi.start.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/pageManager.api/pageManager.api.iml" filepath="$PROJECT_DIR$/modules/pageManager.api/pageManager.api.iml" group="pageManager" />
+      <module fileurl="file://$PROJECT_DIR$/modules/pageManager.impl/pageManager.impl.iml" filepath="$PROJECT_DIR$/modules/pageManager.impl/pageManager.impl.iml" group="pageManager" />
+      <module fileurl="file://$PROJECT_DIR$/modules/properties.api/properties.api.iml" filepath="$PROJECT_DIR$/modules/properties.api/properties.api.iml" group="properties" />
+      <module fileurl="file://$PROJECT_DIR$/modules/properties.impl/properties.impl.iml" filepath="$PROJECT_DIR$/modules/properties.impl/properties.impl.iml" group="properties" />
+      <module fileurl="file://$PROJECT_DIR$/modules/rmi.api/rmi.api.iml" filepath="$PROJECT_DIR$/modules/rmi.api/rmi.api.iml" group="rmi" />
+      <module fileurl="file://$PROJECT_DIR$/modules/rmi.gui/rmi.gui.iml" filepath="$PROJECT_DIR$/modules/rmi.gui/rmi.gui.iml" group="rmi" />
+      <module fileurl="file://$PROJECT_DIR$/modules/rmi.impl/rmi.impl.iml" filepath="$PROJECT_DIR$/modules/rmi.impl/rmi.impl.iml" group="rmi" />
+      <module fileurl="file://$PROJECT_DIR$/modules/rmiClientConnector.gui/rmiClientConnector.gui.iml" filepath="$PROJECT_DIR$/modules/rmiClientConnector.gui/rmiClientConnector.gui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/rmiServerConnector.impl/rmiServerConnector.impl.iml" filepath="$PROJECT_DIR$/modules/rmiServerConnector.impl/rmiServerConnector.impl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/sport.api/sport.api.iml" filepath="$PROJECT_DIR$/modules/sport.api/sport.api.iml" group="sport" />
+      <module fileurl="file://$PROJECT_DIR$/modules/sport.gui/sport.gui.iml" filepath="$PROJECT_DIR$/modules/sport.gui/sport.gui.iml" group="sport" />
+      <module fileurl="file://$PROJECT_DIR$/modules/sport.impl/sport.impl.iml" filepath="$PROJECT_DIR$/modules/sport.impl/sport.impl.iml" group="sport" />
+      <module fileurl="file://$PROJECT_DIR$/start.gui/start.gui.iml" filepath="$PROJECT_DIR$/start.gui/start.gui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/start.server/start.server.iml" filepath="$PROJECT_DIR$/start.server/start.server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/table.api/table.api.iml" filepath="$PROJECT_DIR$/modules/table.api/table.api.iml" group="table" />
+      <module fileurl="file://$PROJECT_DIR$/modules/table.gui/table.gui.iml" filepath="$PROJECT_DIR$/modules/table.gui/table.gui.iml" group="table/lib" />
+      <module fileurl="file://$PROJECT_DIR$/modules/table.guiapi/table.guiapi.iml" filepath="$PROJECT_DIR$/modules/table.guiapi/table.guiapi.iml" group="table" />
+      <module fileurl="file://$PROJECT_DIR$/modules/table.impl/table.impl.iml" filepath="$PROJECT_DIR$/modules/table.impl/table.impl.iml" group="table/lib" />
+      <module fileurl="file://$PROJECT_DIR$/modules/table.lib.api/table.lib.api.iml" filepath="$PROJECT_DIR$/modules/table.lib.api/table.lib.api.iml" group="table/lib" />
+      <module fileurl="file://$PROJECT_DIR$/modules/test.api/test.api.iml" filepath="$PROJECT_DIR$/modules/test.api/test.api.iml" group="test" />
+      <module fileurl="file://$PROJECT_DIR$/modules/test.impl/test.impl.iml" filepath="$PROJECT_DIR$/modules/test.impl/test.impl.iml" group="test" />
+      <module fileurl="file://$PROJECT_DIR$/modules/testConsumer.gui/testConsumer.gui.iml" filepath="$PROJECT_DIR$/modules/testConsumer.gui/testConsumer.gui.iml" />
       <module fileurl="file://$PROJECT_DIR$/testing/testing.iml" filepath="$PROJECT_DIR$/testing/testing.iml" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/travel/api/travel.api.iml" filepath="$PROJECT_DIR$/modules-components/travel/api/travel.api.iml" group="travel" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/travel/gui/travel.gui.iml" filepath="$PROJECT_DIR$/modules-components/travel/gui/travel.gui.iml" group="travel" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/travel/impl/travel.impl.iml" filepath="$PROJECT_DIR$/modules-components/travel/impl/travel.impl.iml" group="travel" />
-      <module fileurl="file://$PROJECT_DIR$/modules-libraries/utils/utils.iml" filepath="$PROJECT_DIR$/modules-libraries/utils/utils.iml" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/viewer/api/viewer.api.iml" filepath="$PROJECT_DIR$/modules-components/viewer/api/viewer.api.iml" group="viewer" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/viewer/gui/viewer.gui.iml" filepath="$PROJECT_DIR$/modules-components/viewer/gui/viewer.gui.iml" group="viewer" />
-      <module fileurl="file://$PROJECT_DIR$/modules-components/viewer/impl/viewer.impl.iml" filepath="$PROJECT_DIR$/modules-components/viewer/impl/viewer.impl.iml" group="viewer" />
+      <module fileurl="file://$PROJECT_DIR$/modules/travel.api/travel.api.iml" filepath="$PROJECT_DIR$/modules/travel.api/travel.api.iml" group="travel" />
+      <module fileurl="file://$PROJECT_DIR$/modules/travel.gui/travel.gui.iml" filepath="$PROJECT_DIR$/modules/travel.gui/travel.gui.iml" group="travel" />
+      <module fileurl="file://$PROJECT_DIR$/modules/travel.impl/travel.impl.iml" filepath="$PROJECT_DIR$/modules/travel.impl/travel.impl.iml" group="travel" />
+      <module fileurl="file://$PROJECT_DIR$/modules/utils.gui/utils.gui.iml" filepath="$PROJECT_DIR$/modules/utils.gui/utils.gui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/utils.impl/utils.impl.iml" filepath="$PROJECT_DIR$/modules/utils.impl/utils.impl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/viewer.api/viewer.api.iml" filepath="$PROJECT_DIR$/modules/viewer.api/viewer.api.iml" group="viewer" />
+      <module fileurl="file://$PROJECT_DIR$/modules/viewer.gui/viewer.gui.iml" filepath="$PROJECT_DIR$/modules/viewer.gui/viewer.gui.iml" group="viewer" />
+      <module fileurl="file://$PROJECT_DIR$/modules/viewer.impl/viewer.impl.iml" filepath="$PROJECT_DIR$/modules/viewer.impl/viewer.impl.iml" group="viewer" />
     </modules>
   </component>
 </project>
