@@ -2,7 +2,6 @@ package com.openaf.travel
 
 import api.{HotelsPageData, FlightsAndHotelsPage, HotelsPage, TravelPageDataFacility}
 import com.openaf.pagemanager.api.{NoPageData, Page}
-import com.openaf.table.server.TableDataGenerator
 
 class TravelPageDataFacilityImpl extends TravelPageDataFacility {
   private val hotelsTableDataSource = new HotelsTableDataSource
@@ -16,7 +15,7 @@ class TravelPageDataFacilityImpl extends TravelPageDataFacility {
   }
 
   private def hotelsPageData(hotelsPage:HotelsPage) = {
-    val tableData = TableDataGenerator.tableData(hotelsPage.tableState, hotelsTableDataSource)
+    val tableData = hotelsTableDataSource.tableData(hotelsPage.tableState)
     HotelsPageData(tableData)
   }
 

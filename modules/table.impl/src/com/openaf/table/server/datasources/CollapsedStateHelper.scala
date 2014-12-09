@@ -4,12 +4,10 @@ import com.openaf.table.lib.api._
 import java.util.{HashMap => JMap}
 
 /**
- * Efficient way to determine whether a path is collapsed when used with the RawRowBasedTableDataSource
+ * Efficient way to determine whether a path is collapsed when used with the UnfilteredArrayTableDataSource
  */
-private[datasources] class RawTableDataSourceCollapsedState(field:Field[_], fieldIndex:Int,
-                                                            rowHeadersLookUp:Array[JMap[Any,WrappedInt]],
-                                                            rowHeadersValueCounter:Array[Int],
-                                                            fieldsValueCounter:Array[Int]) {
+private[datasources] class CollapsedStateHelper(field:Field[_], fieldIndex:Int, rowHeadersLookUp:Array[JMap[Any,WrappedInt]],
+                                                rowHeadersValueCounter:Array[Int], fieldsValueCounter:Array[Int]) {
   private val (intPaths, isCollapsed) = {
     val (paths, isCollapsed) = field.totals.collapsedState match {
       case AllExpanded(collapsedPaths) => (collapsedPaths, false)

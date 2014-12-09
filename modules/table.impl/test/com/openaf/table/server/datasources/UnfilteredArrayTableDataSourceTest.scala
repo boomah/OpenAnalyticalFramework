@@ -4,7 +4,7 @@ import org.scalatest.FunSuite
 import DataSourceTestData._
 import com.openaf.table.lib.api._
 
-class RawRowBasedTableDataSourceTest extends FunSuite {
+class UnfilteredArrayTableDataSourceTest extends FunSuite {
   test("1 row (key), 0 measure, 0 column") {
     val tableState = TableState.Blank.withRowHeaderFields(List(NameField))
 

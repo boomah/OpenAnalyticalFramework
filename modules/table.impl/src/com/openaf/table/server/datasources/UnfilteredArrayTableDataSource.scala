@@ -3,23 +3,29 @@ package com.openaf.table.server.datasources
 import com.openaf.table.lib.api._
 import com.openaf.table.lib.api.StandardFields._
 import com.openaf.table.lib.api.TableValues._
-import com.openaf.table.server.{FieldDefinition, FieldDefinitionGroups, NullFieldDefinition}
+import com.openaf.table.server.{TableDataGenerator, FieldDefinition, NullFieldDefinition}
 import java.util.{HashMap => JMap}
 import scala.collection.mutable
 
 /**
- * A Java style (while loops) TableDataSource used for testing and also as a benchmark for best case single threaded
- * performance.
+ * TableDataSource that generates field values and totals as well as applying filters and sorting.
+ *
+ * Implementations provide the data as a 2D array for performance reasons. This array should not be updated whilst it is
+ * in use.
+ *
+ * Implementation detail: The TableData generation is done in a Java style (while loops) for performance reasons. As
+ * such this TableDataSource can be used as a benchmark for best case single threaded performance.
  */
-class RawRowBasedTableDataSource(data:Array[Array[Any]], fieldIDs:Array[FieldID],
-                                 val fieldDefinitionGroups:FieldDefinitionGroups) extends TableDataSource {
-  def result(tableState:TableState) = RawRowBasedTableDataSource.result(tableState, data, fieldIDs, fieldDefinitionGroups)
-}
+trait UnfilteredArrayTableDataSource extends TableDataSource {
+  def fieldIDs:Array[FieldID]
+  def data:Array[Array[Any]]
+  def tableData(tableStateNoKeys:TableState) = {
+    val tableState = tableStateNoKeys.generateFieldKeys
+    val generatedPivotData = pivotData(tableState)
+    TableDataGenerator.tableData(generatedPivotData)
+  }
 
-object RawRowBasedTableDataSource {
-  // This is far from idiomatic Scala. Written this way for speed.
-  def result(tableState:TableState, data:Array[Array[Any]], fieldIDs:Array[FieldID],
-             fieldDefinitionGroups:FieldDefinitionGroups) = {
+  def pivotData(tableState:TableState) = {
     val fieldDefinitionGroup = fieldDefinitionGroups.rootGroup
     val allFieldIDs = tableState.distinctFieldIDs
     val fieldIDToLookUp:Map[FieldID,JMap[Any,WrappedInt]] = allFieldIDs.map(fieldID => {
@@ -125,7 +131,7 @@ object RawRowBasedTableDataSource {
     var numRowTotals = 0
 
     val rowHeaderCollapsedStates = rowHeaderFields.zipWithIndex.map{case (field,fieldIndex) => {
-      new RawTableDataSourceCollapsedState(field, fieldIndex, rowHeadersLookUp, rowHeadersValueCounter, fieldsValueCounter)
+      new CollapsedStateHelper(field, fieldIndex, rowHeadersLookUp, rowHeadersValueCounter, fieldsValueCounter)
     }}
     var rowHeaderCollapsed = false
 
@@ -309,12 +315,7 @@ object RawRowBasedTableDataSource {
     }
 
     val fieldValues = FieldValues(fieldValuesBitSets.map{case (field,bitSet) => field -> bitSet.toArray}.toMap)
-    val resultDetails = ResultState(
-      FilterState(isFiltered = true),
-      TotalsState(totalsAdded = true),
-      SortState.NoSorting
-    )
-    Result(rowHeadersToUse, columnHeaderPaths.toArray, aggregatedData.toMap, fieldValues, valueLookUp, resultDetails)
+    PivotData(tableState, fieldDefinitionGroups, rowHeadersToUse, columnHeaderPaths.toArray, aggregatedData.toMap, fieldValues, valueLookUp)
   }
 
   @inline private def generateTotalArray(array:Array[Int], upTo:Int, totalInt:Int) = {

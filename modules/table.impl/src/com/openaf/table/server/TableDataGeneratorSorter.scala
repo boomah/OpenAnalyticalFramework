@@ -1,19 +1,20 @@
 package com.openaf.table.server
 
-import com.openaf.table.lib.api.{Field, FieldID, TableState}
-import com.openaf.table.server.datasources.{TableDataSource, Result}
+import com.openaf.table.lib.api.{Field, FieldID}
+import com.openaf.table.server.datasources.PivotData
 import java.util
 
-private[server] class TableDataGeneratorSorter(result:Result, tableState:TableState, tableDataSource:TableDataSource) {
-  private def fieldDefinition(id:FieldID) = tableDataSource.fieldDefinitionGroups.fieldDefinition(id)
+private[server] class TableDataGeneratorSorter(pivotData:PivotData) {
+  private def fieldDefinition(id:FieldID) = pivotData.fieldDefinitionGroups.fieldDefinition(id)
+  private val tableState = pivotData.tableState
 
   def sortFilterFieldValues() {
     val filterFieldIDs = tableState.tableLayout.filterFieldIDs
     val filterFieldDefinitions = filterFieldIDs.map(fieldDefinition).toArray
-    val filterLookUps = filterFieldIDs.map(result.valueLookUp).toArray
+    val filterLookUps = filterFieldIDs.map(pivotData.valueLookUp).toArray
 
     tableState.filterFields.zipWithIndex.foreach{case (field,i) => {
-      val fieldValues = result.fieldValues.values(field)
+      val fieldValues = pivotData.fieldValues.values(field)
       val fieldDefinition = filterFieldDefinitions(i)
       val ordering = fieldDefinition.ordering
       val lookUp = filterLookUps(i).asInstanceOf[Array[fieldDefinition.V]]
@@ -24,16 +25,16 @@ private[server] class TableDataGeneratorSorter(result:Result, tableState:TableSt
   def sortRowHeaderAndFieldValues() {
     val rowHeaderFieldIDs = tableState.tableLayout.rowHeaderFieldIDs
     val rowHeaderFieldDefinitions = rowHeaderFieldIDs.map(fieldDefinition).toArray
-    val rowHeaderLookUps = rowHeaderFieldIDs.map(result.valueLookUp).toArray
+    val rowHeaderLookUps = rowHeaderFieldIDs.map(pivotData.valueLookUp).toArray
 
     util.Arrays.sort(
-      result.rowHeaderValues,
+      pivotData.rowHeaderValues,
       new RowHeaderComparator(tableState.tableLayout.rowHeaderFields.toArray, rowHeaderFieldDefinitions,
         rowHeaderLookUps)
     )
 
     tableState.rowHeaderFields.zipWithIndex.foreach{case (field,i) => {
-      val fieldValues = result.fieldValues.values(field)
+      val fieldValues = pivotData.fieldValues.values(field)
       val fieldDefinition = rowHeaderFieldDefinitions(i)
       val ordering = fieldDefinition.ordering
       val lookUp = rowHeaderLookUps(i).asInstanceOf[Array[fieldDefinition.V]]
@@ -50,16 +51,16 @@ private[server] class TableDataGeneratorSorter(result:Result, tableState:TableSt
     val columnHeaderFieldKeyLookUps = new Array[Array[Any]](columnHeaderFields.size)
     columnHeaderFields.foreach(field => {
       columnHeaderFieldKeyFieldDefinitions(field.key.number) = fieldDefinition(field.id)
-      columnHeaderFieldKeyLookUps(field.key.number) = result.valueLookUp(field.id)
+      columnHeaderFieldKeyLookUps(field.key.number) = pivotData.valueLookUp(field.id)
     })
 
     util.Arrays.sort(
-      result.columnHeaderPaths,
+      pivotData.columnHeaderPaths,
       new ColumnHeaderPathComparator(pathIndexToFields, columnHeaderFieldKeyFieldDefinitions, columnHeaderFieldKeyLookUps)
     )
 
     columnHeaderFields.foreach(field => {
-      val fieldValues = result.fieldValues.values(field)
+      val fieldValues = pivotData.fieldValues.values(field)
       val fieldDefinition = columnHeaderFieldKeyFieldDefinitions(field.key.number)
       val ordering = fieldDefinition.ordering
       val lookUp = columnHeaderFieldKeyLookUps(field.key.number).asInstanceOf[Array[fieldDefinition.V]]

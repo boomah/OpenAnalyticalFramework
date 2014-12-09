@@ -2,10 +2,10 @@ package com.openaf.sport
 
 import com.openaf.table.server._
 import com.openaf.sport.api.SportPage._
-import com.openaf.table.lib.api.{FieldID, TableState}
-import com.openaf.table.server.datasources.{RawRowBasedTableDataSource, TableDataSource}
+import com.openaf.table.lib.api.FieldID
+import com.openaf.table.server.datasources.UnfilteredArrayTableDataSource
 
-class GoalsTableDataSource extends TableDataSource {
+class GoalsTableDataSource extends UnfilteredArrayTableDataSource {
   val fieldDefinitions:List[Either[FieldDefinitionGroup,FieldDefinition]] = List(
     StringFieldDefinition(PlayerField), IntFieldDefinition(TimeField), StringFieldDefinition(TeamField),
     StringFieldDefinition(OppositionTeamField), StringFieldDefinition(VenueField), StringFieldDefinition(DateField),
@@ -29,5 +29,4 @@ class GoalsTableDataSource extends TableDataSource {
     DateField.id, KickOffTimeField.id, CompetitionField.id)
 
   def fieldDefinitionGroups = FieldDefinitionGroups(List(FieldDefinitionGroup.Standard, FieldDefinitionGroup("Goals", fieldDefinitions)))
-  def result(tableState:TableState) = RawRowBasedTableDataSource.result(tableState, data, fieldIDs, fieldDefinitionGroups)
 }

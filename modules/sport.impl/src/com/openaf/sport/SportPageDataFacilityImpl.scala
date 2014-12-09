@@ -2,7 +2,6 @@ package com.openaf.sport
 
 import com.openaf.sport.api.{GoalsPageData, GoalsPage, SportPageDataFacility}
 import com.openaf.pagemanager.api.{NoPageData, Page}
-import com.openaf.table.server.TableDataGenerator
 
 class SportPageDataFacilityImpl extends SportPageDataFacility {
   private val goalsTableDataSource = new GoalsTableDataSource
@@ -15,7 +14,7 @@ class SportPageDataFacilityImpl extends SportPageDataFacility {
   }
 
   private def goalsPageData(goalsPage:GoalsPage) = {
-    val tableData = TableDataGenerator.tableData(goalsPage.tableState, goalsTableDataSource)
+    val tableData = goalsTableDataSource.tableData(goalsPage.tableState)
     GoalsPageData(tableData)
   }
 }

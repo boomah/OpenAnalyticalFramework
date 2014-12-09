@@ -5,7 +5,7 @@ import DataSourceTestData._
 import com.openaf.table.lib.api._
 import TableValues._
 
-class RawRowBasedTableDataSourceTotalsTest extends FunSuite {
+class UnfilteredArrayTableDataSourceTotalsTest extends FunSuite {
   test("1 row (totals top), 1 measure, 0 column") {
     val genderField = GenderField.withTotals(Totals(top = true))
     val tableState = TableState.Blank

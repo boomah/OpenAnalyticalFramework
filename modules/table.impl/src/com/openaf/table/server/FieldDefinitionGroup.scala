@@ -32,3 +32,7 @@ case class FieldDefinitionGroups(fieldDefinitionGroups:Seq[FieldDefinitionGroup]
   def fieldGroup = rootGroup.fieldGroup
   def fieldDefinition(fieldID:FieldID) = fieldDefinitionGroups.flatMap(_.fieldDefinitions).find(_.fieldID == fieldID).get
 }
+
+object FieldDefinitionGroups {
+  val Empty = FieldDefinitionGroups(List(FieldDefinitionGroup.Empty))
+}

@@ -5,7 +5,7 @@ import DataSourceTestData._
 import com.openaf.table.lib.api._
 import TableValues._
 
-class RawRowBasedTableDataSourceCollapsedStateTest extends FunSuite {
+class UnfilteredArrayTableDataSourceCollapsedStateTest extends FunSuite {
   test("2 row (first row, first value collapsed), 1 measure, 0 column") {
     val genderField = GenderField.withTotals(Totals(collapsedState = AllExpanded(Set(CollapsedStatePath(Array(F))))))
     val tableState = TableState.Blank

@@ -1,48 +1,35 @@
 package com.openaf.table.server
 
 import com.openaf.table.lib.api._
-import com.openaf.table.server.datasources.{DataPath, TableDataSource}
+import com.openaf.table.server.datasources.{PivotData, DataPath}
 
 object TableDataGenerator {
   // This is far from idiomatic Scala. Written this way for speed.
-  def tableData(tableStateNoKeys:TableState, tableDataSource:TableDataSource) = {
-    val tableState = tableStateNoKeys.generateFieldKeys
-    val result = tableDataSource.result(tableState)
+  def tableData(pivotData:PivotData) = {
+    val sorter = new TableDataGeneratorSorter(pivotData)
+    sorter.sortFilterFieldValues()
+    sorter.sortRowHeaderAndFieldValues()
+    sorter.sortColumnHeaderAndFieldValues()
 
-    if (result.resultState.sortState.sortingRequired) {
-      val sorter = new TableDataGeneratorSorter(result, tableState, tableDataSource)
-
-      if (!result.resultState.sortState.filtersSorted) {
-        sorter.sortFilterFieldValues()
-      }
-
-      if (!result.resultState.sortState.rowHeadersSorted) {
-        sorter.sortRowHeaderAndFieldValues()
-      }
-
-      if (!result.resultState.sortState.columnHeadersSorted) {
-        sorter.sortColumnHeaderAndFieldValues()
-      }
-    }
-
-    val extraRowForRowHeaderFields = tableState.rowHeaderFields.nonEmpty && (result.numColumnHeaderRows == 0)
-    val numRows = result.numRows + (if (extraRowForRowHeaderFields) 1 else 0)
+    val tableState = pivotData.tableState
+    val extraRowForRowHeaderFields = tableState.rowHeaderFields.nonEmpty && (pivotData.numColumnHeaderRows == 0)
+    val numRows = pivotData.numRows + (if (extraRowForRowHeaderFields) 1 else 0)
     val rows = new Array[OpenAFTableRow](numRows)
     var rowCounter = 0
     var columnCounter = 0
-    val blankRowHeaderValues = Array.fill(result.numRowHeaderColumns)(TableValues.NoValueInt)
+    val blankRowHeaderValues = Array.fill(pivotData.numRowHeaderColumns)(TableValues.NoValueInt)
     var row:OpenAFTableRow = null
     var rowHeaderKey:Array[Int] = null
     var key:DataPath = null
 
     // Populate the rows from the column headers
-    while (rowCounter < result.numColumnHeaderRows) {
-      row = new OpenAFTableRow(rowCounter, blankRowHeaderValues, new Array[Any](result.numColumnHeaderColumns))
+    while (rowCounter < pivotData.numColumnHeaderRows) {
+      row = new OpenAFTableRow(rowCounter, blankRowHeaderValues, new Array[Any](pivotData.numColumnHeaderColumns))
       rows(rowCounter) = row
 
-      while (columnCounter < result.numColumnHeaderColumns) {
-        row.columnHeaderAndDataValues(columnCounter) = if (rowCounter < result.columnHeaderPaths(columnCounter).values.length) {
-          result.columnHeaderPaths(columnCounter).values(rowCounter)
+      while (columnCounter < pivotData.numColumnHeaderColumns) {
+        row.columnHeaderAndDataValues(columnCounter) = if (rowCounter < pivotData.columnHeaderPaths(columnCounter).values.length) {
+          pivotData.columnHeaderPaths(columnCounter).values(rowCounter)
         } else {
           TableValues.NoValueInt
         }
@@ -62,17 +49,17 @@ object TableDataGenerator {
       val row = rowCounter - 1
       rows(row) = new OpenAFTableRow(row, rowHeaderFieldsArray, rows(row).columnHeaderAndDataValues)
     }
-    val rowOffset = if (extraRowForRowHeaderFields) 1 + result.numColumnHeaderRows else result.numColumnHeaderRows
+    val rowOffset = if (extraRowForRowHeaderFields) 1 + pivotData.numColumnHeaderRows else pivotData.numColumnHeaderRows
     
     // Populate the rows from the row header values and the data
     while (rowCounter < numRows) {
-      rowHeaderKey = result.rowHeaderValues(rowCounter - rowOffset)
-      row = new OpenAFTableRow(rowCounter, rowHeaderKey, new Array[Any](result.numColumnHeaderColumns))
+      rowHeaderKey = pivotData.rowHeaderValues(rowCounter - rowOffset)
+      row = new OpenAFTableRow(rowCounter, rowHeaderKey, new Array[Any](pivotData.numColumnHeaderColumns))
       rows(rowCounter) = row
 
-      while (columnCounter < result.numColumnHeaderColumns) {
-        key = new DataPath(rowHeaderKey, result.columnHeaderPaths(columnCounter))
-        row.columnHeaderAndDataValues(columnCounter) = result.data.getOrElse(key, NoValue)
+      while (columnCounter < pivotData.numColumnHeaderColumns) {
+        key = new DataPath(rowHeaderKey, pivotData.columnHeaderPaths(columnCounter))
+        row.columnHeaderAndDataValues(columnCounter) = pivotData.data.getOrElse(key, NoValue)
         columnCounter += 1
       }
 
@@ -80,17 +67,17 @@ object TableDataGenerator {
       rowCounter += 1
     }
 
-    val fieldPathsIndexes = new Array[Int](result.numColumnHeaderColumns)
+    val fieldPathsIndexes = new Array[Int](pivotData.numColumnHeaderColumns)
     columnCounter = 0
-    while (columnCounter < result.numColumnHeaderColumns) {
-      fieldPathsIndexes(columnCounter) = result.columnHeaderPaths(columnCounter).fieldsPathIndex
+    while (columnCounter < pivotData.numColumnHeaderColumns) {
+      fieldPathsIndexes(columnCounter) = pivotData.columnHeaderPaths(columnCounter).fieldsPathIndex
       columnCounter += 1
     }
 
-    val fieldGroup = tableDataSource.fieldDefinitionGroups.fieldGroup
-    val tableValues = TableValues(rows, fieldPathsIndexes, result.fieldValues, result.valueLookUp)
+    val fieldGroup = pivotData.fieldDefinitionGroups.fieldGroup
+    val tableValues = TableValues(rows, fieldPathsIndexes, pivotData.fieldValues, pivotData.valueLookUp)
     val defaultRenderers:Map[FieldID,Renderer[_]] = tableState.tableLayout.allFields.map(field => {
-      val fieldDefinition = tableDataSource.fieldDefinitionGroups.fieldDefinition(field.id)
+      val fieldDefinition = pivotData.fieldDefinitionGroups.fieldDefinition(field.id)
       val renderer = if (field.fieldType.isDimension) fieldDefinition.renderer else fieldDefinition.combinedRenderer
       field.id -> NoValueAwareDelegatingRenderer(renderer)
     }).toMap

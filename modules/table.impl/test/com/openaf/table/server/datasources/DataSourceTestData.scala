@@ -51,7 +51,7 @@ object DataSourceTestData {
   val EmptySet:Set[List[Int]] = Set.empty
   val EmptyMapList:List[Map[(List[Int],List[Int]),Int]] = List(Map.empty)
 
-  val dataSource = new RawRowBasedTableDataSource(data, FieldIDs, Groups)
+  val dataSource = new TestTableDataSource(Groups, FieldIDs, data)
 
   def nameFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2,3,4,5,6))
   def orderedNameFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(6,3,2,4,5,1))
@@ -72,19 +72,19 @@ object DataSourceTestData {
   def check(tableState:TableState, expectedRowHeaderValues:Set[List[Int]],
             expectedColumnHeaderPaths:Set[ColumnHeaderPath], expectedData:Map[DataPath,Any],
             expectedFieldValues:Map[Field[_],List[Int]], expectedValueLookUp:Map[FieldID,List[Any]]) {
-    val result = dataSource.result(tableState.generateFieldKeys)
-    assert(result.rowHeaderValues.map(_.toList).toSet === expectedRowHeaderValues)
-    assert(result.columnHeaderPaths.toSet === expectedColumnHeaderPaths)
-    assert(result.data === expectedData)
-    assert(result.fieldValues.values.mapValues(_.toList) === expectedFieldValues)
-    assert(result.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
+    val pivotData = dataSource.pivotData(tableState.generateFieldKeys)
+    assert(pivotData.rowHeaderValues.map(_.toList).toSet === expectedRowHeaderValues)
+    assert(pivotData.columnHeaderPaths.toSet === expectedColumnHeaderPaths)
+    assert(pivotData.data === expectedData)
+    assert(pivotData.fieldValues.values.mapValues(_.toList) === expectedFieldValues)
+    assert(pivotData.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
   }
 
   def check(tableState:TableState,
             expectedRows:List[OpenAFTableRow],
             expectedFieldValues:Map[Field[_],List[Int]],
             expectedValueLookUp:Map[FieldID,List[Any]]) {
-    val tableData = TableDataGenerator.tableData(tableState.generateFieldKeys, dataSource)
+    val tableData = dataSource.tableData(tableState)
     val rows = tableData.tableValues.rows.toList
     assert(rows.map(_.row).toList === expectedRows.map(_.row))
     assert(rows.map(_.rowHeaderValues.toList) === expectedRows.map(_.rowHeaderValues.toList))
@@ -93,3 +93,6 @@ object DataSourceTestData {
     assert(tableData.tableValues.fieldValues.values.mapValues(_.toList) === expectedFieldValues)
   }
 }
+
+class TestTableDataSource(val fieldDefinitionGroups:FieldDefinitionGroups, val fieldIDs:Array[FieldID],
+                          val data:Array[Array[Any]]) extends UnfilteredArrayTableDataSource

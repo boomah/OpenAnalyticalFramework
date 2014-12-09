@@ -4,7 +4,7 @@ import org.scalatest.FunSuite
 import DataSourceTestData._
 import com.openaf.table.lib.api._
 
-class RawRowBasedTableDataSourceFilteredTest extends FunSuite {
+class UnfilteredArrayTableDataSourceFilteredTest extends FunSuite {
   test("1 row (filtered), 0 measure, 0 column") {
     val genderField = GenderField.withSingleFilter(F)
     val tableState = TableState.Blank.withRowHeaderFields(List(genderField))
