@@ -3,7 +3,7 @@ package com.openaf.table.server.datasources
 import com.openaf.table.lib.api._
 import com.openaf.table.lib.api.StandardFields._
 import com.openaf.table.lib.api.TableValues._
-import com.openaf.table.server.{TableDataGenerator, FieldDefinition, NullFieldDefinition}
+import com.openaf.table.server._
 import java.util.{HashMap => JMap}
 import scala.collection.mutable
 
@@ -17,6 +17,7 @@ import scala.collection.mutable
  * such this TableDataSource can be used as a benchmark for best case single threaded performance.
  */
 trait UnfilteredArrayTableDataSource extends TableDataSource {
+  def fieldDefinitionGroups:FieldDefinitionGroups
   def fieldIDs:Array[FieldID]
   def data:Array[Array[Any]]
   def tableData(tableStateNoKeys:TableState) = {
