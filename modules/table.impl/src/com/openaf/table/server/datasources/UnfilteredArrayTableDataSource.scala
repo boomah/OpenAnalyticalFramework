@@ -201,9 +201,19 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
       rowHeaderCounter = 0
       if (matchesFilter && !rowHeaderCollapsed) {
         rowHeaders += new RowHeaderPath(rowHeaderValues)
-        rowHeaders ++= rowTotals
+        numRowTotals = rowTotals.length
+        rowTotalsCounter = 0
+        while (rowTotalsCounter < numRowTotals) {
+          rowHeaders += rowTotals(rowTotalsCounter)
+          rowTotalsCounter += 1
+        }
       } else if (matchesFilter && rowHeaderCollapsed) {
-        rowHeaders ++= rowTotals
+        numRowTotals = rowTotals.length
+        rowTotalsCounter = 0
+        while (rowTotalsCounter < numRowTotals) {
+          rowHeaders += rowTotals(rowTotalsCounter)
+          rowTotalsCounter += 1
+        }
       }
 
       while (matchesFilter && pathsCounter < numPaths) {
@@ -270,7 +280,6 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
             }
 
             rowTotalsCounter = 0
-            numRowTotals = rowTotals.size
             while (rowTotalsCounter < numRowTotals) {
               key = new DataPath(rowTotals(rowTotalsCounter).values, columnHeaderPath)
               if (aggregatedData.contains(key)) {
