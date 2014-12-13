@@ -62,7 +62,7 @@ class RowHeaderCellFactory[T](valueLookUp:Map[FieldID,Array[Any]], renderer:Rend
           addStyleBasedOnTableCellPosition()
           addStyle(TotalRowHeaderTableCell)
           val shouldRender = (rowHeaderTableColumn.column == 0) || (row.rowHeaderValues(rowHeaderTableColumn.column - 1) != intValue)
-          if (shouldRender) textProperty.bind(stringBinding("total")) else setText(null)
+          if (shouldRender) textProperty.bind(stringBinding(field.totalTextID)) else setText(null)
         } else {
           populateContextMenuForCell(expandAndCollapse, row)
           addStyleBasedOnTableCellPosition()

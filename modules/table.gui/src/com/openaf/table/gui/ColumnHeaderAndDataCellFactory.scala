@@ -81,7 +81,7 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
                   if (totalAlreadyDisplayedAbove) {
                     setText(null)
                   } else {
-                    textProperty.bind(stringBinding("total"))
+                    textProperty.bind(stringBinding(fieldOption(row.row, column).map(_.totalTextID).getOrElse("total")))
                   }
                 }
               } else {
