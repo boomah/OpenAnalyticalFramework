@@ -258,20 +258,17 @@
 }
 
 .openaf-table-view .right-field-column-header-table-cell{
-    -fx-font-weight: bold;
     -fx-table-cell-background-color: -fx-table-cell-header-color;
     -fx-table-cell-right-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .bottom-field-column-header-table-cell{
-    -fx-font-weight: bold;
     -fx-table-cell-background-color: -fx-table-cell-header-color;
     -fx-table-cell-right-border-color: -fx-table-cell-border-color-split-highlight;
     -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
 }
 
 .openaf-table-view .bottom-right-field-column-header-table-cell{
-    -fx-font-weight: bold;
     -fx-table-cell-background-color: -fx-table-cell-header-color;
     -fx-table-cell-right-border-color: -fx-table-cell-border-color-highlight;
     -fx-table-cell-bottom-border-color: -fx-table-cell-border-color-highlight;
@@ -292,7 +289,10 @@
 }
 
 /*Totals*/
-.openaf-table-view .total-row-header-table-cell{
+.openaf-table-view .total-column-header-table-cell,
+.openaf-table-view .total-row-header-table-cell,
+.openaf-table-view .row-total-data-table-cell,
+.openaf-table-view .column-total-data-table-cell{
     -fx-table-cell-background-color: -fx-table-cell-total-color;
 }
 

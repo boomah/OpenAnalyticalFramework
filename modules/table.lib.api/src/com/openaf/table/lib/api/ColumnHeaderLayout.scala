@@ -56,6 +56,15 @@ object ColumnHeaderLayout {
   def apply(topFields:Seq[Field[_]], childFields:Seq[Field[_]]):ColumnHeaderLayout = {
     ColumnHeaderLayout(ColumnHeaderTree(topFields.toList, childFields.toList)).normalise
   }
+
+  def verticallyStacked(fields:Seq[Field[_]]):ColumnHeaderLayout = {
+    val result = fields match {
+      case Seq() => ColumnHeaderLayout.Blank
+      case Seq(field) => ColumnHeaderLayout(field)
+      case field +: rest => ColumnHeaderLayout(ColumnHeaderTree(field, verticallyStacked(rest)))
+    }
+    result.normalise
+  }
 }
 
 case class ColumnHeaderLayoutPath(fields:List[Field[_]]) {

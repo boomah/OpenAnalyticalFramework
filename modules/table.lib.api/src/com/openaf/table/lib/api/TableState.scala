@@ -18,6 +18,7 @@ case class TableState(tableLayout:TableLayout) {
   def remove(fields:List[Field[_]]) = copy(tableLayout = tableLayout.remove(fields))
   def replaceField(oldField:Field[_], newField:Field[_]) = copy(tableLayout = tableLayout.replaceField(oldField, newField))
   def generateFieldKeys = copy(tableLayout = tableLayout.generateFieldKeys)
+  def isColumnHeaderField(field:Field[_]) = tableLayout.isColumnHeaderField(field)
 }
 object TableState {
   val Blank = TableState(TableLayout.Blank)

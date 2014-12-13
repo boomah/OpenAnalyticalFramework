@@ -11,8 +11,11 @@ object TableCellStyle extends Enumeration {
   val TotalRowHeaderTableCell = Value
 
   val StandardColumnHeaderTableCell, RightColumnHeaderTableCell, BottomColumnHeaderTableCell, BottomRightColumnHeaderTableCell = Value
+  val TotalColumnHeaderTableCell = Value
   val FieldColumnHeaderTableCell, RightFieldColumnHeaderTableCell, BottomFieldColumnHeaderTableCell, BottomRightFieldColumnHeaderTableCell = Value
+
   val RightDataTableCell, BottomDataTableCell, BottomRightDataTableCell = Value
+  val RowTotalDataTableCell, ColumnTotalDataTableCell = Value
 
   def removeAllStyles(tableCell:TableCell[_,_]) {
     val styles = values.map(value => GuiUtils.camelCaseToDashed(value.toString)).toArray

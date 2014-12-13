@@ -11,10 +11,11 @@ object DataSourceTestData {
   val NameField = Field[String]("name")
   val GenderField = Field[String]("gender")
   val LocationField = Field[String]("location")
+  val GroupField = Field[String]("friends")
   val AgeField = Field[Int]("age")
   val ScoreField = Field[Int]("score", Measure)
 
-  private val StringFields = List(NameField, GenderField, LocationField)
+  private val StringFields = List(NameField, GenderField, LocationField, GroupField)
   private val StringFieldDefinitions = StringFields.map(StringFieldDefinition)
   private val IntFields = List(AgeField, ScoreField)
   private val IntFieldDefinitions = IntFields.map(IntFieldDefinition)
@@ -38,13 +39,15 @@ object DataSourceTestData {
   val Manchester = "Manchester"
   val Edinburgh = "Edinburgh"
 
+  val Friends = "Friends"
+
   val data:Array[Array[Any]] = Array(
-    Array(Rosie, F, London,     36, 50),
-    Array(Laura, F, Manchester, 36, 60),
-    Array(Josie, F, Manchester, 31, 70),
-    Array(Nick,  M, London,     34, 80),
-    Array(Paul,  M, Manchester, 32, 90),
-    Array(Ally,  M, Edinburgh,  34, 75)
+    Array(Rosie, F, London,     Friends, 36, 50),
+    Array(Laura, F, Manchester, Friends, 36, 60),
+    Array(Josie, F, Manchester, Friends, 31, 70),
+    Array(Nick,  M, London,     Friends, 34, 80),
+    Array(Paul,  M, Manchester, Friends, 32, 90),
+    Array(Ally,  M, Edinburgh,  Friends, 34, 75)
   )
 
   val EmptyListSet:Set[List[Int]] = Set(Nil)
@@ -64,6 +67,7 @@ object DataSourceTestData {
   def reversedLocationFieldValues(field:Field[_]):Map[Field[_],List[Int]] = orderedLocationFieldValues(field).mapValues(_.reverse)
   def scoreFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
   def measureFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
+  def orderedGroupFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1))
 
   def row(rowIndex:Int=0, rowHeaderValues:List[Int]=Nil, columnHeaderAndDataValues:List[Any]=Nil) = {
     new OpenAFTableRow(rowIndex, rowHeaderValues.toArray, columnHeaderAndDataValues.toArray)

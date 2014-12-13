@@ -9,7 +9,7 @@ import javafx.event.{ActionEvent, EventHandler}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.Boolean
 
-class FieldNodeContextMenu[T](field:Field[T], requestTableStateProperty:Property[TableState],
+class FieldNodeContextMenu[T](field:Field[T], tableDataProperty:Property[TableData], requestTableStateProperty:Property[TableState],
                               locale:Property[Locale]) extends ContextMenu {
   private def stringBinding(id:String) = new TableLocaleStringBinding(id, locale)
 
@@ -36,8 +36,14 @@ class FieldNodeContextMenu[T](field:Field[T], requestTableStateProperty:Property
     })
     getItems.addAll(new SeparatorMenuItem, reverseSortOrderMenuItem)
 
+    val (topTotalStringID, bottomTotalStringID) = if (tableDataProperty.getValue.tableState.isColumnHeaderField(field)) {
+      ("leftTotal", "rightTotal")
+    } else {
+      ("topTotal", "bottomTotal")
+    }
+
     val topTotalMenuItem = new CheckMenuItem
-    topTotalMenuItem.textProperty.bind(stringBinding("topTotal"))
+    topTotalMenuItem.textProperty.bind(stringBinding(topTotalStringID))
     topTotalMenuItem.selectedProperty.set(field.totals.top)
     topTotalMenuItem.selectedProperty.addListener(new ChangeListener[Boolean] {
       def changed(observable:ObservableValue[_<:Boolean], oldValue:Boolean, newValue:Boolean) {
@@ -48,7 +54,7 @@ class FieldNodeContextMenu[T](field:Field[T], requestTableStateProperty:Property
     })
 
     val bottomTotalMenuItem = new CheckMenuItem
-    bottomTotalMenuItem.textProperty.bind(stringBinding("bottomTotal"))
+    bottomTotalMenuItem.textProperty.bind(stringBinding(bottomTotalStringID))
     bottomTotalMenuItem.selectedProperty.set(field.totals.bottom)
     bottomTotalMenuItem.selectedProperty.addListener(new ChangeListener[Boolean] {
       def changed(observable:ObservableValue[_<:Boolean], oldValue:Boolean, newValue:Boolean) {

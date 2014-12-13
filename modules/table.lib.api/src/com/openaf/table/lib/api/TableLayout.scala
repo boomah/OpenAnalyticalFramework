@@ -38,6 +38,7 @@ case class TableLayout(rowHeaderFields:List[Field[_]], columnHeaderLayout:Column
     val newFilterFields = filterFields.zipWithIndex.map{case (field,number) => field.withKey(FilterFieldKey(number))}
     withRowHeaderFields(newRowHeaderFields).withColumnHeaderLayout(newColumnHeaderLayout).withFilterFields(newFilterFields)
   }
+  def isColumnHeaderField(field:Field[_]) = columnHeaderLayout.allFields.contains(field)
 }
 
 object TableLayout {

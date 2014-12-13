@@ -58,9 +58,9 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     val columnHeaderFieldPaths = tableState.tableLayout.columnHeaderLayout.paths
     val numPaths = columnHeaderFieldPaths.length
     var pathsCounter = 0
-    val numColumnHeaderColsPerPath = columnHeaderFieldPaths.map(_.fields.length).toArray
-    var numColumnHeaderCols = -1
-    var colHeaderColCounter = 0
+    val numColumnHeaderRowsPerPath = columnHeaderFieldPaths.map(_.fields.length).toArray
+    var numColumnHeaderRows = -1
+    var colHeaderRowCounter = 0
     val colHeaderFieldsPositions = columnHeaderFieldPaths.map(_.fields.map(field => fieldIDs.indexOf(field.id)).toArray).toArray
     val columnHeaderPaths = new mutable.HashSet[ColumnHeaderPath]
     val colHeadersLookUps = columnHeaderFieldPaths.map(path =>
@@ -130,6 +130,11 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     val rowTotals = new mutable.ArrayBuffer[RowHeaderPath](numRowHeaderCols * 2)
     var rowTotalsCounter = 0
     var numRowTotals = 0
+
+    val maxColumnPathLength = if (numColumnHeaderRowsPerPath.isEmpty) 0 else numColumnHeaderRowsPerPath.max
+    val columnTotals = new mutable.ArrayBuffer[ColumnHeaderPath](maxColumnPathLength * 2)
+    var columnTotalsCounter = 0
+    var numColumnTotals = 0
 
     val rowHeaderCollapsedStates = rowHeaderFields.zipWithIndex.map{case (field,fieldIndex) => {
       new CollapsedStateHelper(field, fieldIndex, rowHeadersLookUp, rowHeadersValueCounter, fieldsValueCounter)
@@ -217,40 +222,58 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
       }
 
       while (matchesFilter && pathsCounter < numPaths) {
+        columnTotals.clear()
         measureFieldIndex = columnHeaderMeasureFieldPositions(pathsCounter)
         columnHeaderFieldPositions = colHeaderFieldsPositions(pathsCounter)
         columnHeaderLookUp = colHeadersLookUps(pathsCounter)
         columnHeaderValueCounter = colHeadersValuesCounter(pathsCounter)
-        numColumnHeaderCols = numColumnHeaderColsPerPath(pathsCounter)
-        colHeaderValues = new Array[Int](numColumnHeaderCols)
+        numColumnHeaderRows = numColumnHeaderRowsPerPath(pathsCounter)
+        colHeaderValues = new Array[Int](numColumnHeaderRows)
         columnHeaderFieldsForPath = columnHeaderPathsFields(pathsCounter)
         columnHeaderFieldDefinitions = columnHeaderPathsFieldDefinitions(pathsCounter)
-        while (matchesFilter && colHeaderColCounter < numColumnHeaderCols) {
-          if (colHeaderColCounter != measureFieldIndex) {
-            value = dataRow(columnHeaderFieldPositions(colHeaderColCounter))
-            val fieldDefinition = columnHeaderFieldDefinitions(colHeaderColCounter)
-            val field = columnHeaderFieldsForPath(colHeaderColCounter).asInstanceOf[Field[fieldDefinition.V]]
+        while (matchesFilter && colHeaderRowCounter < numColumnHeaderRows) {
+          if (colHeaderRowCounter != measureFieldIndex) {
+            value = dataRow(columnHeaderFieldPositions(colHeaderRowCounter))
+            val fieldDefinition = columnHeaderFieldDefinitions(colHeaderRowCounter)
+            val field = columnHeaderFieldsForPath(colHeaderRowCounter).asInstanceOf[Field[fieldDefinition.V]]
             matchesFilter = field.filter.matches(value.asInstanceOf[fieldDefinition.V])
-            lookUp = columnHeaderLookUp(colHeaderColCounter)
+            lookUp = columnHeaderLookUp(colHeaderRowCounter)
             intForValue = lookUp.get(value)
             if (intForValue == null) {
-              fieldsValueCounterIndex = columnHeaderValueCounter(colHeaderColCounter)
+              fieldsValueCounterIndex = columnHeaderValueCounter(colHeaderRowCounter)
               intForValue = new WrappedInt(fieldsValueCounter(fieldsValueCounterIndex) + 1)
               fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
               lookUp.put(value, intForValue)
-              colHeaderValues(colHeaderColCounter) = intForValue.int
+              colHeaderValues(colHeaderRowCounter) = intForValue.int
               columnHeaderFieldsValuesBitSets(field.key.number) += intForValue.int
             } else {
-              colHeaderValues(colHeaderColCounter) = intForValue.int
+              colHeaderValues(colHeaderRowCounter) = intForValue.int
               columnHeaderFieldsValuesBitSets(field.key.number) += intForValue.int
             }
+
+            // Don't add totals for the last column header field
+            if (colHeaderRowCounter < (numColumnHeaderRows - 1)) {
+              if (field.totals.top) {
+                columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalTopInt))
+              }
+              if (field.totals.bottom) {
+                columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalBottomInt))
+              }
+            }
           }
-          colHeaderColCounter += 1
+          colHeaderRowCounter += 1
         }
-        colHeaderColCounter = 0
+        colHeaderRowCounter = 0
         if (matchesFilter) {
           columnHeaderPath = new ColumnHeaderPath(pathsCounter, colHeaderValues)
           columnHeaderPaths += columnHeaderPath
+
+          numColumnTotals = columnTotals.length
+          columnTotalsCounter = 0
+          while (columnTotalsCounter < numColumnTotals) {
+            columnHeaderPaths += columnTotals(columnTotalsCounter)
+            columnTotalsCounter += 1
+          }
 
           measureFieldPosition = measureFieldPositions(pathsCounter)
           // If there isn't a measure field there is no need to update the aggregated data
@@ -295,6 +318,43 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
               }
               aggregatedData.update(key, newDataValue)
               rowTotalsCounter += 1
+            }
+
+            columnTotalsCounter = 0
+            while (columnTotalsCounter < numColumnTotals) {
+              key = new DataPath(rowHeaderValues, columnTotals(columnTotalsCounter))
+              if (aggregatedData.contains(key)) {
+                newDataValue = fieldDefinition.combiner.combine(
+                  aggregatedData(key).asInstanceOf[fieldDefinition.C],
+                  value.asInstanceOf[fieldDefinition.V]
+                )
+              } else {
+                newDataValue = fieldDefinition.combiner.combine(
+                  fieldDefinition.combiner.initialCombinedValue,
+                  value.asInstanceOf[fieldDefinition.V]
+                )
+              }
+              aggregatedData.update(key, newDataValue)
+
+              rowTotalsCounter = 0
+              while (rowTotalsCounter < numRowTotals) {
+                key = new DataPath(rowTotals(rowTotalsCounter).values, columnTotals(columnTotalsCounter))
+                if (aggregatedData.contains(key)) {
+                  newDataValue = fieldDefinition.combiner.combine(
+                    aggregatedData(key).asInstanceOf[fieldDefinition.C],
+                    value.asInstanceOf[fieldDefinition.V]
+                  )
+                } else {
+                  newDataValue = fieldDefinition.combiner.combine(
+                    fieldDefinition.combiner.initialCombinedValue,
+                    value.asInstanceOf[fieldDefinition.V]
+                  )
+                }
+                aggregatedData.update(key, newDataValue)
+                rowTotalsCounter += 1
+              }
+
+              columnTotalsCounter += 1
             }
           }
         }

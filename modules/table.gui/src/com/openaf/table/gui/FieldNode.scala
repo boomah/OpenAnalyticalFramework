@@ -42,7 +42,7 @@ class FieldNode[T](val field:Field[T], val dragAndDrop:DragAndDrop, val dragAndD
     getStyleClass.add("field-node-measure")
   }
 
-  private lazy val contextMenu = new FieldNodeContextMenu[T](field, requestTableStateProperty, locale)
+  private lazy val contextMenu = new FieldNodeContextMenu[T](field, tableDataProperty, requestTableStateProperty, locale)
   addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler[MouseEvent] {
     def handle(event:MouseEvent) {
       if (event.getButton == MouseButton.SECONDARY) {
