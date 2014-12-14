@@ -112,9 +112,9 @@ class RowHeaderCellFactory[T](valueLookUp:Map[FieldID,Array[Any]], renderer:Rend
     private def populateContextMenuForCell(expandAndCollapse:ExpandAndCollapse, row:OpenAFTableRow) {
       val values:Array[Array[Any]] = requestTableStateProperty.getValue.tableLayout.rowHeaderFieldIDs
         .map(id => valueLookUp(id))(collection.breakOut)
-      val pathElements:Array[Any] = (0 to rowHeaderTableColumn.column)
+      val pathValues:Array[Any] = (0 to rowHeaderTableColumn.column)
         .map(column => values(column)(row.rowHeaderValues(column)))(collection.breakOut)
-      val path = CollapsedStatePath(pathElements)
+      val path = CollapsedStatePath(pathValues)
       val expandMenuItem = expandAndCollapse.expandMenuItem(path)
       val collapseMenuItem = expandAndCollapse.collapseMenuItem(path)
       getContextMenu.getItems.addAll(expandMenuItem, collapseMenuItem)

@@ -6,10 +6,10 @@ import java.util.{HashMap => JMap}
 /**
  * Efficient way to determine whether a path is collapsed when used with the UnfilteredArrayTableDataSource
  */
-private[datasources] class CollapsedStateHelper(field:Field[_], fieldIndex:Int, rowHeadersLookUp:Array[JMap[Any,WrappedInt]],
-                                                rowHeadersValueCounter:Array[Int], fieldsValueCounter:Array[Int]) {
+private[datasources] class CollapsedStateHelper(fields:Array[Field[_]], fieldIndex:Int, lookUps:Array[JMap[Any,WrappedInt]],
+                                                valueCounter:Array[Int], fieldsValueCounter:Array[Int]) {
   private val (intPaths, isCollapsed) = {
-    val (paths, isCollapsed) = field.totals.collapsedState match {
+    val (paths, isCollapsed) = fields(fieldIndex).totals.collapsedState match {
       case AllExpanded(collapsedPaths) => (collapsedPaths, false)
       case AllCollapsed(expandedPaths) => (expandedPaths, true)
     }
@@ -21,16 +21,21 @@ private[datasources] class CollapsedStateHelper(field:Field[_], fieldIndex:Int, 
     // TODO - maybe this should be converted into a while loop
     // Ignore paths of the wrong length and convert the path values to the appropriate int value
     val intPaths:Array[Array[Int]] = paths.filter(_.pathValues.length == (fieldIndex + 1)).map(path => {
-      path.pathValues.zipWithIndex.map{case (value,rowHeaderCounter)  => {
-        lookUp = rowHeadersLookUp(rowHeaderCounter)
-        intForValue = lookUp.get(value)
-        if (intForValue == null) {
-          fieldsValueCounterIndex = rowHeadersValueCounter(rowHeaderCounter)
-          intForValue = new WrappedInt(fieldsValueCounter(fieldsValueCounterIndex) + 1)
-          fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
-          lookUp.put(value, intForValue)
+      path.pathValues.zipWithIndex.map{case (value,headerCounter)  => {
+        if (fields(headerCounter).fieldType.isMeasure) {
+          // Measure fields are special in that their int value is always the same
+          TableValues.FieldInt
+        } else {
+          lookUp = lookUps(headerCounter)
+          intForValue = lookUp.get(value)
+          if (intForValue == null) {
+            fieldsValueCounterIndex = valueCounter(headerCounter)
+            intForValue = new WrappedInt(fieldsValueCounter(fieldsValueCounterIndex) + 1)
+            fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
+            lookUp.put(value, intForValue)
+          }
+          intForValue.int
         }
-        intForValue.int
       }}
     })(collection.breakOut)
 

@@ -13,26 +13,36 @@ import TableValues._
 import com.openaf.table.gui.binding.TableLocaleStringBinding
 import javafx.beans.property.Property
 import java.util.Locale
+import javafx.scene.control.ContextMenu
 
 class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindings:ObservableMap[FieldID,StringBinding],
                                      fieldPathsIndexes:Array[Int], columnHeaderLayoutPaths:Array[ColumnHeaderLayoutPath],
                                      maxPathLength:Int, pathRenderers:Array[Renderer[_]],
+                                     requestTableStateProperty:Property[TableState],
                                      locale:Property[Locale]) extends Callback[TableColumnType,OpenAFTableCell] {
 
   def call(tableColumn:TableColumnType) = new OpenAFTableCell {
     private val columnHeaderTableColumn = tableColumn.asInstanceOf[OpenAFTableColumn]
-
+    setContextMenu(new ContextMenu)
     override def updateItem(row:OpenAFTableRow, isEmpty:Boolean) {
       super.updateItem(row, isEmpty)
       removeAllStyles(this)
       textProperty.unbind()
+      getContextMenu.getItems.clear()
       if (isEmpty) {
         setText(null)
       } else {
+        val cellFieldOption = fieldOption(row.row, column)
         val rightBoundaryCell = (column == (row.numColumnHeaderColumns - 1)) ||
-          (fieldOption(row.row, column) != fieldOption(row.row, column + 1))
+          (cellFieldOption != fieldOption(row.row, column + 1))
         if (row.row < maxPathLength) {
           // Column Header area
+          val expandAndCollapseOption = cellFieldOption.map(field => {
+            new ExpandAndCollapse(field, requestTableStateProperty, locale)
+          })
+          if (cellFieldOption.forall(_.fieldType.isDimension)) {
+            expandAndCollapseOption.foreach(populateContextMenuForColumn)
+          }
           addStyle(StandardColumnHeaderTableCell)
           row.columnHeaderAndDataValues(column) match {
             case FieldInt => {
@@ -43,7 +53,7 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
               } else if (rightBoundaryCell) {
                 addStyle(RightFieldColumnHeaderTableCell)
               }
-              if (shouldRender(row, FieldInt)) {
+              if (shouldRender(row, FieldInt, cellFieldOption)) {
                 useFieldText(row.row)
               } else {
                 setText(null)
@@ -81,11 +91,12 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
                   if (totalAlreadyDisplayedAbove) {
                     setText(null)
                   } else {
-                    textProperty.bind(stringBinding(fieldOption(row.row, column).map(_.totalTextID).getOrElse("total")))
+                    textProperty.bind(stringBinding(cellFieldOption.map(_.totalTextID).getOrElse("total")))
                   }
                 }
               } else {
-                if (shouldRender(row, intValue)) {
+                expandAndCollapseOption.foreach(expandAndCollapse => populateContextMenuForCell(expandAndCollapse, row))
+                if (shouldRender(row, intValue, cellFieldOption)) {
                   val value = valueLookUps(row.row)(intValue)
                   val renderer = pathRenderers(row.row).asInstanceOf[Renderer[Any]]
                   setText(renderer.render(value))
@@ -121,7 +132,7 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
       }
     }
 
-    private def column = columnHeaderTableColumn.column
+    private val column = columnHeaderTableColumn.column
 
     private def fieldOption(rowIndex:Int, columnIndex:Int) = {
       val fields = columnHeaderLayoutPaths(fieldPathsIndexes(columnIndex)).fields
@@ -183,8 +194,8 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
       }
     }
 
-    private def shouldRender(row:OpenAFTableRow, intValue:Int) = {
-      if ((column == 0) || (fieldOption(row.row, column) != fieldOption(row.row, column - 1))) {
+    private def shouldRender(row:OpenAFTableRow, intValue:Int, cellFieldOption:Option[Field[_]]) = {
+      if ((column == 0) || (cellFieldOption != fieldOption(row.row, column - 1))) {
         true // Always render the first column header value per path
       } else if (row.columnHeaderAndDataValues(column - 1) != intValue) {
         // The value in the column to the left is different so as long as it isn't the special case of a total value to
@@ -198,6 +209,21 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
       } else {
         shouldRenderDueToRowAbove(row.row, column)
       }
+    }
+
+    private def populateContextMenuForColumn(expandAndCollapse:ExpandAndCollapse) {
+      getContextMenu.getItems.addAll(expandAndCollapse.expandAllMenuItem, expandAndCollapse.collapseAllMenuItem)
+    }
+
+    private def populateContextMenuForCell(expandAndCollapse:ExpandAndCollapse, row:OpenAFTableRow) {
+      val pathValues:Array[Any] = (0 to row.row).map(rowIndex => {
+        val intValue = otherRow(rowIndex).columnHeaderAndDataValues(column).asInstanceOf[Int]
+        valueLookUps(rowIndex)(intValue)
+      })(collection.breakOut)
+      val path = CollapsedStatePath(pathValues)
+      val expandMenuItem = expandAndCollapse.expandMenuItem(path)
+      val collapseMenuItem = expandAndCollapse.collapseMenuItem(path)
+      getContextMenu.getItems.addAll(expandMenuItem, collapseMenuItem)
     }
   }
 }

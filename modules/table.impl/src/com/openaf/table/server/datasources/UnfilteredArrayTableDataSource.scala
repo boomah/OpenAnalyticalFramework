@@ -137,14 +137,21 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     var numColumnTotals = 0
 
     val rowHeaderCollapsedStates = rowHeaderFields.zipWithIndex.map{case (field,fieldIndex) => {
-      new CollapsedStateHelper(field, fieldIndex, rowHeadersLookUp, rowHeadersValueCounter, fieldsValueCounter)
+      new CollapsedStateHelper(rowHeaderFields, fieldIndex, rowHeadersLookUp, rowHeadersValueCounter, fieldsValueCounter)
     }}
     var rowHeaderCollapsed = false
+    val columnHeaderCollapsedStates = new Array[CollapsedStateHelper](columnHeaderFields.size)
+    columnHeaderPathsFields.zipWithIndex.foreach{case (fields, pathIndex) => fields.zipWithIndex.foreach{case (field, fieldIndex) => {
+      columnHeaderCollapsedStates(field.key.number) = new CollapsedStateHelper(fields, fieldIndex,
+        colHeadersLookUps(pathIndex), colHeadersValuesCounter(pathIndex), fieldsValueCounter)
+    }}}
+    var columnHeaderCollapsed = false
 
     while (dataCounter < dataLength) {
       dataRow = data(dataCounter)
       matchesFilter = true
       rowHeaderCollapsed = false
+      columnHeaderCollapsed = false
 
       while (matchesFilter && filterCounter < numFilterCols) {
         value = dataRow(filterFieldPositions(filterCounter))
@@ -204,15 +211,10 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
         rowHeaderCounter += 1
       }
       rowHeaderCounter = 0
-      if (matchesFilter && !rowHeaderCollapsed) {
-        rowHeaders += new RowHeaderPath(rowHeaderValues)
-        numRowTotals = rowTotals.length
-        rowTotalsCounter = 0
-        while (rowTotalsCounter < numRowTotals) {
-          rowHeaders += rowTotals(rowTotalsCounter)
-          rowTotalsCounter += 1
+      if (matchesFilter) {
+        if (!rowHeaderCollapsed) {
+          rowHeaders += new RowHeaderPath(rowHeaderValues)
         }
-      } else if (matchesFilter && rowHeaderCollapsed) {
         numRowTotals = rowTotals.length
         rowTotalsCounter = 0
         while (rowTotalsCounter < numRowTotals) {
@@ -253,11 +255,16 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
 
             // Don't add totals for the last column header field
             if (colHeaderRowCounter < (numColumnHeaderRows - 1)) {
-              if (field.totals.top) {
+              if (columnHeaderCollapsedStates(field.key.number).collapsed(colHeaderValues)) {
+                columnHeaderCollapsed = true
                 columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalTopInt))
-              }
-              if (field.totals.bottom) {
-                columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalBottomInt))
+              } else {
+                if (field.totals.top) {
+                  columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalTopInt))
+                }
+                if (field.totals.bottom) {
+                  columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalBottomInt))
+                }
               }
             }
           }
@@ -266,7 +273,9 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
         colHeaderRowCounter = 0
         if (matchesFilter) {
           columnHeaderPath = new ColumnHeaderPath(pathsCounter, colHeaderValues)
-          columnHeaderPaths += columnHeaderPath
+          if (!columnHeaderCollapsed) {
+            columnHeaderPaths += columnHeaderPath
+          }
 
           numColumnTotals = columnTotals.length
           columnTotalsCounter = 0
@@ -286,7 +295,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
             }
 
             val fieldDefinition = measureFieldDefinitions(pathsCounter)
-            if (!rowHeaderCollapsed) {
+            if (!rowHeaderCollapsed && !columnHeaderCollapsed) {
               key = new DataPath(rowHeaderValues, columnHeaderPath)
               if (aggregatedData.contains(key)) {
                 newDataValue = fieldDefinition.combiner.combine(

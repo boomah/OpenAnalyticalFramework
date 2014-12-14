@@ -122,7 +122,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData], requestTableStatePr
       tableColumn.setCellValueFactory(new CellValueFactory)
       tableColumn.setCellFactory(
         new ColumnHeaderAndDataCellFactory(valueLookUps, fieldBindings, fieldPathIndexes, pathsArray, maxPathLength,
-          pathRenderers, locale)
+          pathRenderers, requestTableStateProperty, locale)
       )
 
       columns.add(tableColumn)
