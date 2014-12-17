@@ -10,7 +10,7 @@ import javafx.event.{ActionEvent, EventHandler}
 import javafx.collections.FXCollections
 import javafx.scene.input.{KeyCode, KeyEvent}
 import javafx.util.Callback
-import com.openaf.gui.utils.{FontAwesome, FontAwesomeText}
+import com.openaf.gui.utils.Icons._
 import javafx.beans.binding.BooleanBinding
 import javafx.scene.text.{TextBoundsType, Text}
 import java.util.function.Predicate
@@ -113,7 +113,7 @@ class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], request
     val filterSelectedButton = new Button //TODO - put in a shortcut
     filterSelectedButton.getStyleClass.add("graphic-button")
     filterSelectedButton.disableProperty.bind(buttonsDisabledBinding)
-    filterSelectedButton.setGraphic(new FontAwesomeText(FontAwesome.Filter))
+    filterSelectedButton.setGraphic(text(Filter))
     val filterSelectedButtonTooltip = new Tooltip
     filterSelectedButtonTooltip.textProperty.bind(stringBinding("filterSelectedButtonTooltip")) //TODO - put in shortcut text
     filterSelectedButton.setTooltip(filterSelectedButtonTooltip)

@@ -1,13 +1,12 @@
 .root{
-    -font-awesome-color: grey;
+    -icons-color: grey;
 }
 
-.font-awesome{
-    -fx-font-family: FontAwesome;
-    -fx-font-size: 20;
-    -fx-effect: innershadow( three-pass-box , derive(-font-awesome-color,-70%) , 0.1em, 0.0 , 0.07em, 0.07em );
-    -fx-fill: linear-gradient(to bottom, derive(-font-awesome-color,20%) 10%, derive(-font-awesome-color,-40%) 80%);
-    -fx-font-smoothing-type: lcd;
+.icons{
+    -fx-font-family: Icomoon;
+    -fx-font-smoothing-type: null;
+    -fx-effect: innershadow( three-pass-box , derive(-icons-color,-70%) , 0.1em, 0.0 , 0.07em, 0.07em );
+    -fx-fill: linear-gradient(to bottom, derive(-icons-color,20%) 10%, derive(-icons-color,-40%) 80%);
 }
 
 .browser-bar{
@@ -19,10 +18,9 @@
     -fx-padding: 4;
 }
 
-.settings-menu-button .font-awesome{
-    -fx-fill: derive(-font-awesome-color,-20%);
-    -fx-effect: null;
-    -fx-font-smoothing-type: null;
+.tool-bar-button .icons,
+.settings-menu-button .icons{
+    -fx-font-size: 20;
 }
 
 .tab-pane{

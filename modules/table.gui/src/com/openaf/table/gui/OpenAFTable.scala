@@ -32,16 +32,18 @@ class OpenAFTable extends StackPane {
     dragAndDrop, localeProperty, unmodifiableFieldBindings)
   private val columnHeaderArea = new ColumnHeaderArea(tableDataProperty, requestTableStateProperty, dragAndDrop,
     localeProperty, unmodifiableFieldBindings)
+  private val toolBar = new OpenAFTableToolBar
   private val tableView = new OpenAFTableView(tableDataProperty, requestTableStateProperty, unmodifiableFieldBindings,
     localeProperty)
 
   {
     val mainContent = new GridPane
-    mainContent.add(configArea, 0, 0, 1, 3)
+    mainContent.add(configArea, 0, 0, 1, 4)
     mainContent.add(filterFieldsArea, 1, 0, 2, 1)
     mainContent.add(rowHeaderFieldsArea, 1, 1)
     mainContent.add(columnHeaderArea, 2, 1)
-    mainContent.add(tableView, 1, 2, 2, 1)
+    mainContent.add(toolBar, 1, 2, 2, 1)
+    mainContent.add(tableView, 1, 3, 2, 1)
 
     val blankColumnConstraints = new ColumnConstraints
     val growColumnConstraints = new ColumnConstraints
@@ -51,7 +53,7 @@ class OpenAFTable extends StackPane {
     val blankRowConstraints = new RowConstraints
     val growRowConstraints = new RowConstraints
     growRowConstraints.setVgrow(Priority.ALWAYS)
-    mainContent.getRowConstraints.addAll(blankRowConstraints, blankRowConstraints, growRowConstraints)
+    mainContent.getRowConstraints.addAll(blankRowConstraints, blankRowConstraints, blankRowConstraints, growRowConstraints)
 
     getChildren.addAll(mainContent, dragAndDrop.dragPane)
   }

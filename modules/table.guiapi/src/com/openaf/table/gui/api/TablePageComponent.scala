@@ -19,7 +19,10 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
     localeProperty.bind(context.cache(BrowserCacheKey.LocaleKey))
   }
 
+  private var doingSetup = false
+
   def setup() {
+    doingSetup = true
     requestTableStateProperty.set(pageData.tableData.tableState)
     tableDataProperty.set(pageData.tableData)
 
@@ -37,11 +40,12 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
     fieldBindings.clear()
     import collection.JavaConversions._
     fieldBindings.putAll(fieldBindingsToAdd)
+    doingSetup = false
   }
 
   requestTableStateProperty.addListener(new ChangeListener[TableState] {
     def changed(observable:ObservableValue[_<:TableState], oldValue:TableState, newValue:TableState) {
-      context.goToPage(page.withTableState(newValue.generateFieldKeys))
+      if (!doingSetup) {context.goToPage(page.withTableState(newValue.generateFieldKeys))}
     }
   })
 

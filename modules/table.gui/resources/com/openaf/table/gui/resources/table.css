@@ -43,13 +43,29 @@
 }
 
 .row-header-fields-area{
-    -fx-border-width: 1 1 0 0;
+    -fx-border-width: 1 1 1 0;
     -fx-border-color: -fx-box-border;
 }
 
 .column-header-area{
-    -fx-border-width: 1 0 0 0;
+    -fx-border-width: 1 0 1 0;
     -fx-border-color: -fx-box-border;
+}
+
+.openaf-table-tool-bar{
+    -fx-padding: 2;
+    -fx-spacing: 2;
+    -fx-background-insets: 0 0 0 0, 1 0 0 0;
+}
+
+.openaf-table-tool-bar-button{
+    -fx-padding: 4;
+}
+
+.openaf-table-tool-bar-button .icons{
+    -fx-font-size: 20;
+    -fx-effect: null;
+    -fx-fill: derive(grey, -20%);
 }
 
 .field-node{
@@ -76,27 +92,22 @@
 }
 
 .field-node .filter-button{
-    -fx-padding: 4 3 3 3;
-    -fx-font-size: 1;
-    -fx-content-display: CENTER;
-    -fx-graphic-text-gap: 0;
-    -fx-alignment: CENTER;
+    -fx-padding: 1 3 1 4;
 }
 
-.field-node .filter-button .font-awesome{
-    -fx-font-size: 14;
-    -fx-fill: grey;
+.field-node .filter-button .icons{
+    -fx-font-size: 13;
 }
 
-.field-node .filter-button .font-awesome-reject-all-filter{
+.field-node .filter-button .icons-reject-all-filter{
     -fx-fill: crimson;
 }
 
-.field-node .filter-button .font-awesome-retain-filter{
+.field-node .filter-button .icons-retain-filter{
     -fx-fill: rgb(0,200,0);
 }
 
-.field-node .filter-button .font-awesome-reject-filter{
+.field-node .filter-button .icons-reject-filter{
     -fx-fill: rgb(0,200,0);
 }
 
@@ -115,14 +126,7 @@
 
 .filter-button-node .graphic-button{
    -fx-padding: 0;
-   -fx-content-display: CENTER;
-   -fx-graphic-text-gap: 0;
-   -fx-alignment: CENTER;
-}
-
-.filter-button-node .font-awesome{
-    -fx-font-size: null;
-    -fx-fill: grey;
+   -fx-font-size: 20;
 }
 
 .filter-button-node .plus-text{
