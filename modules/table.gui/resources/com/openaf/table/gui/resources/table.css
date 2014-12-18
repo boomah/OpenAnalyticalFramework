@@ -43,29 +43,32 @@
 }
 
 .row-header-fields-area{
-    -fx-border-width: 1 1 1 0;
+    -fx-border-width: 1 1 0 0;
     -fx-border-color: -fx-box-border;
 }
 
 .column-header-area{
-    -fx-border-width: 1 0 1 0;
+    -fx-border-width: 1 0 0 0;
     -fx-border-color: -fx-box-border;
 }
 
 .openaf-table-tool-bar{
     -fx-padding: 2;
     -fx-spacing: 2;
-    -fx-background-insets: 0 0 0 0, 1 0 0 0;
+    -fx-background-insets: 0;
+    -fx-background-color: -fx-background;
+    -fx-border-width: 1 0 0 0;
+    -fx-border-color: -fx-box-border;
 }
 
 .openaf-table-tool-bar-button{
-    -fx-padding: 4;
+    -fx-padding: 3;
 }
 
 .openaf-table-tool-bar-button .icons{
-    -fx-font-size: 20;
+    -fx-font-size: 16;
     -fx-effect: null;
-    -fx-fill: derive(grey, -20%);
+    -fx-fill: derive(grey, -30%);
 }
 
 .field-node{
@@ -198,6 +201,30 @@
     -fx-background-color: -fx-table-cell-bottom-border-color, -fx-table-cell-background-color;
     -fx-background-insets: 0, 0 0 1 0;
     -fx-border-color: transparent -fx-table-cell-right-border-color transparent transparent;
+}
+
+/*Table Column Headers (rather than pivot column header cells)*/
+.openaf-table-view .column-header-background{
+    -fx-background-color: rgb(223,227,232);
+    -fx-background-insets: 0;
+}
+
+.openaf-table-view .column-header{
+    -fx-font-weight: null;
+    -fx-size: 20px;
+    -fx-padding: 0;
+    -fx-background-color: rgb(223,227,232);
+    -fx-background-insets: 0;
+}
+
+.openaf-table-view .column-header .label{
+    -fx-border-width: 0 1 1 0;
+    -fx-border-color: rgb(149,179,215);
+}
+
+.openaf-table-view .filler{
+    -fx-background-color: rgb(149,179,215), rgb(223,227,232);
+    -fx-background-insets: 0, 0 0 1 0;
 }
 
 /*Row Header Table Cells*/

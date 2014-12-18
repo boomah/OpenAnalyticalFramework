@@ -13,8 +13,8 @@ object Icons {
   val Bars = "\ue9bd"
   val Filter = "\ue600"
   val Sigma = "\uea67"
-  val ClearLayout = "\uea59"
-  val ClearLayout2 = "\ue601"
+  val ClearLayout = "\ue601"
+  val ClearLayout2 = "\uea59"
 
   def text(iconCode:String) = {
     val text = new Text(iconCode)
