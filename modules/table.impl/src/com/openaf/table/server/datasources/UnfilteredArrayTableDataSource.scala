@@ -234,10 +234,10 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
         columnHeaderFieldsForPath = columnHeaderPathsFields(pathsCounter)
         columnHeaderFieldDefinitions = columnHeaderPathsFieldDefinitions(pathsCounter)
         while (matchesFilter && colHeaderRowCounter < numColumnHeaderRows) {
+          val fieldDefinition = columnHeaderFieldDefinitions(colHeaderRowCounter)
+          val field = columnHeaderFieldsForPath(colHeaderRowCounter).asInstanceOf[Field[fieldDefinition.V]]
           if (colHeaderRowCounter != measureFieldIndex) {
             value = dataRow(columnHeaderFieldPositions(colHeaderRowCounter))
-            val fieldDefinition = columnHeaderFieldDefinitions(colHeaderRowCounter)
-            val field = columnHeaderFieldsForPath(colHeaderRowCounter).asInstanceOf[Field[fieldDefinition.V]]
             matchesFilter = field.filter.matches(value.asInstanceOf[fieldDefinition.V])
             lookUp = columnHeaderLookUp(colHeaderRowCounter)
             intForValue = lookUp.get(value)
@@ -252,22 +252,23 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
               colHeaderValues(colHeaderRowCounter) = intForValue.int
               columnHeaderFieldsValuesBitSets(field.key.number) += intForValue.int
             }
+          }
 
-            // Don't add totals for the last column header field
-            if (colHeaderRowCounter < (numColumnHeaderRows - 1)) {
-              if (columnHeaderCollapsedStates(field.key.number).collapsed(colHeaderValues)) {
-                columnHeaderCollapsed = true
+          // Don't add totals for the last column header field
+          if (colHeaderRowCounter < (numColumnHeaderRows - 1)) {
+            if (columnHeaderCollapsedStates(field.key.number).collapsed(colHeaderValues)) {
+              columnHeaderCollapsed = true
+              columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalTopInt))
+            } else {
+              if (field.totals.top) {
                 columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalTopInt))
-              } else {
-                if (field.totals.top) {
-                  columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalTopInt))
-                }
-                if (field.totals.bottom) {
-                  columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalBottomInt))
-                }
+              }
+              if (field.totals.bottom) {
+                columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalBottomInt))
               }
             }
           }
+
           colHeaderRowCounter += 1
         }
         colHeaderRowCounter = 0

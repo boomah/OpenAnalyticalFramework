@@ -11,7 +11,7 @@ object DataSourceTestData {
   val NameField = Field[String]("name")
   val GenderField = Field[String]("gender")
   val LocationField = Field[String]("location")
-  val GroupField = Field[String]("friends")
+  val GroupField = Field[String]("group")
   val AgeField = Field[Int]("age")
   val ScoreField = Field[Int]("score", Measure)
 

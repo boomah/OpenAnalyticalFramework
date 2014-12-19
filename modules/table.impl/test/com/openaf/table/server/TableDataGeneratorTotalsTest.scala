@@ -142,4 +142,23 @@ class TableDataGeneratorTotalsTest extends FunSuite {
 
     check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
   }
+
+  test("0 row, 1 measure (totals top), 1 column") {
+    val scoreField = ScoreField.withTotals(Totals(top = true))
+    val tableState = TableState.Blank.withColumnHeaderLayout(ColumnHeaderLayout(scoreField, List(GenderField)))
+
+    val expectedRows = List(
+      row(0, Nil, List(FieldInt,    FieldInt, FieldInt)),
+      row(1, Nil, List(TotalTopInt, 1,        2       )),
+      row(2, Nil, List(425,         180,      245     ))
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      ScoreField.id -> List(ScoreField.id)
+    )
+    val expectedFieldValues = scoreFieldValues(scoreField.withKey(ColumnHeaderFieldKey(0))) ++
+      orderedGenderFieldValues(GenderField.withKey(ColumnHeaderFieldKey(1)))
+
+    check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
+  }
 }
