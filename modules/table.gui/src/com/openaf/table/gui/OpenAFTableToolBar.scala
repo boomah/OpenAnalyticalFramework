@@ -3,7 +3,7 @@ package com.openaf.table.gui
 import javafx.scene.control.{Button, ToolBar}
 import com.openaf.gui.utils.Icons._
 
-class OpenAFTableToolBarNick extends ToolBar {
+class OpenAFTableToolBar extends ToolBar {
   getStyleClass.add("openaf-table-tool-bar")
 
   // TODO - put in tooltip and actual action
