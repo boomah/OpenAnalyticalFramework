@@ -195,7 +195,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
         }
 
         // Don't add totals for the last row header field
-        if (rowHeaderCounter < (numRowHeaderCols - 1)) {
+        if (!rowHeaderCollapsed && rowHeaderCounter < (numRowHeaderCols - 1)) {
           if (rowHeaderCollapsedStates(rowHeaderCounter).collapsed(rowHeaderValues)) {
             rowHeaderCollapsed = true
             rowTotals += new RowHeaderPath(generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalTopInt))
@@ -255,7 +255,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
           }
 
           // Don't add totals for the last column header field
-          if (colHeaderRowCounter < (numColumnHeaderRows - 1)) {
+          if (!columnHeaderCollapsed && colHeaderRowCounter < (numColumnHeaderRows - 1)) {
             if (columnHeaderCollapsedStates(field.key.number).collapsed(colHeaderValues)) {
               columnHeaderCollapsed = true
               columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalTopInt))
