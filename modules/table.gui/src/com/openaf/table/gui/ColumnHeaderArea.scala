@@ -1,14 +1,8 @@
 package com.openaf.table.gui
 
-import javafx.beans.property.Property
-import java.util.Locale
-import com.openaf.table.lib.api.{TableState, FieldID, TableData, ColumnHeaderLayout}
-import javafx.collections.ObservableMap
-import javafx.beans.binding.StringBinding
+import com.openaf.table.lib.api.{TableState, ColumnHeaderLayout}
 
-class ColumnHeaderArea(tableDataProperty:Property[TableData], val requestTableStateProperty:Property[TableState],
-                       val dragAndDrop:DragAndDrop, val locale:Property[Locale],
-                       fieldBindings:ObservableMap[FieldID,StringBinding]) extends DragAndDropContainerNode {
+class ColumnHeaderArea(val tableFields:OpenAFTableFields) extends DragAndDropContainerNode {
   getStyleClass.add("column-header-area")
   private val dropTargetsHelper = new ColumnHeaderAreaDropTargetsHelper(mainContent, dropTargetPane, this)
 
@@ -26,8 +20,7 @@ class ColumnHeaderArea(tableDataProperty:Property[TableData], val requestTableSt
   }
 
   private def fullSetup(columnHeaderLayout:ColumnHeaderLayout) {
-    val node = new ColumnHeaderLayoutNode(columnHeaderLayout, tableDataProperty, requestTableStateProperty, dragAndDrop,
-      this, fieldBindings, locale)
+    val node = new ColumnHeaderLayoutNode(columnHeaderLayout, this, tableFields)
     mainContent.getChildren.clear()
     mainContent.getChildren.add(node)
   }

@@ -1,15 +1,13 @@
 package com.openaf.table.gui
 
 import javafx.scene.control._
-import javafx.beans.property.{ReadOnlyObjectWrapper, Property}
+import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import com.openaf.table.lib.api._
-import javafx.collections.{ObservableMap, FXCollections}
+import javafx.collections.FXCollections
 import javafx.util.Callback
 import javafx.scene.control.TableColumn.CellDataFeatures
-import javafx.beans.binding.StringBinding
 import java.util
-import java.util.Locale
 
 object OpenAFTableView {
   type TableColumnType = TableColumn[OpenAFTableRow,OpenAFTableRow]
@@ -17,8 +15,7 @@ object OpenAFTableView {
 }
 import OpenAFTableView._
 
-class OpenAFTableView(tableDataProperty:Property[TableData], requestTableStateProperty:Property[TableState],
-                      fieldBindings:ObservableMap[FieldID,StringBinding], locale:Property[Locale]) extends TableView[OpenAFTableRow] {
+class OpenAFTableView(tableFields:OpenAFTableFields) extends TableView[OpenAFTableRow] {
   getStyleClass.add("openaf-table-view")
   getSelectionModel.setCellSelectionEnabled(true)
   getSelectionModel.setSelectionMode(SelectionMode.MULTIPLE)
@@ -35,7 +32,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData], requestTableStatePr
     }
   }
 
-  tableDataProperty.addListener(new ChangeListener[TableData] {
+  tableFields.tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
       setUpTableView(Option(oldTableData), newTableData)
     }
@@ -83,7 +80,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData], requestTableStatePr
       tableColumn.setSortable(false)
       tableColumn.setCellValueFactory(new CellValueFactory)
       tableColumn.setCellFactory(new RowHeaderCellFactory(valueLookUp, tableData.defaultRenderers(field.id),
-        fieldBindings, startRowHeaderValuesIndex, requestTableStateProperty, field, locale))
+        startRowHeaderValuesIndex, field, tableFields))
       columns.add(tableColumn)
 
       rowHeaderFieldCounter += 1
@@ -121,8 +118,7 @@ class OpenAFTableView(tableDataProperty:Property[TableData], requestTableStatePr
 
       tableColumn.setCellValueFactory(new CellValueFactory)
       tableColumn.setCellFactory(
-        new ColumnHeaderAndDataCellFactory(valueLookUps, fieldBindings, fieldPathIndexes, pathsArray, maxPathLength,
-          pathRenderers, requestTableStateProperty, locale)
+        new ColumnHeaderAndDataCellFactory(valueLookUps, fieldPathIndexes, pathsArray, maxPathLength, pathRenderers, tableFields)
       )
 
       columns.add(tableColumn)

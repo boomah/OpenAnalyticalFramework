@@ -1,8 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.collections.ObservableMap
 import com.openaf.table.lib.api._
-import javafx.beans.binding.StringBinding
 import javafx.util.Callback
 import com.openaf.table.lib.api.ColumnHeaderLayoutPath
 import scala.annotation.tailrec
@@ -11,15 +9,12 @@ import TableCellStyle._
 import com.openaf.gui.utils.GuiUtils._
 import TableValues._
 import com.openaf.table.gui.binding.TableLocaleStringBinding
-import javafx.beans.property.Property
-import java.util.Locale
 import javafx.scene.control.ContextMenu
 
-class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindings:ObservableMap[FieldID,StringBinding],
-                                     fieldPathsIndexes:Array[Int], columnHeaderLayoutPaths:Array[ColumnHeaderLayoutPath],
-                                     maxPathLength:Int, pathRenderers:Array[Renderer[_]],
-                                     requestTableStateProperty:Property[TableState],
-                                     locale:Property[Locale]) extends Callback[TableColumnType,OpenAFTableCell] {
+class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsIndexes:Array[Int],
+                                     columnHeaderLayoutPaths:Array[ColumnHeaderLayoutPath], maxPathLength:Int,
+                                     pathRenderers:Array[Renderer[_]],
+                                     tableFields:OpenAFTableFields) extends Callback[TableColumnType,OpenAFTableCell] {
 
   def call(tableColumn:TableColumnType) = new OpenAFTableCell {
     private val columnHeaderTableColumn = tableColumn.asInstanceOf[OpenAFTableColumn]
@@ -37,9 +32,7 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
           (cellFieldOption != fieldOption(row.row, column + 1))
         if (row.row < maxPathLength) {
           // Column Header area
-          val expandAndCollapseOption = cellFieldOption.map(field => {
-            new ExpandAndCollapse(field, requestTableStateProperty, locale)
-          })
+          val expandAndCollapseOption = cellFieldOption.map(field => new ExpandAndCollapse(field, tableFields))
           if (cellFieldOption.forall(_.fieldType.isDimension)) {
             expandAndCollapseOption.foreach(populateContextMenuForColumn)
           }
@@ -157,11 +150,11 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldBindin
       })
     }
 
-    private def stringBinding(id:String) = new TableLocaleStringBinding(id, locale)
+    private def stringBinding(id:String) = new TableLocaleStringBinding(id, tableFields.localeProperty)
 
     private def useFieldText(rowIndex:Int) {
       val fieldID = valueLookUps(rowIndex)(FieldInt).asInstanceOf[FieldID]
-      Option(fieldBindings.get(fieldID)) match {
+      Option(tableFields.fieldBindings.get(fieldID)) match {
         case Some(binding) => textProperty.bind(binding)
         case None => setText(fieldID.id)
       }

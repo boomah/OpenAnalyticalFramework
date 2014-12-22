@@ -1,22 +1,20 @@
 package com.openaf.table.gui
 
 import com.openaf.table.lib.api._
-import javafx.beans.property.Property
-import java.util.Locale
 import com.openaf.table.gui.binding.TableLocaleStringBinding
 import javafx.scene.control.MenuItem
 import javafx.event.{ActionEvent, EventHandler}
 
-class ExpandAndCollapse(field:Field[_], requestTableStateProperty:Property[TableState], locale:Property[Locale]) {
+class ExpandAndCollapse(field:Field[_], tableFields:OpenAFTableFields) {
   private def requestNewState(collapsedState:CollapsedState) {
     val newTotals = field.totals.copy(collapsedState = collapsedState)
-    val newTableState = requestTableStateProperty.getValue.replaceField(field, field.withTotals(newTotals))
-    requestTableStateProperty.setValue(newTableState)
+    val newTableState = tableFields.tableDataProperty.getValue.tableState.replaceField(field, field.withTotals(newTotals))
+    tableFields.requestTableStateProperty.setValue(newTableState)
   }
 
   private def menuItemFromId(id:String) = {
     val menuItem = new MenuItem
-    menuItem.textProperty.bind(new TableLocaleStringBinding(id, locale))
+    menuItem.textProperty.bind(new TableLocaleStringBinding(id, tableFields.localeProperty))
     menuItem
   }
 

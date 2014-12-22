@@ -1,31 +1,23 @@
 package com.openaf.table.gui
 
-import javafx.beans.property.Property
 import javafx.scene.layout.{Priority, VBox}
 import javafx.geometry.Side
 import com.openaf.table.lib.api._
-import javafx.collections.ObservableMap
-import javafx.beans.binding.StringBinding
-import java.util.Locale
 import com.openaf.table.lib.api.ColumnHeaderLayout.ColumnHeaderTreeType
 import collection.immutable.Seq
 
-class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, tableDataProperty:Property[TableData],
-                           requestTableStateProperty:Property[TableState], dragAndDrop:DragAndDrop,
-                           dragAndDropContainer:DragAndDropContainer,
-                           fieldBindings:ObservableMap[FieldID,StringBinding], locale:Property[Locale]) extends VBox {
+class ColumnHeaderTreeNode(val columnHeaderTree:ColumnHeaderTree, dragAndDropContainer:DragAndDropContainer,
+                           tableFields:OpenAFTableFields) extends VBox {
   getStyleClass.add("column-header-tree-node")
   private val topNode = columnHeaderTree.columnHeaderTreeType match {
-    case Left(field) => new FieldNode(field, dragAndDrop, dragAndDropContainer, tableDataProperty,
-      requestTableStateProperty, fieldBindings, locale)
-    case Right(columnHeaderLayout) => new ColumnHeaderLayoutNode(columnHeaderLayout, tableDataProperty,
-      requestTableStateProperty, dragAndDrop, dragAndDropContainer, fieldBindings, locale)
+    case Left(field) => new FieldNode(field, dragAndDropContainer, tableFields)
+    case Right(columnHeaderLayout) => new ColumnHeaderLayoutNode(columnHeaderLayout, dragAndDropContainer, tableFields)
   }
   VBox.setVgrow(topNode, Priority.ALWAYS)
   getChildren.add(topNode)
   if (columnHeaderTree.hasChildren) {
-    val childColumnHeaderNode = new ColumnHeaderLayoutNode(columnHeaderTree.childColumnHeaderLayout, tableDataProperty,
-      requestTableStateProperty, dragAndDrop, dragAndDropContainer, fieldBindings, locale)
+    val childColumnHeaderNode = new ColumnHeaderLayoutNode(columnHeaderTree.childColumnHeaderLayout,
+      dragAndDropContainer, tableFields)
     VBox.setVgrow(childColumnHeaderNode, Priority.ALWAYS)
     getChildren.add(childColumnHeaderNode)
   }

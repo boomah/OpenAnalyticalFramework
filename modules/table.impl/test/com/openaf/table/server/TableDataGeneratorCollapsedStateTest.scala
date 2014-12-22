@@ -125,4 +125,28 @@ class TableDataGeneratorCollapsedStateTest extends FunSuite {
 
     check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
   }
+
+  test("0 row, 1 measure (collapsed all), 2 columns (first one collapsed all)") {
+    val scoreField = ScoreField.withTotals(Totals(collapsedState = AllCollapsed()))
+    val genderField = GenderField.withTotals(Totals(collapsedState = AllCollapsed()))
+    val tableState = TableState.Blank
+      .withColumnHeaderLayout(ColumnHeaderLayout.verticallyStacked(List(scoreField, genderField, LocationField)))
+
+    val expectedRows = List(
+      row(0, Nil, List(FieldInt   )),
+      row(1, Nil, List(TotalTopInt)),
+      row(2, Nil, List(TotalTopInt)),
+      row(3, Nil, List(425        ))
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh),
+      ScoreField.id -> List(ScoreField.id)
+    )
+    val expectedFieldValues = scoreFieldValues(scoreField.withKey(ColumnHeaderFieldKey(0))) ++
+      orderedGenderFieldValues(genderField.withKey(ColumnHeaderFieldKey(1))) ++
+      orderedLocationFieldValues(LocationField.withKey(ColumnHeaderFieldKey(2)))
+
+    check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
+  }
 }

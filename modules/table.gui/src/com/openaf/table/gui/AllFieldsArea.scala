@@ -2,12 +2,9 @@ package com.openaf.table.gui
 
 import javafx.scene.layout.StackPane
 import javafx.scene.control.{TreeCell, TreeItem, TreeView}
-import javafx.beans.property.Property
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import javafx.util.Callback
 import com.openaf.table.lib.api._
-import javafx.collections.ObservableMap
-import javafx.beans.binding.StringBinding
 import javafx.scene.SnapshotParameters
 
 object AllFieldsArea {
@@ -18,12 +15,10 @@ case class TreeGroup(fieldGroup:String, allChildFields:List[Field[_]])
 
 import AllFieldsArea._
 
-class AllFieldsArea(tableDataProperty:Property[TableData], requestTableStateProperty:Property[TableState],
-                    val dragAndDrop:DragAndDrop, fieldBindings:ObservableMap[FieldID,StringBinding])
-  extends StackPane with DropTarget with DragAndDropContainer with ConfigAreaNode {
+class AllFieldsArea(val tableFields:OpenAFTableFields) extends StackPane with DropTarget with DragAndDropContainer with ConfigAreaNode {
   getStyleClass.add("all-fields-area")
 
-  tableDataProperty.addListener(new ChangeListener[TableData] {
+  tableFields.tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
       if (Option(oldTableData).map(_.fieldGroup) != Option(newTableData).map(_.fieldGroup)) {
         updateTreeView(newTableData.fieldGroup)
@@ -35,23 +30,20 @@ class AllFieldsArea(tableDataProperty:Property[TableData], requestTableStateProp
   private val treeView = new TreeView[TreeItemType](root)
   treeView.setShowRoot(false)
   treeView.setCellFactory(new Callback[TreeView[TreeItemType],TreeCell[TreeItemType]] {
-    def call(treeView:TreeView[TreeItemType]) = new TreeItemTypeTreeCell(dragAndDrop, AllFieldsArea.this,
-      requestTableStateProperty, fieldBindings)
+    def call(treeView:TreeView[TreeItemType]) = new TreeItemTypeTreeCell(AllFieldsArea.this, tableFields)
   })
 
   private def updateTreeItem(treeItem:TreeItem[TreeItemType], fieldGroup:FieldGroup) {
     treeItem.setValue(Left(TreeGroup(fieldGroup.groupName, fieldGroup.fields)))
     treeItem.setExpanded(true)
-    fieldGroup.children.foreach(fieldGroupOrField => {
-      fieldGroupOrField match {
-        case Left(fieldGroup0) => {
-          val newTreeItem = new TreeItem[TreeItemType]
-          treeItem.getChildren.add(newTreeItem)
-          updateTreeItem(newTreeItem, fieldGroup0)
-        }
-        case Right(field) => treeItem.getChildren.add(new TreeItem[TreeItemType](Right(field)))
+    fieldGroup.children.foreach{
+      case Left(childFieldGroup) => {
+        val newTreeItem = new TreeItem[TreeItemType]
+        treeItem.getChildren.add(newTreeItem)
+        updateTreeItem(newTreeItem, childFieldGroup)
       }
-    })
+      case Right(field) => treeItem.getChildren.add(new TreeItem[TreeItemType](Right(field)))
+    }
   }
 
   private def updateTreeView(fieldGroup:FieldGroup) {
@@ -72,9 +64,7 @@ class AllFieldsArea(tableDataProperty:Property[TableData], requestTableStateProp
   dragAndDrop.setRemoveDropTarget(this)
 }
 
-class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsArea,
-                           val requestTableStateProperty:Property[TableState],
-                           fieldBindings:ObservableMap[FieldID,StringBinding]) extends TreeCell[TreeItemType] with Draggable {
+class TreeItemTypeTreeCell(allFieldsArea:AllFieldsArea, val tableFields:OpenAFTableFields) extends TreeCell[TreeItemType] with Draggable {
   private var fields0:List[Field[_]] = Nil
   override def updateItem(treeItemType:TreeItemType, isEmpty:Boolean) {
     super.updateItem(treeItemType, isEmpty)
@@ -89,7 +79,7 @@ class TreeItemTypeTreeCell(val dragAndDrop:DragAndDrop, allFieldsArea:AllFieldsA
           fields0 = treeGroup.allChildFields
         }
         case Right(field) => {
-          Option(fieldBindings.get(field.id)) match {
+          Option(tableFields.fieldBindings.get(field.id)) match {
             case Some(binding) => textProperty.bind(binding)
             case None => setText(field.id.id)
           }

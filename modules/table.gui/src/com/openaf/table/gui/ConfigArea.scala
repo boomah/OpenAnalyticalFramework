@@ -3,26 +3,20 @@ package com.openaf.table.gui
 import javafx.scene.layout.HBox
 import javafx.scene.control.{Toggle, ToggleGroup, ToggleButton}
 import javafx.scene.Group
-import javafx.collections.{ObservableMap, ObservableList, FXCollections}
+import javafx.collections.{ObservableList, FXCollections}
 import javafx.beans.value.{ObservableValue, ChangeListener}
-import javafx.beans.property.Property
-import java.util.Locale
 import com.openaf.table.gui.binding.TableLocaleStringBinding
-import com.openaf.table.lib.api.{TableState, FieldID, TableData}
-import javafx.beans.binding.StringBinding
 
-class ConfigArea(tableDataProperty:Property[TableData], requestTableStateProperty:Property[TableState],
-                 dragAndDrop:DragAndDrop, locale:Property[Locale],
-                 fieldBindings:ObservableMap[FieldID,StringBinding]) extends HBox {
+class ConfigArea(tableFields:OpenAFTableFields) extends HBox {
   getStyleClass.add("config-area")
   private val configAreaEmptyText = "config-area-empty"
   setId(configAreaEmptyText)
   private val fieldsButton = new ToggleButton
-  fieldsButton.textProperty.bind(new TableLocaleStringBinding("fields", locale, Some("1:")))
+  fieldsButton.textProperty.bind(new TableLocaleStringBinding("fields", tableFields.localeProperty, Some("1:")))
   fieldsButton.setFocusTraversable(false)
 
   private val fieldsToConfigAreaNode = Map[Toggle,ConfigAreaNode](
-    fieldsButton -> new AllFieldsArea(tableDataProperty, requestTableStateProperty, dragAndDrop, fieldBindings)
+    fieldsButton -> new AllFieldsArea(tableFields)
   )
 
   private val toggleGroup = new ToggleGroup

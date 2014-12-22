@@ -1,10 +1,10 @@
 package com.openaf.table.gui
 
 import javafx.scene.layout._
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.{Property, SimpleObjectProperty}
 import java.util.Locale
 import com.openaf.table.lib.api.{TableState, FieldID, TableData}
-import javafx.collections.FXCollections
+import javafx.collections.{ObservableMap, FXCollections}
 import javafx.beans.binding.StringBinding
 import javafx.event.EventHandler
 import javafx.scene.input.KeyEvent
@@ -24,17 +24,15 @@ class OpenAFTable extends StackPane {
   protected val fieldBindings = FXCollections.observableHashMap[FieldID,StringBinding]
   protected val unmodifiableFieldBindings = FXCollections.unmodifiableObservableMap(fieldBindings)
 
-  private val configArea = new ConfigArea(tableDataProperty, requestTableStateProperty, dragAndDrop,
-    localeProperty, unmodifiableFieldBindings)
-  private val filterFieldsArea = new FilterFieldsArea(tableDataProperty, requestTableStateProperty, dragAndDrop,
-    localeProperty, unmodifiableFieldBindings)
-  private val rowHeaderFieldsArea = new RowHeaderFieldsArea(tableDataProperty, requestTableStateProperty,
-    dragAndDrop, localeProperty, unmodifiableFieldBindings)
-  private val columnHeaderArea = new ColumnHeaderArea(tableDataProperty, requestTableStateProperty, dragAndDrop,
-    localeProperty, unmodifiableFieldBindings)
-  private val toolBar = new OpenAFTableToolBar
-  private val tableView = new OpenAFTableView(tableDataProperty, requestTableStateProperty, unmodifiableFieldBindings,
-    localeProperty)
+  private val tableFields = OpenAFTableFields(tableDataProperty, requestTableStateProperty, dragAndDrop, localeProperty,
+    unmodifiableFieldBindings)
+
+  private val configArea = new ConfigArea(tableFields)
+  private val filterFieldsArea = new FilterFieldsArea(tableFields)
+  private val rowHeaderFieldsArea = new RowHeaderFieldsArea(tableFields)
+  private val columnHeaderArea = new ColumnHeaderArea(tableFields)
+  private val toolBar = new OpenAFTableToolBar(tableFields)
+  private val tableView = new OpenAFTableView(tableFields)
 
   {
     val mainContent = new GridPane
@@ -74,3 +72,7 @@ class OpenAFTable extends StackPane {
     }
   })
 }
+
+case class OpenAFTableFields(tableDataProperty:Property[TableData], requestTableStateProperty:Property[TableState],
+                             dragAndDrop:DragAndDrop, localeProperty:Property[Locale],
+                             fieldBindings:ObservableMap[FieldID,StringBinding])

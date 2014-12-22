@@ -1,6 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.beans.property.{Property, SimpleObjectProperty}
+import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.{Cursor, Node}
 import javafx.event.EventHandler
 import javafx.scene.input.{MouseButton, MouseEvent}
@@ -10,7 +10,6 @@ import javafx.scene.layout.{Region, Pane, FlowPane, StackPane}
 import javafx.scene.control.Label
 import javafx.geometry.Side
 import com.openaf.table.gui.binding.TableLocaleStringBinding
-import java.util.Locale
 import com.openaf.table.lib.api.{TableState, Field}
 import javafx.scene.image.{Image, ImageView}
 
@@ -114,13 +113,15 @@ class DragAndDrop {
 }
 
 trait Draggable extends Region {
-  def dragAndDrop:DragAndDrop
+  def tableFields:OpenAFTableFields
+  def dragAndDrop = tableFields.dragAndDrop
+  def requestTableStateProperty = tableFields.requestTableStateProperty
+  def tableState = tableFields.tableDataProperty.getValue.tableState
   def dragAndDropContainer:DragAndDropContainer
   def fields:List[Field[_]]
   // When dropped here, nothing will happen. Usually just the Draggable itself, but in the case of a Draggable being
   // dragged from the AllFieldsArea, the AllFieldsArea scene bounds are used.
   def noOpSceneBounds = localToScene(getBoundsInLocal)
-  def requestTableStateProperty:Property[TableState]
   def dragImage:Image
   def isParent = false
 
@@ -167,7 +168,7 @@ trait Draggable extends Region {
       dragAndDrop.fieldsBeingDraggedInfo.get.foreach(draggableFieldsInfo => {
         updateClosestDropTarget(event)
         val newTableStateOption = dragAndDrop.closestDropTarget.get.map(dropTarget => {
-          val tableStateWithFieldsRemoved = requestTableStateProperty.getValue.remove(draggableFieldsInfo.fields)
+          val tableStateWithFieldsRemoved = tableState.remove(draggableFieldsInfo.fields)
           dropTarget.fieldsDropped(draggableFieldsInfo, tableStateWithFieldsRemoved)
         })
         getScene.setCursor(Cursor.DEFAULT)
@@ -186,7 +187,7 @@ trait Draggable extends Region {
   })
 
   private def moveField() {
-    val currentTableState = requestTableStateProperty.getValue
+    val currentTableState = tableState
     val tableStateWithRemoved = currentTableState.remove(fields)
     val tableStateToUse = if (tableStateWithRemoved == currentTableState) {
       val field = fields.head
@@ -209,7 +210,8 @@ trait DropTarget extends Node {
 }
 
 trait DragAndDropContainer {
-  def dragAndDrop:DragAndDrop
+  def tableFields:OpenAFTableFields
+  def dragAndDrop = tableFields.dragAndDrop
   dragAndDrop.register(this)
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo):List[DropTarget]
   def childFieldsDropped(dropTarget:DropTarget, draggableFieldsInfo:DraggableFieldsInfo, tableState:TableState):TableState
@@ -233,9 +235,7 @@ case class DraggableFieldsInfo(draggable:Draggable, dragAndDropContainer:DragAnd
 
 trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
   getStyleClass.add("drag-and-drop-container-node")
-  def requestTableStateProperty:Property[TableState]
   def descriptionID:String
-  def locale:Property[Locale]
   def dropTargets(draggableFieldsInfo:DraggableFieldsInfo) = dropTargetMap.keySet.toList
   def removeDropTargets() {
     dropTargetPane.getChildren.clear()
@@ -248,7 +248,7 @@ trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
   }
   def setup(oldTableStateOption:Option[TableState], newTableState:TableState)
 
-  requestTableStateProperty.addListener(new ChangeListener[TableState] {
+  tableFields.requestTableStateProperty.addListener(new ChangeListener[TableState] {
     def changed(observable:ObservableValue[_<:TableState], oldTableState:TableState, newTableState:TableState) {
       setup(Option(oldTableState), newTableState)
     }
@@ -258,7 +258,7 @@ trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
 
   private val descriptionLabel = new Label
   descriptionLabel.getStyleClass.add("description-label")
-  descriptionLabel.textProperty.bind(new TableLocaleStringBinding(descriptionID, locale))
+  descriptionLabel.textProperty.bind(new TableLocaleStringBinding(descriptionID, tableFields.localeProperty))
 
   protected val mainContent = new FlowPane
   mainContent.getStyleClass.add("main-content")

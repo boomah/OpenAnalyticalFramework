@@ -4,15 +4,12 @@ import javafx.scene.control.ToggleButton
 import com.openaf.gui.utils.{Icons, GuiUtils}
 import javafx.event.EventHandler
 import javafx.scene.input.{MouseButton, MouseEvent}
-import javafx.beans.property.Property
 import com.openaf.table.lib.api._
 import javafx.stage.{WindowEvent, Popup}
-import java.util.Locale
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.{Boolean => JBoolean}
 
-class FilterButton[T](field:Field[T], tableData:Property[TableData], requestTableStateProperty:Property[TableState],
-                      locale:Property[Locale]) extends ToggleButton {
+class FilterButton[T](field:Field[T], tableFields:OpenAFTableFields) extends ToggleButton {
   getStyleClass.add("filter-button")
   setFocusTraversable(false)
   private val filterIcon = Icons.text(Icons.Filter)
@@ -23,7 +20,7 @@ class FilterButton[T](field:Field[T], tableData:Property[TableData], requestTabl
     popup.setAutoFix(true)
     popup.setAutoHide(true)
     popup.setHideOnEscape(true)
-    val filterButtonNode = new FilterButtonNode[T](field, tableData, requestTableStateProperty, locale, hidePopup)
+    val filterButtonNode = new FilterButtonNode[T](field, tableFields, hidePopup)
     popup.getContent.add(filterButtonNode)
     popup.showingProperty.addListener(new ChangeListener[JBoolean] {
       def changed(observableValue:ObservableValue[_<:JBoolean], oldValue:JBoolean, newValue:JBoolean) {

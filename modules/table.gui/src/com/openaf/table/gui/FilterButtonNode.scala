@@ -1,8 +1,6 @@
 package com.openaf.table.gui
 
-import javafx.beans.property.Property
 import com.openaf.table.lib.api._
-import java.util.Locale
 import javafx.scene.layout.{Priority, HBox, VBox}
 import javafx.scene.control._
 import com.openaf.table.gui.binding.TableLocaleStringBinding
@@ -16,11 +14,10 @@ import javafx.scene.text.{TextBoundsType, Text}
 import java.util.function.Predicate
 import javafx.beans.value.{ObservableValue, ChangeListener}
 
-class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], requestTableStateProperty:Property[TableState],
-                          locale:Property[Locale], hidePopup:()=>Unit) extends VBox {
+class FilterButtonNode[T](field:Field[T], tableFields:OpenAFTableFields, hidePopup:()=>Unit) extends VBox {
   getStyleClass.add("filter-button-node")
 
-  private def stringBinding(id:String) = new TableLocaleStringBinding(id, locale)
+  private def stringBinding(id:String) = new TableLocaleStringBinding(id, tableFields.localeProperty)
 
   private val buttonPanel = new HBox
   buttonPanel.getStyleClass.add("button-box")
@@ -46,7 +43,7 @@ class FilterButtonNode[T](field:Field[T], tableData:Property[TableData], request
 
   private val filterTextAreaTextField = new TextField
 
-  private val filterButtonNodeModel = new FilterButtonNodeModel[T](field, tableData, requestTableStateProperty, locale)
+  private val filterButtonNodeModel = new FilterButtonNodeModel[T](field, tableFields)
   private val listView = new ListView[Int]
   listView.getSelectionModel.setSelectionMode(SelectionMode.MULTIPLE)
   listView.setOnKeyPressed(new EventHandler[KeyEvent] {

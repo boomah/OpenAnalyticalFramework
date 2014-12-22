@@ -1,15 +1,13 @@
 package com.openaf.table.gui
 
-import javafx.beans.property.{SimpleBooleanProperty, Property}
+import javafx.beans.property.SimpleBooleanProperty
 import com.openaf.table.lib.api._
-import java.util.Locale
 import javafx.collections.ObservableList
 import scala.collection.mutable
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.{Boolean => JBoolean}
 
-class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData],
-                               requestTableStateProperty:Property[TableState], locale:Property[Locale]) {
+class FilterButtonNodeModel[T](field:Field[T], tableFields:OpenAFTableFields) {
   private val allBooleanProperty = new SimpleBooleanProperty
   private var allShouldChange = true
   allBooleanProperty.addListener(new ChangeListener[JBoolean] {
@@ -20,10 +18,10 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData],
       }
     }
   })
-  private[gui] val values = tableData.getValue.tableValues.fieldValues.values(field)
+  private[gui] val values = tableFields.tableDataProperty.getValue.tableValues.fieldValues.values(field)
   private[gui] val numValues = values.length
-  private val defaultRenderer = tableData.getValue.defaultRenderers(field.id).asInstanceOf[Renderer[T]]
-  private val valueLookUp = tableData.getValue.tableValues.valueLookUp(field.id).asInstanceOf[Array[T]]
+  private val defaultRenderer = tableFields.tableDataProperty.getValue.defaultRenderers(field.id).asInstanceOf[Renderer[T]]
+  private val valueLookUp = tableFields.tableDataProperty.getValue.tableValues.valueLookUp(field.id).asInstanceOf[Array[T]]
   private val propertyLookUp = {
     val lookup = new mutable.LongMap[SimpleBooleanProperty]
     var i = 0
@@ -111,8 +109,8 @@ class FilterButtonNodeModel[T](field:Field[T], tableData:Property[TableData],
 
   private[gui] def updateTableState(filter:Filter[T]) {
     val newField = field.withFilter(filter)
-    val newTableState = requestTableStateProperty.getValue.replaceField(field, newField)
-    requestTableStateProperty.setValue(newTableState)
+    val newTableState = tableFields.tableDataProperty.getValue.tableState.replaceField(field, newField)
+    tableFields.requestTableStateProperty.setValue(newTableState)
   }
 
   private[gui] def property(intValue:Int) = if (intValue == 0) allBooleanProperty else propertyLookUp(intValue)

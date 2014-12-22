@@ -2,31 +2,27 @@ package com.openaf.table.gui
 
 import com.openaf.table.lib.api._
 import TableValues._
-import javafx.collections.ObservableMap
-import javafx.beans.binding.StringBinding
 import javafx.util.Callback
 import annotation.tailrec
 import com.openaf.table.gui.OpenAFTableView.{TableColumnType, OpenAFTableCell}
 import TableCellStyle._
 import com.openaf.gui.utils.GuiUtils._
 import com.openaf.table.gui.binding.TableLocaleStringBinding
-import javafx.beans.property.Property
-import java.util.Locale
 import javafx.scene.control.ContextMenu
 
-class RowHeaderCellFactory[T](valueLookUp:Map[FieldID,Array[Any]], renderer:Renderer[T], fieldBindings:ObservableMap[FieldID,StringBinding],
-                              startRowHeaderValuesIndex:Int, requestTableStateProperty:Property[TableState],
-                              field:Field[_], locale:Property[Locale]) extends Callback[TableColumnType,OpenAFTableCell] {
+class RowHeaderCellFactory[T](valueLookUp:Map[FieldID,Array[Any]], renderer:Renderer[T], startRowHeaderValuesIndex:Int,
+                              field:Field[_], tableFields:OpenAFTableFields) extends Callback[TableColumnType,OpenAFTableCell] {
   def call(tableColumn:TableColumnType) = new OpenAFTableCell {
     private def rowHeaderTableColumn = tableColumn.asInstanceOf[OpenAFTableColumn]
     private def addStyle(style:TableCellStyle) {getStyleClass.add(camelCaseToDashed(style.toString))}
     setContextMenu(new ContextMenu)
+
     override def updateItem(row:OpenAFTableRow, isEmpty:Boolean) {
       super.updateItem(row, isEmpty)
       removeAllStyles(this)
       textProperty.unbind()
       getContextMenu.getItems.clear()
-      val expandAndCollapse = new ExpandAndCollapse(field, requestTableStateProperty, locale)
+      val expandAndCollapse = new ExpandAndCollapse(field, tableFields)
       populateContextMenuForColumn(expandAndCollapse)
       if (isEmpty) {
         setText(null)
@@ -54,7 +50,7 @@ class RowHeaderCellFactory[T](valueLookUp:Map[FieldID,Array[Any]], renderer:Rend
             addStyle(FieldRowHeaderTableCell)
           }
           val fieldID = valueLookUp(field.id)(FieldInt).asInstanceOf[FieldID]
-          Option(fieldBindings.get(fieldID)) match {
+          Option(tableFields.fieldBindings.get(fieldID)) match {
             case Some(binding) => textProperty.bind(binding)
             case None => setText(fieldID.id)
           }
@@ -103,14 +99,14 @@ class RowHeaderCellFactory[T](valueLookUp:Map[FieldID,Array[Any]], renderer:Rend
       }
     }
 
-    private def stringBinding(id:String) = new TableLocaleStringBinding(id, locale)
+    private def stringBinding(id:String) = new TableLocaleStringBinding(id, tableFields.localeProperty)
 
     private def populateContextMenuForColumn(expandAndCollapse:ExpandAndCollapse) {
       getContextMenu.getItems.addAll(expandAndCollapse.expandAllMenuItem, expandAndCollapse.collapseAllMenuItem)
     }
 
     private def populateContextMenuForCell(expandAndCollapse:ExpandAndCollapse, row:OpenAFTableRow) {
-      val values:Array[Array[Any]] = requestTableStateProperty.getValue.tableLayout.rowHeaderFieldIDs
+      val values:Array[Array[Any]] = tableFields.tableDataProperty.getValue.tableState.tableLayout.rowHeaderFieldIDs
         .map(id => valueLookUp(id))(collection.breakOut)
       val pathValues:Array[Any] = (0 to rowHeaderTableColumn.column)
         .map(column => values(column)(row.rowHeaderValues(column)))(collection.breakOut)

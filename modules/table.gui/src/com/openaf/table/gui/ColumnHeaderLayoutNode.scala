@@ -1,24 +1,17 @@
 package com.openaf.table.gui
 
-import javafx.beans.property.Property
 import javafx.scene.layout.{Priority, HBox}
 import javafx.geometry.Side
 import scala.collection.JavaConversions._
 import com.openaf.table.lib.api._
-import javafx.collections.ObservableMap
-import javafx.beans.binding.StringBinding
-import java.util.Locale
 import com.openaf.table.lib.api.ColumnHeaderLayout.ColumnHeaderTreeType
 import collection.immutable.Seq
 
-class ColumnHeaderLayoutNode(columnHeaderLayout:ColumnHeaderLayout, tableDataProperty:Property[TableData],
-                             requestTableStateProperty:Property[TableState], dragAndDrop:DragAndDrop,
-                             dragAndDropContainer:DragAndDropContainer,
-                             fieldBindings:ObservableMap[FieldID,StringBinding], locale:Property[Locale]) extends HBox {
+class ColumnHeaderLayoutNode(columnHeaderLayout:ColumnHeaderLayout, dragAndDropContainer:DragAndDropContainer,
+                             tableFields:OpenAFTableFields) extends HBox {
   getStyleClass.add("column-header-layout-node")
   private val columnHeaderTreeNodes = columnHeaderLayout.columnHeaderTrees.map(columnHeaderTree => {
-    val columnHeaderTreeNode = new ColumnHeaderTreeNode(columnHeaderTree, tableDataProperty, requestTableStateProperty,
-      dragAndDrop, dragAndDropContainer, fieldBindings, locale)
+    val columnHeaderTreeNode = new ColumnHeaderTreeNode(columnHeaderTree, dragAndDropContainer, tableFields)
     HBox.setHgrow(columnHeaderTreeNode, Priority.ALWAYS)
     columnHeaderTreeNode
   })

@@ -3,14 +3,9 @@ package com.openaf.table.gui
 import javafx.geometry.Side
 import scala.collection.JavaConversions._
 import javafx.scene.control.Label
-import com.openaf.table.lib.api.{TableData, TableState, FieldID, Field}
-import javafx.collections.ObservableMap
-import javafx.beans.binding.StringBinding
-import javafx.beans.property.Property
+import com.openaf.table.lib.api.{TableState, Field}
 
 trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
-  def tableDataProperty:Property[TableData]
-  def fieldBindings:ObservableMap[FieldID,StringBinding]
   def withNewFields(fields:List[Field[_]], tableState:TableState):TableState
   def fields(tableStateOption:Option[TableState]):List[Field[_]]
   protected def fields:List[Field[_]] = fields(None)
@@ -89,8 +84,7 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
   }
 
   private def fullSetup(fields:List[Field[_]]) {
-    val nodes = fields.map(field => new FieldNode(field, dragAndDrop, this, tableDataProperty,
-      requestTableStateProperty, fieldBindings, locale))
+    val nodes = fields.map(field => new FieldNode(field, this, tableFields))
     mainContent.getChildren.clear()
     mainContent.getChildren.addAll(nodes.toArray:_*)
   }
