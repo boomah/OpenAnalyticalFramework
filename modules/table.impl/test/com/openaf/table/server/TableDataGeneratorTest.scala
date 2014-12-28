@@ -4,6 +4,7 @@ import org.scalatest.FunSuite
 import com.openaf.table.server.datasources.DataSourceTestData._
 import com.openaf.table.lib.api._
 import com.openaf.table.lib.api.TableValues._
+import StandardFields._
 
 class TableDataGeneratorTest extends FunSuite {
   test("1 row (key), 0 measure, 0 column") {
@@ -480,6 +481,50 @@ class TableDataGeneratorTest extends FunSuite {
       orderedNameFieldValues(NameField.withKey(ColumnHeaderFieldKey(1))) ++
       orderedGenderFieldValues(GenderField.withKey(ColumnHeaderFieldKey(2))) ++
       orderedLocationFieldValues(LocationField.withKey(ColumnHeaderFieldKey(3)))
+
+    check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("1 row (name), 1 measure (count), 0 column") {
+    val tableState = TableState.Blank
+      .withRowHeaderFields(List(NameField))
+      .withColumnHeaderLayout(ColumnHeaderLayout(CountField))
+
+    val expectedRows = List(
+      row(0, List(FieldInt), List(FieldInt)),
+      row(1, List(6),        List(mInt(1) )),
+      row(2, List(3),        List(mInt(1) )),
+      row(3, List(2),        List(mInt(1) )),
+      row(4, List(4),        List(mInt(1) )),
+      row(5, List(5),        List(mInt(1) )),
+      row(6, List(1),        List(mInt(1) ))
+    )
+    val expectedValueLookUp = Map(
+      NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
+      CountField.id -> List(CountField.id)
+    )
+    val expectedFieldValues = orderedNameFieldValues(NameField.withKey(RowHeaderFieldKey(0))) ++
+      countFieldValues(CountField.withKey(ColumnHeaderFieldKey(0)))
+
+    check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("1 row (gender), 1 measure (count), 0 column") {
+    val tableState = TableState.Blank
+      .withRowHeaderFields(List(GenderField))
+      .withColumnHeaderLayout(ColumnHeaderLayout(CountField))
+
+    val expectedRows = List(
+      row(0, List(FieldInt), List(FieldInt)),
+      row(1, List(1),        List(mInt(3) )),
+      row(2, List(2),        List(mInt(3) ))
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      CountField.id -> List(CountField.id)
+    )
+    val expectedFieldValues = orderedGenderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
+      countFieldValues(CountField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
   }

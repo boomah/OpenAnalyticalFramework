@@ -16,14 +16,14 @@ object DataSourceTestData {
   val ScoreField = Field[Int]("score", Measure)
 
   private val StringFields = List(NameField, GenderField, LocationField, GroupField)
-  private val StringFieldDefinitions = StringFields.map(StringFieldDefinition)
+  private val StringFieldDefinitions = StringFields.map(field => StringFieldDefinition(field))
   private val IntFields = List(AgeField, ScoreField)
-  private val IntFieldDefinitions = IntFields.map(IntFieldDefinition)
+  private val IntFieldDefinitions = IntFields.map(field => IntFieldDefinition(field))
   private val FieldDefinitions:List[FieldDefinition] = StringFieldDefinitions ::: IntFieldDefinitions
 
   val FieldIDs = FieldDefinitions.map(_.defaultField.id).toArray
   val Group = FieldDefinitionGroup("Fields", FieldDefinitions.map(definition => Right(definition)))
-  val Groups = FieldDefinitionGroups(List(Group))
+  val Groups = FieldDefinitionGroups(List(FieldDefinitionGroup.Standard, Group))
 
   val Rosie = "Rosie"
   val Laura = "Laura"
@@ -68,10 +68,13 @@ object DataSourceTestData {
   def scoreFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
   def measureFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
   def orderedGroupFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1))
+  def countFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
 
   def row(rowIndex:Int=0, rowHeaderValues:List[Int]=Nil, columnHeaderAndDataValues:List[Any]=Nil) = {
     new OpenAFTableRow(rowIndex, rowHeaderValues.toArray, columnHeaderAndDataValues.toArray)
   }
+
+  def mInt(value:Int) = new MutInt(value)
 
   def check(tableState:TableState, expectedRowHeaderValues:Set[List[Int]],
             expectedColumnHeaderPaths:Set[ColumnHeaderPath], expectedData:Map[DataPath,Any],

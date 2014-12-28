@@ -27,7 +27,7 @@ case object NullFieldDefinition extends FieldDefinition {
   def combiner = NullCombiner
 }
 
-case class AnyFieldDefinition(defaultField:Field[Any]) extends FieldDefinition {
+class AnyFieldDefinition(val defaultField:Field[Any]) extends FieldDefinition {
   type V = Any
   type C = MSet[Any]
   val primaryKey = false
@@ -37,7 +37,11 @@ case class AnyFieldDefinition(defaultField:Field[Any]) extends FieldDefinition {
   val combiner = AnyCombiner
 }
 
-case class StringFieldDefinition(defaultField:Field[String]) extends FieldDefinition {
+object AnyFieldDefinition {
+  def apply(defaultField:Field[Any]) = new AnyFieldDefinition(defaultField)
+}
+
+class StringFieldDefinition(val defaultField:Field[String]) extends FieldDefinition {
   type V = String
   type C = MSet[String]
   val primaryKey = false
@@ -47,7 +51,11 @@ case class StringFieldDefinition(defaultField:Field[String]) extends FieldDefini
   val combiner = StringCombiner
 }
 
-case class IntFieldDefinition(defaultField:Field[Int]) extends FieldDefinition {
+object StringFieldDefinition {
+  def apply(defaultField:Field[String]) = new StringFieldDefinition(defaultField)
+}
+
+class IntFieldDefinition(val defaultField:Field[Int]) extends FieldDefinition {
   type V = Int
   type C = Int
   def primaryKey = false
@@ -56,3 +64,18 @@ case class IntFieldDefinition(defaultField:Field[Int]) extends FieldDefinition {
   def ordering = IntOrdering
   def combiner = IntCombiner
 }
+
+object IntFieldDefinition {
+  def apply(defaultField:Field[Int]) = new IntFieldDefinition(defaultField)
+}
+
+class IncrementingFieldDefinition(val defaultField:Field[Integer]) extends FieldDefinition {
+  type V = Integer
+  type C = MutInt
+  def primaryKey = false
+  def renderer = IntegerRenderer
+  def combinedRenderer = MutIntRenderer
+  def ordering = IntegerOrdering
+  def combiner = MutIntCombiner
+}
+

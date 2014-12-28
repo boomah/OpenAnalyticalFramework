@@ -30,6 +30,14 @@ case object IntRenderer extends Renderer[Int] {
   def render(value:Int) = value.toString
 }
 
+case object IntegerRenderer extends Renderer[Integer] {
+  def render(value:Integer) = value.toString
+}
+
+case object MutIntRenderer extends Renderer[MutInt] {
+  def render(value:MutInt) = value.value.toString
+}
+
 case class MSetRenderer[T](maxNumberToDisplay:Int) extends Renderer[MSet[T]] {
   def render(value:MSet[T]) = {
     val numberOfValues = value.size

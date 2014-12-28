@@ -21,3 +21,7 @@ case object StringOrdering extends Ordering[String] {
 case object IntOrdering extends Ordering[Int] {
   def compare(intX:Int,intY:Int) = Integer.compare(intX, intY)
 }
+
+case object IntegerOrdering extends Ordering[Integer] {
+  def compare(intX:Integer,intY:Integer) = Integer.compare(intX.intValue, intY.intValue)
+}

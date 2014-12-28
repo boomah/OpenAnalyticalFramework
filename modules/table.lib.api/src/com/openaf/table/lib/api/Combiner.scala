@@ -6,6 +6,11 @@ import collection.mutable
 trait Combiner[C,V] {
   def initialCombinedValue:C
   def combine(combinedValue:C, value:V):C
+
+  /**
+   * Indicates whether this combiner does mutable combines. A combiner would do this for performance reasons.
+   */
+  def isMutable:Boolean = false
 }
 
 case object NullCombiner extends Combiner[Null,Null] {
@@ -32,4 +37,15 @@ case object StringCombiner extends Combiner[MSet[String],String] {
 case object IntCombiner extends Combiner[Int,Int] {
   def initialCombinedValue = 0
   def combine(combinedValue:Int, value:Int) = combinedValue + value
+}
+
+case object MutIntCombiner extends Combiner[MutInt,Integer] {
+  def initialCombinedValue = new MutInt(0)
+  def combine(combinedValue:MutInt, value:Integer) = {
+    combinedValue.value += value.intValue
+    combinedValue
+  }
+  override def isMutable = true
+
+  val One = new Integer(1)
 }

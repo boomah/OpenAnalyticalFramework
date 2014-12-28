@@ -111,7 +111,6 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     var dataRow:Array[Any] = null
     var rowHeaderValues:Array[Int] = null
     var value:Any = -1
-    var newDataValue:Any = null
     var lookUp:JMap[Any,WrappedInt] = null
     var intForValue:WrappedInt = null
     var fieldsValueCounterIndex = -1
@@ -121,7 +120,6 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     var columnHeaderValueCounter:Array[Int] = null
     var colHeaderValues:Array[Int] = null
     var measureFieldPosition = -1
-    var key:DataPath = null
     var matchesFilter = true
     var columnHeaderFieldsForPath:Array[Field[_]] = null
     var columnHeaderFieldDefinitions:Array[FieldDefinition] = null
@@ -292,75 +290,27 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
               value = dataRow(measureFieldPosition)
             } else if (measureFieldPosition == countFieldPosition) {
               // Count field
-              value = 1
+              value = MutIntCombiner.One
             }
 
             val fieldDefinition = measureFieldDefinitions(pathsCounter)
             if (!rowHeaderCollapsed && !columnHeaderCollapsed) {
-              key = new DataPath(rowHeaderValues, columnHeaderPath)
-              if (aggregatedData.contains(key)) {
-                newDataValue = fieldDefinition.combiner.combine(
-                  aggregatedData(key).asInstanceOf[fieldDefinition.C],
-                  value.asInstanceOf[fieldDefinition.V]
-                )
-              } else {
-                newDataValue = fieldDefinition.combiner.combine(
-                  fieldDefinition.combiner.initialCombinedValue,
-                  value.asInstanceOf[fieldDefinition.V]
-                )
-              }
-              aggregatedData.update(key, newDataValue)
+              combine(value, fieldDefinition, rowHeaderValues, columnHeaderPath, aggregatedData)
             }
 
             rowTotalsCounter = 0
             while (rowTotalsCounter < numRowTotals) {
-              key = new DataPath(rowTotals(rowTotalsCounter).values, columnHeaderPath)
-              if (aggregatedData.contains(key)) {
-                newDataValue = fieldDefinition.combiner.combine(
-                  aggregatedData(key).asInstanceOf[fieldDefinition.C],
-                  value.asInstanceOf[fieldDefinition.V]
-                )
-              } else {
-                newDataValue = fieldDefinition.combiner.combine(
-                  fieldDefinition.combiner.initialCombinedValue,
-                  value.asInstanceOf[fieldDefinition.V]
-                )
-              }
-              aggregatedData.update(key, newDataValue)
+              combine(value, fieldDefinition, rowTotals(rowTotalsCounter).values, columnHeaderPath, aggregatedData)
               rowTotalsCounter += 1
             }
 
             columnTotalsCounter = 0
             while (columnTotalsCounter < numColumnTotals) {
-              key = new DataPath(rowHeaderValues, columnTotals(columnTotalsCounter))
-              if (aggregatedData.contains(key)) {
-                newDataValue = fieldDefinition.combiner.combine(
-                  aggregatedData(key).asInstanceOf[fieldDefinition.C],
-                  value.asInstanceOf[fieldDefinition.V]
-                )
-              } else {
-                newDataValue = fieldDefinition.combiner.combine(
-                  fieldDefinition.combiner.initialCombinedValue,
-                  value.asInstanceOf[fieldDefinition.V]
-                )
-              }
-              aggregatedData.update(key, newDataValue)
+              combine(value, fieldDefinition, rowHeaderValues, columnTotals(columnTotalsCounter), aggregatedData)
 
               rowTotalsCounter = 0
               while (rowTotalsCounter < numRowTotals) {
-                key = new DataPath(rowTotals(rowTotalsCounter).values, columnTotals(columnTotalsCounter))
-                if (aggregatedData.contains(key)) {
-                  newDataValue = fieldDefinition.combiner.combine(
-                    aggregatedData(key).asInstanceOf[fieldDefinition.C],
-                    value.asInstanceOf[fieldDefinition.V]
-                  )
-                } else {
-                  newDataValue = fieldDefinition.combiner.combine(
-                    fieldDefinition.combiner.initialCombinedValue,
-                    value.asInstanceOf[fieldDefinition.V]
-                  )
-                }
-                aggregatedData.update(key, newDataValue)
+                combine(value, fieldDefinition, rowTotals(rowTotalsCounter).values, columnTotals(columnTotalsCounter), aggregatedData)
                 rowTotalsCounter += 1
               }
 
@@ -389,7 +339,8 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     // If there are no row fields or measure fields there with be an empty row in the headers that isn't needed so
     // remove it
     val rowHeadersToUse = if (rowHeaderFieldIDs.nonEmpty || columnHeaderPathsMeasureOptions.exists(_.isDefined)) {
-      rowHeaders.map(_.values).toArray
+      val headers:Array[Array[Int]] = rowHeaders.map(_.values)(collection.breakOut)
+      headers
     } else {
       Array.empty[Array[Int]]
     }
@@ -410,6 +361,22 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
       totalsCounter += 1
     }
     totalsArray
+  }
+
+  @inline private def combine(value:Any, fieldDefinition:FieldDefinition, rowHeaderValues:Array[Int],
+                              columnHeaderPath:ColumnHeaderPath,  aggregatedData:mutable.AnyRefMap[DataPath,Any]) {
+    val combiner = fieldDefinition.combiner
+    val key = new DataPath(rowHeaderValues, columnHeaderPath)
+    if (aggregatedData.contains(key)) {
+      val newDataValue = combiner.combine(
+        aggregatedData(key).asInstanceOf[fieldDefinition.C],
+        value.asInstanceOf[fieldDefinition.V]
+      )
+      if (!combiner.isMutable) {aggregatedData.update(key, newDataValue)}
+    } else {
+      val newDataValue = combiner.combine(combiner.initialCombinedValue, value.asInstanceOf[fieldDefinition.V])
+      aggregatedData.update(key, newDataValue)
+    }
   }
 }
 
