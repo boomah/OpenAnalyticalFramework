@@ -7,6 +7,7 @@ case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:T
   def columnHeaderLayout = tableState.columnHeaderLayout
   def replaceField(oldField:Field[_], newField:Field[_]) = withTableState(tableState.replaceField(oldField, newField))
   def generateFieldKeys = withTableState(tableState.generateFieldKeys)
+  def numRows = tableValues.numRows
 }
 object TableData {
   val Empty = TableData(FieldGroup.Empty, TableState.Blank, TableValues.Empty, Map.empty)
@@ -20,7 +21,9 @@ class OpenAFTableRow(val row:Int, val rowHeaderValues:Array[Int], val columnHead
 }
 
 case class TableValues(rows:Array[OpenAFTableRow], fieldPathsIndexes:Array[Int], fieldValues:FieldValues,
-                       valueLookUp:Map[FieldID,Array[Any]])
+                       valueLookUp:Map[FieldID,Array[Any]]) {
+  def numRows = rows.length
+}
 
 object TableValues {
   val Empty = TableValues(Array.empty, Array.empty, FieldValues.Empty, Map.empty)

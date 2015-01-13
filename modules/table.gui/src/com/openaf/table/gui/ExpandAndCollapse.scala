@@ -30,7 +30,7 @@ class ExpandAndCollapse(field:Field[_], tableFields:OpenAFTableFields) {
     menuItem
   }
 
-  def expandMenuItem(path:CollapsedStatePath) = {
+  def expandMenuItem(path: => CollapsedStatePath) = {
     val menuItem = menuItemFromId("expand")
     menuItem.setOnAction(new EventHandler[ActionEvent] {
       def handle(event:ActionEvent) {requestNewState(field.totals.collapsedState + path)}
@@ -38,7 +38,7 @@ class ExpandAndCollapse(field:Field[_], tableFields:OpenAFTableFields) {
     menuItem
   }
 
-  def collapseMenuItem(path:CollapsedStatePath) = {
+  def collapseMenuItem(path: => CollapsedStatePath) = {
     val menuItem = menuItemFromId("collapse")
     menuItem.setOnAction(new EventHandler[ActionEvent] {
       def handle(event:ActionEvent) {requestNewState(field.totals.collapsedState - path)}

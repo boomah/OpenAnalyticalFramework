@@ -1,12 +1,9 @@
 package com.openaf.table.gui
 
 import javafx.scene.control._
-import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import com.openaf.table.lib.api._
 import javafx.collections.FXCollections
-import javafx.util.Callback
-import javafx.scene.control.TableColumn.CellDataFeatures
 import java.util
 
 object OpenAFTableView {
@@ -23,14 +20,20 @@ class OpenAFTableView(tableFields:OpenAFTableFields) extends TableView[OpenAFTab
   // I have to override the skin because the default one adds an additional 10 pixels when figuring out how width each 
   // column should be. This removes that padding. I have raised an issue so hopefully in some future JavaFX release this
   // can be removed.
-  override def createDefaultSkin() = {
-    new com.sun.javafx.scene.control.skin.TableViewSkin[OpenAFTableRow](this) {
-      override def resizeColumnToFitContent(tableColumn:TableColumn[OpenAFTableRow,_], maxRows:Int) {
-        super.resizeColumnToFitContent(tableColumn, maxRows)
-        tableColumn.impl_setWidth(tableColumn.getWidth - 10)
+  private val tableViewSkin = new com.sun.javafx.scene.control.skin.TableViewSkin[OpenAFTableRow](this) {
+    def resizeColumnsToFitContent(startIndex:Int, endIndex:Int, maxRows:Int) {
+      var index = startIndex
+      while (index < endIndex) {
+        resizeColumnToFitContent(getColumns.get(index), maxRows)
+        index += 1
       }
     }
+    override def resizeColumnToFitContent(tableColumn:TableColumn[OpenAFTableRow,_], maxRows:Int) {
+      super.resizeColumnToFitContent(tableColumn, maxRows)
+      tableColumn.impl_setWidth(tableColumn.getWidth - 10)
+    }
   }
+  override def createDefaultSkin() = tableViewSkin
 
   tableFields.tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
@@ -40,49 +43,83 @@ class OpenAFTableView(tableFields:OpenAFTableFields) extends TableView[OpenAFTab
 
   private def setUpTableView(oldTableDataOption:Option[TableData], newTableData:TableData) {
     if (newTableData.rowHeaderFields.isEmpty && newTableData.columnHeaderLayout.isEmpty) {
-      getColumns.clear()
       setItems(null)
+      getColumns.clear()
     } else {
-      // TODO - should update the columns rather than recreating them
-      fullSetup(newTableData)
+      val columnNames = new ExcelColumnNameIterator
+      val columns = getColumns
+      val numColumns = columns.size
+      def column(index:Int) = columns.get(index).asInstanceOf[OpenAFTableColumn]
+
+      var counter = 0
+
+      // Stop the current renderers from doing anything
+      while (counter < numColumns) {
+        columns.get(counter).getCellFactory.asInstanceOf[OpenAFCellFactory].shouldUpdateItem = false
+        counter += 1
+      }
+
+      val rowHeaderFields = newTableData.rowHeaderFields.toArray
+      val numRowHeaderColumns = rowHeaderFields.length
+      
+      val paths = newTableData.columnHeaderLayout.paths
+      val startRowHeaderValuesIndex = if (paths.isEmpty) 1 else paths.map(_.fields.size).max
+
+      counter = 0
+
+      if (numRowHeaderColumns <= numColumns) {
+        // The number of columns required are already available. Reconfigure them and remove any extra ones.
+        while (counter < numRowHeaderColumns) {
+          val tableColumn = column(counter)
+          tableColumn.setText(columnNames.next)
+          tableColumn.columnIndex = counter
+          val field = rowHeaderFields(counter)
+          tableColumn.setCellFactory(new RowHeaderCellFactory(startRowHeaderValuesIndex, field, tableFields))
+          counter += 1
+        }
+        columns.remove(numRowHeaderColumns, numColumns)
+
+        // TODO - For now just always create the column header columns
+        columns.addAll(createColumnHeaderTableColumns(newTableData, columnNames))
+
+        setItems(FXCollections.observableArrayList[OpenAFTableRow](newTableData.tableValues.rows:_*))
+        tableViewSkin.resizeColumnsToFitContent(0, numRowHeaderColumns, newTableData.numRows)
+      } else {
+        // Reconfigure the columns available already but some extra will be required.
+        while (counter < numColumns) {
+          val tableColumn = column(counter)
+          tableColumn.setText(columnNames.next)
+          tableColumn.columnIndex = counter
+          val field = rowHeaderFields(counter)
+          tableColumn.setCellFactory(new RowHeaderCellFactory(startRowHeaderValuesIndex, field, tableFields))
+          counter += 1
+        }
+
+        val rowHeaderColumns = createRowHeaderTableColumns(newTableData, columnNames, numColumns)
+        // TODO - For now just always create the column header columns
+        rowHeaderColumns.addAll(createColumnHeaderTableColumns(newTableData, columnNames))
+        columns.addAll(rowHeaderColumns)
+
+        setItems(FXCollections.observableArrayList[OpenAFTableRow](newTableData.tableValues.rows:_*))
+        tableViewSkin.resizeColumnsToFitContent(0, numColumns, newTableData.numRows)
+      }
     }
   }
-  
-  private def fullSetup(tableData:TableData) {
-    val columnNames = new ExcelColumnNameIterator
-    val columns = createRowHeaderTableColumns(tableData, columnNames)
-    columns.addAll(createColumnHeaderTableColumns(tableData, columnNames))
-    getColumns.clear()
-    getColumns.addAll(columns)
 
-    setItems(FXCollections.observableArrayList[OpenAFTableRow](tableData.tableValues.rows:_*))
-  }
-
-  // This is a hack to stop a user from dragging columns about using the column headers. There should be a proper api
-  // for this in future versions of JavaFX
-  private def disableReordering(tableColumn:TableColumn[_,_]) {tableColumn.impl_setReorderable(false)}
-
-  private def createRowHeaderTableColumns(tableData:TableData, columnNames:Iterator[String]) = {
+  private def createRowHeaderTableColumns(tableData:TableData, columnNames:Iterator[String], startIndex:Int) = {
     val rowHeaderFields = tableData.rowHeaderFields.toArray
     val numRowHeaderFields = rowHeaderFields.length
     val columns = new util.ArrayList[TableColumnType](tableData.rowHeaderFields.length)
-    val valueLookUp = tableData.tableValues.valueLookUp
-    var field:Field[_] = null
-    var tableColumn:OpenAFTableColumn = null
-    var rowHeaderFieldCounter = 0
+    var rowHeaderFieldCounter = startIndex
     val paths = tableData.columnHeaderLayout.paths
     val startRowHeaderValuesIndex = if (paths.isEmpty) 1 else paths.map(_.fields.size).max
     while (rowHeaderFieldCounter < numRowHeaderFields) {
-      field = rowHeaderFields(rowHeaderFieldCounter)
-      tableColumn = new OpenAFTableColumn(rowHeaderFieldCounter)
+      val field = rowHeaderFields(rowHeaderFieldCounter)
+      val tableColumn = new OpenAFTableColumn
+      tableColumn.columnIndex = rowHeaderFieldCounter
       tableColumn.setText(columnNames.next)
-      disableReordering(tableColumn)
-      tableColumn.setSortable(false)
-      tableColumn.setCellValueFactory(new CellValueFactory)
-      tableColumn.setCellFactory(new RowHeaderCellFactory(valueLookUp, tableData.defaultRenderers(field.id),
-        startRowHeaderValuesIndex, field, tableFields))
+      tableColumn.setCellFactory(new RowHeaderCellFactory(startRowHeaderValuesIndex, field, tableFields))
       columns.add(tableColumn)
-
       rowHeaderFieldCounter += 1
     }
     columns
@@ -108,15 +145,13 @@ class OpenAFTableView(tableFields:OpenAFTableFields) extends TableView[OpenAFTab
     var columnCounter = 0
 
     while (columnCounter < numColumns) {
-      tableColumn = new OpenAFTableColumn(columnCounter)
+      tableColumn = new OpenAFTableColumn
+      tableColumn.columnIndex = columnCounter
       tableColumn.setText(columnNames.next.toString)
-      disableReordering(tableColumn)
-      tableColumn.setSortable(false)
 
       valueLookUps = allPathValueLookUps(fieldPathIndexes(columnCounter))
       pathRenderers = allPathRenderers(fieldPathIndexes(columnCounter))
 
-      tableColumn.setCellValueFactory(new CellValueFactory)
       tableColumn.setCellFactory(
         new ColumnHeaderAndDataCellFactory(valueLookUps, fieldPathIndexes, pathsArray, maxPathLength, pathRenderers, tableFields)
       )
@@ -125,13 +160,5 @@ class OpenAFTableView(tableFields:OpenAFTableFields) extends TableView[OpenAFTab
       columnCounter += 1
     }
     columns
-  }
-}
-
-class OpenAFTableColumn(val column:Int) extends TableColumnType
-
-class CellValueFactory extends Callback[CellDataFeatures[OpenAFTableRow,OpenAFTableRow],ObservableValue[OpenAFTableRow]] {
-  def call(cellDataFeatures:CellDataFeatures[OpenAFTableRow,OpenAFTableRow]) = {
-    new ReadOnlyObjectWrapper[OpenAFTableRow](cellDataFeatures.getValue)
   }
 }
