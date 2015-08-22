@@ -1,5 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="AllTests" type="ScalaTestRunConfiguration" factoryName="ScalaTest">
+    <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <module name="browser.guiapi" />
     <setting name="path" value="" />
     <setting name="package" value="com.openaf" />
@@ -10,6 +11,7 @@
     <setting name="testName" value="" />
     <setting name="testKind" value="All in package" />
     <setting name="showProgressMessages" value="true" />
+    <envs />
     <RunnerSettings RunnerId="Run" />
     <ConfigurationWrapper RunnerId="Run" />
     <method />

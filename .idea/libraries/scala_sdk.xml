@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="scala-sdk" type="Scala">
+    <properties>
+      <compiler-classpath>
+        <root url="file://$PROJECT_DIR$/common-bundles/scala-library-2.11.2.jar" />
+        <root url="file://$PROJECT_DIR$/lib/scala-compiler-2.11.2.jar" />
+        <root url="file://$PROJECT_DIR$/lib/scala-reflect-2.11.2.jar" />
+      </compiler-classpath>
+    </properties>
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/common-bundles/scala-library-2.11.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/common-bundles/src/scala-library-2.11.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
