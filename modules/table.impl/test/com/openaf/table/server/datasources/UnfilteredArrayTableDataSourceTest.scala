@@ -333,4 +333,54 @@ class UnfilteredArrayTableDataSourceTest extends FunSuite {
 
       check(tableState, expectedRowHeaderValues, expectedColHeaderPaths, expectedData, expectedFieldValues, expectedValueLookUp)
   }
+
+  test("0 row, 0 measure, 0 column, 1 filter") {
+    val tableState = TableState.Blank.withFilterFields(List(NameField))
+
+    val expectedValueLookUp = Map(NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally))
+    val expectedFieldValues = nameFieldValues(NameField.withKey(FilterFieldKey(0)))
+
+    check(tableState, Set.empty, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("0 row, 0 measure, 0 column, 2 filter") {
+    val tableState = TableState.Blank.withFilterFields(List(NameField, GenderField))
+
+    val expectedValueLookUp = Map(
+      NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
+      GenderField.id -> List(GenderField.id, F, M)
+    )
+    val expectedFieldValues = nameFieldValues(NameField.withKey(FilterFieldKey(0))) ++
+      genderFieldValues(GenderField.withKey(FilterFieldKey(1)))
+
+    check(tableState, Set.empty, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("0 row, 0 measure, 0 column, 2 filter (same)") {
+    val nameField1 = NameField.withKey(FilterFieldKey(0))
+    val nameField2 = NameField.withKey(FilterFieldKey(1))
+    val tableState = TableState.Blank.withFilterFields(List(nameField1, nameField2))
+
+    val expectedValueLookUp = Map(
+      NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally)
+    )
+    val expectedFieldValues = nameFieldValues(nameField1) ++ nameFieldValues(nameField2)
+
+    check(tableState, Set.empty, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("0 row, 0 measure, 0 column, 3 filter (2 same, different one in the middle)") {
+    val nameField1 = NameField.withKey(FilterFieldKey(0))
+    val nameField2 = NameField.withKey(FilterFieldKey(2))
+    val tableState = TableState.Blank.withFilterFields(List(nameField1, GenderField, nameField2))
+
+    val expectedValueLookUp = Map(
+      NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
+      GenderField.id -> List(GenderField.id, F, M)
+    )
+    val expectedFieldValues = nameFieldValues(nameField1) ++ nameFieldValues(nameField2) ++
+      genderFieldValues(GenderField.withKey(FilterFieldKey(1)))
+
+    check(tableState, Set.empty, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
+  }
 }
