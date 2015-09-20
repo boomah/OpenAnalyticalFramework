@@ -51,7 +51,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     val numRowHeaderCols = rowHeaderFieldIDs.length
     var rowHeaderCounter = 0
     val rowHeaderFieldPositions = rowHeaderFieldIDs.map(fieldIDs.indexOf(_)).toArray
-    val rowHeaders = new mutable.HashSet[RowHeaderPath]
+    val rowHeaders = new IntArraySet
     val rowHeadersLookUp = rowHeaderFieldIDs.map(fieldIDToLookUp).toArray
     val rowHeadersValueCounter = rowHeaderFieldIDs.map(allFieldIDs.indexOf(_)).toArray
 
@@ -125,7 +125,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     var columnHeaderFieldDefinitions:Array[FieldDefinition] = null
     var columnHeaderPath:ColumnHeaderPath = null
 
-    val rowTotals = new mutable.ArrayBuffer[RowHeaderPath](numRowHeaderCols * 2)
+    val rowTotals = new mutable.ArrayBuffer[Array[Int]](numRowHeaderCols * 2)
     var rowTotalsCounter = 0
     var numRowTotals = 0
 
@@ -196,13 +196,13 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
         if (!rowHeaderCollapsed && rowHeaderCounter < (numRowHeaderCols - 1)) {
           if (rowHeaderCollapsedStates(rowHeaderCounter).collapsed(rowHeaderValues)) {
             rowHeaderCollapsed = true
-            rowTotals += new RowHeaderPath(generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalTopInt))
+            rowTotals += generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalTopInt)
           } else {
             if (field.totals.top) {
-              rowTotals += new RowHeaderPath(generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalTopInt))
+              rowTotals += generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalTopInt)
             }
             if (field.totals.bottom) {
-              rowTotals += new RowHeaderPath(generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalBottomInt))
+              rowTotals += generateTotalArray(rowHeaderValues, rowHeaderCounter, TotalBottomInt)
             }
           }
         }
@@ -211,7 +211,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
       rowHeaderCounter = 0
       if (matchesFilter) {
         if (!rowHeaderCollapsed) {
-          rowHeaders += new RowHeaderPath(rowHeaderValues)
+          rowHeaders += rowHeaderValues
         }
         numRowTotals = rowTotals.length
         rowTotalsCounter = 0
@@ -300,7 +300,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
 
             rowTotalsCounter = 0
             while (rowTotalsCounter < numRowTotals) {
-              combine(value, fieldDefinition, rowTotals(rowTotalsCounter).values, columnHeaderPath, aggregatedData)
+              combine(value, fieldDefinition, rowTotals(rowTotalsCounter), columnHeaderPath, aggregatedData)
               rowTotalsCounter += 1
             }
 
@@ -310,7 +310,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
 
               rowTotalsCounter = 0
               while (rowTotalsCounter < numRowTotals) {
-                combine(value, fieldDefinition, rowTotals(rowTotalsCounter).values, columnTotals(columnTotalsCounter), aggregatedData)
+                combine(value, fieldDefinition, rowTotals(rowTotalsCounter), columnTotals(columnTotalsCounter), aggregatedData)
                 rowTotalsCounter += 1
               }
 
@@ -339,8 +339,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     // If there are no row fields or measure fields there with be an empty row in the headers that isn't needed so
     // remove it
     val rowHeadersToUse = if (rowHeaderFieldIDs.nonEmpty || columnHeaderPathsMeasureOptions.exists(_.isDefined)) {
-      val headers:Array[Array[Int]] = rowHeaders.map(_.values)(collection.breakOut)
-      headers
+      rowHeaders.toArray
     } else {
       Array.empty[Array[Int]]
     }

@@ -2,12 +2,6 @@ package com.openaf.table.server.datasources
 
 import java.util
 
-class RowHeaderPath(val values:Array[Int]) {
-  override val hashCode = util.Arrays.hashCode(values)
-  override def equals(other:Any) = util.Arrays.equals(values, other.asInstanceOf[RowHeaderPath].values)
-  override def toString = s"RowHeaderPath(${values.toList.mkString("[",",","]")})"
-}
-
 class ColumnHeaderPath(val fieldsPathIndex:Int, val values:Array[Int]) {
   override val hashCode = fieldsPathIndex + 31 * util.Arrays.hashCode(values)
   override def equals(other:Any) = {
