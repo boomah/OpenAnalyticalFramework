@@ -93,7 +93,7 @@ object DataSourceTestData {
             expectedValueLookUp:Map[FieldID,List[Any]]) {
     val tableData = dataSource.tableData(tableState)
     val rows = tableData.tableValues.rows.toList
-    assert(rows.map(_.row).toList === expectedRows.map(_.row))
+    assert(rows.map(_.row) === expectedRows.map(_.row))
     assert(rows.map(_.rowHeaderValues.toList) === expectedRows.map(_.rowHeaderValues.toList))
     assert(rows.map(_.columnHeaderAndDataValues.toList) === expectedRows.map(_.columnHeaderAndDataValues.toList))
     assert(tableData.tableValues.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
@@ -101,5 +101,7 @@ object DataSourceTestData {
   }
 }
 
-class TestTableDataSource(val fieldDefinitionGroups:FieldDefinitionGroups, val fieldIDs:Array[FieldID],
-                          val data:Array[Array[Any]]) extends UnfilteredArrayTableDataSource
+class TestTableDataSource(fieldDefinitionGroups:FieldDefinitionGroups, fieldIDs:Array[FieldID],
+                          data:Array[Array[Any]]) extends UnfilteredArrayTableDataSource {
+  override def dataSourceTable(tableState:TableState) = DataSourceTable(fieldIDs, data, fieldDefinitionGroups)
+}

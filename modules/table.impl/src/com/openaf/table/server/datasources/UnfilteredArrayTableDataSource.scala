@@ -17,18 +17,35 @@ import scala.collection.mutable
  * such this TableDataSource can be used as a benchmark for best case single threaded performance.
  */
 trait UnfilteredArrayTableDataSource extends TableDataSource {
-  def fieldDefinitionGroups:FieldDefinitionGroups
-  def fieldIDs:Array[FieldID]
-  def data:Array[Array[Any]]
-  def tableData(tableStateNoKeys:TableState) = {
+  /**
+   * The raw data required to generate the TableData given the tableState supplied. The DataSourceTable should contain
+   * data and FieldDefinitions for any FieldID used in the tableState supplied.
+   */
+  def dataSourceTable(tableState:TableState):DataSourceTable
+
+  final def tableData(tableStateNoKeys:TableState) = {
     val tableState = tableStateNoKeys.generateFieldKeys
     val generatedPivotData = pivotData(tableState)
     TableDataGenerator.tableData(generatedPivotData)
   }
 
   def pivotData(tableState:TableState) = {
-    val fieldDefinitionGroup = fieldDefinitionGroups.rootGroup
+    val dataSourceTableProvided = dataSourceTable(tableState)
     val allFieldIDs = tableState.distinctFieldIDs
+    val fieldDefinitionGroup = dataSourceTableProvided.fieldDefinitionGroups.rootGroup
+
+    {
+      val allFieldIDsSet = allFieldIDs.toSet
+      val fieldIDsProvidedByFieldDefinitions = fieldDefinitionGroup.fieldDefinitions.map(_.fieldID).toSet
+      val missingFieldDefinitionFieldIDs = allFieldIDsSet -- fieldIDsProvidedByFieldDefinitions
+      require(missingFieldDefinitionFieldIDs.isEmpty, "There must be a FieldDefinition for all FieldIDs used in the " +
+        s"tableState. There are missing FieldIDs for $missingFieldDefinitionFieldIDs")
+      val missingDataFieldIDs = allFieldIDsSet -- (dataSourceTableProvided.fieldIDs.toSet ++ AllFieldIDs.toSet)
+      require(missingDataFieldIDs.isEmpty, "There must be a data column for all FieldIDs used in the tableState. " +
+        s"There are missing FieldIDs for $missingDataFieldIDs")
+    }
+
+    val fieldIDs = dataSourceTableProvided.fieldIDs
     val fieldIDToLookUp:Map[FieldID,JMap[Any,WrappedInt]] = allFieldIDs.map(fieldID => {
       val map = new JMap[Any,WrappedInt]
       map.put(fieldID, new WrappedInt(0))
@@ -105,6 +122,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     val columnHeaderFieldsValuesBitSets = new Array[mutable.BitSet](columnHeaderFields.size)
     columnHeaderFields.foreach(field => columnHeaderFieldsValuesBitSets(field.key.number) = fieldValuesBitSets(field))
 
+    val data = dataSourceTableProvided.data
     val dataLength = data.length
     var dataCounter = 0
 
@@ -134,15 +152,15 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     var columnTotalsCounter = 0
     var numColumnTotals = 0
 
-    val rowHeaderCollapsedStates = rowHeaderFields.zipWithIndex.map{case (field,fieldIndex) => {
+    val rowHeaderCollapsedStates = rowHeaderFields.zipWithIndex.map{case (field,fieldIndex) =>
       new CollapsedStateHelper(rowHeaderFields, fieldIndex, rowHeadersLookUp, rowHeadersValueCounter, fieldsValueCounter)
-    }}
+    }
     var rowHeaderCollapsed = false
     val columnHeaderCollapsedStates = new Array[CollapsedStateHelper](columnHeaderFields.size)
-    columnHeaderPathsFields.zipWithIndex.foreach{case (fields, pathIndex) => fields.zipWithIndex.foreach{case (field, fieldIndex) => {
+    columnHeaderPathsFields.zipWithIndex.foreach{case (fields, pathIndex) => fields.zipWithIndex.foreach{case (field, fieldIndex) =>
       columnHeaderCollapsedStates(field.key.number) = new CollapsedStateHelper(fields, fieldIndex,
         colHeadersLookUps(pathIndex), colHeadersValuesCounter(pathIndex), fieldsValueCounter)
-    }}}
+    }}
     var columnHeaderCollapsed = false
 
     while (dataCounter < dataLength) {
@@ -345,7 +363,8 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     }
 
     val fieldValues = FieldValues(fieldValuesBitSets.map{case (field,bitSet) => field -> bitSet.toArray}.toMap)
-    PivotData(tableState, fieldDefinitionGroups, rowHeadersToUse, columnHeaderPaths.toArray, aggregatedData.toMap, fieldValues, valueLookUp)
+    PivotData(tableState, dataSourceTableProvided.fieldDefinitionGroups, rowHeadersToUse, columnHeaderPaths.toArray,
+      aggregatedData.toMap, fieldValues, valueLookUp)
   }
 
   @inline private def generateTotalArray(array:Array[Int], upTo:Int, totalInt:Int) = {
