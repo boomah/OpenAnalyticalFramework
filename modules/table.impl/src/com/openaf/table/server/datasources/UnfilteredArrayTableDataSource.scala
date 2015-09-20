@@ -68,7 +68,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     val numRowHeaderCols = rowHeaderFieldIDs.length
     var rowHeaderCounter = 0
     val rowHeaderFieldPositions = rowHeaderFieldIDs.map(fieldIDs.indexOf(_)).toArray
-    val rowHeaders = new IntArraySet
+    val rowHeaders = new IntArraySet(rowHeaderFields.length)
     val rowHeadersLookUp = rowHeaderFieldIDs.map(fieldIDToLookUp).toArray
     val rowHeadersValueCounter = rowHeaderFieldIDs.map(allFieldIDs.indexOf(_)).toArray
 

@@ -22,7 +22,7 @@ class IntArraySetTest extends FunSuite {
       array
     }).toArray
 
-    val intArraySet = new IntArraySet
+    val intArraySet = new IntArraySet(widthOfData)
     testData.foreach(array => intArraySet += array)
     val intArraySetResult = intArraySet.toArray.map(_.toList).toList.sorted
 
