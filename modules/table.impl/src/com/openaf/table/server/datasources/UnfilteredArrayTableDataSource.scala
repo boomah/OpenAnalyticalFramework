@@ -367,7 +367,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
       aggregatedData.toMap, fieldValues, valueLookUp)
   }
 
-  @inline private def generateTotalArray(array:Array[Int], upTo:Int, totalInt:Int) = {
+  @inline private final def generateTotalArray(array:Array[Int], upTo:Int, totalInt:Int) = {
     val totalsArray = new Array[Int](array.length)
     var totalsCounter = 0
     while (totalsCounter <= upTo) {
@@ -381,7 +381,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     totalsArray
   }
 
-  @inline private def combine(value:Any, fieldDefinition:FieldDefinition, rowHeaderValues:Array[Int],
+  @inline private final def combine(value:Any, fieldDefinition:FieldDefinition, rowHeaderValues:Array[Int],
                               columnHeaderPath:ColumnHeaderPath,  aggregatedData:mutable.AnyRefMap[DataPath,Any]) {
     val combiner = fieldDefinition.combiner
     val key = new DataPath(rowHeaderValues, columnHeaderPath)
