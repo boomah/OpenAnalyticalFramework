@@ -44,27 +44,27 @@ class IntArraySet(width:Int) {
     if (used > threshold) growTable()
   }
 
-  @inline private final def addOldEntry(array:Array[Int]):Unit = {
-    var index = hash(array) & tableLengthM1
+  @inline private final def addExistingEntry(existingEntry:Array[Int]):Unit = {
+    var index = hash(existingEntry) & tableLengthM1
     var entry = table(index)
     while (entry ne null) {
       index = (index + 1) & tableLengthM1
       entry = table(index)
     }
-    table(index) = array
+    table(index) = existingEntry
   }
 
   @inline private final def growTable():Unit = {
-    val oldTable = table
+    val existingTable = table
     tableLength = tableLength << 1
     tableLengthM1 = tableLength - 1
     threshold = tableLength >> 2
     table = new Array[Array[Int]](tableLength)
-    var oldTableIndex = 0
-    while (oldTableIndex < oldTable.length) {
-      val entry = oldTable(oldTableIndex)
-      if (entry ne null) addOldEntry(entry)
-      oldTableIndex += 1
+    var index = 0
+    while (index < existingTable.length) {
+      val entry = existingTable(index)
+      if (entry ne null) addExistingEntry(entry)
+      index += 1
     }
   }
 

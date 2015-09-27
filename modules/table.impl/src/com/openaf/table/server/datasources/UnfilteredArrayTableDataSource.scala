@@ -4,7 +4,6 @@ import com.openaf.table.lib.api._
 import com.openaf.table.lib.api.StandardFields._
 import com.openaf.table.lib.api.TableValues._
 import com.openaf.table.server._
-import java.util.{HashMap => JMap}
 import scala.collection.mutable
 
 /**
@@ -46,12 +45,11 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     }
 
     val fieldIDs = dataSourceTableProvided.fieldIDs
-    val fieldIDToLookUp:Map[FieldID,JMap[Any,WrappedInt]] = allFieldIDs.map(fieldID => {
-      val map = new JMap[Any,WrappedInt]
-      map.put(fieldID, new WrappedInt(0))
-      fieldID -> map
+    val fieldIDToValueCounter:Map[FieldID,DistinctValueCounter] = allFieldIDs.map(fieldID => {
+      val distinctValueCounter = new DistinctValueCounter
+      distinctValueCounter.intForValue(fieldID)
+      fieldID -> distinctValueCounter
     })(collection.breakOut)
-    val fieldsValueCounter = new Array[Int](allFieldIDs.size)
 
     val filterFields = tableState.filterFields.toArray
     val filterFieldIDs = tableState.tableLayout.filterFieldIDs
@@ -59,8 +57,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     val numFilterCols = filterFieldIDs.length
     var filterCounter = 0
     val filterFieldPositions = filterFieldIDs.map(fieldIDs.indexOf(_)).toArray
-    val filtersLookUp = filterFieldIDs.map(fieldIDToLookUp).toArray
-    val filtersValueCounter = filterFieldIDs.map(allFieldIDs.indexOf(_)).toArray
+    val filterValueCounters = filterFieldIDs.map(fieldIDToValueCounter).toArray
 
     val rowHeaderFields = tableState.rowHeaderFields.toArray
     val rowHeaderFieldIDs = tableState.tableLayout.rowHeaderFieldIDs
@@ -69,8 +66,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     var rowHeaderCounter = 0
     val rowHeaderFieldPositions = rowHeaderFieldIDs.map(fieldIDs.indexOf(_)).toArray
     val rowHeaders = new IntArraySet(rowHeaderFields.length)
-    val rowHeadersLookUp = rowHeaderFieldIDs.map(fieldIDToLookUp).toArray
-    val rowHeadersValueCounter = rowHeaderFieldIDs.map(allFieldIDs.indexOf(_)).toArray
+    val rowHeaderValueCounters = rowHeaderFieldIDs.map(fieldIDToValueCounter).toArray
 
     val columnHeaderFieldPaths = tableState.tableLayout.columnHeaderLayout.paths
     val numPaths = columnHeaderFieldPaths.length
@@ -80,18 +76,15 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     var colHeaderRowCounter = 0
     val colHeaderFieldsPositions = columnHeaderFieldPaths.map(_.fields.map(field => fieldIDs.indexOf(field.id)).toArray).toArray
     val columnHeaderPaths = new mutable.HashSet[ColumnHeaderPath]
-    val colHeadersLookUps = columnHeaderFieldPaths.map(path =>
-      path.fields.map(field => fieldIDToLookUp(field.id)).toArray
-    ).toArray
-    val colHeadersValuesCounter = columnHeaderFieldPaths.map(path =>
-      path.fields.map(field => allFieldIDs.indexOf(field.id)).toArray
+    val columnHeaderValueCountersForPath:Array[Array[DistinctValueCounter]] = columnHeaderFieldPaths.map(path =>
+      path.fields.map(field => fieldIDToValueCounter(field.id)).toArray
     ).toArray
 
     val columnHeaderMeasureFieldPositions = columnHeaderFieldPaths.map(_.measureFieldIndex).toArray
     val columnHeaderPathsMeasureOptions = columnHeaderFieldPaths.map(_.measureFieldOption)
     val countFieldPosition = -2
     val measureFieldPositions = columnHeaderPathsMeasureOptions.map{
-      case Some(field) => {
+      case Some(field) =>
         val index = fieldIDs.indexOf(field.id)
         if (index >= 0) {
           index
@@ -101,7 +94,6 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
             case _ => -1
           }
         }
-      }
       case _ => -1
     }
     val measureFieldDefinitions = columnHeaderPathsMeasureOptions.map{
@@ -129,13 +121,9 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     var dataRow:Array[Any] = null
     var rowHeaderValues:Array[Int] = null
     var value:Any = -1
-    var lookUp:JMap[Any,WrappedInt] = null
-    var intForValue:WrappedInt = null
-    var fieldsValueCounterIndex = -1
     var measureFieldIndex = -1
     var columnHeaderFieldPositions:Array[Int] = null
-    var columnHeaderLookUp:Array[JMap[Any,WrappedInt]] = null
-    var columnHeaderValueCounter:Array[Int] = null
+    var columnHeaderValueCounters:Array[DistinctValueCounter] = null
     var colHeaderValues:Array[Int] = null
     var measureFieldPosition = -1
     var matchesFilter = true
@@ -153,13 +141,12 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     var numColumnTotals = 0
 
     val rowHeaderCollapsedStates = rowHeaderFields.zipWithIndex.map{case (field,fieldIndex) =>
-      new CollapsedStateHelper(rowHeaderFields, fieldIndex, rowHeadersLookUp, rowHeadersValueCounter, fieldsValueCounter)
+      new CollapsedStateHelper(rowHeaderFields, fieldIndex, rowHeaderValueCounters)
     }
     var rowHeaderCollapsed = false
     val columnHeaderCollapsedStates = new Array[CollapsedStateHelper](columnHeaderFields.size)
     columnHeaderPathsFields.zipWithIndex.foreach{case (fields, pathIndex) => fields.zipWithIndex.foreach{case (field, fieldIndex) =>
-      columnHeaderCollapsedStates(field.key.number) = new CollapsedStateHelper(fields, fieldIndex,
-        colHeadersLookUps(pathIndex), colHeadersValuesCounter(pathIndex), fieldsValueCounter)
+      columnHeaderCollapsedStates(field.key.number) = new CollapsedStateHelper(fields, fieldIndex, columnHeaderValueCountersForPath(pathIndex))
     }}
     var columnHeaderCollapsed = false
 
@@ -174,17 +161,8 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
         val fieldDefinition = filterFieldDefinitions(filterCounter)
         val field = filterFields(filterCounter).asInstanceOf[Field[fieldDefinition.V]]
         matchesFilter = field.filter.matches(value.asInstanceOf[fieldDefinition.V])
-        lookUp = filtersLookUp(filterCounter)
-        intForValue = lookUp.get(value)
-        if (intForValue == null) {
-          fieldsValueCounterIndex = filtersValueCounter(filterCounter)
-          intForValue = new WrappedInt(fieldsValueCounter(fieldsValueCounterIndex) + 1)
-          fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
-          lookUp.put(value, intForValue)
-          filterFieldsValuesBitSets(filterCounter) += intForValue.int
-        } else {
-          filterFieldsValuesBitSets(filterCounter) += intForValue.int
-        }
+        val int = filterValueCounters(filterCounter).intForValue(value)
+        filterFieldsValuesBitSets(filterCounter) += int
         filterCounter += 1
       }
       filterCounter = 0
@@ -196,19 +174,9 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
         val fieldDefinition = rowHeaderFieldDefinitions(rowHeaderCounter)
         val field = rowHeaderFields(rowHeaderCounter).asInstanceOf[Field[fieldDefinition.V]]
         matchesFilter = field.filter.matches(value.asInstanceOf[fieldDefinition.V])
-        lookUp = rowHeadersLookUp(rowHeaderCounter)
-        intForValue = lookUp.get(value)
-        if (intForValue == null) {
-          fieldsValueCounterIndex = rowHeadersValueCounter(rowHeaderCounter)
-          intForValue = new WrappedInt(fieldsValueCounter(fieldsValueCounterIndex) + 1)
-          fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
-          lookUp.put(value, intForValue)
-          rowHeaderValues(rowHeaderCounter) = intForValue.int
-          rowHeaderFieldsValuesBitSets(rowHeaderCounter) += intForValue.int
-        } else {
-          rowHeaderValues(rowHeaderCounter) = intForValue.int
-          rowHeaderFieldsValuesBitSets(rowHeaderCounter) += intForValue.int
-        }
+        val int = rowHeaderValueCounters(rowHeaderCounter).intForValue(value)
+        rowHeaderValues(rowHeaderCounter) = int
+        rowHeaderFieldsValuesBitSets(rowHeaderCounter) += int
 
         // Don't add totals for the last row header field
         if (!rowHeaderCollapsed && rowHeaderCounter < (numRowHeaderCols - 1)) {
@@ -243,8 +211,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
         columnTotals.clear()
         measureFieldIndex = columnHeaderMeasureFieldPositions(pathsCounter)
         columnHeaderFieldPositions = colHeaderFieldsPositions(pathsCounter)
-        columnHeaderLookUp = colHeadersLookUps(pathsCounter)
-        columnHeaderValueCounter = colHeadersValuesCounter(pathsCounter)
+        columnHeaderValueCounters = columnHeaderValueCountersForPath(pathsCounter)
         numColumnHeaderRows = numColumnHeaderRowsPerPath(pathsCounter)
         colHeaderValues = new Array[Int](numColumnHeaderRows)
         columnHeaderFieldsForPath = columnHeaderPathsFields(pathsCounter)
@@ -255,19 +222,9 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
           if (colHeaderRowCounter != measureFieldIndex) {
             value = dataRow(columnHeaderFieldPositions(colHeaderRowCounter))
             matchesFilter = field.filter.matches(value.asInstanceOf[fieldDefinition.V])
-            lookUp = columnHeaderLookUp(colHeaderRowCounter)
-            intForValue = lookUp.get(value)
-            if (intForValue == null) {
-              fieldsValueCounterIndex = columnHeaderValueCounter(colHeaderRowCounter)
-              intForValue = new WrappedInt(fieldsValueCounter(fieldsValueCounterIndex) + 1)
-              fieldsValueCounter(fieldsValueCounterIndex) = intForValue.int
-              lookUp.put(value, intForValue)
-              colHeaderValues(colHeaderRowCounter) = intForValue.int
-              columnHeaderFieldsValuesBitSets(field.key.number) += intForValue.int
-            } else {
-              colHeaderValues(colHeaderRowCounter) = intForValue.int
-              columnHeaderFieldsValuesBitSets(field.key.number) += intForValue.int
-            }
+            val int = columnHeaderValueCounters(colHeaderRowCounter).intForValue(value)
+            colHeaderValues(colHeaderRowCounter) = int
+            columnHeaderFieldsValuesBitSets(field.key.number) += int
           }
 
           // Don't add totals for the last column header field
@@ -343,16 +300,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
       dataCounter += 1
     }
 
-    val valueLookUp = fieldIDToLookUp.map{case (fieldID,hashMap) => {
-      val values = new Array[Any](hashMap.size)
-      val keyIterator = hashMap.keySet.iterator
-      var key:Any = null
-      while (keyIterator.hasNext) {
-        key = keyIterator.next
-        values(hashMap.get(key).int) = key
-      }
-      fieldID -> values
-    }}
+    val valueLookups = fieldIDToValueCounter.map{case (fieldID,anyToIntLookup) => fieldID -> anyToIntLookup.toArray}
 
     // If there are no row fields or measure fields there with be an empty row in the headers that isn't needed so
     // remove it
@@ -363,8 +311,9 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     }
 
     val fieldValues = FieldValues(fieldValuesBitSets.map{case (field,bitSet) => field -> bitSet.toArray}.toMap)
+
     PivotData(tableState, dataSourceTableProvided.fieldDefinitionGroups, rowHeadersToUse, columnHeaderPaths.toArray,
-      aggregatedData.toMap, fieldValues, valueLookUp)
+      aggregatedData.toMap, fieldValues, valueLookups)
   }
 
   @inline private final def generateTotalArray(array:Array[Int], upTo:Int, totalInt:Int) = {
