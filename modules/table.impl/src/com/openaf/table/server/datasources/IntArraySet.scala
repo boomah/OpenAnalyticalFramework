@@ -3,18 +3,17 @@ package com.openaf.table.server.datasources
 /**
  * Set like data structure that provides a distinct array of Int arrays.
  */
-class IntArraySet(width:Int) {
+class IntArraySet {
   // Always need the table length to be a power of 2.
   private var tableLength = 512
   private var tableLengthM1 = tableLength - 1
   private var threshold = tableLength >> 2
   private var table = new Array[Array[Int]](tableLength)
   private var used = 0
-  private val widthM1 = width - 1
 
   @inline private final def hash(array:Array[Int]) = {
     var hash = 1
-    var index = widthM1
+    var index = array.length - 1
     while (index >= 0) {
       hash = 31 * hash + array(index)
       index -= 1
@@ -23,12 +22,17 @@ class IntArraySet(width:Int) {
   }
 
   @inline private final def arraysEqual(array1:Array[Int], array2:Array[Int]):Boolean = {
-    var index = widthM1
-    while (index >= 0) {
-      if (array1(index) != array2(index)) return false
-      index -= 1
+    val length = array1.length
+    if (length == array2.length) {
+      var index = length - 1
+      while (index >= 0) {
+        if (array1(index) != array2(index)) return false
+        index -= 1
+      }
+      true
+    } else {
+      false
     }
-    true
   }
 
   final def +=(array:Array[Int]):Unit = {

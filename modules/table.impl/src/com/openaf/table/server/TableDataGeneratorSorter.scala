@@ -55,8 +55,8 @@ private[server] class TableDataGeneratorSorter(pivotData:PivotData) {
     })
 
     util.Arrays.sort(
-      pivotData.columnHeaderPaths,
-      new ColumnHeaderPathComparator(pathIndexToFields, columnHeaderFieldKeyFieldDefinitions, columnHeaderFieldKeyLookUps)
+      pivotData.columnHeaderValues,
+      new ColumnHeaderComparator(pathIndexToFields, columnHeaderFieldKeyFieldDefinitions, columnHeaderFieldKeyLookUps)
     )
 
     columnHeaderFields.foreach(field => {

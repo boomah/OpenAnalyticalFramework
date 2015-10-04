@@ -1,7 +1,7 @@
 package com.openaf.table.server
 
 import com.openaf.table.lib.api._
-import com.openaf.table.server.datasources.{PivotData, DataPath}
+import com.openaf.table.server.datasources.PivotData
 
 object TableDataGenerator {
   // This is far from idiomatic Scala. Written this way for speed.
@@ -20,7 +20,6 @@ object TableDataGenerator {
     val blankRowHeaderValues = Array.fill(pivotData.numRowHeaderColumns)(TableValues.NoValueInt)
     var row:OpenAFTableRow = null
     var rowHeaderKey:Array[Int] = null
-    var key:DataPath = null
 
     // Populate the rows from the column headers
     while (rowCounter < pivotData.numColumnHeaderRows) {
@@ -28,8 +27,8 @@ object TableDataGenerator {
       rows(rowCounter) = row
 
       while (columnCounter < pivotData.numColumnHeaderColumns) {
-        row.columnHeaderAndDataValues(columnCounter) = if (rowCounter < pivotData.columnHeaderPaths(columnCounter).values.length) {
-          pivotData.columnHeaderPaths(columnCounter).values(rowCounter)
+        row.columnHeaderAndDataValues(columnCounter) = if (rowCounter < pivotData.columnHeaderValues(columnCounter).length - 1) {
+          pivotData.columnHeaderValues(columnCounter)(rowCounter)
         } else {
           TableValues.NoValueInt
         }
@@ -58,8 +57,7 @@ object TableDataGenerator {
       rows(rowCounter) = row
 
       while (columnCounter < pivotData.numColumnHeaderColumns) {
-        key = new DataPath(rowHeaderKey, pivotData.columnHeaderPaths(columnCounter))
-        row.columnHeaderAndDataValues(columnCounter) = pivotData.data.getOrElse(key, NoValue)
+        row.columnHeaderAndDataValues(columnCounter) = pivotData.aggregator(rowHeaderKey, pivotData.columnHeaderValues(columnCounter))
         columnCounter += 1
       }
 
@@ -70,7 +68,8 @@ object TableDataGenerator {
     val fieldPathsIndexes = new Array[Int](pivotData.numColumnHeaderColumns)
     columnCounter = 0
     while (columnCounter < pivotData.numColumnHeaderColumns) {
-      fieldPathsIndexes(columnCounter) = pivotData.columnHeaderPaths(columnCounter).fieldsPathIndex
+      val columnHeaderValues = pivotData.columnHeaderValues(columnCounter)
+      fieldPathsIndexes(columnCounter) = columnHeaderValues(columnHeaderValues.length - 1)
       columnCounter += 1
     }
 

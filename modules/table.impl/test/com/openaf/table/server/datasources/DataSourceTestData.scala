@@ -76,13 +76,16 @@ object DataSourceTestData {
 
   def mInt(value:Int) = new MutInt(value)
 
+  def p(rowHeaderValues:Int*)(columnHeaders:List[Int]) = (rowHeaderValues.toList, columnHeaders)
+
   def check(tableState:TableState, expectedRowHeaderValues:Set[List[Int]],
-            expectedColumnHeaderPaths:Set[ColumnHeaderPath], expectedData:Map[DataPath,Any],
+            expectedColumnHeaderValues:Set[List[Int]], expectedData:Map[(List[Int],List[Int]),Any],
             expectedFieldValues:Map[Field[_],List[Int]], expectedValueLookUp:Map[FieldID,List[Any]]) {
     val pivotData = dataSource.pivotData(tableState.generateFieldKeys)
     assert(pivotData.rowHeaderValues.map(_.toList).toSet === expectedRowHeaderValues)
-    assert(pivotData.columnHeaderPaths.toSet === expectedColumnHeaderPaths)
-    assert(pivotData.data === expectedData)
+    assert(pivotData.columnHeaderValues.map(_.toList).toSet === expectedColumnHeaderValues)
+    val aggregatorData = expectedData.map{case ((row,column),_) => (row,column) -> pivotData.aggregator(row.toArray,column.toArray)}
+    assert(aggregatorData === expectedData)
     assert(pivotData.fieldValues.values.mapValues(_.toList) === expectedFieldValues)
     assert(pivotData.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
   }

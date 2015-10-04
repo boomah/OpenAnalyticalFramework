@@ -13,12 +13,11 @@ class UnfilteredArrayTableDataSourceTotalsTest extends FunSuite {
       .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
 
     val expectedRowHeaderValues = Set(List(1), List(2))
-    val columnHeaderPath = new ColumnHeaderPath(0, Array(0))
-    def dp(rowHeaderValues:Int*) = new DataPath(rowHeaderValues.toArray, columnHeaderPath)
-    val expectedColHeaderPaths = Set(columnHeaderPath)
+    val ch = List(0,0)
+    val expectedColHeaders = Set(ch)
     val expectedData = Map(
-      dp(1) -> 180,
-      dp(2) -> 245
+      p(1)(ch) -> 180,
+      p(2)(ch) -> 245
     )
     val expectedValueLookUp = Map(
       GenderField.id -> List(GenderField.id, F, M),
@@ -27,7 +26,7 @@ class UnfilteredArrayTableDataSourceTotalsTest extends FunSuite {
     val expectedFieldValues = genderFieldValues(genderField.withKey(RowHeaderFieldKey(0))) ++
       scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderPaths, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaders, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("2 row (first totals top), 1 measure, 0 column") {
@@ -37,17 +36,16 @@ class UnfilteredArrayTableDataSourceTotalsTest extends FunSuite {
       .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
 
     val expectedRowHeaderValues = Set(List(1,TotalTopInt), List(1,1), List(1,2), List(2,TotalTopInt), List(2,1), List(2,2), List(2,3))
-    val columnHeaderPath = new ColumnHeaderPath(0, Array(0))
-    def dp(rowHeaderValues:Int*) = new DataPath(rowHeaderValues.toArray, columnHeaderPath)
-    val expectedColHeaderPaths = Set(columnHeaderPath)
+    val ch = List(0,0)
+    val expectedColHeaders = Set(ch)
     val expectedData = Map(
-      dp(1,TotalTopInt) -> 180,
-      dp(1,1          ) -> 50,
-      dp(1,2          ) -> 130,
-      dp(2,TotalTopInt) -> 245,
-      dp(2,1          ) -> 80,
-      dp(2,2          ) -> 90,
-      dp(2,3          ) -> 75
+      p(1,TotalTopInt)(ch) -> 180,
+      p(1,1          )(ch) -> 50,
+      p(1,2          )(ch) -> 130,
+      p(2,TotalTopInt)(ch) -> 245,
+      p(2,1          )(ch) -> 80,
+      p(2,2          )(ch) -> 90,
+      p(2,3          )(ch) -> 75
     )
     val expectedValueLookUp = Map(
       GenderField.id -> List(GenderField.id, F, M),
@@ -58,7 +56,7 @@ class UnfilteredArrayTableDataSourceTotalsTest extends FunSuite {
       locationFieldValues(LocationField.withKey(RowHeaderFieldKey(1))) ++
       scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderPaths, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaders, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 
   test("2 row (first totals bottom), 1 measure, 0 column") {
@@ -68,17 +66,16 @@ class UnfilteredArrayTableDataSourceTotalsTest extends FunSuite {
       .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
 
     val expectedRowHeaderValues = Set(List(1,TotalBottomInt), List(1,1), List(1,2), List(2,TotalBottomInt), List(2,1), List(2,2), List(2,3))
-    val columnHeaderPath = new ColumnHeaderPath(0, Array(0))
-    def dp(rowHeaderValues:Int*) = new DataPath(rowHeaderValues.toArray, columnHeaderPath)
-    val expectedColHeaderPaths = Set(columnHeaderPath)
+    val ch = List(0,0)
+    val expectedColHeaders = Set(ch)
     val expectedData = Map(
-      dp(1,TotalBottomInt) -> 180,
-      dp(1,1             ) -> 50,
-      dp(1,2             ) -> 130,
-      dp(2,TotalBottomInt) -> 245,
-      dp(2,1             ) -> 80,
-      dp(2,2             ) -> 90,
-      dp(2,3             ) -> 75
+      p(1,TotalBottomInt)(ch) -> 180,
+      p(1,1             )(ch) -> 50,
+      p(1,2             )(ch) -> 130,
+      p(2,TotalBottomInt)(ch) -> 245,
+      p(2,1             )(ch) -> 80,
+      p(2,2             )(ch) -> 90,
+      p(2,3             )(ch) -> 75
     )
     val expectedValueLookUp = Map(
       GenderField.id -> List(GenderField.id, F, M),
@@ -89,6 +86,6 @@ class UnfilteredArrayTableDataSourceTotalsTest extends FunSuite {
       locationFieldValues(LocationField.withKey(RowHeaderFieldKey(1))) ++
       scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
 
-    check(tableState, expectedRowHeaderValues, expectedColHeaderPaths, expectedData, expectedFieldValues, expectedValueLookUp)
+    check(tableState, expectedRowHeaderValues, expectedColHeaders, expectedData, expectedFieldValues, expectedValueLookUp)
   }
 }

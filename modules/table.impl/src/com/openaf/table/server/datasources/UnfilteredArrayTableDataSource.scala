@@ -65,7 +65,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     val numRowHeaderCols = rowHeaderFieldIDs.length
     var rowHeaderCounter = 0
     val rowHeaderFieldPositions = rowHeaderFieldIDs.map(fieldIDs.indexOf(_)).toArray
-    val rowHeaders = new IntArraySet(rowHeaderFields.length)
+    val rowHeaders = new IntArraySet
     val rowHeaderValueCounters = rowHeaderFieldIDs.map(fieldIDToValueCounter).toArray
 
     val columnHeaderFieldPaths = tableState.tableLayout.columnHeaderLayout.paths
@@ -75,7 +75,10 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     var numColumnHeaderRows = -1
     var colHeaderRowCounter = 0
     val colHeaderFieldsPositions = columnHeaderFieldPaths.map(_.fields.map(field => fieldIDs.indexOf(field.id)).toArray).toArray
-    val columnHeaderPaths = new mutable.HashSet[ColumnHeaderPath]
+
+    val aggregator = new Aggregator(numRowHeaderCols)
+    val columnHeaders = new IntArraySet
+
     val columnHeaderValueCountersForPath:Array[Array[DistinctValueCounter]] = columnHeaderFieldPaths.map(path =>
       path.fields.map(field => fieldIDToValueCounter(field.id)).toArray
     ).toArray
@@ -105,8 +108,6 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
       fieldDefinitionGroup.fieldDefinition(field.id)
     }))
 
-    val aggregatedData = new mutable.AnyRefMap[DataPath,Any]
-
     val fieldValuesBitSets:Map[Field[_],mutable.BitSet] = tableState.allFields.map(_ -> new mutable.BitSet).toMap
     val filterFieldsValuesBitSets = filterFields.map(field => fieldValuesBitSets(field))
     val rowHeaderFieldsValuesBitSets = rowHeaderFields.map(field => fieldValuesBitSets(field))
@@ -129,14 +130,13 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     var matchesFilter = true
     var columnHeaderFieldsForPath:Array[Field[_]] = null
     var columnHeaderFieldDefinitions:Array[FieldDefinition] = null
-    var columnHeaderPath:ColumnHeaderPath = null
 
     val rowTotals = new mutable.ArrayBuffer[Array[Int]](numRowHeaderCols * 2)
     var rowTotalsCounter = 0
     var numRowTotals = 0
 
     val maxColumnPathLength = if (numColumnHeaderRowsPerPath.isEmpty) 0 else numColumnHeaderRowsPerPath.max
-    val columnTotals = new mutable.ArrayBuffer[ColumnHeaderPath](maxColumnPathLength * 2)
+    val columnTotals = new mutable.ArrayBuffer[Array[Int]](maxColumnPathLength * 2)
     var columnTotalsCounter = 0
     var numColumnTotals = 0
 
@@ -213,7 +213,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
         columnHeaderFieldPositions = colHeaderFieldsPositions(pathsCounter)
         columnHeaderValueCounters = columnHeaderValueCountersForPath(pathsCounter)
         numColumnHeaderRows = numColumnHeaderRowsPerPath(pathsCounter)
-        colHeaderValues = new Array[Int](numColumnHeaderRows)
+        colHeaderValues = new Array[Int](numColumnHeaderRows + 1)
         columnHeaderFieldsForPath = columnHeaderPathsFields(pathsCounter)
         columnHeaderFieldDefinitions = columnHeaderPathsFieldDefinitions(pathsCounter)
         while (matchesFilter && colHeaderRowCounter < numColumnHeaderRows) {
@@ -231,13 +231,13 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
           if (!columnHeaderCollapsed && colHeaderRowCounter < (numColumnHeaderRows - 1)) {
             if (columnHeaderCollapsedStates(field.key.number).collapsed(colHeaderValues)) {
               columnHeaderCollapsed = true
-              columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalTopInt))
+              columnTotals += generateColumnHeaderTotalArray(colHeaderValues, colHeaderRowCounter, TotalTopInt, pathsCounter)
             } else {
               if (field.totals.top) {
-                columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalTopInt))
+                columnTotals += generateColumnHeaderTotalArray(colHeaderValues, colHeaderRowCounter, TotalTopInt, pathsCounter)
               }
               if (field.totals.bottom) {
-                columnTotals += new ColumnHeaderPath(pathsCounter, generateTotalArray(colHeaderValues, colHeaderRowCounter, TotalBottomInt))
+                columnTotals += generateColumnHeaderTotalArray(colHeaderValues, colHeaderRowCounter, TotalBottomInt, pathsCounter)
               }
             }
           }
@@ -246,15 +246,15 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
         }
         colHeaderRowCounter = 0
         if (matchesFilter) {
-          columnHeaderPath = new ColumnHeaderPath(pathsCounter, colHeaderValues)
+          colHeaderValues(numColumnHeaderRows) = pathsCounter
           if (!columnHeaderCollapsed) {
-            columnHeaderPaths += columnHeaderPath
+            columnHeaders += colHeaderValues
           }
 
           numColumnTotals = columnTotals.length
           columnTotalsCounter = 0
           while (columnTotalsCounter < numColumnTotals) {
-            columnHeaderPaths += columnTotals(columnTotalsCounter)
+            columnHeaders += columnTotals(columnTotalsCounter)
             columnTotalsCounter += 1
           }
 
@@ -270,22 +270,22 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
 
             val fieldDefinition = measureFieldDefinitions(pathsCounter)
             if (!rowHeaderCollapsed && !columnHeaderCollapsed) {
-              combine(value, fieldDefinition, rowHeaderValues, columnHeaderPath, aggregatedData)
+              aggregator.combine(value, fieldDefinition, rowHeaderValues, colHeaderValues)
             }
 
             rowTotalsCounter = 0
             while (rowTotalsCounter < numRowTotals) {
-              combine(value, fieldDefinition, rowTotals(rowTotalsCounter), columnHeaderPath, aggregatedData)
+              aggregator.combine(value, fieldDefinition, rowTotals(rowTotalsCounter), colHeaderValues)
               rowTotalsCounter += 1
             }
 
             columnTotalsCounter = 0
             while (columnTotalsCounter < numColumnTotals) {
-              combine(value, fieldDefinition, rowHeaderValues, columnTotals(columnTotalsCounter), aggregatedData)
+              aggregator.combine(value, fieldDefinition, rowHeaderValues, columnTotals(columnTotalsCounter))
 
               rowTotalsCounter = 0
               while (rowTotalsCounter < numRowTotals) {
-                combine(value, fieldDefinition, rowTotals(rowTotalsCounter), columnTotals(columnTotalsCounter), aggregatedData)
+                aggregator.combine(value, fieldDefinition, rowTotals(rowTotalsCounter), columnTotals(columnTotalsCounter))
                 rowTotalsCounter += 1
               }
 
@@ -309,11 +309,11 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     } else {
       Array.empty[Array[Int]]
     }
-
+    val columnHeadersToUse = columnHeaders.toArray
     val fieldValues = FieldValues(fieldValuesBitSets.map{case (field,bitSet) => field -> bitSet.toArray}.toMap)
 
-    PivotData(tableState, dataSourceTableProvided.fieldDefinitionGroups, rowHeadersToUse, columnHeaderPaths.toArray,
-      aggregatedData.toMap, fieldValues, valueLookups)
+    PivotData(tableState, dataSourceTableProvided.fieldDefinitionGroups, rowHeadersToUse, columnHeadersToUse,
+      aggregator, fieldValues, valueLookups)
   }
 
   @inline private final def generateTotalArray(array:Array[Int], upTo:Int, totalInt:Int) = {
@@ -330,21 +330,18 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     totalsArray
   }
 
-  @inline private final def combine(value:Any, fieldDefinition:FieldDefinition, rowHeaderValues:Array[Int],
-                              columnHeaderPath:ColumnHeaderPath,  aggregatedData:mutable.AnyRefMap[DataPath,Any]) {
-    val combiner = fieldDefinition.combiner
-    val key = new DataPath(rowHeaderValues, columnHeaderPath)
-    if (aggregatedData.contains(key)) {
-      val newDataValue = combiner.combine(
-        aggregatedData(key).asInstanceOf[fieldDefinition.C],
-        value.asInstanceOf[fieldDefinition.V]
-      )
-      if (!combiner.isMutable) {aggregatedData.update(key, newDataValue)}
-    } else {
-      val newDataValue = combiner.combine(combiner.initialCombinedValue, value.asInstanceOf[fieldDefinition.V])
-      aggregatedData.update(key, newDataValue)
+  @inline private final def generateColumnHeaderTotalArray(array:Array[Int], upTo:Int, totalInt:Int, pathIndex:Int) = {
+    val totalsArray = new Array[Int](array.length)
+    totalsArray(array.length - 1) = pathIndex
+    var totalsCounter = 0
+    while (totalsCounter <= upTo) {
+      totalsArray(totalsCounter) = array(totalsCounter)
+      totalsCounter += 1
     }
+    while (totalsCounter < (totalsArray.length - 1)) {
+      totalsArray(totalsCounter) = totalInt
+      totalsCounter += 1
+    }
+    totalsArray
   }
 }
-
-private class WrappedInt(val int:Int)

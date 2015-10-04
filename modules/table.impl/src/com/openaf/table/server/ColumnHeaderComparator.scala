@@ -1,12 +1,11 @@
 package com.openaf.table.server
 
 import java.util.Comparator
-import com.openaf.table.server.datasources.ColumnHeaderPath
 import com.openaf.table.lib.api.{SortOrder, TableValues, Field}
 import TableValues._
 
-class ColumnHeaderPathComparator(pathIndexToFields:Array[Array[Field[_]]], fieldKeyFieldDefinitions:Array[FieldDefinition],
-                                 fieldKeyLookUps:Array[Array[Any]]) extends Comparator[ColumnHeaderPath] {
+class ColumnHeaderComparator(pathIndexToFields:Array[Array[Field[_]]], fieldKeyFieldDefinitions:Array[FieldDefinition],
+                             fieldKeyLookUps:Array[Array[Any]]) extends Comparator[Array[Int]] {
   private var length = -1
   private var counter = 0
   private var sorted = false
@@ -17,17 +16,18 @@ class ColumnHeaderPathComparator(pathIndexToFields:Array[Array[Field[_]]], field
   private var field1:Field[_] = _
   private var field2:Field[_] = _
 
-  def compare(path1:ColumnHeaderPath, path2:ColumnHeaderPath) = {
-    length = math.min(path1.values.length, path2.values.length)
+  def compare(array1:Array[Int], array2:Array[Int]):Int = {
+    // -1 to the length here because the path index is stored at the end of the array
+    length = math.min(array1.length, array2.length) - 1
     sorted = false
     counter = 0
     while (!sorted && counter < length) {
-      field1 = pathIndexToFields(path1.fieldsPathIndex)(counter)
-      field2 = pathIndexToFields(path2.fieldsPathIndex)(counter)
+      field1 = pathIndexToFields(array1(length))(counter)
+      field2 = pathIndexToFields(array2(length))(counter)
       if (field1 == field2) {
         // Fields are the same so just compare the values
-        value1 = path1.values(counter)
-        value2 = path2.values(counter)
+        value1 = array1(counter)
+        value2 = array2(counter)
         result = if (value1 == value2) {
           0
         } else {
@@ -76,7 +76,7 @@ class RowHeaderComparator(fields:Array[Field[_]], fieldDefinitions:Array[FieldDe
   private var value1 = -1
   private var value2 = -1
 
-  def compare(array1:Array[Int], array2:Array[Int]) = {
+  def compare(array1:Array[Int], array2:Array[Int]):Int = {
     length = array1.length
     sorted = false
     counter = 0
