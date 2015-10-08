@@ -46,9 +46,9 @@ private[server] class TableDataGeneratorSorter(pivotData:PivotData) {
     val fieldPaths = tableState.columnHeaderLayout.paths
     val pathIndexToFields = new Array[Array[Field[_]]](fieldPaths.length)
     fieldPaths.zipWithIndex.foreach{case (path,i) => pathIndexToFields(i) = path.fields.toArray}
-    val columnHeaderFields = tableState.columnHeaderLayout.allFields.toSet
-    val columnHeaderFieldKeyFieldDefinitions = new Array[FieldDefinition](columnHeaderFields.size)
-    val columnHeaderFieldKeyLookUps = new Array[Array[Any]](columnHeaderFields.size)
+    val columnHeaderFields = tableState.columnHeaderLayout.allFields.toArray
+    val columnHeaderFieldKeyFieldDefinitions = new Array[FieldDefinition](columnHeaderFields.length)
+    val columnHeaderFieldKeyLookUps = new Array[Array[Any]](columnHeaderFields.length)
     columnHeaderFields.foreach(field => {
       columnHeaderFieldKeyFieldDefinitions(field.key.number) = fieldDefinition(field.id)
       columnHeaderFieldKeyLookUps(field.key.number) = pivotData.valueLookUp(field.id)
