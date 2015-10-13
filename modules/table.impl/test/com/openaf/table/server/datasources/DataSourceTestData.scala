@@ -94,7 +94,7 @@ object DataSourceTestData {
             expectedRows:List[OpenAFTableRow],
             expectedFieldValues:Map[Field[_],List[Int]],
             expectedValueLookUp:Map[FieldID,List[Any]]) {
-    val tableData = dataSource.tableData(tableState)
+    val tableData = dataSource.tableData(tableState.generateFieldKeys)
     val rows = tableData.tableValues.rows.toList
     assert(rows.map(_.row) === expectedRows.map(_.row))
     assert(rows.map(_.rowHeaderValues.toList) === expectedRows.map(_.rowHeaderValues.toList))

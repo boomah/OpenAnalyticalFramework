@@ -22,13 +22,12 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
    */
   def dataSourceTable(tableState:TableState):DataSourceTable
 
-  final def tableData(tableStateNoKeys:TableState) = {
-    val tableState = tableStateNoKeys.generateFieldKeys
+  final def tableData(tableState:TableState):TableData = {
     val generatedPivotData = pivotData(tableState)
     TableDataGenerator.tableData(generatedPivotData)
   }
 
-  def pivotData(tableState:TableState) = {
+  final def pivotData(tableState:TableState):PivotData = {
     val dataSourceTableProvided = dataSourceTable(tableState)
     val allFieldIDs = tableState.distinctFieldIDs
     val fieldDefinitionGroup = dataSourceTableProvided.fieldDefinitionGroups.rootGroup
