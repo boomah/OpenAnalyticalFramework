@@ -8,11 +8,10 @@ import com.openaf.table.lib.api.{TableState, Field}
 trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
   def withNewFields(fields:List[Field[_]], tableState:TableState):TableState
   def fields(tableStateOption:Option[TableState]):List[Field[_]]
-  protected def fields:List[Field[_]] = fields(None)
 
   def dropTargetsToNodeSide(draggableFieldsInfo:DraggableFieldsInfo) = {
     val currentChildren = mainContent.getChildren
-    if (fields.isEmpty) {
+    if (currentChildren.forall(_.isInstanceOf[Label])) {
       val label = currentChildren.head.asInstanceOf[Label]
       val (dropTarget1, dropTarget2) = DropTargetNode.createDropTargetNodesForLabel(label, this)
       Map(dropTarget1 -> NodeSide(label, Side.LEFT), dropTarget2 -> NodeSide(label, Side.LEFT))

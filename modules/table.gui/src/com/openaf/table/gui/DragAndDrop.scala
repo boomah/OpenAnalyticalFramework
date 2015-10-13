@@ -116,7 +116,7 @@ trait Draggable extends Region {
   def tableFields:OpenAFTableFields
   def dragAndDrop = tableFields.dragAndDrop
   def requestTableStateProperty = tableFields.requestTableStateProperty
-  def tableState = tableFields.tableDataProperty.getValue.tableState
+  def requestTableState = requestTableStateProperty.getValue
   def dragAndDropContainer:DragAndDropContainer
   def fields:List[Field[_]]
   // When dropped here, nothing will happen. Usually just the Draggable itself, but in the case of a Draggable being
@@ -168,7 +168,8 @@ trait Draggable extends Region {
       dragAndDrop.fieldsBeingDraggedInfo.get.foreach(draggableFieldsInfo => {
         updateClosestDropTarget(event)
         val newTableStateOption = dragAndDrop.closestDropTarget.get.map(dropTarget => {
-          val tableStateWithFieldsRemoved = tableState.remove(draggableFieldsInfo.fields)
+          // Use requestTableState as it allows fields to be positioned one after the other before the page data has come back
+          val tableStateWithFieldsRemoved = requestTableState.remove(draggableFieldsInfo.fields)
           dropTarget.fieldsDropped(draggableFieldsInfo, tableStateWithFieldsRemoved)
         })
         getScene.setCursor(Cursor.DEFAULT)
@@ -187,7 +188,8 @@ trait Draggable extends Region {
   })
 
   private def moveField() {
-    val currentTableState = tableState
+    // Use requestTableState as it allows fields to be positioned one after the other before the page data has come back
+    val currentTableState = requestTableState
     val tableStateWithRemoved = currentTableState.remove(fields)
     val tableStateToUse = if (tableStateWithRemoved == currentTableState) {
       val field = fields.head
