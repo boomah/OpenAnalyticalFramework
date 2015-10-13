@@ -6,11 +6,17 @@ import com.openaf.table.lib.api.{TableState, FieldID}
 import com.openaf.table.server.datasources.{DataSourceTable, UnfilteredArrayTableDataSource}
 
 class GoalsTableDataSource extends UnfilteredArrayTableDataSource {
-  private val fieldDefinitions:List[Either[FieldDefinitionGroup,FieldDefinition]] = List(
+  private val fieldDefinitions:List[FieldDefinition] = List(
     StringFieldDefinition(PlayerField), IntFieldDefinition(TimeField), StringFieldDefinition(TeamField),
     StringFieldDefinition(OppositionTeamField), StringFieldDefinition(VenueField), StringFieldDefinition(DateField),
     StringFieldDefinition(KickOffTimeField), StringFieldDefinition(CompetitionField)
-  ).map(fieldDefinition => Right(fieldDefinition))
+  )
+
+  private val fieldIDs:Array[FieldID] = fieldDefinitions.map(_.fieldID).toArray
+
+  private val fieldDefinitionGroups = FieldDefinitionGroups(List(FieldDefinitionGroup.Standard,
+    FieldDefinitionGroup("Goals", fieldDefinitions.map(Right(_)))
+  ))
 
   private val data:Array[Array[Any]] = Array(
     Array("Ba", 54, "Newcastle United", "Tottenham Hotspur", "Sports Direct Arena", "18Aug12", "17:30", "Barclays Premier League"),
@@ -25,10 +31,6 @@ class GoalsTableDataSource extends UnfilteredArrayTableDataSource {
     Array("Ivanovic", 2, "Chelsea", "Wigan Athletic", "The DW Stadium", "19Aug12", "13:30", "Barclays Premier League"),
     Array("Lampard", 7, "Chelsea", "Wigan Athletic", "The DW Stadium", "19Aug12", "13:30", "Barclays Premier League")
   )
-  private val fieldIDs:Array[FieldID] = Array(PlayerField.id, TimeField.id, TeamField.id, OppositionTeamField.id, VenueField.id,
-    DateField.id, KickOffTimeField.id, CompetitionField.id)
-
-  private val fieldDefinitionGroups = FieldDefinitionGroups(List(FieldDefinitionGroup.Standard, FieldDefinitionGroup("Goals", fieldDefinitions)))
 
   override def dataSourceTable(tableState:TableState) = DataSourceTable(fieldIDs, data, fieldDefinitionGroups)
 }
