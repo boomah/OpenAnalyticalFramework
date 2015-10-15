@@ -13,10 +13,6 @@ trait PageData
 case object NoPageData extends PageData
 case class ExceptionPageData(exception:Exception) extends PageData
 
-trait PageFactory {
-  def page:Page
-}
-
 trait ServerContext {
   def facility[T](klass:Class[T]):T
 }

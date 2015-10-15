@@ -6,8 +6,4 @@ case class ViewerPage(number:Int) extends Page {
   def pageDataFacility(serverContext:ServerContext) = serverContext.facility(classOf[ViewerPageDataFacility])
 }
 
-object ViewerPageFactory extends PageFactory {
-  def page = ViewerPage(0)
-}
-
 case class ViewerPageData(text:String) extends PageData

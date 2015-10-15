@@ -1,7 +1,7 @@
 package com.openaf.sport.api
 
 import com.openaf.table.api.{TablePageData, TablePage}
-import com.openaf.pagemanager.api.{PageFactory, ServerContext}
+import com.openaf.pagemanager.api.ServerContext
 import com.openaf.table.lib.api.{Field, TableData, TableState}
 
 trait SportPage extends TablePage {
@@ -21,10 +21,6 @@ object SportPage {
 
 case class GoalsPage(tableState:TableState) extends SportPage {
   def withTableState(tableState:TableState) = GoalsPage(tableState)
-}
-
-object GoalsPageFactory extends PageFactory {
-  def page = GoalsPage(TableState.Blank)
 }
 
 case class GoalsPageData(tableData:TableData) extends TablePageData

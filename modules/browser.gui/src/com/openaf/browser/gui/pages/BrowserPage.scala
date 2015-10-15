@@ -1,5 +1,6 @@
 package com.openaf.browser.gui.pages
 
+import com.openaf.browser.gui.api.PageFactory
 import com.openaf.pagemanager.api._
 
 trait BrowserPage extends Page {

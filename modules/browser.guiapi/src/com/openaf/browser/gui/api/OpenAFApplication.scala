@@ -1,7 +1,5 @@
 package com.openaf.browser.gui.api
 
-import com.openaf.pagemanager.api.PageFactory
-
 trait OpenAFApplication {
   def resourceLocation:String = {
     val className = getClass.getName
