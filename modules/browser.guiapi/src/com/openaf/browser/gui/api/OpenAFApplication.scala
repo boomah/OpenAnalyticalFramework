@@ -27,4 +27,4 @@ trait OpenAFApplication {
   def order:Int = 0
 }
 
-case class BrowserActionButton(name:String, pageFactory:PageFactory)
+case class BrowserActionButton(nameId:String, pageFactory:PageFactory)

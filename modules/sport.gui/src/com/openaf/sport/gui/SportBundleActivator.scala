@@ -18,7 +18,9 @@ class SportBundleActivator extends BundleActivator {
 }
 
 object SportBrowserApplication extends OpenAFApplication {
-  override def applicationButtons(context:BrowserContext) = List(BrowserActionButton("Goals", GoalsPageFactory))
+  override def applicationButtons(context:BrowserContext) = {
+    List(BrowserActionButton(GoalsPageComponentFactory.pageComponent.nameId, GoalsPageFactory))
+  }
   override def componentFactoryMap = Map(classOf[GoalsPage].getName -> GoalsPageComponentFactory)
   override def styleSheets = OpenAFTable.styleSheets
   override def order = -1 // For now I want the sport application to be first

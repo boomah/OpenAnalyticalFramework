@@ -16,7 +16,9 @@ class ViewerBundleActivator extends BundleActivator {
 }
 
 object ViewerBrowserApplication extends OpenAFApplication {
-  override def applicationButtons(context:BrowserContext) = List(BrowserActionButton("View", ViewerPageFactory))
+  override def applicationButtons(context:BrowserContext) = {
+    List(BrowserActionButton(ViewerPageComponentFactory.pageComponent.nameId, ViewerPageFactory))
+  }
   override def componentFactoryMap = Map(classOf[ViewerPage].getName -> ViewerPageComponentFactory)
 }
 

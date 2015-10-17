@@ -7,12 +7,10 @@ import javafx.collections.{ObservableList, ListChangeListener}
 import javafx.collections.ListChangeListener.Change
 import scala.collection.JavaConversions._
 import com.openaf.pagemanager.api.NoPageData
-import com.openaf.browser.gui.utils.BrowserUtils
 import com.openaf.browser.gui.api.{PageComponentFactory, OpenAFApplication, BrowserCacheKey}
 import javafx.event.{ActionEvent, EventHandler}
 import java.util.Locale
 import com.openaf.browser.gui.InternalBrowserCacheKey
-import com.openaf.browser.gui.binding.ApplicationLocaleStringBinding
 
 class UtilsPageComponent extends BorderPane with BrowserPageComponent {
   type P = UtilsPage.type
@@ -31,8 +29,7 @@ class UtilsPageComponent extends BorderPane with BrowserPageComponent {
   private val browserApplicationsPane = new FlowPane
   private def updateBrowserApplications(browserApplications:ObservableList[OpenAFApplication]) {
     val utilButtons = browserApplications.filter(_.utilButtons(context).nonEmpty).map(application => {
-      val nameBinding = new ApplicationLocaleStringBinding(BrowserUtils.ApplicationName, application, context.cache)
-      new OpenAFApplicationComponent(context, nameBinding, application.utilButtons(context))
+      new OpenAFApplicationComponent(application, context)
     })
     browserApplicationsPane.getChildren.clear()
     browserApplicationsPane.getChildren.addAll(utilButtons.toArray :_*)

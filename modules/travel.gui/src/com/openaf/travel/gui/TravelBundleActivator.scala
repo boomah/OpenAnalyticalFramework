@@ -20,7 +20,7 @@ class TravelBundleActivator extends BundleActivator {
 object TravelBrowserApplication extends OpenAFApplication {
   override def applicationButtons(context:BrowserContext) = {
     List(
-      BrowserActionButton("Hotels", HotelsPageFactory),
+      BrowserActionButton(HotelsPageComponentFactory.pageComponent.nameId, HotelsPageFactory),
       BrowserActionButton("Flights and Hotels", FlightsAndHotelsPageFactory)
     )
   }

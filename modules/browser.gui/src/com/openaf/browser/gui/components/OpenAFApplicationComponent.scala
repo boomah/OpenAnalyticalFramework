@@ -3,21 +3,29 @@ package com.openaf.browser.gui.components
 import javafx.scene.layout.VBox
 import javafx.scene.control.{Button, Label}
 import javafx.event.{ActionEvent, EventHandler}
-import com.openaf.browser.gui.api.{BrowserContext, BrowserActionButton}
-import javafx.beans.binding.StringBinding
+import com.openaf.browser.gui.api.{OpenAFApplication, BrowserContext, BrowserActionButton}
 
-class OpenAFApplicationComponent(context:BrowserContext, applicationNameBinding:StringBinding,
-                                 actionButtons:List[BrowserActionButton]) extends VBox {
-  private val nameLabel = new Label
-  nameLabel.textProperty.bind(applicationNameBinding)
+import com.openaf.browser.gui.binding.ApplicationLocaleStringBinding
+import com.openaf.browser.gui.utils.BrowserUtils
 
-  getChildren.add(nameLabel)
+class OpenAFApplicationComponent(application:OpenAFApplication, context:BrowserContext) extends VBox {
+  {
+    val nameLabel = new Label
+    val nameLabelBinding = new ApplicationLocaleStringBinding(BrowserUtils.ApplicationName, application, context.cache)
+    nameLabel.textProperty.bind(nameLabelBinding)
 
-  actionButtons.map(button => {
-    val buttonNameButton = new Button(button.name)
-    buttonNameButton.setOnAction(new EventHandler[ActionEvent] {
-      def handle(event:ActionEvent) {context.goToPage(button.pageFactory.page)}
+    getChildren.add(nameLabel)
+
+    val actionButtons = application.applicationButtons(context)
+    actionButtons.map(actionButton => {
+      val button = new Button
+      val buttonLabelBinding = new ApplicationLocaleStringBinding(actionButton.nameId, application, context.cache)
+      button.textProperty.bind(buttonLabelBinding)
+      button.setOnAction(new EventHandler[ActionEvent] {
+        def handle(event:ActionEvent) {context.goToPage(actionButton.pageFactory.page)}
+      })
+
+      getChildren.add(button)
     })
-    getChildren.add(buttonNameButton)
-  })
+  }
 }

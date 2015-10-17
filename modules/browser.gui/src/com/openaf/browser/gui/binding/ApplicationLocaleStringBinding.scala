@@ -8,8 +8,9 @@ class ApplicationLocaleStringBinding(id:String, application:OpenAFApplication, c
   private val localeProperty = cache(BrowserCacheKey.LocaleKey)
   bind(localeProperty)
   def computeValue = {
-    ResourceBundle.getBundle(
+    val bundle = ResourceBundle.getBundle(
       application.resourceLocation, localeProperty.getValue, application.getClass.getClassLoader
-    ).getString(id)
+    )
+    if (bundle.containsKey(id)) bundle.getString(id) else id
   }
 }
