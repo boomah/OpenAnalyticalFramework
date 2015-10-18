@@ -17,6 +17,7 @@
       <w>keypass</w>
       <w>keystore</w>
       <w>keytool</w>
+      <w>klass</w>
       <w>memoize</w>
       <w>openaf</w>
       <w>osgi</w>

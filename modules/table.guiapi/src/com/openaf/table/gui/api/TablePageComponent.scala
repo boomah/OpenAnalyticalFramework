@@ -51,3 +51,5 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
 
   setOnMousePressed(new EventHandler[MouseEvent] {def handle(event:MouseEvent) {event.consume()}})
 }
+
+class StandardTablePageComponent(override val nameId:String) extends TablePageComponent

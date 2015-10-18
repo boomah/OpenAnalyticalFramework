@@ -61,5 +61,5 @@ object HotelsPageFactory extends PageFactory {
 }
 
 object FlightsAndHotelsPageFactory extends PageFactory {
-  def page = FlightsAndHotelsPage()
+  def page = FlightsAndHotelsPage(TableState.Blank)
 }

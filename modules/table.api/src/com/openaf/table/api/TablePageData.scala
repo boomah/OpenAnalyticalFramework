@@ -6,3 +6,5 @@ import com.openaf.table.lib.api.TableData
 trait TablePageData extends PageData {
   def tableData:TableData
 }
+
+case class StandardTablePageData(tableData:TableData) extends TablePageData

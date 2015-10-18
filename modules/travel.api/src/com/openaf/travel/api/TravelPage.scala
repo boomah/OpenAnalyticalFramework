@@ -18,8 +18,9 @@ object TravelPage {
 case class HotelsPage(tableState:TableState) extends TravelPage {
   def withTableState(tableState:TableState) = HotelsPage(tableState)
 }
-case class FlightsAndHotelsPage() extends TravelPage {
-  def withTableState(tableState:TableState) = this
+
+case class FlightsAndHotelsPage(tableState:TableState) extends TravelPage {
+  def withTableState(tableState:TableState) = FlightsAndHotelsPage(tableState)
 }
 
 case class HotelsPageData(tableData:TableData) extends TablePageData

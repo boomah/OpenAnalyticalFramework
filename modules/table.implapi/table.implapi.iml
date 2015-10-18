@@ -7,8 +7,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="pageManager.api" exported="" />
-    <orderEntry type="module" module-name="table.lib.api" />
     <orderEntry type="library" name="scala-sdk" level="project" />
+    <orderEntry type="module" module-name="osgi.api" exported="" />
+    <orderEntry type="module" module-name="table.api" exported="" />
+    <orderEntry type="module" module-name="table.impl" exported="" />
   </component>
 </module>

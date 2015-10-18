@@ -13,6 +13,8 @@ object OSGIServer {
       Some(ModuleBundleDefinition(module, ModuleType.API))
     } else if (module.endsWith(".impl")) {
       Some(ModuleBundleDefinition(module, ModuleType.IMPL))
+    } else if (module.endsWith(".implapi")) {
+      Some(ModuleBundleDefinition(module, ModuleType.IMPL_API))
     } else {
       None
     }

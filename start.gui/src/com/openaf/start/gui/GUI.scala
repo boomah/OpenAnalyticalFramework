@@ -22,7 +22,7 @@ object GUI {
     client.connectBlocking()
 
     val serverContext = new ServerContext {
-      def facility[T](klass:Class[T]) = client.proxy[T](klass)
+      def facilities[T](klass:Class[T]) = List(client.proxy[T](klass))
     }
 
     GuiUtils.runLater({

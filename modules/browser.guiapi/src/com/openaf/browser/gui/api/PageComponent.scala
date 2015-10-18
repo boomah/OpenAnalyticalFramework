@@ -22,12 +22,12 @@ trait PageComponent extends Region {
   final protected def context = context0
 
   protected def resourceLocation = application0.resourceLocation
-  protected def textFromResource(id:String, location:String=resourceLocation,
-                                 classLoader:ClassLoader=getClass.getClassLoader) = {
-    ResourceBundle.getBundle(location, context.cache(BrowserCacheKey.LocaleKey).getValue, classLoader).getString(id)
+  protected def resourceClassLoader = Option(application0).map(_.getClass.getClassLoader).getOrElse(getClass.getClassLoader)
+  protected def textFromResource(id:String, location:String=resourceLocation, classLoader:ClassLoader=resourceClassLoader) = {
+    val bundle = ResourceBundle.getBundle(location, context.cache(BrowserCacheKey.LocaleKey).getValue, classLoader)
+    if (bundle.containsKey(id)) bundle.getString(id) else id
   }
-  protected def stringBindingFromResource(id:String, location:String=resourceLocation,
-                                          classLoader:ClassLoader=getClass.getClassLoader) = {
+  protected def stringBindingFromResource(id:String, location:String=resourceLocation, classLoader:ClassLoader=resourceClassLoader) = {
     new StringBinding {
       bind(context.cache(BrowserCacheKey.LocaleKey))
       def computeValue = textFromResource(id, location, classLoader)
