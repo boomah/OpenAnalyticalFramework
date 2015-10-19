@@ -3,8 +3,7 @@ package com.openaf.table.lib.api
 import SortOrder._
 
 case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=RetainAllFilter[T](),
-                    rendererID:RendererID=DefaultRendererID, sortOrder:SortOrder=Ascending,
-                    totals:Totals=Totals.Default, key:FieldKey=NoFieldKey) {
+                    sortOrder:SortOrder=Ascending, totals:Totals=Totals.Default, key:FieldKey=NoFieldKey) {
   def totalTextID = "total"
   def withSingleFilter(value:T) = copy(filter = RetainFilter[T](Set(value)))
   def withFilter(filter:Filter[T]) = copy(filter = filter)
