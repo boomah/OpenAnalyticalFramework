@@ -1,9 +1,10 @@
 package com.openaf.sport.gui
 
+import com.openaf.sport.api.SportPage._
 import com.openaf.table.lib.api.TableState
 import org.osgi.framework.{BundleContext, BundleActivator}
 import com.openaf.browser.gui.api.{PageFactory, BrowserActionButton, BrowserContext, OpenAFApplication}
-import com.openaf.table.gui.OpenAFTable
+import com.openaf.table.gui.{IntRenderer, StringRenderer, OpenAFTable}
 import com.openaf.sport.gui.components.GoalsPageComponentFactory
 import com.openaf.sport.api.GoalsPage
 
@@ -28,4 +29,17 @@ object SportBrowserApplication extends OpenAFApplication {
 
 object GoalsPageFactory extends PageFactory {
   def page = GoalsPage(TableState.Blank)
+}
+
+object SportRenderers {
+  val DefaultRenderers = Map(
+    PlayerField.id -> StringRenderer,
+    TimeField.id -> IntRenderer,
+    TeamField.id -> StringRenderer,
+    OppositionTeamField.id -> StringRenderer,
+    VenueField.id -> StringRenderer,
+    DateField.id -> StringRenderer,
+    KickOffTimeField.id -> StringRenderer,
+    CompetitionField.id -> StringRenderer
+  )
 }

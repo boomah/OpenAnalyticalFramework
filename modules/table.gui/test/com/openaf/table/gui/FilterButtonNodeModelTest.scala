@@ -13,12 +13,13 @@ class FilterButtonNodeModelTest extends FunSuite {
     val tableState = TableState(tableLayout).generateFieldKeys
     val fieldValues = FieldValues(nameFieldValues(NameField))
     val tableValues = TableValues.Empty.copy(fieldValues = fieldValues, valueLookUp = NameValuesLookUp)
-    TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+    TableData(FieldGroupData, tableState, tableValues)
   }
   val tableDataProperty = new SimpleObjectProperty[TableData](tableData)
   val requestTableStateProperty = new SimpleObjectProperty[TableState](tableData.tableState)
   val localeProperty = new SimpleObjectProperty[Locale](Locale.UK)
-  val tableFields = OpenAFTableFields(tableDataProperty, requestTableStateProperty, null, localeProperty, null)
+  val defaultRenderers = new SimpleObjectProperty[Map[FieldID,Renderer[_]]](DefaultRenderers)
+  val tableFields = OpenAFTableFields(tableDataProperty, requestTableStateProperty, null, localeProperty, null, defaultRenderers)
 
   test("RetainAllFilter") {
     val model = new FilterButtonNodeModel[String](NameField, tableFields)
@@ -73,7 +74,7 @@ class FilterButtonNodeModelTest extends FunSuite {
       val tableState = TableState(tableLayout)
       val fieldValues = FieldValues(nameFieldValues(nameField))
       val tableValues = TableValues.Empty.copy(fieldValues = fieldValues, valueLookUp = NameValuesLookUp)
-      TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+      TableData(FieldGroupData, tableState, tableValues)
     }
     val newTableDataProperty = new SimpleObjectProperty[TableData](newTableData)
     val model = new FilterButtonNodeModel[String](nameField, tableFields.copy(tableDataProperty = newTableDataProperty))
@@ -88,7 +89,7 @@ class FilterButtonNodeModelTest extends FunSuite {
       val tableState = TableState(tableLayout)
       val fieldValues = FieldValues(nameFieldValues(nameField))
       val tableValues = TableValues.Empty.copy(fieldValues = fieldValues, valueLookUp = NameValuesLookUp)
-      TableData(FieldGroupData, tableState, tableValues, DefaultRenderers)
+      TableData(FieldGroupData, tableState, tableValues)
     }
     val newTableDataProperty = new SimpleObjectProperty[TableData](newTableData)
     val model = new FilterButtonNodeModel[String](nameField, tableFields.copy(tableDataProperty = newTableDataProperty))

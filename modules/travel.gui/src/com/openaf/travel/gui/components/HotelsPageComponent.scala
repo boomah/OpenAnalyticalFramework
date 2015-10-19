@@ -9,6 +9,8 @@ class HotelsPageComponent extends TablePageComponent {
   type PD = HotelsPageData
 
   def nameId = "hotelsName"
+
+  override def defaultRenderers = Map.empty
 }
 
 object HotelsPageComponentFactory extends PageComponentFactory {

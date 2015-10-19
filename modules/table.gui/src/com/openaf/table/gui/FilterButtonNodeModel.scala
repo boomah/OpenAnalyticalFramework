@@ -20,7 +20,7 @@ class FilterButtonNodeModel[T](field:Field[T], tableFields:OpenAFTableFields) {
   })
   private[gui] val values = tableFields.tableDataProperty.getValue.tableValues.fieldValues.values(field)
   private[gui] val numValues = values.length
-  private val defaultRenderer = tableFields.tableDataProperty.getValue.defaultRenderers(field.id).asInstanceOf[Renderer[T]]
+  private val defaultRenderer = tableFields.defaultRenderers.getValue()(field.id).asInstanceOf[Renderer[T]]
   private val valueLookUp = tableFields.tableDataProperty.getValue.tableValues.valueLookUp(field.id).asInstanceOf[Array[T]]
   private val propertyLookUp = {
     val lookup = new mutable.LongMap[SimpleBooleanProperty]

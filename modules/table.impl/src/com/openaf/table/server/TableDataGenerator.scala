@@ -75,12 +75,7 @@ object TableDataGenerator {
 
     val fieldGroup = pivotData.fieldDefinitionGroups.fieldGroup
     val tableValues = TableValues(rows, fieldPathsIndexes, pivotData.fieldValues, pivotData.valueLookUp)
-    val defaultRenderers:Map[FieldID,Renderer[_]] = tableState.tableLayout.allFields.map(field => {
-      val fieldDefinition = pivotData.fieldDefinitionGroups.fieldDefinition(field.id)
-      val renderer = if (field.fieldType.isDimension) fieldDefinition.renderer else fieldDefinition.combinedRenderer
-      field.id -> NoValueAwareDelegatingRenderer(renderer)
-    }).toMap
 
-    TableData(fieldGroup, tableState, tableValues, defaultRenderers)
+    TableData(fieldGroup, tableState, tableValues)
   }
 }

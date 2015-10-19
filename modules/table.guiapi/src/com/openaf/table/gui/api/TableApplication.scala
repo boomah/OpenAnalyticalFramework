@@ -2,15 +2,16 @@ package com.openaf.table.gui.api
 
 import com.openaf.browser.gui.api._
 import com.openaf.table.api.StandardTablePage
-import com.openaf.table.gui.OpenAFTable
-import com.openaf.table.lib.api.TableState
+import com.openaf.table.gui.{Renderer, OpenAFTable}
+import com.openaf.table.lib.api.{FieldID, TableState}
 import org.osgi.framework.{BundleActivator, BundleContext}
 
 trait TableApplication extends OpenAFApplication {
   def nameId:String
+  def defaultRenderers:Map[FieldID,Renderer[_]]
   private def tablePageFactory = new TablePageFactory(nameId)
   override def applicationButtons(context:BrowserContext) = List(BrowserActionButton(nameId, tablePageFactory))
-  override def componentFactoryMap = Map(classOf[StandardTablePage].getName -> new TablePageComponentFactory(nameId))
+  override def componentFactoryMap = Map(classOf[StandardTablePage].getName -> new TablePageComponentFactory(nameId, defaultRenderers))
   override def styleSheets = OpenAFTable.styleSheets
 }
 
@@ -29,6 +30,6 @@ trait TableBundleActivator extends BundleActivator {
   }
 }
 
-class TablePageComponentFactory(nameId:String) extends PageComponentFactory {
-  def pageComponent = new StandardTablePageComponent(nameId)
+class TablePageComponentFactory(nameId:String, defaultRenderers:Map[FieldID,Renderer[_]]) extends PageComponentFactory {
+  def pageComponent = new StandardTablePageComponent(nameId, defaultRenderers)
 }

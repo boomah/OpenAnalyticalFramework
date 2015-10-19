@@ -1,4 +1,7 @@
-package com.openaf.table.lib.api
+package com.openaf.table.gui
+
+import com.openaf.table.lib.api.{NoValue, MutInt, FieldID}
+import com.openaf.table.lib.api.StandardFields._
 
 import collection.mutable.{Set => MSet}
 
@@ -53,5 +56,8 @@ object MSetRenderer {
   val DefaultMaxNumberToDisplay = 3
 }
 
-trait RendererID
-case object DefaultRendererID extends RendererID
+object Renderer {
+  val StandardRenderers:Map[FieldID,Renderer[_]] = Map(
+    CountField.id -> MutIntRenderer
+  )
+}

@@ -10,8 +10,6 @@ trait FieldDefinition {
   def defaultField:Field[V]
   def fieldID = defaultField.id
   def primaryKey:Boolean
-  def renderer:Renderer[V]
-  def combinedRenderer:Renderer[C]
   def ordering:Ordering[V]
   def combiner:Combiner[C,V]
 }
@@ -21,8 +19,6 @@ case object NullFieldDefinition extends FieldDefinition {
   type C = Null
   def defaultField = Field.Null
   def primaryKey = false
-  def renderer = NullRenderer
-  def combinedRenderer = NullRenderer
   def ordering = NullOrdering
   def combiner = NullCombiner
 }
@@ -31,8 +27,6 @@ class AnyFieldDefinition(val defaultField:Field[Any]) extends FieldDefinition {
   type V = Any
   type C = MSet[Any]
   val primaryKey = false
-  val renderer = AnyRenderer
-  def combinedRenderer = MSetRenderer[Any](MSetRenderer.DefaultMaxNumberToDisplay)
   val ordering = AnyOrdering
   val combiner = AnyCombiner
 }
@@ -45,8 +39,6 @@ class StringFieldDefinition(val defaultField:Field[String]) extends FieldDefinit
   type V = String
   type C = MSet[String]
   val primaryKey = false
-  val renderer = StringRenderer
-  def combinedRenderer = MSetRenderer[String](MSetRenderer.DefaultMaxNumberToDisplay)
   val ordering = StringOrdering
   val combiner = StringCombiner
 }
@@ -59,8 +51,6 @@ class IntFieldDefinition(val defaultField:Field[Int]) extends FieldDefinition {
   type V = Int
   type C = Int
   def primaryKey = false
-  def renderer = IntRenderer
-  def combinedRenderer = renderer
   def ordering = IntOrdering
   def combiner = IntCombiner
 }
@@ -73,8 +63,6 @@ class IncrementingFieldDefinition(val defaultField:Field[Integer]) extends Field
   type V = Integer
   type C = MutInt
   def primaryKey = false
-  def renderer = IntegerRenderer
-  def combinedRenderer = MutIntRenderer
   def ordering = IntegerOrdering
   def combiner = MutIntCombiner
 }

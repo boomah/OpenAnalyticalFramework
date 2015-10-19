@@ -17,7 +17,7 @@ class RowHeaderCellFactory(startRowHeaderValuesIndex:Int, field:Field[_],
     private def addStyle(style:TableCellStyle) {getStyleClass.add(camelCaseToDashed(style.toString))}
     private val tableData = tableFields.tableDataProperty.getValue
     private val valueLookUp = tableData.tableValues.valueLookUp
-    private val renderer = tableData.defaultRenderers(field.id).asInstanceOf[Renderer[AnyRef]]
+    private val renderer = tableFields.defaultRenderers.getValue()(field.id).asInstanceOf[Renderer[AnyRef]]
     setContextMenu(new ContextMenu)
 
     override def updateItem(row:OpenAFTableRow, isEmpty:Boolean) {

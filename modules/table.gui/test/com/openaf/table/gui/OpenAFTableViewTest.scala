@@ -14,8 +14,9 @@ class OpenAFTableViewTest extends FunSuite {
   val tableDataProperty = new SimpleObjectProperty[TableData]
   val requestTableStateProperty = new SimpleObjectProperty[TableState]
   val localeProperty = new SimpleObjectProperty[Locale](Locale.getDefault)
+  val defaultRenderers = new SimpleObjectProperty[Map[FieldID,Renderer[_]]](DefaultRenderers)
   val tableFields = OpenAFTableFields(tableDataProperty, requestTableStateProperty, null, localeProperty,
-    FXCollections.emptyObservableMap[FieldID,StringBinding])
+    FXCollections.emptyObservableMap[FieldID,StringBinding], defaultRenderers)
   val tableView = new OpenAFTableView(tableFields)
 
   test("1 column") {
@@ -27,7 +28,7 @@ class OpenAFTableViewTest extends FunSuite {
       fieldPathsIndexes = Array(0,0),
       valueLookUp = GenderValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues, DefaultRenderers).generateFieldKeys
+    val tableData = TableData(FieldGroupData, tableState, tableValues).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns

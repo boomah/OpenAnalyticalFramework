@@ -135,7 +135,7 @@ class OpenAFTableView(tableFields:OpenAFTableFields) extends TableView[OpenAFTab
     val valueLookUp = tableData.tableValues.valueLookUp
     val allPathValueLookUps = paths.map(path => path.fields.map(field => valueLookUp(field.id)).toArray).toArray
     val allPathRenderers:Array[Array[Renderer[_]]] = paths.map(path => path.fields.map(field => {
-      tableData.defaultRenderers(field.id)
+      tableFields.defaultRenderers.getValue()(field.id)
     }).toArray).toArray
 
     var tableColumn:OpenAFTableColumn = null
