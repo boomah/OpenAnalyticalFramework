@@ -111,7 +111,7 @@ case class ModuleBundleDefinition(moduleName:String, moduleType:ModuleType.Modul
 
     // TODO - if it is an impl module with no activator then at the moment we presume it is a library. Need to give these better names or types
     val newStyleLibrary = !activatorPreset && ((moduleType == ModuleType.IMPL) || (moduleType == ModuleType.GUI))
-    if ((moduleType == ModuleType.API) || (moduleType == ModuleType.GUI_API) || (moduleType == ModuleType.IMPL_API) || (moduleType == ModuleType.Library) || newStyleLibrary) {
+    if ((moduleType == ModuleType.API) || (moduleType == ModuleType.GUI_API) || (moduleType == ModuleType.Library) || newStyleLibrary) {
       builder.setProperty(EXPORT_PACKAGE, "*")
     } else {
       builder.setProperty(PRIVATE_PACKAGE, "*")
@@ -161,5 +161,5 @@ class SimpleBundleDefinitions(systemPackages0:()=>List[String], bundles0:()=>Lis
 
 object ModuleType extends Enumeration {
   type ModuleType = Value
-  val API, IMPL, IMPL_API, GUI, GUI_API, Library = Value
+  val API, IMPL, GUI, GUI_API, Library = Value
 }

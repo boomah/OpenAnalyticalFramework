@@ -1,5 +1,7 @@
 package com.openaf.table.gui
 
+import javafx.beans.binding.StringBinding
+
 import com.openaf.table.lib.api._
 import com.openaf.table.lib.api.ColumnHeaderLayoutPath
 import scala.annotation.tailrec
@@ -12,9 +14,7 @@ import javafx.scene.control.ContextMenu
 
 class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsIndexes:Array[Int],
                                      columnHeaderLayoutPaths:Array[ColumnHeaderLayoutPath], maxPathLength:Int,
-                                     pathRenderers:Array[Renderer[_]],
-                                     tableFields:OpenAFTableFields) extends OpenAFCellFactory {
-
+                                     val tableFields:OpenAFTableFields) extends OpenAFCellFactory {
   def call(tableColumn:TableColumnType) = new OpenAFTableCell {
     private def columnIndex = tableColumn.asInstanceOf[OpenAFTableColumn].columnIndex
     setContextMenu(new ContextMenu)
@@ -91,8 +91,10 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsI
                   expandAndCollapseOption.foreach(expandAndCollapse => populateContextMenuForCell(expandAndCollapse, row))
                   if (shouldRender(row, intValue, cellFieldOption)) {
                     val value = valueLookUps(row.row)(intValue)
-                    val renderer = pathRenderers(row.row).asInstanceOf[Renderer[Any]]
-                    setText(renderer.render(value))
+                    cellFieldOption match {
+                      case Some(field) => textProperty.bind(rendererBinding(field, value))
+                      case None => setText(null)
+                    }
                   } else {
                     setText(null)
                   }
@@ -118,9 +120,11 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsI
             } else if (rightBoundaryCell) {
               addStyle(RightDataTableCell)
             }
-            val measureFieldIndex = columnHeaderLayoutPaths(fieldPathsIndexes(columnIndex)).measureFieldIndex
-            val renderer = if (measureFieldIndex == -1) BlankRenderer else pathRenderers(measureFieldIndex).asInstanceOf[Renderer[Any]]
-            setText(renderer.render(row.columnHeaderAndDataValues(columnIndex)))
+
+            columnHeaderLayoutPaths(fieldPathsIndexes(columnIndex)).measureFieldOption match {
+              case Some(field) => textProperty.bind(rendererBinding(field, row.columnHeaderAndDataValues(columnIndex)))
+              case None => setText(null)
+            }
           }
         }
       }

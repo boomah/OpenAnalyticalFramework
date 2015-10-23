@@ -134,13 +134,9 @@ class OpenAFTableView(tableFields:OpenAFTableFields) extends TableView[OpenAFTab
     val fieldPathIndexes = tableData.tableValues.fieldPathsIndexes
     val valueLookUp = tableData.tableValues.valueLookUp
     val allPathValueLookUps = paths.map(path => path.fields.map(field => valueLookUp(field.id)).toArray).toArray
-    val allPathRenderers:Array[Array[Renderer[_]]] = paths.map(path => path.fields.map(field => {
-      tableFields.defaultRenderers.getValue()(field.id)
-    }).toArray).toArray
 
     var tableColumn:OpenAFTableColumn = null
     var valueLookUps:Array[Array[Any]] = null
-    var pathRenderers:Array[Renderer[_]] = null
 
     var columnCounter = 0
 
@@ -150,10 +146,9 @@ class OpenAFTableView(tableFields:OpenAFTableFields) extends TableView[OpenAFTab
       tableColumn.setText(columnNames.next.toString)
 
       valueLookUps = allPathValueLookUps(fieldPathIndexes(columnCounter))
-      pathRenderers = allPathRenderers(fieldPathIndexes(columnCounter))
 
       tableColumn.setCellFactory(
-        new ColumnHeaderAndDataCellFactory(valueLookUps, fieldPathIndexes, pathsArray, maxPathLength, pathRenderers, tableFields)
+        new ColumnHeaderAndDataCellFactory(valueLookUps, fieldPathIndexes, pathsArray, maxPathLength, tableFields)
       )
 
       columns.add(tableColumn)

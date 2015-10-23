@@ -29,6 +29,7 @@ class FilterButtonNodeListCell[T](filterButtonNodeModel:FilterButtonNodeModel[T]
   override def updateItem(intValue:Int, isEmpty:Boolean) {
     super.updateItem(intValue, isEmpty)
     setText(null)
+    checkBox.textProperty.unbind()
     lastPropertyOption.foreach(lastProperty => checkBox.selectedProperty.unbindBidirectional(lastProperty))
     if (isEmpty) {
       setId(null)
@@ -42,7 +43,7 @@ class FilterButtonNodeListCell[T](filterButtonNodeModel:FilterButtonNodeModel[T]
       val property = filterButtonNodeModel.property(intValue)
       checkBox.selectedProperty.bindBidirectional(property)
       lastPropertyOption = Some(property)
-      checkBox.setText(filterButtonNodeModel.text(intValue))
+      checkBox.textProperty.bind(filterButtonNodeModel.stringProperty(intValue))
       setGraphic(checkBox)
     }
   }

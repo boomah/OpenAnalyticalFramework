@@ -1,6 +1,6 @@
 package com.openaf.table.api
 
-import com.openaf.pagemanager.api.{NoPageData, ServerContext, PageDataFacility, Page}
+import com.openaf.pagemanager.api.{Page, PageDataFacility, ServerContext}
 import com.openaf.table.lib.api.TableState
 
 trait TablePage extends Page {
@@ -19,10 +19,4 @@ case class StandardTablePage(override val nameId:String, tableState:TableState) 
 trait TablePageDataFacility extends PageDataFacility {
   def nameId:String
   def pageData(tablePage:TablePage):TablePageData
-  override def pageData(page:Page) = {
-    page match {
-      case tablePage:TablePage => pageData(tablePage)
-      case _ => NoPageData
-    }
-  }
 }

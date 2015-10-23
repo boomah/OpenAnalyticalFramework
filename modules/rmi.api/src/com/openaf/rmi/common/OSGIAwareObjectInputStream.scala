@@ -9,7 +9,7 @@ class OSGIAwareObjectInputStream(inputStream:InputStream, topLevelClassLoader:Cl
 
   override def resolveClass(desc:ObjectStreamClass):Class[_] = {
     var classAndClassLoaderOption:Option[ClassAndClassLoader] = None
-    for (classLoader <- classLoaders if classAndClassLoaderOption == None) {
+    for (classLoader <- classLoaders if classAndClassLoaderOption.isEmpty) {
       try {
         val klass = Class.forName(desc.getName, false, classLoader)
         classAndClassLoaderOption = Some(new ClassAndClassLoader(klass, klass.getClassLoader))

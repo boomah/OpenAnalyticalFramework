@@ -1,5 +1,7 @@
 package com.openaf.table.gui
 
+import javafx.beans.binding.StringBinding
+
 import com.openaf.table.lib.api._
 import TableValues._
 import annotation.tailrec
@@ -10,14 +12,13 @@ import com.openaf.table.gui.binding.TableLocaleStringBinding
 import javafx.scene.control.ContextMenu
 
 class RowHeaderCellFactory(startRowHeaderValuesIndex:Int, field:Field[_],
-                           tableFields:OpenAFTableFields) extends OpenAFCellFactory {
+                           val tableFields:OpenAFTableFields) extends OpenAFCellFactory {
 
   def call(tableColumn:TableColumnType) = new OpenAFTableCell {
     private val columnIndex = tableColumn.asInstanceOf[OpenAFTableColumn].columnIndex
     private def addStyle(style:TableCellStyle) {getStyleClass.add(camelCaseToDashed(style.toString))}
     private val tableData = tableFields.tableDataProperty.getValue
     private val valueLookUp = tableData.tableValues.valueLookUp
-    private val renderer = tableFields.defaultRenderers.getValue()(field.id).asInstanceOf[Renderer[AnyRef]]
     setContextMenu(new ContextMenu)
 
     override def updateItem(row:OpenAFTableRow, isEmpty:Boolean) {
@@ -81,7 +82,7 @@ class RowHeaderCellFactory(startRowHeaderValuesIndex:Int, field:Field[_],
             }
             if (shouldRender) {
               val value = valueLookUp(field.id)(intValue).asInstanceOf[AnyRef]
-              setText(renderer.render(value))
+              textProperty.bind(rendererBinding(field, value))
             } else {
               setText(null)
             }

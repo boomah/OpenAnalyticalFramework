@@ -8,10 +8,13 @@ import org.osgi.framework.{BundleActivator, BundleContext}
 
 trait TableApplication extends OpenAFApplication {
   def nameId:String
-  def defaultRenderers:Map[FieldID,Renderer[_]]
+  def defaultRenderers:Map[FieldID,Renderer[_]] = Map.empty
+  def additionalRenderers:Map[FieldID,List[Renderer[_]]] = Map.empty
   private def tablePageFactory = new TablePageFactory(nameId)
   override def applicationButtons(context:BrowserContext) = List(BrowserActionButton(nameId, tablePageFactory))
-  override def componentFactoryMap = Map(classOf[StandardTablePage].getName -> new TablePageComponentFactory(nameId, defaultRenderers))
+  override def componentFactoryMap = Map(
+    classOf[StandardTablePage].getName -> new TablePageComponentFactory(nameId, defaultRenderers, additionalRenderers)
+  )
   override def styleSheets = OpenAFTable.styleSheets
 }
 
@@ -30,6 +33,7 @@ trait TableBundleActivator extends BundleActivator {
   }
 }
 
-class TablePageComponentFactory(nameId:String, defaultRenderers:Map[FieldID,Renderer[_]]) extends PageComponentFactory {
-  def pageComponent = new StandardTablePageComponent(nameId, defaultRenderers)
+class TablePageComponentFactory(nameId:String, defaultRenderers:Map[FieldID,Renderer[_]],
+                                additionalRenderers:Map[FieldID,List[Renderer[_]]]) extends PageComponentFactory {
+  def pageComponent = new StandardTablePageComponent(nameId, defaultRenderers, additionalRenderers)
 }

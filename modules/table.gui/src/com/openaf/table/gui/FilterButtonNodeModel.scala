@@ -1,6 +1,8 @@
 package com.openaf.table.gui
 
+import javafx.beans.binding.StringBinding
 import javafx.beans.property.SimpleBooleanProperty
+import com.openaf.table.gui.binding.TableLocaleStringBinding
 import com.openaf.table.lib.api._
 import javafx.collections.ObservableList
 import scala.collection.mutable
@@ -20,7 +22,6 @@ class FilterButtonNodeModel[T](field:Field[T], tableFields:OpenAFTableFields) {
   })
   private[gui] val values = tableFields.tableDataProperty.getValue.tableValues.fieldValues.values(field)
   private[gui] val numValues = values.length
-  private val defaultRenderer = tableFields.defaultRenderers.getValue()(field.id).asInstanceOf[Renderer[T]]
   private val valueLookUp = tableFields.tableDataProperty.getValue.tableValues.valueLookUp(field.id).asInstanceOf[Array[T]]
   private val propertyLookUp = {
     val lookup = new mutable.LongMap[SimpleBooleanProperty]
@@ -114,8 +115,20 @@ class FilterButtonNodeModel[T](field:Field[T], tableFields:OpenAFTableFields) {
   }
 
   private[gui] def property(intValue:Int) = if (intValue == 0) allBooleanProperty else propertyLookUp(intValue)
-  // TODO - All should be a binding that uses locale
-  private[gui] def text(intValue:Int) = if (intValue == 0) "All" else defaultRenderer.render(value(intValue))
+  private[gui] def text(intValue:Int) = {
+    val renderer = tableFields.renderersProperty.getValue.renderer(field).asInstanceOf[Renderer[Any]]
+    if (intValue == 0) {
+      TableLocaleStringBinding.stringFromBundle("all", tableFields.localeProperty.getValue)
+    } else {
+      renderer.render(value(intValue), tableFields.localeProperty.getValue)
+    }
+  }
+  private[gui] def stringProperty(intValue:Int) = {
+    new StringBinding {
+      bind(tableFields.renderersProperty, tableFields.localeProperty)
+      override def computeValue = text(intValue)
+    }
+  }
   private[gui] def value(intValue:Int) = valueLookUp(intValue)
 
   private[gui] def filter:Filter[T] = {

@@ -9,6 +9,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="scala-sdk" level="project" />
     <orderEntry type="module" module-name="testData.api" />
-    <orderEntry type="module" module-name="table.implapi" />
+    <orderEntry type="module" module-name="osgi.api" />
+    <orderEntry type="module" module-name="table.impl" />
   </component>
 </module>

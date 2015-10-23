@@ -17,7 +17,7 @@ object OpenAFTable {
 class OpenAFTable extends StackPane {
   protected val tableDataProperty = new SimpleObjectProperty[TableData]
   protected val requestTableStateProperty = new SimpleObjectProperty[TableState]
-  protected val defaultRenderersProperty = new SimpleObjectProperty[Map[FieldID,Renderer[_]]]
+  protected val renderersProperty = new SimpleObjectProperty[Renderers]
 
   private val dragAndDrop = new DragAndDrop
 
@@ -26,7 +26,7 @@ class OpenAFTable extends StackPane {
   protected val unmodifiableFieldBindings = FXCollections.unmodifiableObservableMap(fieldBindings)
 
   private val tableFields = OpenAFTableFields(tableDataProperty, requestTableStateProperty, dragAndDrop, localeProperty,
-    unmodifiableFieldBindings, defaultRenderersProperty)
+    unmodifiableFieldBindings, renderersProperty)
 
   private val configArea = new ConfigArea(tableFields)
   private val filterFieldsArea = new FilterFieldsArea(tableFields)
@@ -76,5 +76,4 @@ class OpenAFTable extends StackPane {
 
 case class OpenAFTableFields(tableDataProperty:Property[TableData], requestTableStateProperty:Property[TableState],
                              dragAndDrop:DragAndDrop, localeProperty:Property[Locale],
-                             fieldBindings:ObservableMap[FieldID,StringBinding],
-                             defaultRenderers:Property[Map[FieldID,Renderer[_]]])
+                             fieldBindings:ObservableMap[FieldID,StringBinding], renderersProperty:Property[Renderers])

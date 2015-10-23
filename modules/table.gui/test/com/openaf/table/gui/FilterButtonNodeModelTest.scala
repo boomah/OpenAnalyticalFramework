@@ -18,8 +18,8 @@ class FilterButtonNodeModelTest extends FunSuite {
   val tableDataProperty = new SimpleObjectProperty[TableData](tableData)
   val requestTableStateProperty = new SimpleObjectProperty[TableState](tableData.tableState)
   val localeProperty = new SimpleObjectProperty[Locale](Locale.UK)
-  val defaultRenderers = new SimpleObjectProperty[Map[FieldID,Renderer[_]]](DefaultRenderers)
-  val tableFields = OpenAFTableFields(tableDataProperty, requestTableStateProperty, null, localeProperty, null, defaultRenderers)
+  val renderersProperty = new SimpleObjectProperty[Renderers](new Renderers(DefaultRenderers))
+  val tableFields = OpenAFTableFields(tableDataProperty, requestTableStateProperty, null, localeProperty, null, renderersProperty)
 
   test("RetainAllFilter") {
     val model = new FilterButtonNodeModel[String](NameField, tableFields)
