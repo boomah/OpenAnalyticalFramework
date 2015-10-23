@@ -5,7 +5,7 @@ import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.event.{ActionEvent, EventHandler}
 import javafx.scene.control._
 
-import com.openaf.table.gui.binding.{RendererNameBinding$, TableLocaleStringBinding}
+import com.openaf.table.gui.binding.{RendererNameBinding, TableLocaleStringBinding}
 import com.openaf.table.lib.api._
 
 class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) extends ContextMenu {
