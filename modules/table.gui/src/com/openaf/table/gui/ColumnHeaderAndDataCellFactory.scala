@@ -1,7 +1,5 @@
 package com.openaf.table.gui
 
-import javafx.beans.binding.StringBinding
-
 import com.openaf.table.lib.api._
 import com.openaf.table.lib.api.ColumnHeaderLayoutPath
 import scala.annotation.tailrec

@@ -28,15 +28,15 @@ import RendererNameBinding._
 class RendererNameBinding(renderer:Renderer[_], localeProperty:Property[Locale]) extends StringBinding {
   bind(localeProperty)
   override def computeValue = {
-    val id = renderer.id
+    val name = renderer.name
     val packageName = renderer.getClass.getPackage.getName
     packageName match {
       case ModulePattern(module) =>
         val locale = localeProperty.getValue
         val bundleLocation = packageName + ".resources." + module
         val bundle = ResourceBundle.getBundle(bundleLocation, locale, renderer.getClass.getClassLoader)
-        if (bundle.containsKey(id)) bundle.getString(id) else id
-      case _ => id
+        if (bundle.containsKey(name)) bundle.getString(name) else name
+      case _ => name
     }
   }
 }

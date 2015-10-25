@@ -14,8 +14,7 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
   type P <: TablePage
 
   override def providesTopBorder = true
-  def defaultRenderers:Map[FieldID,Renderer[_]] = Map.empty
-  def additionalRenderers:Map[FieldID,List[Renderer[_]]] = Map.empty
+  def defaultRenderers:Map[FieldID,List[Renderer[_]]] = Map.empty
 
   override def initialise() {
     localeProperty.bind(context.cache(BrowserCacheKey.LocaleKey))
@@ -27,8 +26,8 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
     doingSetup = true
     requestTableStateProperty.set(pageData.tableData.tableState)
     tableDataProperty.set(pageData.tableData)
-    val allDefaultRenderers:Map[FieldID,Renderer[_]] = Renderer.StandardRenderers ++ defaultRenderers
-    renderersProperty.setValue(new Renderers(allDefaultRenderers, additionalRenderers))
+    val allDefaultRenderers:Map[FieldID,List[Renderer[_]]] = Renderer.StandardRenderers ++ defaultRenderers
+    renderersProperty.setValue(new Renderers(allDefaultRenderers))
 
     val fieldBindingsToAdd:Map[FieldID,StringBinding] = pageData.tableData.fieldGroup.fields.map(field => {
       val fieldID = field.id
@@ -49,7 +48,9 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
 
   requestTableStateProperty.addListener(new ChangeListener[TableState] {
     def changed(observable:ObservableValue[_<:TableState], oldValue:TableState, newValue:TableState) {
-      if (!doingSetup) {context.goToPage(page.withTableState(newValue.generateFieldKeys))}
+      if (!doingSetup && (oldValue.withDefaultRendererIds != newValue.withDefaultRendererIds)) {
+        context.goToPage(page.withTableState(newValue.generateFieldKeys))
+      }
     }
   })
 
@@ -57,5 +58,4 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
 }
 
 class StandardTablePageComponent(override val nameId:String,
-                                 override val defaultRenderers:Map[FieldID,Renderer[_]],
-                                 override val additionalRenderers:Map[FieldID,List[Renderer[_]]]) extends TablePageComponent
+                                 override val defaultRenderers:Map[FieldID,List[Renderer[_]]]) extends TablePageComponent

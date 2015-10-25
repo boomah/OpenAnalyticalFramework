@@ -32,6 +32,9 @@ case class ColumnHeaderLayout(columnHeaderTrees:List[ColumnHeaderTree]) {
   private[api] def generateFieldKeys(keyIterator:Iterator[Int]):ColumnHeaderLayout = {
     copy(columnHeaderTrees = columnHeaderTrees.map(_.generateFieldKeys(keyIterator)))
   }
+  def withDefaultRendererIds:ColumnHeaderLayout = {
+    copy(columnHeaderTrees = columnHeaderTrees.map(_.withDefaultRendererIds))
+  }
 }
 
 object ColumnHeaderLayout {

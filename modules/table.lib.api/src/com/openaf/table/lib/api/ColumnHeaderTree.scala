@@ -78,6 +78,15 @@ case class ColumnHeaderTree(columnHeaderTreeType:ColumnHeaderTreeType,
     val newChildColumnHeaderLayout = childColumnHeaderLayout.generateFieldKeys(keyIterator)
     copy(columnHeaderTreeType = newColumnHeaderTreeType, childColumnHeaderLayout = newChildColumnHeaderLayout)
   }
+
+  def withDefaultRendererIds:ColumnHeaderTree = {
+    val newColumnHeaderTreeType:ColumnHeaderTreeType = columnHeaderTreeType match {
+      case Left(field) => Left(field.withDefaultRendererId)
+      case Right(columnHeaderLayout) => Right(columnHeaderLayout.withDefaultRendererIds)
+    }
+    val newChildColumnHeaderLayout = childColumnHeaderLayout.withDefaultRendererIds
+    copy(columnHeaderTreeType = newColumnHeaderTreeType, childColumnHeaderLayout = newChildColumnHeaderLayout)
+  }
 }
 
 object ColumnHeaderTree {

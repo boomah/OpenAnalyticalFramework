@@ -76,24 +76,28 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
     val renderers = renderersValue.renderers(field.id)
     if (renderers.nonEmpty) {
       val toggleGroup = new ToggleGroup
-      val menuItems = new SeparatorMenuItem :: renderers.map(renderer => {
+      val menuItems = new SeparatorMenuItem :: renderers.zipWithIndex.map{case (renderer,index) => {
         val rendererMenuItem = new RadioMenuItem
         rendererMenuItem.textProperty.bind(rendererBinding(renderer))
         rendererMenuItem.setUserData(renderer)
         toggleGroup.getToggles.add(rendererMenuItem)
-        if (renderersValue.selectedRenderer(field) == renderer) {
+        if (field.rendererId == renderer.id || (field.rendererId == RendererId.DefaultRendererId && index == 0)) {
           toggleGroup.selectToggle(rendererMenuItem)
         }
         rendererMenuItem.selectedProperty.addListener(new ChangeListener[Boolean] {
           def changed(observable:ObservableValue[_<:Boolean], oldValue:Boolean, newValue:Boolean):Unit = {
             if (newValue) {
-              tableFields.renderersProperty.setValue(renderersValue.updateSelectedRenderer(field, renderer))
+              val newField = field.withRendererId(renderer.id)
+              val newTableState = tableFields.requestTableStateProperty.getValue.replaceField(field, newField)
+              tableFields.requestTableStateProperty.setValue(newTableState)
+              val newTableData = tableFields.tableDataProperty.getValue.replaceField(field, newField)
+              tableFields.tableDataProperty.setValue(newTableData)
             }
           }
         })
 
         rendererMenuItem
-      })
+      }}
       getItems.addAll(menuItems.toArray:_*)
     }
   }

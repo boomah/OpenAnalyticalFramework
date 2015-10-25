@@ -2,11 +2,16 @@ package com.openaf.table.lib.api
 
 case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:TableValues) {
   def withTableState(newTableState:TableState) = copy(tableState = newTableState)
+  def withTableValues(newTableValues:TableValues) = copy(tableValues = newTableValues)
   def rowHeaderFields = tableState.rowHeaderFields
   def columnHeaderLayout = tableState.columnHeaderLayout
-  def replaceField(oldField:Field[_], newField:Field[_]) = withTableState(tableState.replaceField(oldField, newField))
+  def replaceField(oldField:Field[_], newField:Field[_]) = {
+    withTableState(tableState.replaceField(oldField, newField))
+      .withTableValues(tableValues.replaceField(oldField, newField))
+  }
   def generateFieldKeys = withTableState(tableState.generateFieldKeys)
   def numRows = tableValues.numRows
+  def withDefaultRendererIds = withTableState(tableState.withDefaultRendererIds)
 }
 object TableData {
   val Empty = TableData(FieldGroup.Empty, TableState.Blank, TableValues.Empty)
@@ -22,6 +27,7 @@ class OpenAFTableRow(val row:Int, val rowHeaderValues:Array[Int], val columnHead
 case class TableValues(rows:Array[OpenAFTableRow], fieldPathsIndexes:Array[Int], fieldValues:FieldValues,
                        valueLookUp:Map[FieldID,Array[Any]]) {
   def numRows = rows.length
+  def replaceField(oldField:Field[_], newField:Field[_]) = copy(fieldValues = fieldValues.replaceField(oldField, newField))
 }
 
 object TableValues {
@@ -33,7 +39,12 @@ object TableValues {
   val TotalBottomInt = -3
 }
 
-case class FieldValues(values:Map[Field[_],Array[Int]])
+case class FieldValues(values:Map[Field[_],Array[Int]]) {
+  def replaceField(oldField:Field[_], newField:Field[_]) = {
+    val newValues = values.map{case (field,valuesArray) => if (field == oldField) newField -> valuesArray else field -> valuesArray}
+    copy(values = newValues.toMap)
+  }
+}
 
 object FieldValues {
   val Empty = FieldValues(Map.empty)

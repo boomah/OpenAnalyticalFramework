@@ -16,14 +16,11 @@ class TestDataBundleActivator extends TableBundleActivator {
 object TestDataTableApplication extends TableApplication {
   override def nameId = NameId
   override def defaultRenderers = Map(
-    IdField.id -> IntRenderer,
-    PersonField.id -> StringWrapperRenderer
-  )
-  override def additionalRenderers = Map(
-    IdField.id -> List(FormattedIntRenderer())
+    IdField.id -> List(IntRenderer, FormattedIntRenderer()),
+    PersonField.id -> List(StringWrapperRenderer)
   )
   override def componentFactoryMap = Map(
-    classOf[TestDataPage].getName -> new TablePageComponentFactory(nameId, defaultRenderers, additionalRenderers)
+    classOf[TestDataPage].getName -> new TablePageComponentFactory(nameId, defaultRenderers)
   )
   override def applicationButtons(context:BrowserContext) = {
     List(BrowserActionButton(nameId, TestDataPageFactory))

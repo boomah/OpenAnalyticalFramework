@@ -39,6 +39,12 @@ case class TableLayout(rowHeaderFields:List[Field[_]], columnHeaderLayout:Column
     withRowHeaderFields(newRowHeaderFields).withColumnHeaderLayout(newColumnHeaderLayout).withFilterFields(newFilterFields)
   }
   def isColumnHeaderField(field:Field[_]) = columnHeaderLayout.allFields.contains(field)
+  def withDefaultRendererIds = {
+    val newRowHeaderFields = rowHeaderFields.map(_.withDefaultRendererId)
+    val newColumnHeaderLayout = columnHeaderLayout.withDefaultRendererIds
+    val newFilterFields = filterFields.map(_.withDefaultRendererId)
+    withRowHeaderFields(newRowHeaderFields).withColumnHeaderLayout(newColumnHeaderLayout).withFilterFields(newFilterFields)
+  }
 }
 
 object TableLayout {

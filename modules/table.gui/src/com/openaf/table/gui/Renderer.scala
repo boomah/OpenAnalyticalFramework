@@ -2,11 +2,12 @@ package com.openaf.table.gui
 
 import java.util.Locale
 
-import com.openaf.table.lib.api.{Field, NoValue, MutInt, FieldID}
+import com.openaf.table.lib.api._
 import com.openaf.table.lib.api.StandardFields._
 
 trait Renderer[V] {
-  def id:String = {
+  def id:RendererId.RendererId = getClass.getName
+  def name:String = {
     val className = getClass.getSimpleName.replace("$", "")
     if (className.length > 1) className.head.toLower + className.tail else className.toLowerCase
   }
@@ -19,6 +20,7 @@ case object BlankRenderer extends Renderer[Any] {
 
 case class NoValueAwareDelegatingRenderer[V](renderer:Renderer[V]) extends Renderer[Any] {
   override def id = renderer.id
+  override def name = renderer.name
   def render(value:Any, locale:Locale) = if (value == NoValue) "" else renderer.render(value.asInstanceOf[V], locale)
 }
 
@@ -47,6 +49,7 @@ case object MutIntRenderer extends Renderer[MutInt] {
 }
 
 case object DefaultRenderer extends Renderer[Any] {
+  override def id = RendererId.DefaultRendererId
   override def render(value:Any, locale:Locale) = {
     if (value == null) {
       "null value - should never happen"
@@ -65,26 +68,22 @@ object MSetRenderer {
 }
 
 object Renderer {
-  val StandardRenderers:Map[FieldID,Renderer[_]] = Map(
-    CountField.id -> MutIntRenderer
+  val StandardRenderers:Map[FieldID,List[Renderer[_]]] = Map(
+    CountField.id -> List(MutIntRenderer)
   )
 }
 
-class Renderers(defaultRenderers:Map[FieldID,Renderer[_]], additionalRenderers:Map[FieldID,List[Renderer[_]]]=Map.empty,
-                selectedRenderers:Map[Field[_],Renderer[_]]=Map.empty) {
-  def renderer(field:Field[_]):Renderer[_] = NoValueAwareDelegatingRenderer(selectedRenderer(field))
-
-  def selectedRenderer(field:Field[_]):Renderer[_] = {
-    selectedRenderers.getOrElse(field, defaultRenderers.getOrElse(field.id, DefaultRenderer))
+class Renderers(renderers:Map[FieldID,List[Renderer[_]]]=Map.empty) {
+  private val idToRenderers:Map[RendererId.RendererId,Renderer[_]] = renderers.flatMap{case (_,rendererList) =>
+      rendererList.map(renderer => renderer.id -> renderer)
+  }.toMap
+  def renderer(field:Field[_]):Renderer[_] = {
+    val selectedRenderer = if (field.rendererId == RendererId.DefaultRendererId) {
+      renderers.get(field.id).flatMap(_.headOption).getOrElse(DefaultRenderer)
+    } else {
+      idToRenderers.getOrElse(field.rendererId, DefaultRenderer)
+    }
+    NoValueAwareDelegatingRenderer(selectedRenderer)
   }
-
-  def updateSelectedRenderer(field:Field[_], renderer:Renderer[_]):Renderers = {
-    require(renderers(field.id).contains(renderer))
-    val updatedSelectedRenderers = selectedRenderers + (field -> renderer)
-    new Renderers(defaultRenderers, additionalRenderers, updatedSelectedRenderers)
-  }
-
-  def renderers(fieldId:FieldID):List[Renderer[_]] = {
-    (defaultRenderers.get(fieldId) ++ additionalRenderers.getOrElse(fieldId, Nil)).toList
-  }
+  def renderers(fieldId:FieldID):List[Renderer[_]] = renderers.getOrElse(fieldId, Nil)
 }

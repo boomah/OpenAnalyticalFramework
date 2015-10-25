@@ -3,13 +3,16 @@ package com.openaf.table.lib.api
 import SortOrder._
 
 case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=RetainAllFilter[T](),
-                    sortOrder:SortOrder=Ascending, totals:Totals=Totals.Default, key:FieldKey=NoFieldKey) {
+                    sortOrder:SortOrder=Ascending, totals:Totals=Totals.Default, key:FieldKey=NoFieldKey,
+                    rendererId:RendererId.RendererId=RendererId.DefaultRendererId) {
   def totalTextID = "total"
   def withSingleFilter(value:T) = copy(filter = RetainFilter[T](Set(value)))
   def withFilter(filter:Filter[T]) = copy(filter = filter)
   def flipSortOrder = copy(sortOrder = if (sortOrder == Ascending) Descending else Ascending)
   def withTotals(totals:Totals) = copy(totals = totals)
   def withKey(key:FieldKey) = copy(key = key)
+  def withRendererId(id:RendererId.RendererId) = copy(rendererId = id)
+  def withDefaultRendererId = copy(rendererId = RendererId.DefaultRendererId)
 //  override def toString = id.id
 }
 
@@ -48,3 +51,8 @@ case object NoFieldKey extends FieldKey {def number = 0}
 case class RowHeaderFieldKey(number:Int) extends FieldKey
 case class ColumnHeaderFieldKey(number:Int) extends FieldKey
 case class FilterFieldKey(number:Int) extends FieldKey
+
+object RendererId {
+  type RendererId = String
+  val DefaultRendererId:RendererId = "com.openaf.table.gui.DefaultRenderer"
+}

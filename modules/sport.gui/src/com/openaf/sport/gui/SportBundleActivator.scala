@@ -33,13 +33,13 @@ object GoalsPageFactory extends PageFactory {
 
 object SportRenderers {
   val DefaultRenderers = Map(
-    PlayerField.id -> StringRenderer,
-    TimeField.id -> IntRenderer,
-    TeamField.id -> StringRenderer,
-    OppositionTeamField.id -> StringRenderer,
-    VenueField.id -> StringRenderer,
-    DateField.id -> StringRenderer,
-    KickOffTimeField.id -> StringRenderer,
-    CompetitionField.id -> StringRenderer
+    PlayerField.id -> List(StringRenderer),
+    TimeField.id -> List(IntRenderer),
+    TeamField.id -> List(StringRenderer),
+    OppositionTeamField.id -> List(StringRenderer),
+    VenueField.id -> List(StringRenderer),
+    DateField.id -> List(StringRenderer),
+    KickOffTimeField.id -> List(StringRenderer),
+    CompetitionField.id -> List(StringRenderer)
   )
 }

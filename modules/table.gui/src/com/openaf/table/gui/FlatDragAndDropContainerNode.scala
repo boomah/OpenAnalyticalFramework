@@ -73,8 +73,8 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
       val childrenToUse = if (internalDrag) {
         mainContent.getChildren.toArray.filterNot(_ == draggableFieldsInfo.draggable)
       } else {
-        mainContent.getChildren
-      }.toArray
+        mainContent.getChildren.toArray
+      }
       generateFields(childrenToUse)
     } else {
       draggableFieldsInfo.fields ::: currentFields

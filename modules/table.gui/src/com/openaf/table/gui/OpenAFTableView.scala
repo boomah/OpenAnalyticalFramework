@@ -37,11 +37,18 @@ class OpenAFTableView(tableFields:OpenAFTableFields) extends TableView[OpenAFTab
 
   tableFields.tableDataProperty.addListener(new ChangeListener[TableData] {
     def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
-      setUpTableView(Option(oldTableData), newTableData)
+      Option(oldTableData) match {
+        case Some(tableData) if tableData.withDefaultRendererIds != newTableData.withDefaultRendererIds =>
+          setUpTableView(newTableData)
+        case None => setUpTableView(newTableData)
+        case _ =>
+          // TODO - don't need to set up the whole table here as only a renderer has changed.
+          setUpTableView(newTableData)
+      }
     }
   })
 
-  private def setUpTableView(oldTableDataOption:Option[TableData], newTableData:TableData) {
+  private def setUpTableView(newTableData:TableData) {
     if (newTableData.rowHeaderFields.isEmpty && newTableData.columnHeaderLayout.isEmpty) {
       setItems(null)
       getColumns.clear()
