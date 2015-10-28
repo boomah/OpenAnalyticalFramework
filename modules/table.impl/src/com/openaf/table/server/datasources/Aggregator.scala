@@ -1,6 +1,6 @@
 package com.openaf.table.server.datasources
 
-import com.openaf.table.lib.api.{Combiner, NoValue}
+import com.openaf.table.lib.api.{CombinerType, Combiner, NoValue}
 import com.openaf.table.server.FieldDefinition
 
 /**
@@ -55,7 +55,8 @@ class Aggregator(rowHeaderWidth:Int) {
     }
   }
 
-  final def combine(value:Any, fieldDefinition:FieldDefinition, rowHeaders:Array[Int], columnHeaders:Array[Int]):Unit = {
+  final def combine(value:Any, fieldDefinition:FieldDefinition, combinerType:CombinerType, rowHeaders:Array[Int],
+                    columnHeaders:Array[Int]):Unit = {
     var index = hash(rowHeaders, columnHeaders) & tableLengthM1
     var rowHeaderEntry = rowHeaderTable(index)
     while (rowHeaderEntry ne null) {
@@ -71,7 +72,7 @@ class Aggregator(rowHeaderWidth:Int) {
     // Data not found.
     rowHeaderTable(index) = rowHeaders
     columnHeaderTable(index) = columnHeaders
-    val combiner = fieldDefinition.combiner
+    val combiner = fieldDefinition.combinerFromType(combinerType)
     combiner.combine(value.asInstanceOf[fieldDefinition.V])
     combinerTable(index) = combiner
 

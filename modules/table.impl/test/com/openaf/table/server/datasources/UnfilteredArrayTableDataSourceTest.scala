@@ -374,4 +374,49 @@ class UnfilteredArrayTableDataSourceTest extends FunSuite {
 
     check(tableState, Set.empty, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
   }
+
+  test("1 row, 1 measure, 0 column") {
+    val tableState = TableState.Blank.withRowHeaderFields(List(GenderField))
+      .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
+
+    val expectedRowHeaderValues = Set(List(1), List(2))
+    val ch = List(0,0)
+    val expectedColHeaders = Set(List(0,0))
+    val expectedData = Map(
+      p(1)(ch) -> 180,
+      p(2)(ch) -> 245
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      ScoreField.id -> List(ScoreField.id)
+    )
+    val expectedFieldValues = genderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
+
+    check(tableState, expectedRowHeaderValues, expectedColHeaders, expectedData, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("1 row, 1 measure, 0 column, average") {
+    val scoreField = ScoreField.withKey(ColumnHeaderFieldKey(0)).withCombinerType(Average)
+    val tableState = TableState.Blank.withRowHeaderFields(List(GenderField))
+      .withColumnHeaderLayout(ColumnHeaderLayout(scoreField))
+
+    val expectedRowHeaderValues = Set(List(1), List(2))
+    val ch = List(0,0)
+    val expectedColHeaders = Set(List(0,0))
+    val expectedData = Map(
+      p(1)(ch) -> 60,
+      p(2)(ch) -> 81
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      ScoreField.id -> List(scoreField.id)
+    )
+    val expectedFieldValues = genderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
+      scoreFieldValues(scoreField)
+
+    check(tableState, expectedRowHeaderValues, expectedColHeaders, expectedData, expectedFieldValues, expectedValueLookUp)
+  }
+
+  // TODO - add another test that checks Average with filters
 }

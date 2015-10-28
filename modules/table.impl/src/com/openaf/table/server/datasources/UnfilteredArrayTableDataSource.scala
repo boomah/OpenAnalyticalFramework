@@ -67,23 +67,24 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     val rowHeaders = new IntArraySet
     val rowHeaderValueCounters = rowHeaderFieldIDs.map(fieldIDToValueCounter).toArray
 
-    val columnHeaderFieldPaths = tableState.tableLayout.columnHeaderLayout.paths
+    val columnHeaderFieldPaths = tableState.tableLayout.columnHeaderLayout.paths.toArray
     val numPaths = columnHeaderFieldPaths.length
     var pathsCounter = 0
-    val numColumnHeaderRowsPerPath = columnHeaderFieldPaths.map(_.fields.length).toArray
+    val numColumnHeaderRowsPerPath = columnHeaderFieldPaths.map(_.fields.length)
     var numColumnHeaderRows = -1
     var colHeaderRowCounter = 0
-    val colHeaderFieldsPositions = columnHeaderFieldPaths.map(_.fields.map(field => fieldIDs.indexOf(field.id)).toArray).toArray
+    val colHeaderFieldsPositions = columnHeaderFieldPaths.map(_.fields.map(field => fieldIDs.indexOf(field.id)).toArray)
 
     val aggregator = new Aggregator(numRowHeaderCols)
     val columnHeaders = new IntArraySet
 
     val columnHeaderValueCountersForPath:Array[Array[DistinctValueCounter]] = columnHeaderFieldPaths.map(path =>
       path.fields.map(field => fieldIDToValueCounter(field.id)).toArray
-    ).toArray
+    )
 
-    val columnHeaderMeasureFieldPositions = columnHeaderFieldPaths.map(_.measureFieldIndex).toArray
+    val columnHeaderMeasureFieldPositions = columnHeaderFieldPaths.map(_.measureFieldIndex)
     val columnHeaderPathsMeasureOptions = columnHeaderFieldPaths.map(_.measureFieldOption)
+    val columnHeaderPathsCombinerTypes = columnHeaderPathsMeasureOptions.map(_.getOrElse(Field.Null).combinerType)
     val countFieldPosition = -2
     val measureFieldPositions = columnHeaderPathsMeasureOptions.map{
       case Some(field) =>
@@ -102,7 +103,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
       case Some(field) => fieldDefinitionGroup.fieldDefinition(field.id)
       case _ => NullFieldDefinition
     }
-    val columnHeaderPathsFields = columnHeaderFieldPaths.map(_.fields.toArray).toArray
+    val columnHeaderPathsFields = columnHeaderFieldPaths.map(_.fields.toArray)
     val columnHeaderPathsFieldDefinitions = columnHeaderPathsFields.map(_.map(field => {
       fieldDefinitionGroup.fieldDefinition(field.id)
     }))
@@ -267,24 +268,25 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
               value = IntegerCombiner.One
             }
 
+            val combinerType = columnHeaderPathsCombinerTypes(pathsCounter)
             val fieldDefinition = measureFieldDefinitions(pathsCounter)
             if (!rowHeaderCollapsed && !columnHeaderCollapsed) {
-              aggregator.combine(value, fieldDefinition, rowHeaderValues, colHeaderValues)
+              aggregator.combine(value, fieldDefinition, combinerType, rowHeaderValues, colHeaderValues)
             }
 
             rowTotalsCounter = 0
             while (rowTotalsCounter < numRowTotals) {
-              aggregator.combine(value, fieldDefinition, rowTotals(rowTotalsCounter), colHeaderValues)
+              aggregator.combine(value, fieldDefinition, combinerType, rowTotals(rowTotalsCounter), colHeaderValues)
               rowTotalsCounter += 1
             }
 
             columnTotalsCounter = 0
             while (columnTotalsCounter < numColumnTotals) {
-              aggregator.combine(value, fieldDefinition, rowHeaderValues, columnTotals(columnTotalsCounter))
+              aggregator.combine(value, fieldDefinition, combinerType, rowHeaderValues, columnTotals(columnTotalsCounter))
 
               rowTotalsCounter = 0
               while (rowTotalsCounter < numRowTotals) {
-                aggregator.combine(value, fieldDefinition, rowTotals(rowTotalsCounter), columnTotals(columnTotalsCounter))
+                aggregator.combine(value, fieldDefinition, combinerType, rowTotals(rowTotalsCounter), columnTotals(columnTotalsCounter))
                 rowTotalsCounter += 1
               }
 

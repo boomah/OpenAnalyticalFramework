@@ -10,7 +10,23 @@ trait FieldDefinition {
   def fieldID = defaultField.id
   def primaryKey:Boolean
   def ordering:Ordering[V]
+
+  /**
+   * Must always return a new Combiner here.
+   */
   def combiner:Combiner[C,V]
+
+  /**
+   * Returns the combiner appropriate for the supplied CombinerType. Ideally this could be done with just the Combiner
+   * using Numeric for primitive types but implementers should override it and provide their own Combiners for
+   * performance reasons.
+   */
+  def combinerFromType(combinerType:CombinerType):Combiner[C,V] = {
+    combinerType match {
+      case Sum => combiner
+      case other => throw new IllegalStateException(s"No Combiner specified for $other")
+    }
+  }
 }
 
 case object NullFieldDefinition extends FieldDefinition {
@@ -52,6 +68,12 @@ class IntFieldDefinition(val defaultField:Field[Int]) extends FieldDefinition {
   val primaryKey = false
   val ordering = IntOrdering
   def combiner = new IntCombiner
+  override def combinerFromType(combinerType:CombinerType) = {
+    combinerType match {
+      case Sum => combiner
+      case Average => new AverageIntCombiner
+    }
+  }
 }
 
 object IntFieldDefinition {
@@ -64,5 +86,11 @@ class IncrementingFieldDefinition(val defaultField:Field[Integer]) extends Field
   val primaryKey = false
   val ordering = IntegerOrdering
   def combiner = new IntegerCombiner
+  override def combinerFromType(combinerType:CombinerType) = {
+    combinerType match {
+      case Sum => combiner
+      case Average => new AverageIntegerCombiner
+    }
+  }
 }
 

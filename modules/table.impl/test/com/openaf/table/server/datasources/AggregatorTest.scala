@@ -1,6 +1,6 @@
 package com.openaf.table.server.datasources
 
-import com.openaf.table.lib.api.{Combiner, Field}
+import com.openaf.table.lib.api.{Average, Sum, Combiner, Field}
 import com.openaf.table.server.IntFieldDefinition
 import org.scalatest.FunSuite
 
@@ -26,7 +26,7 @@ class AggregatorTest extends FunSuite {
 
     keys.foreach{case (row,column) =>
       val value = random.nextInt(1000)
-      aggregator.combine(value, fieldDefinition, row, column)
+      aggregator.combine(value, fieldDefinition, Sum, row, column)
 
       val mapKey = (row.toList, column.toList)
       map.get(mapKey) match {
@@ -40,7 +40,7 @@ class AggregatorTest extends FunSuite {
 
     keys.reverse.foreach{case (row,column) =>
       val value = random.nextInt(2000)
-      aggregator.combine(value, fieldDefinition, row, column)
+      aggregator.combine(value, fieldDefinition, Sum, row, column)
 
       val mapKey = (row.toList, column.toList)
       map.get(mapKey) match {
@@ -54,5 +54,19 @@ class AggregatorTest extends FunSuite {
 
     val result = keys.forall{case (row,column) => aggregator(row,column) == map((row.toList,column.toList)).value}
     assert(result, "Aggregator not matching a standard map")
+  }
+
+  test("Average aggregation") {
+    val rowKey = Array(0,1,2)
+    val columnKey = Array(0,1,2)
+    val aggregator = new Aggregator(rowKey.length)
+    val fieldDefinition = new IntFieldDefinition(Field[Int]("count"))
+
+    aggregator.combine(1, fieldDefinition, Average, rowKey, columnKey)
+    aggregator.combine(5, fieldDefinition, Average, rowKey, columnKey)
+    aggregator.combine(8, fieldDefinition, Average, rowKey, columnKey)
+    aggregator.combine(9, fieldDefinition, Average, rowKey, columnKey)
+
+    assert(aggregator(rowKey, columnKey) === 5, "Aggregator not averaging properly")
   }
 }

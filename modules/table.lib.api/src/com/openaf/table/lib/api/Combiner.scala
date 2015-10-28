@@ -8,7 +8,7 @@ trait Combiner[C,V] {
 }
 
 case object NullCombiner extends Combiner[Null,Null] {
-  override def combine(value:Null):Unit = {}
+  override def combine(value:Null) = {}
   override def value = null
 }
 
@@ -42,7 +42,6 @@ object IntegerCombiner {
 
 sealed trait CombinerType {
   def nameId:String
-  def combiner(combiner:Combiner[Int,Int]):Combiner[_,Int]
 }
 
 object CombinerType {
@@ -50,21 +49,29 @@ object CombinerType {
 }
 
 case object Sum extends CombinerType {
-  override def nameId = "combiner.sum"
-  override def combiner(combiner:Combiner[Int,Int]) = combiner
+  override val nameId = "combiner.sum"
 }
 
 case object Average extends CombinerType {
-  override def nameId = "combiner.average"
-  override def combiner(combiner:Combiner[Int,Int]) = new IntAverageCombiner
+  override val nameId = "combiner.average"
 }
 
-class IntAverageCombiner extends Combiner[Int,Int] {
+class AverageIntCombiner extends Combiner[Int,Int] {
   private var counter = 0
   private var runningSum = 0
   override def combine(value:Int) = {
     counter += 1
     runningSum += value
+  }
+  override def value = runningSum / counter
+}
+
+class AverageIntegerCombiner extends Combiner[Int,Integer] {
+  private var counter = 0
+  private var runningSum = 0
+  def combine(value:Integer) = {
+    counter += 1
+    runningSum += value.intValue
   }
   override def value = runningSum / counter
 }
