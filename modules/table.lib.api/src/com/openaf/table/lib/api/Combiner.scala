@@ -1,52 +1,42 @@
 package com.openaf.table.lib.api
 
-import collection.mutable.{Set => MSet}
 import collection.mutable
 
 trait Combiner[C,V] {
-  def initialCombinedValue:C
-  def combine(combinedValue:C, value:V):C
-
-  /**
-   * Indicates whether this combiner does mutable combines. A combiner would do this for performance reasons.
-   */
-  def isMutable:Boolean = false
+  def combine(value:V):Unit
+  def value:C
 }
 
 case object NullCombiner extends Combiner[Null,Null] {
-  def initialCombinedValue = null
-  def combine(combinedValue:Null, value:Null) = null
+  override def combine(value:Null):Unit = {}
+  override def value = null
 }
 
-case object AnyCombiner extends Combiner[MSet[Any],Any] {
-  def initialCombinedValue = new mutable.HashSet[Any]
-  def combine(combinedValue:MSet[Any], value:Any) = {
-    combinedValue.add(value)
-    combinedValue
-  }
+class AnyCombiner extends Combiner[Set[Any],Any] {
+  private val set = new mutable.HashSet[Any]
+  override def combine(value:Any) = {set.add(value)}
+  override def value = set.toSet
 }
 
-case object StringCombiner extends Combiner[MSet[String],String] {
-  def initialCombinedValue = new mutable.HashSet[String]
-  def combine(combinedValue:MSet[String], value:String) = {
-    combinedValue += value
-    combinedValue
-  }
+class StringCombiner extends Combiner[Set[String],String] {
+  private val set = new mutable.HashSet[String]
+  override def combine(value:String) = {set += value}
+  override def value = set.toSet
 }
 
-case object IntCombiner extends Combiner[Int,Int] {
-  def initialCombinedValue = 0
-  def combine(combinedValue:Int, value:Int) = combinedValue + value
+class IntCombiner extends Combiner[Int,Int] {
+  private var count = 0
+  override def combine(value:Int) = {count += value}
+  override def value = count
 }
 
-case object MutIntCombiner extends Combiner[MutInt,Integer] {
-  def initialCombinedValue = new MutInt(0)
-  def combine(combinedValue:MutInt, value:Integer) = {
-    combinedValue.value += value.intValue
-    combinedValue
-  }
-  override def isMutable = true
+class IntegerCombiner extends Combiner[Int,Integer] {
+  private var count = 0
+  def combine(value:Integer) = {count += value.intValue}
+  override def value = count
+}
 
+object IntegerCombiner {
   val One = new Integer(1)
 }
 
@@ -66,17 +56,15 @@ case object Sum extends CombinerType {
 
 case object Average extends CombinerType {
   override def nameId = "combiner.average"
-  override def combiner(combiner:Combiner[Int,Int]) = AverageCombiner(combiner)
+  override def combiner(combiner:Combiner[Int,Int]) = new IntAverageCombiner
 }
 
-case class AverageCombiner(combiner:Combiner[Int,Int]) extends Combiner[Double,Int] {
+class IntAverageCombiner extends Combiner[Int,Int] {
   private var counter = 0
   private var runningSum = 0
-  override def initialCombinedValue = 0.0
-  override def combine(combinedValue:Double, value:Int) = {
+  override def combine(value:Int) = {
     counter += 1
     runningSum += value
-    runningSum / counter
   }
-  override def isMutable = true
+  override def value = runningSum / counter
 }

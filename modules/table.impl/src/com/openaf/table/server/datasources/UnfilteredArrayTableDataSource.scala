@@ -264,7 +264,7 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
               value = dataRow(measureFieldPosition)
             } else if (measureFieldPosition == countFieldPosition) {
               // Count field
-              value = MutIntCombiner.One
+              value = IntegerCombiner.One
             }
 
             val fieldDefinition = measureFieldDefinitions(pathsCounter)

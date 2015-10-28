@@ -1,6 +1,6 @@
 package com.openaf.table.server.datasources
 
-import com.openaf.table.lib.api.Field
+import com.openaf.table.lib.api.{Combiner, Field}
 import com.openaf.table.server.IntFieldDefinition
 import org.scalatest.FunSuite
 
@@ -20,7 +20,7 @@ class AggregatorTest extends FunSuite {
       (rowArray, columnArray)
     }).toArray
 
-    val map = new mutable.HashMap[(List[Int],List[Int]),Int]
+    val map = new mutable.HashMap[(List[Int],List[Int]),Combiner[_,_]]
     val aggregator = new Aggregator(widthOfData)
     val fieldDefinition = new IntFieldDefinition(Field[Int]("count"))
 
@@ -29,12 +29,12 @@ class AggregatorTest extends FunSuite {
       aggregator.combine(value, fieldDefinition, row, column)
 
       val mapKey = (row.toList, column.toList)
-      val newValue = map.get(mapKey) match {
-        case Some(currentInt) => fieldDefinition.combiner.combine(currentInt, value)
-        case None => fieldDefinition.combiner.combine(fieldDefinition.combiner.initialCombinedValue, value)
-      }
-      if (!fieldDefinition.combiner.isMutable) {
-        map(mapKey) = newValue
+      map.get(mapKey) match {
+        case Some(combiner) => combiner.asInstanceOf[Combiner[Int,Int]].combine(value)
+        case None =>
+          val combiner = fieldDefinition.combiner
+          combiner.combine(value)
+          map(mapKey) = combiner
       }
     }
 
@@ -43,16 +43,16 @@ class AggregatorTest extends FunSuite {
       aggregator.combine(value, fieldDefinition, row, column)
 
       val mapKey = (row.toList, column.toList)
-      val newValue = map.get(mapKey) match {
-        case Some(currentInt) => fieldDefinition.combiner.combine(currentInt, value)
-        case None => fieldDefinition.combiner.combine(fieldDefinition.combiner.initialCombinedValue, value)
-      }
-      if (!fieldDefinition.combiner.isMutable) {
-        map(mapKey) = newValue
+      map.get(mapKey) match {
+        case Some(combiner) => combiner.asInstanceOf[Combiner[Int,Int]].combine(value)
+        case None =>
+          val combiner = fieldDefinition.combiner
+          combiner.combine(value)
+          map(mapKey) = combiner
       }
     }
 
-    val result = keys.forall{case (row,column) => aggregator(row,column) == map((row.toList,column.toList))}
+    val result = keys.forall{case (row,column) => aggregator(row,column) == map((row.toList,column.toList)).value}
     assert(result, "Aggregator not matching a standard map")
   }
 }

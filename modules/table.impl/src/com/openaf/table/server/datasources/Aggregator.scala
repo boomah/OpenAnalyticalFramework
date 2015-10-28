@@ -1,6 +1,6 @@
 package com.openaf.table.server.datasources
 
-import com.openaf.table.lib.api.NoValue
+import com.openaf.table.lib.api.{Combiner, NoValue}
 import com.openaf.table.server.FieldDefinition
 
 /**
@@ -13,7 +13,7 @@ class Aggregator(rowHeaderWidth:Int) {
   private var threshold = tableLength >> 2
   private var rowHeaderTable = new Array[Array[Int]](tableLength)
   private var columnHeaderTable = new Array[Array[Int]](tableLength)
-  private var valueTable = new Array[Any](tableLength)
+  private var combinerTable = new Array[Combiner[_,_]](tableLength)
   private var used = 0
   private val rowHeaderWidthM1 = rowHeaderWidth - 1
 
@@ -56,17 +56,12 @@ class Aggregator(rowHeaderWidth:Int) {
   }
 
   final def combine(value:Any, fieldDefinition:FieldDefinition, rowHeaders:Array[Int], columnHeaders:Array[Int]):Unit = {
-    val combiner = fieldDefinition.combiner
     var index = hash(rowHeaders, columnHeaders) & tableLengthM1
     var rowHeaderEntry = rowHeaderTable(index)
     while (rowHeaderEntry ne null) {
       if (rowArraysEqual(rowHeaderEntry, rowHeaders) && columnArraysEqual(columnHeaderTable(index), columnHeaders)) {
-        // Data already there, aggregate it.
-        val newDataValue = combiner.combine(
-          valueTable(index).asInstanceOf[fieldDefinition.C],
-          value.asInstanceOf[fieldDefinition.V]
-        )
-        if (!combiner.isMutable) {valueTable(index) = newDataValue}
+        // Combiner already there, so combine value with that.
+        combinerTable(index).asInstanceOf[Combiner[fieldDefinition.C,fieldDefinition.V]].combine(value.asInstanceOf[fieldDefinition.V])
         return
       }
       index = (index + 1) & tableLengthM1
@@ -76,14 +71,16 @@ class Aggregator(rowHeaderWidth:Int) {
     // Data not found.
     rowHeaderTable(index) = rowHeaders
     columnHeaderTable(index) = columnHeaders
-    valueTable(index) = combiner.combine(combiner.initialCombinedValue, value.asInstanceOf[fieldDefinition.V])
+    val combiner = fieldDefinition.combiner
+    combiner.combine(value.asInstanceOf[fieldDefinition.V])
+    combinerTable(index) = combiner
 
     used += 1
     if (used > threshold) growTable()
   }
 
   @inline private final def addExistingEntry(existingRowHeaderEntry:Array[Int],
-                                             existingColumnHeaderEntry:Array[Int], existingValue:Any):Unit = {
+                                             existingColumnHeaderEntry:Array[Int], existingCombiner:Combiner[_,_]):Unit = {
     var index = hash(existingRowHeaderEntry, existingColumnHeaderEntry) & tableLengthM1
     var rowHeaderEntry = rowHeaderTable(index)
     while (rowHeaderEntry ne null) {
@@ -92,13 +89,13 @@ class Aggregator(rowHeaderWidth:Int) {
     }
     rowHeaderTable(index) = existingRowHeaderEntry
     columnHeaderTable(index) = existingColumnHeaderEntry
-    valueTable(index) = existingValue
+    combinerTable(index) = existingCombiner
   }
 
   @inline private final def growTable():Unit = {
     val existingRowHeaderTable = rowHeaderTable
     val existingColumnHeaderTable = columnHeaderTable
-    val existingValueTable = valueTable
+    val existingValueTable = combinerTable
 
     tableLength = tableLength << 1
     tableLengthM1 = tableLength - 1
@@ -106,7 +103,7 @@ class Aggregator(rowHeaderWidth:Int) {
 
     rowHeaderTable = new Array[Array[Int]](tableLength)
     columnHeaderTable = new Array[Array[Int]](tableLength)
-    valueTable = new Array[Any](tableLength)
+    combinerTable = new Array[Combiner[_,_]](tableLength)
 
     var index = 0
     while (index < existingRowHeaderTable.length) {
@@ -132,7 +129,7 @@ class Aggregator(rowHeaderWidth:Int) {
         if (rowHeaderEntry eq null) return NoValue
         columnHeaderEntry = columnHeaderTable(index)
       }
-      valueTable(index)
+      combinerTable(index).value
     }
   }
 }

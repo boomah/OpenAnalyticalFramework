@@ -44,10 +44,6 @@ case object IntegerRenderer extends Renderer[Integer] {
   def render(value:Integer, locale:Locale) = value.toString
 }
 
-case object MutIntRenderer extends Renderer[MutInt] {
-  def render(value:MutInt, locale:Locale) = value.value.toString
-}
-
 case object DefaultRenderer extends Renderer[Any] {
   override def id = RendererId.DefaultRendererId
   override def render(value:Any, locale:Locale) = {
@@ -56,7 +52,6 @@ case object DefaultRenderer extends Renderer[Any] {
     } else {
       value match {
         case NoValue => ""
-        case mutInt:MutInt => MutIntRenderer.render(mutInt, locale)
         case other => other.toString
       }
     }
@@ -69,7 +64,7 @@ object MSetRenderer {
 
 object Renderer {
   val StandardRenderers:Map[FieldID,List[Renderer[_]]] = Map(
-    CountField.id -> List(MutIntRenderer)
+    CountField.id -> List(IntRenderer)
   )
 }
 

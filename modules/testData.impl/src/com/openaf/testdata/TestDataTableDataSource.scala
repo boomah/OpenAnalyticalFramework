@@ -7,7 +7,6 @@ import com.openaf.testdata.api.StringWrapper
 import com.openaf.testdata.api.TestDataTablePageDataFacility._
 
 import scala.collection.mutable
-import scala.collection.mutable.{Set => MSet}
 import scala.util.Random
 
 class TestDataTableDataSource extends UnfilteredArrayTableDataSource {
@@ -39,21 +38,19 @@ class TestDataTableDataSource extends UnfilteredArrayTableDataSource {
 
 case object StringWrapperFieldDefinition extends FieldDefinition {
   type V = StringWrapper
-  type C = MSet[StringWrapper]
-  def defaultField = PersonField
-  def primaryKey = false
-  def ordering = StringWrapperOrdering
-  def combiner = StringWrapperCombiner
+  type C = Set[StringWrapper]
+  val defaultField = PersonField
+  val primaryKey = false
+  val ordering = StringWrapperOrdering
+  def combiner = new StringWrapperCombiner
 }
 
 case object StringWrapperOrdering extends Ordering[StringWrapper] {
   def compare(stringWrapperX:StringWrapper, stringWrapperY:StringWrapper) = stringWrapperX.string.compareTo(stringWrapperY.string)
 }
 
-case object StringWrapperCombiner extends Combiner[MSet[StringWrapper],StringWrapper] {
-  def initialCombinedValue = new mutable.HashSet[StringWrapper]
-  def combine(combinedValue:MSet[StringWrapper], value:StringWrapper) = {
-    combinedValue += value
-    combinedValue
-  }
+class StringWrapperCombiner extends Combiner[Set[StringWrapper],StringWrapper] {
+  private val set = new mutable.HashSet[StringWrapper]
+  def combine(value:StringWrapper) = {set += value}
+  override def value = set.toSet
 }

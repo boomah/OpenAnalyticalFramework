@@ -2,7 +2,6 @@ package com.openaf.table.server
 
 import com.openaf.table.lib.api._
 import com.openaf.table.lib.api.Field
-import collection.mutable.{Set => MSet}
 
 trait FieldDefinition {
   type V
@@ -17,18 +16,18 @@ trait FieldDefinition {
 case object NullFieldDefinition extends FieldDefinition {
   type V = Null
   type C = Null
-  def defaultField = Field.Null
-  def primaryKey = false
-  def ordering = NullOrdering
-  def combiner = NullCombiner
+  val defaultField = Field.Null
+  val primaryKey = false
+  val ordering = NullOrdering
+  val combiner = NullCombiner
 }
 
 class AnyFieldDefinition(val defaultField:Field[Any]) extends FieldDefinition {
   type V = Any
-  type C = MSet[Any]
+  type C = Set[Any]
   val primaryKey = false
   val ordering = AnyOrdering
-  val combiner = AnyCombiner
+  def combiner = new AnyCombiner
 }
 
 object AnyFieldDefinition {
@@ -37,10 +36,10 @@ object AnyFieldDefinition {
 
 class StringFieldDefinition(val defaultField:Field[String]) extends FieldDefinition {
   type V = String
-  type C = MSet[String]
+  type C = Set[String]
   val primaryKey = false
   val ordering = StringOrdering
-  val combiner = StringCombiner
+  def combiner = new StringCombiner
 }
 
 object StringFieldDefinition {
@@ -50,9 +49,9 @@ object StringFieldDefinition {
 class IntFieldDefinition(val defaultField:Field[Int]) extends FieldDefinition {
   type V = Int
   type C = Int
-  def primaryKey = false
-  def ordering = IntOrdering
-  def combiner = IntCombiner
+  val primaryKey = false
+  val ordering = IntOrdering
+  def combiner = new IntCombiner
 }
 
 object IntFieldDefinition {
@@ -61,9 +60,9 @@ object IntFieldDefinition {
 
 class IncrementingFieldDefinition(val defaultField:Field[Integer]) extends FieldDefinition {
   type V = Integer
-  type C = MutInt
-  def primaryKey = false
-  def ordering = IntegerOrdering
-  def combiner = MutIntCombiner
+  type C = Int
+  val primaryKey = false
+  val ordering = IntegerOrdering
+  def combiner = new IntegerCombiner
 }
 

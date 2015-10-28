@@ -492,12 +492,12 @@ class TableDataGeneratorTest extends FunSuite {
 
     val expectedRows = List(
       row(0, List(FieldInt), List(FieldInt)),
-      row(1, List(6),        List(mInt(1) )),
-      row(2, List(3),        List(mInt(1) )),
-      row(3, List(2),        List(mInt(1) )),
-      row(4, List(4),        List(mInt(1) )),
-      row(5, List(5),        List(mInt(1) )),
-      row(6, List(1),        List(mInt(1) ))
+      row(1, List(6),        List(1)       ),
+      row(2, List(3),        List(1)       ),
+      row(3, List(2),        List(1)       ),
+      row(4, List(4),        List(1)       ),
+      row(5, List(5),        List(1)       ),
+      row(6, List(1),        List(1)       )
     )
     val expectedValueLookUp = Map(
       NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
@@ -516,8 +516,8 @@ class TableDataGeneratorTest extends FunSuite {
 
     val expectedRows = List(
       row(0, List(FieldInt), List(FieldInt)),
-      row(1, List(1),        List(mInt(3) )),
-      row(2, List(2),        List(mInt(3) ))
+      row(1, List(1),        List(3)       ),
+      row(2, List(2),        List(3)       )
     )
     val expectedValueLookUp = Map(
       GenderField.id -> List(GenderField.id, F, M),

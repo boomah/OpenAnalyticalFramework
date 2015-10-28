@@ -74,8 +74,6 @@ object DataSourceTestData {
     new OpenAFTableRow(rowIndex, rowHeaderValues.toArray, columnHeaderAndDataValues.toArray)
   }
 
-  def mInt(value:Int) = new MutInt(value)
-
   def p(rowHeaderValues:Int*)(columnHeaders:List[Int]) = (rowHeaderValues.toList, columnHeaders)
 
   def check(tableState:TableState, expectedRowHeaderValues:Set[List[Int]],
