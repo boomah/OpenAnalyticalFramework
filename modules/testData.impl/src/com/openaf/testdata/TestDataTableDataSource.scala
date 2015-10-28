@@ -12,7 +12,7 @@ import scala.util.Random
 
 class TestDataTableDataSource extends UnfilteredArrayTableDataSource {
   private val fieldDefinitions = List(
-    IntFieldDefinition(IdField), StringWrapperFieldDefinition
+    IntFieldDefinition(IdField), StringWrapperFieldDefinition, IntFieldDefinition(ScoreField)
   )
   private val fieldIds = fieldDefinitions.map(_.fieldID).toArray
   private val fieldDefinitionGroups = FieldDefinitionGroups(List(FieldDefinitionGroup.Standard,
@@ -21,13 +21,14 @@ class TestDataTableDataSource extends UnfilteredArrayTableDataSource {
   private val data:Array[Array[Any]] = {
     val rand = new Random(0)
     val num = 10
-    val people = Array("Nick", "Loz", "Josie")
+    val people = Array("Nick", "Loz", "Josie", "Rosie")
     val rows = new Array[Array[Any]](num)
     (0 until num).foreach(i => {
       val row = new Array[Any](fieldIds.length)
       rows(i) = row
       row(0) = i
       row(1) = StringWrapper(people(rand.nextInt(people.length)))
+      row(2) = rand.nextInt(500)
     })
 
     rows

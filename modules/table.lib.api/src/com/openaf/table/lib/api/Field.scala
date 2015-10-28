@@ -3,8 +3,8 @@ package com.openaf.table.lib.api
 import SortOrder._
 
 case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=RetainAllFilter[T](),
-                    sortOrder:SortOrder=Ascending, totals:Totals=Totals.Default, key:FieldKey=NoFieldKey,
-                    rendererId:RendererId.RendererId=RendererId.DefaultRendererId) {
+                    sortOrder:SortOrder=Ascending, totals:Totals=Totals.Default, combinerType:CombinerType=Sum,
+                    key:FieldKey=NoFieldKey, rendererId:RendererId.RendererId=RendererId.DefaultRendererId) {
   def totalTextID = "total"
   def withSingleFilter(value:T) = copy(filter = RetainFilter[T](Set(value)))
   def withFilter(filter:Filter[T]) = copy(filter = filter)
@@ -13,6 +13,7 @@ case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=
   def withKey(key:FieldKey) = copy(key = key)
   def withRendererId(id:RendererId.RendererId) = copy(rendererId = id)
   def withDefaultRendererId = copy(rendererId = RendererId.DefaultRendererId)
+  def withCombinerType(combinerType:CombinerType) = copy(combinerType = combinerType)
 //  override def toString = id.id
 }
 

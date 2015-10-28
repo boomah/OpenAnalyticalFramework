@@ -49,3 +49,34 @@ case object MutIntCombiner extends Combiner[MutInt,Integer] {
 
   val One = new Integer(1)
 }
+
+sealed trait CombinerType {
+  def nameId:String
+  def combiner(combiner:Combiner[Int,Int]):Combiner[_,Int]
+}
+
+object CombinerType {
+  val Types = List(Sum, Average)
+}
+
+case object Sum extends CombinerType {
+  override def nameId = "combiner.sum"
+  override def combiner(combiner:Combiner[Int,Int]) = combiner
+}
+
+case object Average extends CombinerType {
+  override def nameId = "combiner.average"
+  override def combiner(combiner:Combiner[Int,Int]) = AverageCombiner(combiner)
+}
+
+case class AverageCombiner(combiner:Combiner[Int,Int]) extends Combiner[Double,Int] {
+  private var counter = 0
+  private var runningSum = 0
+  override def initialCombinedValue = 0.0
+  override def combine(combinedValue:Double, value:Int) = {
+    counter += 1
+    runningSum += value
+    runningSum / counter
+  }
+  override def isMutable = true
+}

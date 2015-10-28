@@ -2,7 +2,7 @@ package com.openaf.testdata.gui
 
 import java.util.Locale
 
-import com.openaf.browser.gui.api.{PageFactory, PageComponentFactory, BrowserActionButton, BrowserContext}
+import com.openaf.browser.gui.api.{PageFactory, BrowserActionButton, BrowserContext}
 import com.openaf.table.gui.{Renderer, FormattedIntRenderer, IntRenderer}
 import com.openaf.table.gui.api.{TablePageComponentFactory, TableApplication, TableBundleActivator}
 import com.openaf.table.lib.api.TableState
@@ -17,7 +17,8 @@ object TestDataTableApplication extends TableApplication {
   override def nameId = NameId
   override def defaultRenderers = Map(
     IdField.id -> List(IntRenderer, FormattedIntRenderer()),
-    PersonField.id -> List(StringWrapperRenderer)
+    PersonField.id -> List(StringWrapperRenderer),
+    ScoreField.id -> List(IntRenderer)
   )
   override def componentFactoryMap = Map(
     classOf[TestDataPage].getName -> new TablePageComponentFactory(nameId, defaultRenderers)

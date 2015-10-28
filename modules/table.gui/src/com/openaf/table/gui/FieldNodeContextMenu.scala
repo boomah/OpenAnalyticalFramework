@@ -79,7 +79,6 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
       val menuItems = new SeparatorMenuItem :: renderers.zipWithIndex.map{case (renderer,index) => {
         val rendererMenuItem = new RadioMenuItem
         rendererMenuItem.textProperty.bind(rendererBinding(renderer))
-        rendererMenuItem.setUserData(renderer)
         toggleGroup.getToggles.add(rendererMenuItem)
         if (field.rendererId == renderer.id || (field.rendererId == RendererId.DefaultRendererId && index == 0)) {
           toggleGroup.selectToggle(rendererMenuItem)
@@ -98,6 +97,29 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
 
         rendererMenuItem
       }}
+      getItems.addAll(menuItems.toArray:_*)
+    }
+
+    if (field.fieldType.isMeasure) {
+      val toggleGroup = new ToggleGroup
+      val menuItems = new SeparatorMenuItem :: CombinerType.Types.map(combinerType => {
+        val combinerTypeMenuItem = new RadioMenuItem
+        combinerTypeMenuItem.textProperty.bind(stringBinding(combinerType.nameId))
+        toggleGroup.getToggles.add(combinerTypeMenuItem)
+        if (field.combinerType == combinerType) {
+          toggleGroup.selectToggle(combinerTypeMenuItem)
+        }
+        combinerTypeMenuItem.selectedProperty.addListener(new ChangeListener[Boolean] {
+          def changed(observable:ObservableValue[_ <: Boolean], oldValue:Boolean, newValue:Boolean):Unit = {
+            if (newValue) {
+              val newField = field.withCombinerType(combinerType)
+              val newTableState = tableState.replaceField(field, newField)
+              requestTableStateProperty.setValue(newTableState)
+            }
+          }
+        })
+        combinerTypeMenuItem
+      })
       getItems.addAll(menuItems.toArray:_*)
     }
   }
