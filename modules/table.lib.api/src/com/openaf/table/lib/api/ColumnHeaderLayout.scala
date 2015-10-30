@@ -33,7 +33,7 @@ case class ColumnHeaderLayout(columnHeaderTrees:List[ColumnHeaderTree]) {
     copy(columnHeaderTrees = columnHeaderTrees.map(_.generateFieldKeys(keyIterator)))
   }
   def withDefaultRendererIds:ColumnHeaderLayout = {
-    copy(columnHeaderTrees = columnHeaderTrees.map(_.withDefaultRendererIds))
+    copy(columnHeaderTrees = columnHeaderTrees.map(_.withDefaultFieldNodeStates))
   }
 }
 

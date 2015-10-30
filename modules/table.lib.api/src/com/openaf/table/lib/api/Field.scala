@@ -4,16 +4,18 @@ import SortOrder._
 
 case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=RetainAllFilter[T](),
                     sortOrder:SortOrder=Ascending, totals:Totals=Totals.Default, combinerType:CombinerType=Sum,
-                    key:FieldKey=NoFieldKey, rendererId:RendererId.RendererId=RendererId.DefaultRendererId) {
+                    key:FieldKey=NoFieldKey, fieldNodeState:FieldNodeState=FieldNodeState.Default) {
   def totalTextID = "total"
   def withSingleFilter(value:T) = copy(filter = RetainFilter[T](Set(value)))
   def withFilter(filter:Filter[T]) = copy(filter = filter)
   def flipSortOrder = copy(sortOrder = if (sortOrder == Ascending) Descending else Ascending)
   def withTotals(totals:Totals) = copy(totals = totals)
   def withKey(key:FieldKey) = copy(key = key)
-  def withRendererId(id:RendererId.RendererId) = copy(rendererId = id)
-  def withDefaultRendererId = copy(rendererId = RendererId.DefaultRendererId)
+  def withFieldNodeState(fieldNodeState:FieldNodeState) = copy(fieldNodeState = fieldNodeState)
+  def withRendererId(id:RendererId.RendererId) = withFieldNodeState(fieldNodeState.copy(rendererId = id))
+  def withDefaultFieldNodeState = copy(fieldNodeState = FieldNodeState.Default)
   def withCombinerType(combinerType:CombinerType) = copy(combinerType = combinerType)
+  def rendererId = fieldNodeState.rendererId
 //  override def toString = id.id
 }
 
@@ -56,4 +58,16 @@ case class FilterFieldKey(number:Int) extends FieldKey
 object RendererId {
   type RendererId = String
   val DefaultRendererId:RendererId = "com.openaf.table.gui.DefaultRenderer"
+}
+
+import RendererId._
+
+/**
+ * UI state that doesn't effect any data contained within the table. Therefore changing this state should only ever
+ * effect the display of the data.
+ */
+case class FieldNodeState(rendererId:RendererId= RendererId.DefaultRendererId)
+
+object FieldNodeState {
+  val Default = FieldNodeState()
 }

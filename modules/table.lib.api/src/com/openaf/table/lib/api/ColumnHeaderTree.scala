@@ -79,9 +79,9 @@ case class ColumnHeaderTree(columnHeaderTreeType:ColumnHeaderTreeType,
     copy(columnHeaderTreeType = newColumnHeaderTreeType, childColumnHeaderLayout = newChildColumnHeaderLayout)
   }
 
-  def withDefaultRendererIds:ColumnHeaderTree = {
+  def withDefaultFieldNodeStates:ColumnHeaderTree = {
     val newColumnHeaderTreeType:ColumnHeaderTreeType = columnHeaderTreeType match {
-      case Left(field) => Left(field.withDefaultRendererId)
+      case Left(field) => Left(field.withDefaultFieldNodeState)
       case Right(columnHeaderLayout) => Right(columnHeaderLayout.withDefaultRendererIds)
     }
     val newChildColumnHeaderLayout = childColumnHeaderLayout.withDefaultRendererIds
