@@ -91,3 +91,12 @@ class MaxIntegerCombiner extends Combiner[Int,Integer] {
   }
   override def value = max
 }
+
+/**
+ * A combiner that always returns 1. This can be used when the value of max, min, mean and median is always going to be
+ * 1 such as for a count field.
+ */
+object OneIntegerCombiner extends Combiner[Int,Integer] {
+  def combine(value:Integer) = {}
+  override def value = 1
+}
