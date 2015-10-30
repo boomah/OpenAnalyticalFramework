@@ -37,11 +37,10 @@ class AllFieldsArea(val tableFields:OpenAFTableFields) extends StackPane with Dr
     treeItem.setValue(Left(TreeGroup(fieldGroup.groupName, fieldGroup.fields)))
     treeItem.setExpanded(true)
     fieldGroup.children.foreach{
-      case Left(childFieldGroup) => {
+      case Left(childFieldGroup) =>
         val newTreeItem = new TreeItem[TreeItemType]
         treeItem.getChildren.add(newTreeItem)
         updateTreeItem(newTreeItem, childFieldGroup)
-      }
       case Right(field) => treeItem.getChildren.add(new TreeItem[TreeItemType](Right(field)))
     }
   }
@@ -74,17 +73,19 @@ class TreeItemTypeTreeCell(allFieldsArea:AllFieldsArea, val tableFields:OpenAFTa
       fields0 = Nil
     } else {
       treeItemType match {
-        case Left(treeGroup) => {
+        case Left(treeGroup) =>
           setText(treeGroup.fieldGroup)
           fields0 = treeGroup.allChildFields
-        }
-        case Right(field) => {
-          Option(tableFields.fieldBindings.get(field.id)) match {
-            case Some(binding) => textProperty.bind(binding)
-            case None => setText(field.id.id)
+        case Right(field) =>
+          field.fieldNodeState.nameOverrideOption match {
+            case Some(nameOverride) => setText(nameOverride)
+            case None =>
+              Option(tableFields.fieldBindings.get(field.id)) match {
+                case Some(binding) => textProperty.bind(binding)
+                case None => setText(field.id.id)
+              }
           }
           fields0 = List(field)
-        }
       }
     }
   }

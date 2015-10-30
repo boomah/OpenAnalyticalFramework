@@ -19,9 +19,13 @@ class FieldNode[T](val field:Field[T], val dragAndDropContainer:DragAndDropConta
 
   private val nameLabel = {
     val label = new Label
-    Option(tableFields.fieldBindings.get(field.id)) match {
-      case Some(binding) => label.textProperty.bind(binding)
-      case None => label.setText(field.id.id)
+    field.fieldNodeState.nameOverrideOption match {
+      case Some(nameOverride) => label.setText(nameOverride)
+      case None =>
+        Option(tableFields.fieldBindings.get(field.id)) match {
+          case Some(binding) => label.textProperty.bind(binding)
+          case None => label.setText(field.id.id)
+        }
     }
     label
   }

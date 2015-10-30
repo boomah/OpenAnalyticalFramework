@@ -36,7 +36,7 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsI
             }
             addStyle(StandardColumnHeaderTableCell)
             row.columnHeaderAndDataValues(columnIndex) match {
-              case FieldInt => {
+              case FieldInt =>
                 addStyle(FieldColumnHeaderTableCell)
                 if (row.row == (maxPathLength - 1)) {
                   val style = if (rightBoundaryCell) BottomRightFieldColumnHeaderTableCell else BottomFieldColumnHeaderTableCell
@@ -45,12 +45,11 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsI
                   addStyle(RightFieldColumnHeaderTableCell)
                 }
                 if (shouldRender(row, FieldInt, cellFieldOption)) {
-                  useFieldText(row.row)
+                  useFieldText(cellFieldOption, row.row)
                 } else {
                   setText(null)
                 }
-              }
-              case intValue:Int => {
+              case intValue:Int =>
                 if (row.row == (maxPathLength - 1)) {
                   val style = if (rightBoundaryCell) BottomRightColumnHeaderTableCell else BottomColumnHeaderTableCell
                   addStyle(style)
@@ -71,9 +70,9 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsI
                     // Only add the field text and show a green background if a total cell is already above the field row
                     if (totalAlreadyDisplayedAbove) {
                       addStyle(TotalColumnHeaderTableCell)
-                      useFieldText(row.row)
+                      useFieldText(cellFieldOption, row.row)
                     } else if (intValue == TotalTopInt) {
-                      useFieldText(row.row)
+                      useFieldText(cellFieldOption, row.row)
                     } else {
                       setText(null)
                     }
@@ -97,7 +96,6 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsI
                     setText(null)
                   }
                 }
-              }
             }
           } else {
             // Data area
@@ -153,11 +151,15 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsI
 
     private def stringBinding(id:String) = new TableLocaleStringBinding(id, tableFields.localeProperty)
 
-    private def useFieldText(rowIndex:Int) {
-      val fieldID = valueLookUps(rowIndex)(FieldInt).asInstanceOf[FieldID]
-      Option(tableFields.fieldBindings.get(fieldID)) match {
-        case Some(binding) => textProperty.bind(binding)
-        case None => setText(fieldID.id)
+    private def useFieldText(cellFieldOption:Option[Field[_]], rowIndex:Int) {
+      cellFieldOption.flatMap(_.fieldNodeState.nameOverrideOption) match {
+        case Some(nameOverride) => setText(nameOverride)
+        case None =>
+          val fieldID = valueLookUps(rowIndex)(FieldInt).asInstanceOf[FieldID]
+          Option(tableFields.fieldBindings.get(fieldID)) match {
+            case Some(binding) => textProperty.bind(binding)
+            case None => setText(fieldID.id)
+          }
       }
     }
 

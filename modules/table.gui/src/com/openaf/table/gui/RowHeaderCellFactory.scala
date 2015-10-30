@@ -1,7 +1,5 @@
 package com.openaf.table.gui
 
-import javafx.beans.binding.StringBinding
-
 import com.openaf.table.lib.api._
 import TableValues._
 import annotation.tailrec
@@ -54,10 +52,13 @@ class RowHeaderCellFactory(startRowHeaderValuesIndex:Int, field:Field[_],
             } else {
               addStyle(FieldRowHeaderTableCell)
             }
-            val fieldID = valueLookUp(field.id)(FieldInt).asInstanceOf[FieldID]
-            Option(tableFields.fieldBindings.get(fieldID)) match {
-              case Some(binding) => textProperty.bind(binding)
-              case None => setText(fieldID.id)
+            field.fieldNodeState.nameOverrideOption match {
+              case Some(nameOverride) => setText(nameOverride)
+              case None =>
+                Option(tableFields.fieldBindings.get(field.id)) match {
+                  case Some(binding) => textProperty.bind(binding)
+                  case None => setText(field.id.id)
+                }
             }
           } else if (intValue == TotalTopInt || intValue == TotalBottomInt) {
             addStyleBasedOnTableCellPosition()

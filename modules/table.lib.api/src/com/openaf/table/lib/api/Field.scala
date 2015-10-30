@@ -66,7 +66,7 @@ import RendererId._
  * UI state that doesn't effect any data contained within the table. Therefore changing this state should only ever
  * effect the display of the data.
  */
-case class FieldNodeState(rendererId:RendererId= RendererId.DefaultRendererId)
+case class FieldNodeState(rendererId:RendererId=RendererId.DefaultRendererId, nameOverrideOption:Option[String]=None)
 
 object FieldNodeState {
   val Default = FieldNodeState()
