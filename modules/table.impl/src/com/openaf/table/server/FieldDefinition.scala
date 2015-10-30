@@ -71,7 +71,10 @@ class IntFieldDefinition(val defaultField:Field[Int]) extends FieldDefinition {
   override def combinerFromType(combinerType:CombinerType) = {
     combinerType match {
       case Sum => combiner
-      case Average => new AverageIntCombiner
+      case Mean => new AverageIntCombiner
+      case Median => combiner
+      case Min => new MinIntCombiner
+      case Max => new MaxIntCombiner
     }
   }
 }
@@ -89,7 +92,10 @@ class IncrementingFieldDefinition(val defaultField:Field[Integer]) extends Field
   override def combinerFromType(combinerType:CombinerType) = {
     combinerType match {
       case Sum => combiner
-      case Average => new AverageIntegerCombiner
+      case Mean => new AverageIntegerCombiner
+      case Median => combiner
+      case Min => new MinIntegerCombiner
+      case Max => new MaxIntegerCombiner
     }
   }
 }

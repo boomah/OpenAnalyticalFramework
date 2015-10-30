@@ -142,7 +142,6 @@ class UnfilteredArrayTableDataSourceTest extends FunSuite {
     val nameField = NameField.withKey(ColumnHeaderFieldKey(1))
 
     val chs = (1 to 6).map(i => List(0,i,0)).toArray
-    def dp(i:Int) = (Array.empty, chs(i))
     val expectedColHeaders = chs.toSet
     val expectedData = Map(
       p()(chs(0)) -> 50,
@@ -392,52 +391,6 @@ class UnfilteredArrayTableDataSourceTest extends FunSuite {
     )
     val expectedFieldValues = genderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
       scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
-
-    check(tableState, expectedRowHeaderValues, expectedColHeaders, expectedData, expectedFieldValues, expectedValueLookUp)
-  }
-
-  test("1 row, 1 measure, 0 column, average") {
-    val scoreField = ScoreField.withKey(ColumnHeaderFieldKey(0)).withCombinerType(Average)
-    val tableState = TableState.Blank.withRowHeaderFields(List(GenderField))
-      .withColumnHeaderLayout(ColumnHeaderLayout(scoreField))
-
-    val expectedRowHeaderValues = Set(List(1), List(2))
-    val ch = List(0,0)
-    val expectedColHeaders = Set(List(0,0))
-    val expectedData = Map(
-      p(1)(ch) -> 60,
-      p(2)(ch) -> 81
-    )
-    val expectedValueLookUp = Map(
-      GenderField.id -> List(GenderField.id, F, M),
-      ScoreField.id -> List(scoreField.id)
-    )
-    val expectedFieldValues = genderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
-      scoreFieldValues(scoreField)
-
-    check(tableState, expectedRowHeaderValues, expectedColHeaders, expectedData, expectedFieldValues, expectedValueLookUp)
-  }
-
-  test("1 row, 1 measure, 0 column, 1 filter, average") {
-    val nameField = NameField.withFilter(RejectFilter(Set(Nick))).withKey(FilterFieldKey(0))
-    val scoreField = ScoreField.withKey(ColumnHeaderFieldKey(0)).withCombinerType(Average)
-    val tableState = TableState.Blank.withRowHeaderFields(List(GenderField))
-      .withColumnHeaderLayout(ColumnHeaderLayout(scoreField)).withFilterFields(List(nameField))
-
-    val expectedRowHeaderValues = Set(List(1), List(2))
-    val ch = List(0,0)
-    val expectedColHeaders = Set(List(0,0))
-    val expectedData = Map(
-      p(1)(ch) -> 60,
-      p(2)(ch) -> 82
-    )
-    val expectedValueLookUp = Map(
-      NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul, Ally),
-      GenderField.id -> List(GenderField.id, F, M),
-      ScoreField.id -> List(scoreField.id)
-    )
-    val expectedFieldValues = genderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
-      scoreFieldValues(scoreField) ++ nameFieldValues(nameField)
 
     check(tableState, expectedRowHeaderValues, expectedColHeaders, expectedData, expectedFieldValues, expectedValueLookUp)
   }

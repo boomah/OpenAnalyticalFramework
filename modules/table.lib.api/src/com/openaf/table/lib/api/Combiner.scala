@@ -1,6 +1,6 @@
 package com.openaf.table.lib.api
 
-import collection.mutable
+import scala.collection.mutable
 
 trait Combiner[C,V] {
   def combine(value:V):Unit
@@ -37,23 +37,7 @@ class IntegerCombiner extends Combiner[Int,Integer] {
 }
 
 object IntegerCombiner {
-  val One = new Integer(1)
-}
-
-sealed trait CombinerType {
-  def nameId:String
-}
-
-object CombinerType {
-  val Types = List(Sum, Average)
-}
-
-case object Sum extends CombinerType {
-  override val nameId = "combiner.sum"
-}
-
-case object Average extends CombinerType {
-  override val nameId = "combiner.average"
+  val One = Integer.valueOf(1)
 }
 
 class AverageIntCombiner extends Combiner[Int,Int] {
@@ -74,4 +58,36 @@ class AverageIntegerCombiner extends Combiner[Int,Integer] {
     runningSum += value.intValue
   }
   override def value = runningSum / counter
+}
+
+class MinIntCombiner extends Combiner[Int,Int] {
+  private var min = Int.MaxValue
+  override def combine(value:Int) = {
+    if (value < min) {min = value}
+  }
+  override def value = min
+}
+
+class MinIntegerCombiner extends Combiner[Int,Integer] {
+  private var min = Int.MaxValue
+  override def combine(value:Integer) = {
+    if (value.intValue < min) {min = value.intValue}
+  }
+  override def value = min
+}
+
+class MaxIntCombiner extends Combiner[Int,Int] {
+  private var max = Int.MinValue
+  override def combine(value:Int) = {
+    if (value > max) {max = value}
+  }
+  override def value = max
+}
+
+class MaxIntegerCombiner extends Combiner[Int,Integer] {
+  private var max = Int.MinValue
+  override def combine(value:Integer) = {
+    if (value.intValue > max) {max = value.intValue}
+  }
+  override def value = max
 }

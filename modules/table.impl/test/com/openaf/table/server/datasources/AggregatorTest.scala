@@ -1,6 +1,6 @@
 package com.openaf.table.server.datasources
 
-import com.openaf.table.lib.api.{Average, Sum, Combiner, Field}
+import com.openaf.table.lib.api.{Mean, Sum, Combiner, Field}
 import com.openaf.table.server.IntFieldDefinition
 import org.scalatest.FunSuite
 
@@ -62,10 +62,10 @@ class AggregatorTest extends FunSuite {
     val aggregator = new Aggregator(rowKey.length)
     val fieldDefinition = new IntFieldDefinition(Field[Int]("count"))
 
-    aggregator.combine(1, fieldDefinition, Average, rowKey, columnKey)
-    aggregator.combine(5, fieldDefinition, Average, rowKey, columnKey)
-    aggregator.combine(8, fieldDefinition, Average, rowKey, columnKey)
-    aggregator.combine(9, fieldDefinition, Average, rowKey, columnKey)
+    aggregator.combine(1, fieldDefinition, Mean, rowKey, columnKey)
+    aggregator.combine(5, fieldDefinition, Mean, rowKey, columnKey)
+    aggregator.combine(8, fieldDefinition, Mean, rowKey, columnKey)
+    aggregator.combine(9, fieldDefinition, Mean, rowKey, columnKey)
 
     assert(aggregator(rowKey, columnKey) === 5, "Aggregator not averaging properly")
   }
