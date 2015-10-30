@@ -7,6 +7,8 @@ import TableValues._
 class ColumnHeaderComparator(pathIndexToFields:Array[Array[Field[_]]], fieldKeyFieldDefinitions:Array[FieldDefinition],
                              fieldKeyLookUps:Array[Array[Any]]) extends Comparator[Array[Int]] {
   private var length = -1
+  private var array1LengthM1 = -1
+  private var array2LengthM1 = -1
   private var counter = 0
   private var sorted = false
   private var result = 0
@@ -18,12 +20,14 @@ class ColumnHeaderComparator(pathIndexToFields:Array[Array[Field[_]]], fieldKeyF
 
   def compare(array1:Array[Int], array2:Array[Int]):Int = {
     // -1 to the length here because the path index is stored at the end of the array
-    length = math.min(array1.length, array2.length) - 1
+    array1LengthM1 = array1.length - 1
+    array2LengthM1 = array2.length - 1
+    length = math.min(array1LengthM1, array2LengthM1)
     sorted = false
     counter = 0
     while (!sorted && counter < length) {
-      field1 = pathIndexToFields(array1(length))(counter)
-      field2 = pathIndexToFields(array2(length))(counter)
+      field1 = pathIndexToFields(array1(array1LengthM1))(counter)
+      field2 = pathIndexToFields(array2(array2LengthM1))(counter)
       if (field1 == field2) {
         // Fields are the same so just compare the values
         value1 = array1(counter)

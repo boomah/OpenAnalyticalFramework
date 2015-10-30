@@ -528,4 +528,23 @@ class TableDataGeneratorTest extends FunSuite {
 
     check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
   }
+
+  test("0 row, 0 measure, 3 column (two the same, different ones stacked to the right of the other)") {
+    val trees = List(ColumnHeaderTree(GroupField), ColumnHeaderTree(List(GroupField), List(GenderField)))
+    val tableState = TableState.Blank.withColumnHeaderLayout(ColumnHeaderLayout(trees))
+
+    val expectedRows = List(
+      row(0, Nil, List(1,         1,1)),
+      row(1, Nil, List(NoValueInt,1,2))
+    )
+    val expectedValueLookUp = Map(
+      GroupField.id -> List(GroupField.id, Friends),
+      GenderField.id -> List(GenderField.id, F, M)
+    )
+    val expectedFieldValues = orderedGroupFieldValues(GroupField.withKey(ColumnHeaderFieldKey(0))) ++
+      orderedGroupFieldValues(GroupField.withKey(ColumnHeaderFieldKey(1))) ++
+      orderedGenderFieldValues(GenderField.withKey(ColumnHeaderFieldKey(2)))
+
+    check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
+  }
 }
