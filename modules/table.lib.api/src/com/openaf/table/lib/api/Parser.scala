@@ -29,9 +29,10 @@ object IntParser extends Parser[Int] {
 
 object DurationParser extends Parser[Duration] {
   override def parse(string:String) = {
-    // TODO - for now this only handles mm:ss format. Need to change it to be more general.
+    // TODO - for now this only handles hh:mm:ss format. Need to change it to be more general.
     val components = string.split(":")
-    Duration.ofSeconds(components(0).toInt * 60 + components(1).toInt)
+    val seconds = components.reverse.zipWithIndex.map{case (intString,index) => intString.toInt * math.pow(60,index)}.sum.toLong
+    Duration.ofSeconds(seconds)
   }
 }
 
