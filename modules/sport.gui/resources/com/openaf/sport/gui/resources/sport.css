@@ -7,3 +7,11 @@
     -fx-alignment: CENTER_RIGHT;
     -fx-font-family: monospace;
 }
+
+.filter-button-node #table-cell-date,
+.filter-button-node #table-cell-time,
+.filter-button-node #table-cell-total-runs,
+.filter-button-node #table-cell-gender-pos,
+.filter-button-node #table-cell-position{
+    -fx-font-family: monospace;
+}

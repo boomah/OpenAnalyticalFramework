@@ -6,6 +6,8 @@ import javafx.scene.input.{MouseButton, MouseEvent}
 import com.openaf.gui.utils.GuiUtils
 import javafx.beans.property.SimpleBooleanProperty
 
+import com.openaf.gui.utils.GuiUtils._
+
 class FilterButtonNodeListCell[T](filterButtonNodeModel:FilterButtonNodeModel[T]) extends ListCell[Int] {
   getStyleClass.add("filter-button-node-list-cell")
   private val checkBox = new CheckBox
@@ -38,7 +40,7 @@ class FilterButtonNodeListCell[T](filterButtonNodeModel:FilterButtonNodeModel[T]
       if (intValue == FilterButtonNodeModel.AllValue) {
         setId("all-filter-button-node-list-cell")
       } else {
-        setId(null)
+        setId(s"table-cell-${camelCaseToDashed(filterButtonNodeModel.field.id.id)}")
       }
       val property = filterButtonNodeModel.property(intValue)
       checkBox.selectedProperty.bindBidirectional(property)

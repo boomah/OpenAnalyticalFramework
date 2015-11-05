@@ -89,7 +89,9 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsI
                   if (shouldRender(row, intValue, cellFieldOption)) {
                     val value = valueLookUps(row.row)(intValue)
                     cellFieldOption match {
-                      case Some(field) => textProperty.bind(rendererBinding(field, value))
+                      case Some(field) =>
+                        setId(s"table-cell-${camelCaseToDashed(field.id.id)}")
+                        textProperty.bind(rendererBinding(field, value))
                       case None => setText(null)
                     }
                   } else {
@@ -100,7 +102,7 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsI
           } else {
             // Data area
             addStyle(MeasureTableCell)
-            columnHeaderLayoutPaths(fieldPathsIndexes(columnIndex)).measureFieldOption.foreach(measureField => {
+            measureFieldOption(columnIndex).foreach(measureField => {
               setId(s"table-cell-${camelCaseToDashed(measureField.id.id)}")
             })
             // Add style if this cell represents a total
@@ -126,6 +128,8 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsI
         }
       }
     }
+
+    private def measureFieldOption(columnIndex:Int) = columnHeaderLayoutPaths(fieldPathsIndexes(columnIndex)).measureFieldOption
 
     private def fieldOption(rowIndex:Int, columnIndex:Int) = {
       val fields = columnHeaderLayoutPaths(fieldPathsIndexes(columnIndex)).fields

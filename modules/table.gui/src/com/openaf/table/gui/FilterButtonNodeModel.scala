@@ -9,7 +9,7 @@ import scala.collection.mutable
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.{Boolean => JBoolean}
 
-class FilterButtonNodeModel[T](field:Field[T], tableFields:OpenAFTableFields) {
+class FilterButtonNodeModel[T](val field:Field[T], tableFields:OpenAFTableFields) {
   private val allBooleanProperty = new SimpleBooleanProperty
   private var allShouldChange = true
   allBooleanProperty.addListener(new ChangeListener[JBoolean] {
