@@ -1,6 +1,6 @@
 package com.openaf.testdata
 
-import com.openaf.table.lib.api.{Combiner, TableState}
+import com.openaf.table.lib.api.{Parser, Combiner, TableState}
 import com.openaf.table.server.datasources.{DataSourceTable, UnfilteredArrayTableDataSource}
 import com.openaf.table.server.{FieldDefinition, FieldDefinitionGroup, FieldDefinitionGroups, IntFieldDefinition}
 import com.openaf.testdata.api.StringWrapper
@@ -37,12 +37,13 @@ class TestDataTableDataSource extends UnfilteredArrayTableDataSource {
 }
 
 case object StringWrapperFieldDefinition extends FieldDefinition {
-  type V = StringWrapper
-  type C = Set[StringWrapper]
-  val defaultField = PersonField
-  val primaryKey = false
-  val ordering = StringWrapperOrdering
-  def combiner = new StringWrapperCombiner
+  override type V = StringWrapper
+  override type C = Set[StringWrapper]
+  override val defaultField = PersonField
+  override val primaryKey = false
+  override val ordering = StringWrapperOrdering
+  override def combiner = new StringWrapperCombiner
+  override def parser = StringWrapperParser
 }
 
 case object StringWrapperOrdering extends Ordering[StringWrapper] {
@@ -53,4 +54,8 @@ class StringWrapperCombiner extends Combiner[Set[StringWrapper],StringWrapper] {
   private val set = new mutable.HashSet[StringWrapper]
   def combine(value:StringWrapper) = {set += value}
   override def value = set.toSet
+}
+
+object StringWrapperParser extends Parser[StringWrapper] {
+  override def parse(string:String) = StringWrapper(string)
 }

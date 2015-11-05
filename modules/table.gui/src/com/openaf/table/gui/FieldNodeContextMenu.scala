@@ -14,6 +14,33 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
   private def requestTableStateProperty = tableFields.requestTableStateProperty
   private def tableState = tableFields.tableDataProperty.getValue.tableState
 
+  field.fieldType match {
+    case MultipleFieldType(currentFieldType) =>
+      val menuItem = if (currentFieldType.isDimension) {
+        val measureField = new MenuItem
+        measureField.textProperty.bind(stringBinding("switchToMeasure"))
+        measureField.setOnAction(new EventHandler[ActionEvent] {
+          def handle(event:ActionEvent) {
+            val newTableState = tableState.replaceField(field, field.toMeasure)
+            requestTableStateProperty.setValue(newTableState)
+          }
+        })
+        measureField
+      } else {
+        val dimensionField = new MenuItem
+        dimensionField.textProperty.bind(stringBinding("switchToDimension"))
+        dimensionField.setOnAction(new EventHandler[ActionEvent] {
+          def handle(event:ActionEvent) {
+            val newTableState = tableState.replaceField(field, field.toDimension)
+            requestTableStateProperty.setValue(newTableState)
+          }
+        })
+        dimensionField
+      }
+      getItems.addAll(menuItem, new SeparatorMenuItem)
+    case _ =>
+  }
+
   {
     val removeMenuItem = new MenuItem
     removeMenuItem.textProperty.bind(stringBinding("remove"))

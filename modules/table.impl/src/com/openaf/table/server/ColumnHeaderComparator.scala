@@ -1,7 +1,7 @@
 package com.openaf.table.server
 
 import java.util.Comparator
-import com.openaf.table.lib.api.{SortOrder, TableValues, Field}
+import com.openaf.table.lib.api.{NoValue, TableValues, Field}
 import TableValues._
 
 class ColumnHeaderComparator(pathIndexToFields:Array[Array[Field[_]]], fieldKeyFieldDefinitions:Array[FieldDefinition],
@@ -42,16 +42,14 @@ class ColumnHeaderComparator(pathIndexToFields:Array[Array[Field[_]]], fieldKeyF
           } else {
             val fieldDefinition = fieldKeyFieldDefinitions(field1.key.number)
             lookUp = fieldKeyLookUps(field1.key.number)
-            if (field1.sortOrder == SortOrder.Ascending) {
-              fieldDefinition.ordering.compare(
-                lookUp(value1).asInstanceOf[fieldDefinition.V],
-                lookUp(value2).asInstanceOf[fieldDefinition.V]
-              )
+            val lookedUpValue1 = lookUp(value1).asInstanceOf[fieldDefinition.V]
+            val lookedUpValue2 = lookUp(value2).asInstanceOf[fieldDefinition.V]
+            if (lookedUpValue1 == NoValue) {
+              field1.sortOrder.direction
+            } else if (lookedUpValue2 == NoValue) {
+              -field1.sortOrder.direction
             } else {
-              fieldDefinition.ordering.compare(
-                lookUp(value2).asInstanceOf[fieldDefinition.V],
-                lookUp(value1).asInstanceOf[fieldDefinition.V]
-              )
+              fieldDefinition.ordering.compare(lookedUpValue1, lookedUpValue2) * field1.sortOrder.direction
             }
           }
         }
@@ -95,16 +93,15 @@ class RowHeaderComparator(fields:Array[Field[_]], fieldDefinitions:Array[FieldDe
         } else {
           val fieldDefinition = fieldDefinitions(counter)
           lookUp = lookUps(counter)
-          if (fields(counter).sortOrder == SortOrder.Ascending) {
-            fieldDefinition.ordering.compare(
-              lookUp(value1).asInstanceOf[fieldDefinition.V],
-              lookUp(value2).asInstanceOf[fieldDefinition.V]
-            )
+          val lookedUpValue1 = lookUp(value1).asInstanceOf[fieldDefinition.V]
+          val lookedUpValue2 = lookUp(value2).asInstanceOf[fieldDefinition.V]
+          val sortOrder = fields(counter).sortOrder
+          if (lookedUpValue1 == NoValue) {
+            sortOrder.direction
+          } else if (lookedUpValue2 == NoValue) {
+            -sortOrder.direction
           } else {
-            fieldDefinition.ordering.compare(
-              lookUp(value2).asInstanceOf[fieldDefinition.V],
-              lookUp(value1).asInstanceOf[fieldDefinition.V]
-            )
+            fieldDefinition.ordering.compare(lookedUpValue1, lookedUpValue2) * sortOrder.direction
           }
         }
       } else {

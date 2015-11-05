@@ -5,10 +5,19 @@ import com.openaf.sport.gui.SportRenderers
 import com.openaf.table.gui.api.TablePageComponent
 
 class GoalsPageComponent extends TablePageComponent {
-  def nameId = "goalsName"
-  override def defaultRenderers = SportRenderers.DefaultRenderers
+  override def nameId = "goalsName"
+  override def defaultRenderers = SportRenderers.GoalPageRenderers
 }
 
 object GoalsPageComponentFactory extends PageComponentFactory {
-  def pageComponent = new GoalsPageComponent
+  override def pageComponent = new GoalsPageComponent
+}
+
+class RunningPageComponent extends TablePageComponent {
+  override def nameId = "runningPage"
+  override def defaultRenderers = SportRenderers.RunningPageRenderers
+}
+
+object RunningPageComponentFactory extends PageComponentFactory {
+  override def pageComponent = new RunningPageComponent
 }

@@ -1,0 +1,9 @@
+
+.openaf-table-view #table-cell-date,
+.openaf-table-view #table-cell-time,
+.openaf-table-view #table-cell-total-runs,
+.openaf-table-view #table-cell-gender-pos,
+.openaf-table-view #table-cell-position{
+    -fx-alignment: CENTER_RIGHT;
+    -fx-font-family: monospace;
+}

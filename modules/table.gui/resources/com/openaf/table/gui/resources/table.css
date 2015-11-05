@@ -188,6 +188,11 @@
     -fx-background: white;
 }
 
+.openaf-table-view .measure-table-cell{
+    -fx-alignment: CENTER_RIGHT;
+    -fx-font-family: monospace;
+}
+
 .openaf-table-view #table-cell-count{
     -fx-alignment: CENTER_RIGHT;
 }

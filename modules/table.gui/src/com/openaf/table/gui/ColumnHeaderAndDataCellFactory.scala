@@ -99,8 +99,9 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsI
             }
           } else {
             // Data area
+            addStyle(MeasureTableCell)
             columnHeaderLayoutPaths(fieldPathsIndexes(columnIndex)).measureFieldOption.foreach(measureField => {
-              setId(s"table-cell-${measureField.id.id}")
+              setId(s"table-cell-${camelCaseToDashed(measureField.id.id)}")
             })
             // Add style if this cell represents a total
             if (onRowTotalRow(row)) {

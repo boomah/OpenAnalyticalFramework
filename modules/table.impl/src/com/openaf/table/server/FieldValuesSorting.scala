@@ -1,6 +1,6 @@
 package com.openaf.table.server
 
-import com.openaf.table.lib.api.SortOrder._
+import com.openaf.table.lib.api.{SortOrder, NoValue}
 
 object FieldValuesSorting {
   def sort[V](data:Array[Int], ordering:Ordering[V], lookUp:Array[V], sortOrder:SortOrder) {
@@ -9,11 +9,16 @@ object FieldValuesSorting {
 
   private def sort[V](x:Array[Int], off:Int, len:Int, ordering:Ordering[V], lookUp:Array[V], sortOrder:SortOrder) {
     def compare(left:Int, right:Int) = {
-      if (sortOrder == Ascending) {
-        ordering.compare(lookUp(left), lookUp(right)) < 0
-      } else {
-        ordering.compare(lookUp(right), lookUp(left)) < 0
+      val leftValue = lookUp(left)
+      val rightValue = lookUp(right)
+      val compareInt = if (leftValue == NoValue) {
+        sortOrder.direction
+      } else if (rightValue == NoValue) {
+        -sortOrder.direction
+      } else  {
+        ordering.compare(leftValue, rightValue) * sortOrder.direction
       }
+      compareInt < 0
     }
     def swap(a:Int, b:Int) {
       val t = x(a)

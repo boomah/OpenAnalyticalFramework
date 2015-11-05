@@ -31,6 +31,7 @@ object DataSourceTestData {
   val Nick = "Nick"
   val Paul = "Paul"
   val Ally = "Ally"
+  val Unknown = "Unknown"
 
   val F = "F"
   val M = "M"
@@ -50,18 +51,31 @@ object DataSourceTestData {
     Array(Ally,  M, Edinburgh,  Friends, 34, 75)
   )
 
+  val dataWithNoValues:Array[Array[Any]] = Array(
+    Array(Rosie,   F,       London,     Friends, 36,      50),
+    Array(Laura,   F,       Manchester, Friends, 36,      60),
+    Array(Unknown, NoValue, NoValue,    NoValue, NoValue, 70),
+    Array(Nick,    M,       London,     Friends, 34,      80),
+    Array(Paul,    M,       Manchester, Friends, 32,      90),
+    Array(Unknown, NoValue, NoValue,    NoValue, NoValue, 75)
+  )
+
   val EmptyListSet:Set[List[Int]] = Set(Nil)
   val EmptySet:Set[List[Int]] = Set.empty
   val EmptyMapList:List[Map[(List[Int],List[Int]),Int]] = List(Map.empty)
 
   val dataSource = new TestTableDataSource(Groups, FieldIDs, data)
+  val dataSourceNoValue = new TestTableDataSource(Groups, FieldIDs, dataWithNoValues)
 
   def nameFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2,3,4,5,6))
   def orderedNameFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(6,3,2,4,5,1))
   def reversedNameFieldValues(field:Field[_]):Map[Field[_],List[Int]] = orderedNameFieldValues(field).mapValues(_.reverse)
+  def orderedNameFieldValuesNoValue(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(2,4,5,1,3))
   def genderFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2))
   def orderedGenderFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2))
   def reversedGenderFieldValues(field:Field[_]):Map[Field[_],List[Int]] = orderedGenderFieldValues(field).mapValues(_.reverse)
+  def orderedGenderFieldValuesNoValue(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,3,2))
+  def reversedGenderFieldValuesNoValue(field:Field[_]):Map[Field[_],List[Int]] = orderedGenderFieldValuesNoValue(field).mapValues(_.reverse)
   def locationFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2,3))
   def orderedLocationFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(3,1,2))
   def reversedLocationFieldValues(field:Field[_]):Map[Field[_],List[Int]] = orderedLocationFieldValues(field).mapValues(_.reverse)
@@ -88,10 +102,10 @@ object DataSourceTestData {
     assert(pivotData.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
   }
 
-  def check(tableState:TableState,
-            expectedRows:List[OpenAFTableRow],
-            expectedFieldValues:Map[Field[_],List[Int]],
-            expectedValueLookUp:Map[FieldID,List[Any]]) {
+  def checkWithDataSource(dataSource:TableDataSource, tableState:TableState,
+                          expectedRows:List[OpenAFTableRow],
+                          expectedFieldValues:Map[Field[_],List[Int]],
+                          expectedValueLookUp:Map[FieldID,List[Any]]):Unit = {
     val tableData = dataSource.tableData(tableState.generateFieldKeys)
     val rows = tableData.tableValues.rows.toList
     assert(rows.map(_.row) === expectedRows.map(_.row))
@@ -99,6 +113,20 @@ object DataSourceTestData {
     assert(rows.map(_.columnHeaderAndDataValues.toList) === expectedRows.map(_.columnHeaderAndDataValues.toList))
     assert(tableData.tableValues.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
     assert(tableData.tableValues.fieldValues.values.mapValues(_.toList) === expectedFieldValues)
+  }
+
+  def check(tableState:TableState,
+            expectedRows:List[OpenAFTableRow],
+            expectedFieldValues:Map[Field[_],List[Int]],
+            expectedValueLookUp:Map[FieldID,List[Any]]) {
+    checkWithDataSource(dataSource, tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
+  }
+
+  def checkNoValue(tableState:TableState,
+                   expectedRows:List[OpenAFTableRow],
+                   expectedFieldValues:Map[Field[_],List[Int]],
+                   expectedValueLookUp:Map[FieldID,List[Any]]):Unit = {
+    checkWithDataSource(dataSourceNoValue, tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
   }
 }
 

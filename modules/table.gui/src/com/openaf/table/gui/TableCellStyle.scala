@@ -6,6 +6,8 @@ import com.openaf.gui.utils.GuiUtils
 object TableCellStyle extends Enumeration {
   type TableCellStyle = Value
 
+  val DimensionTableCell, MeasureTableCell = Value
+
   val StandardRowHeaderTableCell, RightRowHeaderTableCell, BottomRowHeaderTableCell, BottomRightRowHeaderTableCell = Value
   val FieldRowHeaderTableCell, RightFieldRowHeaderTableCell = Value
   val TotalRowHeaderTableCell = Value

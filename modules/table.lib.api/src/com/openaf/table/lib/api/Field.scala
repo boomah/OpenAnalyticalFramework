@@ -1,7 +1,5 @@
 package com.openaf.table.lib.api
 
-import SortOrder._
-
 case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=RetainAllFilter[T](),
                     sortOrder:SortOrder=Ascending, totals:Totals=Totals.Default, combinerType:CombinerType=Sum,
                     key:FieldKey=NoFieldKey, fieldNodeState:FieldNodeState=FieldNodeState.Default) {
@@ -16,6 +14,18 @@ case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=
   def withDefaultFieldNodeState = copy(fieldNodeState = FieldNodeState.Default)
   def withCombinerType(combinerType:CombinerType) = copy(combinerType = combinerType)
   def rendererId = fieldNodeState.rendererId
+  def toMeasure = {
+    fieldType match {
+      case MultipleFieldType(currentFieldType) if currentFieldType.isDimension => copy(fieldType = MultipleFieldType(Measure))
+      case _ => throw new IllegalStateException(s"Can't convert field to measure as it is currently a $fieldType")
+    }
+  }
+  def toDimension = {
+    fieldType match {
+      case MultipleFieldType(currentFieldType) if currentFieldType.isMeasure => copy(fieldType = MultipleFieldType(Dimension))
+      case _ => throw new IllegalStateException(s"Can't convert field to dimension as it is currently a $fieldType")
+    }
+  }
 //  override def toString = id.id
 }
 

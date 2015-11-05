@@ -2,8 +2,8 @@ package com.openaf.table.gui
 
 import java.util.Locale
 
-import com.openaf.table.lib.api._
 import com.openaf.table.lib.api.StandardFields._
+import com.openaf.table.lib.api._
 
 trait Renderer[V] {
   def id:RendererId.RendererId = getClass.getName
@@ -15,25 +15,25 @@ trait Renderer[V] {
 }
 
 case object BlankRenderer extends Renderer[Any] {
-  def render(value:Any, locale:Locale) = ""
+  override def render(value:Any, locale:Locale) = ""
 }
 
 case class NoValueAwareDelegatingRenderer[V](renderer:Renderer[V]) extends Renderer[Any] {
   override def id = renderer.id
   override def name = renderer.name
-  def render(value:Any, locale:Locale) = if (value == NoValue) "" else renderer.render(value.asInstanceOf[V], locale)
+  override def render(value:Any, locale:Locale) = if (value == NoValue) "" else renderer.render(value.asInstanceOf[V], locale)
 }
 
 case object AnyRenderer extends Renderer[Any] {
-  def render(value:Any, locale:Locale) = value.toString
+  override def render(value:Any, locale:Locale) = value.toString
 }
 
 case object StringRenderer extends Renderer[String] {
-  def render(value:String, locale:Locale) = value
+  override def render(value:String, locale:Locale) = value
 }
 
 case object IntRenderer extends Renderer[Int] {
-  def render(value:Int, locale:Locale) = value.toString
+  override def render(value:Int, locale:Locale) = value.toString
 }
 
 case class FormattedIntRenderer(format:String="%05d") extends Renderer[Int] {
@@ -41,7 +41,7 @@ case class FormattedIntRenderer(format:String="%05d") extends Renderer[Int] {
 }
 
 case object IntegerRenderer extends Renderer[Integer] {
-  def render(value:Integer, locale:Locale) = value.toString
+  override def render(value:Integer, locale:Locale) = value.toString
 }
 
 case object DefaultRenderer extends Renderer[Any] {

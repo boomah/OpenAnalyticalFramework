@@ -62,7 +62,10 @@ class Aggregator(rowHeaderWidth:Int) {
     while (rowHeaderEntry ne null) {
       if (rowArraysEqual(rowHeaderEntry, rowHeaders) && columnArraysEqual(columnHeaderTable(index), columnHeaders)) {
         // Combiner already there, so combine value with that.
-        combinerTable(index).asInstanceOf[Combiner[fieldDefinition.C,fieldDefinition.V]].combine(value.asInstanceOf[fieldDefinition.V])
+        // TODO - need to decide how to combine NoValue with the other values - maybe just indicate in the UI
+        if (value != NoValue) {
+          combinerTable(index).asInstanceOf[Combiner[fieldDefinition.C,fieldDefinition.V]].combine(value.asInstanceOf[fieldDefinition.V])
+        }
         return
       }
       index = (index + 1) & tableLengthM1
@@ -73,7 +76,10 @@ class Aggregator(rowHeaderWidth:Int) {
     rowHeaderTable(index) = rowHeaders
     columnHeaderTable(index) = columnHeaders
     val combiner = fieldDefinition.combinerFromType(combinerType)
-    combiner.combine(value.asInstanceOf[fieldDefinition.V])
+    // TODO - need to decide how to combine NoValue with the other values - maybe just indicate in the UI
+    if (value != NoValue) {
+      combiner.combine(value.asInstanceOf[fieldDefinition.V])
+    }
     combinerTable(index) = combiner
 
     used += 1

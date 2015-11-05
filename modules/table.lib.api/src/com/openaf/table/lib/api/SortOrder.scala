@@ -1,6 +1,13 @@
 package com.openaf.table.lib.api
 
-object SortOrder extends Enumeration {
-  type SortOrder = Value
-  val Ascending, Descending = Value
+sealed trait SortOrder {
+  def direction:Int
+}
+
+case object Ascending extends SortOrder {
+  override val direction = 1
+}
+
+case object Descending extends SortOrder {
+  override val direction = -1
 }

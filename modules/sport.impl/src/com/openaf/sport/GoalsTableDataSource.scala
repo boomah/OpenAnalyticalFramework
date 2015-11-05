@@ -7,8 +7,8 @@ import com.openaf.table.server.datasources.{DataSourceTable, UnfilteredArrayTabl
 
 class GoalsTableDataSource extends UnfilteredArrayTableDataSource {
   private val fieldDefinitions:List[FieldDefinition] = List(
-    StringFieldDefinition(PlayerField), IntFieldDefinition(TimeField), StringFieldDefinition(TeamField),
-    StringFieldDefinition(OppositionTeamField), StringFieldDefinition(VenueField), StringFieldDefinition(DateField),
+    StringFieldDefinition(PlayerField), IntFieldDefinition(StartTimeField), StringFieldDefinition(TeamField),
+    StringFieldDefinition(OppositionTeamField), StringFieldDefinition(VenueField), LocalDateFieldDefinition(DateField),
     StringFieldDefinition(KickOffTimeField), StringFieldDefinition(CompetitionField)
   )
 

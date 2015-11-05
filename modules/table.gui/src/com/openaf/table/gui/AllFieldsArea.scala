@@ -74,6 +74,7 @@ class TreeItemTypeTreeCell(allFieldsArea:AllFieldsArea, val tableFields:OpenAFTa
     } else {
       treeItemType match {
         case Left(treeGroup) =>
+          // TODO - this should be a binding
           setText(treeGroup.fieldGroup)
           fields0 = treeGroup.allChildFields
         case Right(field) =>

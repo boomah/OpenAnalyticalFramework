@@ -25,6 +25,7 @@ class RowHeaderCellFactory(startRowHeaderValuesIndex:Int, field:Field[_],
       textProperty.unbind()
       getContextMenu.getItems.clear()
       if (shouldUpdateItem) {
+        addStyle(DimensionTableCell)
         val expandAndCollapse = new ExpandAndCollapse(field, tableFields)
         populateContextMenuForColumn(expandAndCollapse)
         if (isEmpty) {
@@ -66,6 +67,7 @@ class RowHeaderCellFactory(startRowHeaderValuesIndex:Int, field:Field[_],
             val shouldRender = (columnIndex == 0) || (row.rowHeaderValues(columnIndex - 1) != intValue)
             if (shouldRender) textProperty.bind(stringBinding(field.totalTextID)) else setText(null)
           } else {
+            setId(s"table-cell-${camelCaseToDashed(field.id.id)}")
             populateContextMenuForCell(expandAndCollapse, row)
             addStyleBasedOnTableCellPosition()
             val shouldRender = {

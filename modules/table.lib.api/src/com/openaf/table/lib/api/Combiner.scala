@@ -40,7 +40,7 @@ object IntegerCombiner {
   val One = Integer.valueOf(1)
 }
 
-class AverageIntCombiner extends Combiner[Int,Int] {
+class MeanIntCombiner extends Combiner[Int,Int] {
   private var counter = 0
   private var runningSum = 0
   override def combine(value:Int) = {
@@ -50,13 +50,14 @@ class AverageIntCombiner extends Combiner[Int,Int] {
   override def value = runningSum / counter
 }
 
-class AverageIntegerCombiner extends Combiner[Int,Integer] {
+class MeanIntegerCombiner extends Combiner[Int,Integer] {
   private var counter = 0
   private var runningSum = 0
   def combine(value:Integer) = {
     counter += 1
     runningSum += value.intValue
   }
+  // TODO - make sure this can't be divided by zero in the same way as the duration mean combiner
   override def value = runningSum / counter
 }
 

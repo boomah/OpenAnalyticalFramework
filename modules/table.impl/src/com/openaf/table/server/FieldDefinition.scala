@@ -27,23 +27,27 @@ trait FieldDefinition {
       case other => throw new IllegalStateException(s"No Combiner specified for $other")
     }
   }
+
+  def parser:Parser[V]
 }
 
 case object NullFieldDefinition extends FieldDefinition {
-  type V = Null
-  type C = Null
-  val defaultField = Field.Null
-  val primaryKey = false
-  val ordering = NullOrdering
-  val combiner = NullCombiner
+  override type V = Null
+  override type C = Null
+  override val defaultField = Field.Null
+  override val primaryKey = false
+  override val ordering = NullOrdering
+  override val combiner = NullCombiner
+  override val parser = NullParser
 }
 
 class AnyFieldDefinition(val defaultField:Field[Any]) extends FieldDefinition {
-  type V = Any
-  type C = Set[Any]
-  val primaryKey = false
-  val ordering = AnyOrdering
-  def combiner = new AnyCombiner
+  override type V = Any
+  override type C = Set[Any]
+  override val primaryKey = false
+  override val ordering = AnyOrdering
+  override def combiner = new AnyCombiner
+  override val parser = AnyParser
 }
 
 object AnyFieldDefinition {
@@ -51,11 +55,12 @@ object AnyFieldDefinition {
 }
 
 class StringFieldDefinition(val defaultField:Field[String]) extends FieldDefinition {
-  type V = String
-  type C = Set[String]
-  val primaryKey = false
-  val ordering = StringOrdering
-  def combiner = new StringCombiner
+  override type V = String
+  override type C = Set[String]
+  override val primaryKey = false
+  override val ordering = StringOrdering
+  override def combiner = new StringCombiner
+  override val parser = StringParser
 }
 
 object StringFieldDefinition {
@@ -63,20 +68,21 @@ object StringFieldDefinition {
 }
 
 class IntFieldDefinition(val defaultField:Field[Int]) extends FieldDefinition {
-  type V = Int
-  type C = Int
-  val primaryKey = false
-  val ordering = IntOrdering
-  def combiner = new IntCombiner
+  override type V = Int
+  override type C = Int
+  override val primaryKey = false
+  override val ordering = IntOrdering
+  override def combiner = new IntCombiner
   override def combinerFromType(combinerType:CombinerType) = {
     combinerType match {
       case Sum => combiner
-      case Mean => new AverageIntCombiner
+      case Mean => new MeanIntCombiner
       case Median => combiner
       case Min => new MinIntCombiner
       case Max => new MaxIntCombiner
     }
   }
+  override val parser = IntParser
 }
 
 object IntFieldDefinition {
@@ -84,11 +90,11 @@ object IntFieldDefinition {
 }
 
 class IncrementingFieldDefinition(val defaultField:Field[Integer]) extends FieldDefinition {
-  type V = Integer
-  type C = Int
-  val primaryKey = false
-  val ordering = IntegerOrdering
-  def combiner = new IntegerCombiner
+  override type V = Integer
+  override type C = Int
+  override val primaryKey = false
+  override val ordering = IntegerOrdering
+  override def combiner = new IntegerCombiner
   override def combinerFromType(combinerType:CombinerType) = {
     combinerType match {
       case Sum => combiner
@@ -98,5 +104,27 @@ class IncrementingFieldDefinition(val defaultField:Field[Integer]) extends Field
       case Max => OneIntegerCombiner
     }
   }
+  override val parser = IntegerParser
 }
 
+class IntegerFieldDefinition(val defaultField:Field[Integer]) extends FieldDefinition {
+  override type V = Integer
+  override type C = Int
+  override val primaryKey = false
+  override val ordering = IntegerOrdering
+  override def combiner = new IntegerCombiner
+  override def combinerFromType(combinerType:CombinerType) = {
+    combinerType match {
+      case Sum => combiner
+      case Mean => new MeanIntegerCombiner
+      case Median => combiner
+      case Min => new MinIntegerCombiner
+      case Max => new MaxIntegerCombiner
+    }
+  }
+  override val parser = IntegerParser
+}
+
+object IntegerFieldDefinition {
+  def apply(defaultField:Field[Integer]) = new IntegerFieldDefinition(defaultField)
+}
