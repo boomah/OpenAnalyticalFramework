@@ -161,4 +161,36 @@ class TableDataGeneratorTotalsTest extends FunSuite {
 
     check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
   }
+
+  test("3 row (middle filtered and totals top), 1 measure, 0 column, ") {
+    val locationField = LocationField.withFilter(new RetainFilter[String](Set(Manchester, London))).withTotals(Totals(top = true))
+    val tableState = TableState.Blank
+      .withRowHeaderFields(List(GenderField, locationField, NameField))
+      .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
+
+    val expectedRows = List(
+      row(0, List(FieldInt, FieldInt, FieldInt   ), List(FieldInt)),
+      row(1, List(1,        1,        TotalTopInt), List(50)),
+      row(2, List(1,        1,        1          ), List(50)),
+      row(3, List(1,        2,        TotalTopInt), List(130)),
+      row(4, List(1,        2,        3          ), List(70)),
+      row(5, List(1,        2,        2          ), List(60)),
+      row(6, List(2,        1,        TotalTopInt), List(80)),
+      row(7, List(2,        1,        4          ), List(80)),
+      row(8, List(2,        2,        TotalTopInt), List(90)),
+      row(9, List(2,        2,        5          ), List(90))
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      LocationField.id -> List(LocationField.id, London, Manchester, Edinburgh),
+      NameField.id -> List(NameField.id, Rosie, Laura, Josie, Nick, Paul),
+      ScoreField.id -> List(ScoreField.id)
+    )
+    val expectedFieldValues = orderedGenderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
+      orderedLocationFieldValues(locationField.withKey(RowHeaderFieldKey(1))) ++
+      Map(NameField.withKey(RowHeaderFieldKey(2)) -> List(3,2,4,5,1)) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
+
+    check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
+  }
 }

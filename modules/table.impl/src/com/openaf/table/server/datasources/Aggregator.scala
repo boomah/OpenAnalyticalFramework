@@ -130,7 +130,7 @@ class Aggregator(rowHeaderWidth:Int) {
       NoValue
     } else {
       var columnHeaderEntry = columnHeaderTable(index)
-      while (!rowArraysEqual(rowHeaderEntry, rowHeaders) && !columnArraysEqual(columnHeaderEntry, columnHeaders)) {
+      while (!rowArraysEqual(rowHeaderEntry, rowHeaders) || !columnArraysEqual(columnHeaderEntry, columnHeaders)) {
         index = (index + 1) & tableLengthM1
         rowHeaderEntry = rowHeaderTable(index)
         if (rowHeaderEntry eq null) return NoValue
