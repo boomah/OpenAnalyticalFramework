@@ -30,14 +30,7 @@ class ColumnHeaderArea(val tableFields:OpenAFTableFields) extends DragAndDropCon
     if (newColumnHeaderLayout.allFields.isEmpty) {
       setupForEmpty()
     } else {
-      oldTableStateOption match {
-        case None => fullSetup(newColumnHeaderLayout)
-        case Some(oldTableState) => {
-          if (oldTableState.tableLayout.columnHeaderLayout != newColumnHeaderLayout) {
-            fullSetup(newColumnHeaderLayout)
-          }
-        }
-      }
+      fullSetup(newColumnHeaderLayout)
     }
   }
 }

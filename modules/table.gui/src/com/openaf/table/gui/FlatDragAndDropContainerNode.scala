@@ -93,15 +93,7 @@ trait FlatDragAndDropContainerNode extends DragAndDropContainerNode {
     if (newFields.isEmpty) {
       setupForEmpty()
     } else {
-      oldTableStateOption match {
-        case None => fullSetup(newFields)
-        case oldTableStateSome@Some(oldTableState) => {
-          val oldFields = fields(oldTableStateSome)
-          if (oldFields != newFields) {
-            fullSetup(newFields)
-          }
-        }
-      }
+      fullSetup(newFields)
     }
   }
 }
