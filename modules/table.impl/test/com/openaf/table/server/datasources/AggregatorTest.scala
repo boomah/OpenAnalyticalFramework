@@ -1,6 +1,6 @@
 package com.openaf.table.server.datasources
 
-import com.openaf.table.lib.api.{Mean, Sum, Combiner, Field}
+import com.openaf.table.lib.api._
 import com.openaf.table.server.IntFieldDefinition
 import org.scalatest.FunSuite
 
@@ -68,5 +68,48 @@ class AggregatorTest extends FunSuite {
     aggregator.combine(9, fieldDefinition, Mean, rowKey, columnKey)
 
     assert(aggregator(rowKey, columnKey) === 5, "Aggregator not averaging properly")
+  }
+
+  test("Min aggregation") {
+    val rowKey = Array(0,1,2)
+    val columnKey = Array(0,1,2)
+    val aggregator = new Aggregator(rowKey.length)
+    val fieldDefinition = new IntFieldDefinition(Field[Int]("count"))
+
+    aggregator.combine(5, fieldDefinition, Min, rowKey, columnKey)
+    aggregator.combine(1, fieldDefinition, Min, rowKey, columnKey)
+    aggregator.combine(8, fieldDefinition, Min, rowKey, columnKey)
+    aggregator.combine(9, fieldDefinition, Min, rowKey, columnKey)
+
+    assert(aggregator(rowKey, columnKey) === 1, "Aggregator not mining properly")
+  }
+
+  test("Max aggregation") {
+    val rowKey = Array(0,1,2)
+    val columnKey = Array(0,1,2)
+    val aggregator = new Aggregator(rowKey.length)
+    val fieldDefinition = new IntFieldDefinition(Field[Int]("count"))
+
+    aggregator.combine(5, fieldDefinition, Max, rowKey, columnKey)
+    aggregator.combine(1, fieldDefinition, Max, rowKey, columnKey)
+    aggregator.combine(9, fieldDefinition, Max, rowKey, columnKey)
+    aggregator.combine(8, fieldDefinition, Max, rowKey, columnKey)
+
+    assert(aggregator(rowKey, columnKey) === 9, "Aggregator not maxing properly")
+  }
+
+  test("Hash clash resolves correctly") {
+    val columnKey = Array(0, 0)
+    val rowKey1 = Array(1, 2, 96)
+    val rowKey2 = Array(2, 1, -2)
+
+    val aggregator = new Aggregator(rowKey1.length)
+    val fieldDefinition = new IntFieldDefinition(Field[Int]("count"))
+
+    aggregator.combine(5, fieldDefinition, Max, rowKey1, columnKey)
+    aggregator.combine(7, fieldDefinition, Max, rowKey2, columnKey)
+
+    assert(aggregator(rowKey1, columnKey) === 5, "")
+    assert(aggregator(rowKey2, columnKey) === 7, "")
   }
 }
