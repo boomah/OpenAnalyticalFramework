@@ -193,4 +193,73 @@ class TableDataGeneratorTotalsTest extends FunSuite {
 
     check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
   }
+
+  test("1 row (top grand total), 1 measure, 0 column") {
+    val tableState = TableState.Blank
+      .withRowHeaderFields(List(GenderField))
+      .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
+      .toggleTopRowGrandTotal
+
+    val expectedRows = List(
+      row(0, List(FieldInt   ), List(FieldInt)),
+      row(1, List(TotalTopInt), List(425)),
+      row(2, List(1          ), List(180)),
+      row(3, List(2          ), List(245))
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      ScoreField.id -> List(ScoreField.id)
+    )
+    val expectedFieldValues = orderedGenderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
+
+    check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("1 row (bottom grand total), 1 measure, 0 column") {
+    val tableState = TableState.Blank
+      .withRowHeaderFields(List(GenderField))
+      .withColumnHeaderLayout(ColumnHeaderLayout(ScoreField))
+      .toggleBottomRowGrandTotal
+
+    val expectedRows = List(
+      row(0, List(FieldInt      ), List(FieldInt)),
+      row(1, List(1             ), List(180)),
+      row(2, List(2             ), List(245)),
+      row(3, List(TotalBottomInt), List(425))
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      ScoreField.id -> List(ScoreField.id)
+    )
+    val expectedFieldValues = orderedGenderFieldValues(GenderField.withKey(RowHeaderFieldKey(0))) ++
+      scoreFieldValues(ScoreField.withKey(ColumnHeaderFieldKey(0)))
+
+    check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("1 row (bottom grand total), 1 measure (left total), 1 column") {
+    val scoreField = ScoreField.withTotals(Totals(top = true))
+    val tableState = TableState.Blank
+      .withRowHeaderFields(List(GroupField))
+      .withColumnHeaderLayout(ColumnHeaderLayout(scoreField, List(GenderField)))
+      .toggleBottomRowGrandTotal
+
+    val expectedRows = List(
+      row(0, List(NoValueInt    ), List(FieldInt,    FieldInt, FieldInt)),
+      row(1, List(FieldInt      ), List(TotalTopInt, 1,        2       )),
+      row(2, List(1             ), List(425,         180,      245     )),
+      row(3, List(TotalBottomInt), List(425,         180,      245     ))
+    )
+    val expectedValueLookUp = Map(
+      GenderField.id -> List(GenderField.id, F, M),
+      ScoreField.id -> List(ScoreField.id),
+      GroupField.id -> List(GroupField.id, Friends)
+    )
+    val expectedFieldValues = orderedGroupFieldValues(GroupField.withKey(RowHeaderFieldKey(0))) ++
+      scoreFieldValues(scoreField.withKey(ColumnHeaderFieldKey(0))) ++
+      orderedGenderFieldValues(GenderField.withKey(ColumnHeaderFieldKey(1)))
+
+    check(tableState, expectedRows, expectedFieldValues, expectedValueLookUp)
+  }
 }

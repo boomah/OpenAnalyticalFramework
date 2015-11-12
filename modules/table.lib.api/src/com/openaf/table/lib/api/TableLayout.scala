@@ -1,7 +1,7 @@
 package com.openaf.table.lib.api
 
 case class TableLayout(rowHeaderFields:List[Field[_]], columnHeaderLayout:ColumnHeaderLayout,
-                       filterFields:List[Field[_]]) {
+                       filterFields:List[Field[_]], rowGrandTotals:RowGrandTotals) {
   def rowHeaderFieldIDs = rowHeaderFields.map(_.id)
   def columnHeaderLayoutFieldIDs = columnHeaderLayout.allFields.map(_.id)
   def filterFieldIDs = filterFields.map(_.id)
@@ -45,8 +45,11 @@ case class TableLayout(rowHeaderFields:List[Field[_]], columnHeaderLayout:Column
     val newFilterFields = filterFields.map(_.withDefaultFieldNodeState)
     withRowHeaderFields(newRowHeaderFields).withColumnHeaderLayout(newColumnHeaderLayout).withFilterFields(newFilterFields)
   }
+  def withRowGrandTotals(rowGrandTotals:RowGrandTotals) = copy(rowGrandTotals = rowGrandTotals)
+  def toggleTopRowGrandTotal = withRowGrandTotals(rowGrandTotals.toggleTopTotal)
+  def toggleBottomRowGrandTotal = withRowGrandTotals(rowGrandTotals.toggleBottomTotal)
 }
 
 object TableLayout {
-  val Blank = TableLayout(Nil, ColumnHeaderLayout.Blank, Nil)
+  val Blank = TableLayout(Nil, ColumnHeaderLayout.Blank, Nil, RowGrandTotals.Default)
 }

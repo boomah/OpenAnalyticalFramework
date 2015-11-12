@@ -8,6 +8,15 @@ object Totals {
   val Default = Totals()
 }
 
+case class RowGrandTotals(top:Boolean=false, bottom:Boolean=false) {
+  def toggleTopTotal = copy(top = !top)
+  def toggleBottomTotal = copy(bottom = !bottom)
+}
+
+object RowGrandTotals {
+  val Default = RowGrandTotals()
+}
+
 object CollapsedState {
   val Default = AllExpanded(Set.empty)
 }

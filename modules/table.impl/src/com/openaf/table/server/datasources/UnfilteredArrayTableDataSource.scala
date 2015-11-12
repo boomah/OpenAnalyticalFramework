@@ -131,6 +131,10 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     var columnHeaderFieldsForPath:Array[Field[_]] = null
     var columnHeaderFieldDefinitions:Array[FieldDefinition] = null
 
+    val topRowGrandTotals = tableState.tableLayout.rowGrandTotals.top && (numRowHeaderCols > 0)
+    val topRowGrandTotalsKey = Array.fill(numRowHeaderCols)(TotalTopInt)
+    val bottomRowGrandTotals = tableState.tableLayout.rowGrandTotals.bottom && (numRowHeaderCols > 0)
+    val bottomRowGrandTotalsKey = Array.fill(numRowHeaderCols)(TotalBottomInt)
     val rowTotals = new mutable.ArrayBuffer[Array[Int]](numRowHeaderCols * 2)
     var rowTotalsCounter = 0
     var numRowTotals = 0
@@ -279,6 +283,12 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
               aggregator.combine(value, fieldDefinition, combinerType, rowTotals(rowTotalsCounter), colHeaderValues)
               rowTotalsCounter += 1
             }
+            if (bottomRowGrandTotals) {
+              aggregator.combine(value, fieldDefinition, combinerType, bottomRowGrandTotalsKey, colHeaderValues)
+            }
+            if (topRowGrandTotals) {
+              aggregator.combine(value, fieldDefinition, combinerType, topRowGrandTotalsKey, colHeaderValues)
+            }
 
             columnTotalsCounter = 0
             while (columnTotalsCounter < numColumnTotals) {
@@ -288,6 +298,12 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
               while (rowTotalsCounter < numRowTotals) {
                 aggregator.combine(value, fieldDefinition, combinerType, rowTotals(rowTotalsCounter), columnTotals(columnTotalsCounter))
                 rowTotalsCounter += 1
+              }
+              if (bottomRowGrandTotals) {
+                aggregator.combine(value, fieldDefinition, combinerType, bottomRowGrandTotalsKey, columnTotals(columnTotalsCounter))
+              }
+              if (topRowGrandTotals) {
+                aggregator.combine(value, fieldDefinition, combinerType, topRowGrandTotalsKey, columnTotals(columnTotalsCounter))
               }
 
               columnTotalsCounter += 1
@@ -306,6 +322,8 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     // If there are no row fields or measure fields there with be an empty row in the headers that isn't needed so
     // remove it
     val rowHeadersToUse = if (rowHeaderFieldIDs.nonEmpty || columnHeaderPathsMeasureOptions.exists(_.isDefined)) {
+      if (bottomRowGrandTotals) rowHeaders += bottomRowGrandTotalsKey
+      if (topRowGrandTotals) rowHeaders += topRowGrandTotalsKey
       rowHeaders.toArray
     } else {
       Array.empty[Array[Int]]

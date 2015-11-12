@@ -71,6 +71,18 @@
     -fx-fill: derive(grey, -30%);
 }
 
+.openaf-table-tool-bar .separator:vertical .line {
+    -fx-border-width: 1, 1;
+}
+
+.top-total .icons{
+    -fx-fill: linear-gradient(to bottom, green, derive(grey, -30%));
+}
+
+.bottom-total .icons{
+    -fx-fill: linear-gradient(to bottom, derive(grey, -30%), green);
+}
+
 .field-node{
     -fx-field-node-background-color: rgb(220,230,241);
     -fx-field-node-border-color: rgb(149,179,215);

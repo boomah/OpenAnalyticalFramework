@@ -81,6 +81,7 @@ object DataSourceTestData {
   def reversedLocationFieldValues(field:Field[_]):Map[Field[_],List[Int]] = orderedLocationFieldValues(field).mapValues(_.reverse)
   def scoreFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
   def measureFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
+  def groupFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1))
   def orderedGroupFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1))
   def countFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
 
