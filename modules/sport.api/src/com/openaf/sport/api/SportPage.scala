@@ -38,10 +38,14 @@ case class GoalsPage(tableState:TableState) extends SportPage {
   def withTableState(tableState:TableState) = GoalsPage(tableState)
 }
 
-case class GoalsPageData(tableData:TableData) extends TablePageData
+case class GoalsPageData(tableData:TableData) extends TablePageData {
+  override def withTableData(tableData:TableData) = copy(tableData = tableData)
+}
 
 case class RunningPage(tableState:TableState) extends SportPage {
   def withTableState(tableState:TableState) = RunningPage(tableState)
 }
 
-case class RunningPageData(tableData:TableData) extends TablePageData
+case class RunningPageData(tableData:TableData) extends TablePageData {
+  override def withTableData(tableData:TableData) = copy(tableData = tableData)
+}

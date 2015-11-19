@@ -116,7 +116,7 @@ trait Draggable extends Region {
   def tableFields:OpenAFTableFields
   def dragAndDrop = tableFields.dragAndDrop
   def requestTableStateProperty = tableFields.requestTableStateProperty
-  def requestTableState = requestTableStateProperty.getValue
+  def requestTableState = requestTableStateProperty.getValue.tableState
   def dragAndDropContainer:DragAndDropContainer
   def fields:List[Field[_]]
   // When dropped here, nothing will happen. Usually just the Draggable itself, but in the case of a Draggable being
@@ -176,7 +176,7 @@ trait Draggable extends Region {
         dragAndDrop.clearDragPane()
         dragAndDrop.closestDropTarget.set(None)
         dragAndDrop.fieldsBeingDraggedInfo.set(None)
-        newTableStateOption.foreach(newTableState => requestTableStateProperty.setValue(newTableState.generateFieldKeys))
+        newTableStateOption.foreach(newTableState => requestTableStateProperty.setValue(RequestTableState(newTableState.generateFieldKeys)))
       })
     }
   })
@@ -203,7 +203,7 @@ trait Draggable extends Region {
     } else {
       tableStateWithRemoved
     }
-    requestTableStateProperty.setValue(tableStateToUse.generateFieldKeys)
+    requestTableStateProperty.setValue(RequestTableState(tableStateToUse.generateFieldKeys))
   }
 }
 
@@ -250,9 +250,9 @@ trait DragAndDropContainerNode extends StackPane with DragAndDropContainer {
   }
   def setup(oldTableStateOption:Option[TableState], newTableState:TableState)
 
-  tableFields.requestTableStateProperty.addListener(new ChangeListener[TableState] {
-    def changed(observable:ObservableValue[_<:TableState], oldTableState:TableState, newTableState:TableState) {
-      setup(Option(oldTableState), newTableState)
+  tableFields.requestTableStateProperty.addListener(new ChangeListener[RequestTableState] {
+    def changed(observable:ObservableValue[_<:RequestTableState], oldTableState:RequestTableState, newTableState:RequestTableState) {
+      setup(Option(oldTableState)map(_.tableState), newTableState.tableState)
     }
   })
 

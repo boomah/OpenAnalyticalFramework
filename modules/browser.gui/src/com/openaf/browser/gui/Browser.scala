@@ -4,6 +4,8 @@ import javafx.scene.layout.{StackPane, BorderPane}
 import javafx.beans.binding.{StringBinding, ObjectBinding, BooleanBinding}
 import javafx.beans.property.{SimpleObjectProperty, SimpleBooleanProperty, SimpleIntegerProperty}
 import javafx.collections.FXCollections
+import com.openaf.gui.utils.GuiUtils
+
 import collection.JavaConversions._
 import ref.SoftReference
 import com.openaf.pagemanager.api._
@@ -239,7 +241,7 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
     }
   }
 
-  def goToPage(page:Page) {
+  def goToPage(page:Page, pageDataOption:Option[PageData]) {
     checkFXThread()
     if (goingToPage.get != Some(page)) {
       println("Going to page: " + page)
@@ -251,7 +253,14 @@ class Browser(homePage:Page, initialPage:Page, tabPane:BrowserTabPane, stage:Bro
 
       val pageInfoToGoTo = PageInfo(page, emptyPageDataSoftReference)
 
-      goToPage(fromPagePosition, toPagePosition, pageInfoToGoTo, newPage = true)
+      pageDataOption match {
+        case Some(pageData) =>
+          // runLater here so if things like a context menu kicked this off it will be hidden before any more processing is done
+          GuiUtils.runLater(withPageResponse(
+            SuccessPageResponse(pageData), fromPagePosition, toPagePosition, pageInfoToGoTo, newPage = true
+          ))
+        case None => goToPage(fromPagePosition, toPagePosition, pageInfoToGoTo, newPage = true)
+      }
     }
   }
 

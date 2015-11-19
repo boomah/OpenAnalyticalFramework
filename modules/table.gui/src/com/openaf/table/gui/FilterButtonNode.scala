@@ -81,7 +81,7 @@ class FilterButtonNode[T](field:Field[T], tableFields:OpenAFTableFields, hidePop
       }
     }
   }
-  private val filteredItems = observableItems.filtered(generatePredicate(""))
+  private val filteredItems = observableItems.filtered(null)
   listView.setItems(filteredItems)
 
   private val filterTextAreaPanel = {

@@ -9,7 +9,7 @@ class ExpandAndCollapse(field:Field[_], tableFields:OpenAFTableFields) {
   private def requestNewState(collapsedState:CollapsedState) {
     val newTotals = field.totals.copy(collapsedState = collapsedState)
     val newTableState = tableFields.tableDataProperty.getValue.tableState.replaceField(field, field.withTotals(newTotals))
-    tableFields.requestTableStateProperty.setValue(newTableState)
+    tableFields.requestTableStateProperty.setValue(RequestTableState(newTableState))
   }
 
   private def menuItemFromId(id:String) = {

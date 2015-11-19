@@ -1,7 +1,7 @@
 package com.openaf.table.gui.api
 
 import com.openaf.browser.gui.api.{BrowserCacheKey, PageComponent}
-import com.openaf.table.gui.{Renderers, Renderer, OpenAFTable}
+import com.openaf.table.gui.{RequestTableState, Renderers, Renderer, OpenAFTable}
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import com.openaf.table.lib.api._
 import com.openaf.table.api.{TablePage, TablePageData}
@@ -24,7 +24,7 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
 
   def setup() {
     doingSetup = true
-    requestTableStateProperty.set(pageData.tableData.tableState)
+    requestTableStateProperty.set(RequestTableState(pageData.tableData.tableState))
     tableDataProperty.set(pageData.tableData)
     val allDefaultRenderers:Map[FieldID,List[Renderer[_]]] = Renderer.StandardRenderers ++ defaultRenderers
     renderersProperty.setValue(new Renderers(allDefaultRenderers))
@@ -46,10 +46,11 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
     doingSetup = false
   }
 
-  requestTableStateProperty.addListener(new ChangeListener[TableState] {
-    def changed(observable:ObservableValue[_<:TableState], oldValue:TableState, newValue:TableState) {
-      if (!doingSetup && (oldValue.withDefaultRendererIds != newValue.withDefaultRendererIds)) {
-        context.goToPage(page.withTableState(newValue.generateFieldKeys))
+  requestTableStateProperty.addListener(new ChangeListener[RequestTableState] {
+    def changed(observable:ObservableValue[_<:RequestTableState], oldValue:RequestTableState, newValue:RequestTableState) {
+      if (!doingSetup) {
+        val newTablePageData = newValue.newTableDataOption.map(newTableData => pageData.withTableData(newTableData))
+        context.goToPage(page.withTableState(newValue.tableState.generateFieldKeys), newTablePageData)
       }
     }
   })

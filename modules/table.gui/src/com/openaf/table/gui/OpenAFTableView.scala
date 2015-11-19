@@ -6,6 +6,8 @@ import com.openaf.table.lib.api._
 import javafx.collections.FXCollections
 import java.util
 
+import scala.collection.mutable.ArrayBuffer
+
 object OpenAFTableView {
   type TableColumnType = TableColumn[OpenAFTableRow,OpenAFTableRow]
   type OpenAFTableCell = TableCell[OpenAFTableRow,OpenAFTableRow]
@@ -36,80 +38,133 @@ class OpenAFTableView(tableFields:OpenAFTableFields) extends TableView[OpenAFTab
   override def createDefaultSkin() = tableViewSkin
 
   tableFields.tableDataProperty.addListener(new ChangeListener[TableData] {
-    def changed(observableValue:ObservableValue[_<:TableData], oldTableData:TableData, newTableData:TableData) {
-      Option(oldTableData) match {
-        case Some(tableData) if tableData.withDefaultRendererIds != newTableData.withDefaultRendererIds =>
-          setUpTableView(newTableData)
-        case None => setUpTableView(newTableData)
-        case _ =>
-          // TODO - don't need to set up the whole table here as only a renderer has changed.
-          setUpTableView(newTableData)
+    def changed(observableValue:ObservableValue[_<:TableData], oldTableDataPossiblyNull:TableData, newTableData:TableData) {
+      if (newTableData.rowHeaderFields.isEmpty && newTableData.columnHeaderLayout.isEmpty) {
+        setItems(null)
+        getColumns.clear()
+      } else {
+        Option(oldTableDataPossiblyNull) match {
+          case Some(oldTableData) if oldTableData.tableState.withDefaultFieldNodeStates == newTableData.tableState.withDefaultFieldNodeStates =>
+            // Currently only renderers are contained in the field node states
+            updateRenderers(oldTableData, newTableData)
+          case _ =>
+            // TODO - just doing a full setup here but should only update the bits that need updating
+            setUpTableView(newTableData)
+        }
       }
     }
   })
 
-  private def setUpTableView(newTableData:TableData) {
-    if (newTableData.rowHeaderFields.isEmpty && newTableData.columnHeaderLayout.isEmpty) {
-      setItems(null)
-      getColumns.clear()
-    } else {
-      val columnNames = new ExcelColumnNameIterator
-      val columns = getColumns
-      val numColumns = columns.size
-      def column(index:Int) = columns.get(index).asInstanceOf[OpenAFTableColumn]
+  private def updateRenderers(oldTableData:TableData, tableData:TableData):Unit = {
+    val columns = getColumns
+    def column(index:Int) = columns.get(index).asInstanceOf[OpenAFTableColumn]
 
-      var counter = 0
+    val oldRowHeaderFields = oldTableData.rowHeaderFields.toArray
+    val rowHeaderFields = tableData.rowHeaderFields.toArray
 
-      // Stop the current renderers from doing anything
+    var counter = 0
+
+    val paths = tableData.columnHeaderLayout.paths
+    val startRowHeaderValuesIndex = if (paths.isEmpty) 1 else paths.map(_.fields.size).max
+
+    val columnsToResize = new ArrayBuffer[Int]
+
+    while (counter < rowHeaderFields.length) {
+      val field = rowHeaderFields(counter)
+      if (oldRowHeaderFields(counter).rendererId != field.rendererId) {
+        column(counter).setCellFactory(new RowHeaderCellFactory(startRowHeaderValuesIndex, field, tableFields))
+        columnsToResize += counter
+      }
+      counter += 1
+    }
+
+    if (oldTableData.columnHeaderLayout != tableData.columnHeaderLayout) {
+      val offset = counter
+      val numColumns = tableData.tableValues.fieldPathsIndexes.length + offset
+      val maxPathLength = if (paths.isEmpty) 0 else paths.map(_.fields.size).max
+      val pathsArray = paths.toArray
+      val fieldPathIndexes = tableData.tableValues.fieldPathsIndexes
+      val valueLookUp = tableData.tableValues.valueLookUp
+      val allPathValueLookUps = paths.map(path => path.fields.map(field => valueLookUp(field.id)).toArray).toArray
+
+      var valueLookUps:Array[Array[Any]] = null
+
       while (counter < numColumns) {
-        columns.get(counter).getCellFactory.asInstanceOf[OpenAFCellFactory].shouldUpdateItem = false
+        valueLookUps = allPathValueLookUps(fieldPathIndexes(counter - offset))
+        column(counter).setCellFactory(
+          new ColumnHeaderAndDataCellFactory(valueLookUps, fieldPathIndexes, pathsArray, maxPathLength, tableFields)
+        )
+        columnsToResize += counter
+        counter += 1
+      }
+    }
+
+    columnsToResize.foreach(columnIndex =>
+      tableViewSkin.resizeColumnsToFitContent(columnIndex, columnIndex + 1, numRowsToResize(tableData))
+    )
+  }
+
+  // The TableViewSkin only considers 30 rows when initially sizing the column because it could be a very
+  // expensive operation if the number of rows is large. That behaviour is replicated here.
+  private def numRowsToResize(tableData:TableData) = math.min(30, tableData.numRows)
+
+  private def setUpTableView(newTableData:TableData) {
+    val columnNames = new ExcelColumnNameIterator
+    val columns = getColumns
+    val numColumns = columns.size
+    def column(index:Int) = columns.get(index).asInstanceOf[OpenAFTableColumn]
+
+    var counter = 0
+
+    // Stop the current renderers from doing anything
+    while (counter < numColumns) {
+      columns.get(counter).getCellFactory.asInstanceOf[OpenAFCellFactory].shouldUpdateItem = false
+      counter += 1
+    }
+
+    val rowHeaderFields = newTableData.rowHeaderFields.toArray
+    val numRowHeaderColumns = rowHeaderFields.length
+      
+    val paths = newTableData.columnHeaderLayout.paths
+    val startRowHeaderValuesIndex = if (paths.isEmpty) 1 else paths.map(_.fields.size).max
+
+    counter = 0
+
+    if (numRowHeaderColumns <= numColumns) {
+      // The number of columns required are already available. Reconfigure them and remove any extra ones.
+      while (counter < numRowHeaderColumns) {
+        val tableColumn = column(counter)
+        tableColumn.setText(columnNames.next)
+        tableColumn.columnIndex = counter
+        val field = rowHeaderFields(counter)
+        tableColumn.setCellFactory(new RowHeaderCellFactory(startRowHeaderValuesIndex, field, tableFields))
+        counter += 1
+      }
+      columns.remove(numRowHeaderColumns, numColumns)
+
+      // TODO - For now just always create the column header columns
+      columns.addAll(createColumnHeaderTableColumns(newTableData, columnNames))
+
+      setItems(FXCollections.observableArrayList[OpenAFTableRow](newTableData.tableValues.rows:_*))
+      tableViewSkin.resizeColumnsToFitContent(0, numRowHeaderColumns, numRowsToResize(newTableData))
+    } else {
+      // Reconfigure the columns available already but some extra will be required.
+      while (counter < numColumns) {
+        val tableColumn = column(counter)
+        tableColumn.setText(columnNames.next)
+        tableColumn.columnIndex = counter
+        val field = rowHeaderFields(counter)
+        tableColumn.setCellFactory(new RowHeaderCellFactory(startRowHeaderValuesIndex, field, tableFields))
         counter += 1
       }
 
-      val rowHeaderFields = newTableData.rowHeaderFields.toArray
-      val numRowHeaderColumns = rowHeaderFields.length
-      
-      val paths = newTableData.columnHeaderLayout.paths
-      val startRowHeaderValuesIndex = if (paths.isEmpty) 1 else paths.map(_.fields.size).max
+      val rowHeaderColumns = createRowHeaderTableColumns(newTableData, columnNames, numColumns)
+      // TODO - For now just always create the column header columns
+      rowHeaderColumns.addAll(createColumnHeaderTableColumns(newTableData, columnNames))
+      columns.addAll(rowHeaderColumns)
 
-      counter = 0
-
-      if (numRowHeaderColumns <= numColumns) {
-        // The number of columns required are already available. Reconfigure them and remove any extra ones.
-        while (counter < numRowHeaderColumns) {
-          val tableColumn = column(counter)
-          tableColumn.setText(columnNames.next)
-          tableColumn.columnIndex = counter
-          val field = rowHeaderFields(counter)
-          tableColumn.setCellFactory(new RowHeaderCellFactory(startRowHeaderValuesIndex, field, tableFields))
-          counter += 1
-        }
-        columns.remove(numRowHeaderColumns, numColumns)
-
-        // TODO - For now just always create the column header columns
-        columns.addAll(createColumnHeaderTableColumns(newTableData, columnNames))
-
-        setItems(FXCollections.observableArrayList[OpenAFTableRow](newTableData.tableValues.rows:_*))
-        tableViewSkin.resizeColumnsToFitContent(0, numRowHeaderColumns, newTableData.numRows)
-      } else {
-        // Reconfigure the columns available already but some extra will be required.
-        while (counter < numColumns) {
-          val tableColumn = column(counter)
-          tableColumn.setText(columnNames.next)
-          tableColumn.columnIndex = counter
-          val field = rowHeaderFields(counter)
-          tableColumn.setCellFactory(new RowHeaderCellFactory(startRowHeaderValuesIndex, field, tableFields))
-          counter += 1
-        }
-
-        val rowHeaderColumns = createRowHeaderTableColumns(newTableData, columnNames, numColumns)
-        // TODO - For now just always create the column header columns
-        rowHeaderColumns.addAll(createColumnHeaderTableColumns(newTableData, columnNames))
-        columns.addAll(rowHeaderColumns)
-
-        setItems(FXCollections.observableArrayList[OpenAFTableRow](newTableData.tableValues.rows:_*))
-        tableViewSkin.resizeColumnsToFitContent(0, numColumns, newTableData.numRows)
-      }
+      setItems(FXCollections.observableArrayList[OpenAFTableRow](newTableData.tableValues.rows:_*))
+      tableViewSkin.resizeColumnsToFitContent(0, numColumns, numRowsToResize(newTableData))
     }
   }
 

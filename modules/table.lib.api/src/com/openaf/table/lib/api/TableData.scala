@@ -11,7 +11,6 @@ case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:T
   }
   def generateFieldKeys = withTableState(tableState.generateFieldKeys)
   def numRows = tableValues.numRows
-  def withDefaultRendererIds = withTableState(tableState.withDefaultRendererIds)
 }
 object TableData {
   val Empty = TableData(FieldGroup.Empty, TableState.Blank, TableValues.Empty)

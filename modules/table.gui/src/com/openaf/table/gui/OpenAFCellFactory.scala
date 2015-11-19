@@ -13,7 +13,7 @@ trait OpenAFCellFactory extends Callback[TableColumnType,OpenAFTableCell] {
   protected def rendererBinding(field:Field[_], value:Any):StringBinding = new StringBinding {
     bind(tableFields.localeProperty)
     override def computeValue = {
-      val renderer = tableFields.renderersProperty.getValue.renderer(field).asInstanceOf[Renderer[Any]]
+      val renderer = tableFields.renderers.renderer(field).asInstanceOf[Renderer[Any]]
       renderer.render(value, tableFields.localeProperty.getValue)
     }
   }

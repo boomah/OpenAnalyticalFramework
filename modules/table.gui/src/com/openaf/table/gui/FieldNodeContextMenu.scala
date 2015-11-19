@@ -12,7 +12,7 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
   private def stringBinding(id:String) = new TableLocaleStringBinding(id, tableFields.localeProperty)
   private def rendererBinding(renderer:Renderer[_]) = new RendererNameBinding(renderer, tableFields.localeProperty)
   private def requestTableStateProperty = tableFields.requestTableStateProperty
-  private def tableState = tableFields.tableDataProperty.getValue.tableState
+  private def requestTableState = requestTableStateProperty.getValue.tableState
 
   field.fieldType match {
     case MultipleFieldType(currentFieldType) =>
@@ -21,8 +21,8 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
         measureField.textProperty.bind(stringBinding("switchToMeasure"))
         measureField.setOnAction(new EventHandler[ActionEvent] {
           def handle(event:ActionEvent) {
-            val newTableState = tableState.replaceField(field, field.toMeasure)
-            requestTableStateProperty.setValue(newTableState)
+            val newTableState = requestTableState.replaceField(field, field.toMeasure)
+            requestTableStateProperty.setValue(RequestTableState(newTableState))
           }
         })
         measureField
@@ -31,8 +31,8 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
         dimensionField.textProperty.bind(stringBinding("switchToDimension"))
         dimensionField.setOnAction(new EventHandler[ActionEvent] {
           def handle(event:ActionEvent) {
-            val newTableState = tableState.replaceField(field, field.toDimension)
-            requestTableStateProperty.setValue(newTableState)
+            val newTableState = requestTableState.replaceField(field, field.toDimension)
+            requestTableStateProperty.setValue(RequestTableState(newTableState))
           }
         })
         dimensionField
@@ -46,8 +46,8 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
     removeMenuItem.textProperty.bind(stringBinding("remove"))
     removeMenuItem.setOnAction(new EventHandler[ActionEvent] {
       def handle(event:ActionEvent) {
-        val newTableState = tableState.remove(List(field))
-        requestTableStateProperty.setValue(newTableState)
+        val newTableState = requestTableState.remove(List(field))
+        requestTableStateProperty.setValue(RequestTableState(newTableState))
       }
     })
     getItems.add(removeMenuItem)
@@ -58,8 +58,8 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
     reverseSortOrderMenuItem.textProperty.bind(stringBinding("reverseSortOrder"))
     reverseSortOrderMenuItem.setOnAction(new EventHandler[ActionEvent] {
       def handle(event:ActionEvent) {
-        val newTableState = tableState.replaceField(field, field.flipSortOrder)
-        requestTableStateProperty.setValue(newTableState)
+        val newTableState = requestTableState.replaceField(field, field.flipSortOrder)
+        requestTableStateProperty.setValue(RequestTableState(newTableState))
       }
     })
     getItems.addAll(new SeparatorMenuItem, reverseSortOrderMenuItem)
@@ -78,8 +78,8 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
     topTotalMenuItem.selectedProperty.addListener(new ChangeListener[Boolean] {
       def changed(observable:ObservableValue[_ <: Boolean], oldValue:Boolean, newValue:Boolean) {
         val newTotals = field.totals.copy(top = newValue)
-        val newTableState = tableState.replaceField(field, field.withTotals(newTotals))
-        requestTableStateProperty.setValue(newTableState)
+        val newTableState = requestTableState.replaceField(field, field.withTotals(newTotals))
+        requestTableStateProperty.setValue(RequestTableState(newTableState))
       }
     })
 
@@ -89,8 +89,8 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
     bottomTotalMenuItem.selectedProperty.addListener(new ChangeListener[Boolean] {
       def changed(observable:ObservableValue[_ <: Boolean], oldValue:Boolean, newValue:Boolean) {
         val newTotals = field.totals.copy(bottom = newValue)
-        val newTableState = tableState.replaceField(field, field.withTotals(newTotals))
-        requestTableStateProperty.setValue(newTableState)
+        val newTableState = requestTableState.replaceField(field, field.withTotals(newTotals))
+        requestTableStateProperty.setValue(RequestTableState(newTableState))
       }
     })
     getItems.addAll(new SeparatorMenuItem, topTotalMenuItem, bottomTotalMenuItem)
@@ -99,8 +99,7 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
 
     getItems.addAll(new SeparatorMenuItem, expandAndCollapse.expandAllMenuItem, expandAndCollapse.collapseAllMenuItem)
 
-    val renderersValue = tableFields.renderersProperty.getValue
-    val renderers = renderersValue.renderers(field.id)
+    val renderers = tableFields.renderers.renderers(field.id)
     if (renderers.nonEmpty) {
       val toggleGroup = new ToggleGroup
       val menuItems = new SeparatorMenuItem :: renderers.zipWithIndex.map{case (renderer,index) => {
@@ -114,10 +113,10 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
           def changed(observable:ObservableValue[_<:Boolean], oldValue:Boolean, newValue:Boolean):Unit = {
             if (newValue) {
               val newField = field.withRendererId(renderer.id)
-              val newTableState = tableFields.requestTableStateProperty.getValue.replaceField(field, newField)
-              tableFields.requestTableStateProperty.setValue(newTableState)
-              val newTableData = tableFields.tableDataProperty.getValue.replaceField(field, newField)
-              tableFields.tableDataProperty.setValue(newTableData)
+              val newTableState = requestTableState.replaceField(field, newField)
+              val tableData = tableFields.tableDataProperty.getValue
+              val newTableData = Some(tableData.replaceField(field, newField))
+              requestTableStateProperty.setValue(RequestTableState(newTableState, newTableData))
             }
           }
         })
@@ -140,8 +139,8 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
           def changed(observable:ObservableValue[_ <: Boolean], oldValue:Boolean, newValue:Boolean):Unit = {
             if (newValue) {
               val newField = field.withCombinerType(combinerType)
-              val newTableState = tableState.replaceField(field, newField)
-              requestTableStateProperty.setValue(newTableState)
+              val newTableState = requestTableState.replaceField(field, newField)
+              requestTableStateProperty.setValue(RequestTableState(newTableState))
             }
           }
         })

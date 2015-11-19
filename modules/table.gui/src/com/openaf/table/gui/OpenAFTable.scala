@@ -16,7 +16,7 @@ object OpenAFTable {
 
 class OpenAFTable extends StackPane {
   protected val tableDataProperty = new SimpleObjectProperty[TableData]
-  protected val requestTableStateProperty = new SimpleObjectProperty[TableState]
+  protected val requestTableStateProperty = new SimpleObjectProperty[RequestTableState]
   protected val renderersProperty = new SimpleObjectProperty[Renderers]
 
   private val dragAndDrop = new DragAndDrop
@@ -74,6 +74,10 @@ class OpenAFTable extends StackPane {
   })
 }
 
-case class OpenAFTableFields(tableDataProperty:Property[TableData], requestTableStateProperty:Property[TableState],
+case class OpenAFTableFields(tableDataProperty:Property[TableData], requestTableStateProperty:Property[RequestTableState],
                              dragAndDrop:DragAndDrop, localeProperty:Property[Locale],
-                             fieldBindings:ObservableMap[FieldID,StringBinding], renderersProperty:Property[Renderers])
+                             fieldBindings:ObservableMap[FieldID,StringBinding], renderersProperty:Property[Renderers]) {
+  def renderers = renderersProperty.getValue
+}
+
+case class RequestTableState(tableState:TableState, newTableDataOption:Option[TableData]=None)

@@ -46,11 +46,11 @@ class FilterButtonNodeModel[T](val field:Field[T], tableFields:OpenAFTableFields
       resetRequired = false
       var allSelected = true
       var selected = false
-      propertyLookUp.foreach{case (value,property) => {
+      propertyLookUp.foreach{case (value,property) =>
         selected = field.filter.matches(valueLookUp(value.toInt))
         allSelected = allSelected & selected
         property.set(selected)
-      }}
+      }
       setAllProperty(allSelected)
     }
   }
@@ -89,9 +89,7 @@ class FilterButtonNodeModel[T](val field:Field[T], tableFields:OpenAFTableFields
       allBooleanProperty.set(true)
     } else {
       updateAllProperty(false)
-      propertyLookUp.foreach{case (value,property) => {
-        property.set(intValue == value)
-      }}
+      propertyLookUp.foreach{case (value,property) => property.set(intValue == value)}
       retainFilterType = true
     }
   }
@@ -111,12 +109,12 @@ class FilterButtonNodeModel[T](val field:Field[T], tableFields:OpenAFTableFields
   private[gui] def updateTableState(filter:Filter[T]) {
     val newField = field.withFilter(filter)
     val newTableState = tableFields.tableDataProperty.getValue.tableState.replaceField(field, newField)
-    tableFields.requestTableStateProperty.setValue(newTableState)
+    tableFields.requestTableStateProperty.setValue(RequestTableState(newTableState))
   }
 
   private[gui] def property(intValue:Int) = if (intValue == 0) allBooleanProperty else propertyLookUp(intValue)
   private[gui] def text(intValue:Int) = {
-    val renderer = tableFields.renderersProperty.getValue.renderer(field).asInstanceOf[Renderer[Any]]
+    val renderer = tableFields.renderers.renderer(field).asInstanceOf[Renderer[Any]]
     if (intValue == 0) {
       TableLocaleStringBinding.stringFromBundle("all", tableFields.localeProperty.getValue)
     } else {
@@ -125,7 +123,7 @@ class FilterButtonNodeModel[T](val field:Field[T], tableFields:OpenAFTableFields
   }
   private[gui] def stringProperty(intValue:Int) = {
     new StringBinding {
-      bind(tableFields.renderersProperty, tableFields.localeProperty)
+      bind(tableFields.localeProperty)
       override def computeValue = text(intValue)
     }
   }
@@ -135,10 +133,10 @@ class FilterButtonNodeModel[T](val field:Field[T], tableFields:OpenAFTableFields
     if (allBooleanProperty.get) {
       RetainAllFilter[T]()
     } else {
-      val filteredValues = propertyLookUp.collect{case (intValue,property) if property.get == retainFilterType => {
+      val filteredValues = propertyLookUp.collect{case (intValue,property) if property.get == retainFilterType =>
         valueLookUp(intValue.toInt)
-      }}.toSet
-      if ((retainFilterType && filteredValues.isEmpty) || (!retainFilterType && (filteredValues.size == values.size))) {
+      }.toSet
+      if ((retainFilterType && filteredValues.isEmpty) || (!retainFilterType && (filteredValues.size == values.length))) {
         RejectAllFilter[T]()
       } else {
         if (retainFilterType) {

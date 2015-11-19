@@ -2,37 +2,39 @@ package com.openaf.table.gui
 
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.event.{ActionEvent, EventHandler}
-import javafx.geometry.{Orientation, Pos}
+import javafx.geometry.Pos
 import javafx.scene.control._
 
 import com.openaf.gui.utils.Icons._
 import com.openaf.table.gui.binding.TableLocaleStringBinding
-import com.openaf.table.lib.api.{TableLayout, TableState}
+import com.openaf.table.lib.api.TableLayout
 
 class OpenAFTableToolBar(tableFields:OpenAFTableFields) extends ToolBar {
   getStyleClass.add("openaf-table-tool-bar")
 
+  private def requestTableState = tableFields.requestTableStateProperty.getValue.tableState
+
   val clearLayoutButton = OpenAFTableToolBarButton(ClearLayout, "clearLayout", tableFields) { () =>
-    val newTableState = tableFields.requestTableStateProperty.getValue.copy(tableLayout = TableLayout.Blank)
-    tableFields.requestTableStateProperty.setValue(newTableState)
+    val newTableState = requestTableState.copy(tableLayout = TableLayout.Blank)
+    tableFields.requestTableStateProperty.setValue(RequestTableState(newTableState))
   }
 
   val topRowGrandTotalsButton = TotalsToolBarToggleButton("topRowGrandTotals", tableFields, Pos.TOP_CENTER) { () =>
-    val newTableState = tableFields.requestTableStateProperty.getValue.toggleTopRowGrandTotal
-    tableFields.requestTableStateProperty.setValue(newTableState)
+    val newTableState = requestTableState.toggleTopRowGrandTotal
+    tableFields.requestTableStateProperty.setValue(RequestTableState(newTableState))
   }
   topRowGrandTotalsButton.getStyleClass.add("top-total")
 
   val bottomRowGrandTotalsButton = TotalsToolBarToggleButton("bottomRowGrandTotals", tableFields, Pos.BOTTOM_CENTER) { () =>
-    val newTableState = tableFields.requestTableStateProperty.getValue.toggleBottomRowGrandTotal
-    tableFields.requestTableStateProperty.setValue(newTableState)
+    val newTableState = requestTableState.toggleBottomRowGrandTotal
+    tableFields.requestTableStateProperty.setValue(RequestTableState(newTableState))
   }
   bottomRowGrandTotalsButton.getStyleClass.add("bottom-total")
 
-  tableFields.requestTableStateProperty.addListener(new ChangeListener[TableState] {
-    def changed(observable:ObservableValue[_<:TableState], oldTableState:TableState, newTableState:TableState) {
-      topRowGrandTotalsButton.setSelected(newTableState.rowGrandTotals.top)
-      bottomRowGrandTotalsButton.setSelected(newTableState.rowGrandTotals.bottom)
+  tableFields.requestTableStateProperty.addListener(new ChangeListener[RequestTableState] {
+    def changed(observable:ObservableValue[_<:RequestTableState], oldTableState:RequestTableState, newTableState:RequestTableState) {
+      topRowGrandTotalsButton.setSelected(newTableState.tableState.rowGrandTotals.top)
+      bottomRowGrandTotalsButton.setSelected(newTableState.tableState.rowGrandTotals.bottom)
     }
   })
 
