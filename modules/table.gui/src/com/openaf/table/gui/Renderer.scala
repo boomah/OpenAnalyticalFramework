@@ -6,7 +6,15 @@ import com.openaf.table.lib.api.StandardFields._
 import com.openaf.table.lib.api._
 
 trait Renderer[V] {
+  /**
+   * Unique identifier for the renderer. Is used in the TableState to indicate which renderer is in use.
+   */
   def id:RendererId.RendererId = getClass.getName
+
+  /**
+   * The text used to look up the name of the renderer in the resource file. If there is no entry in the resource file,
+   * this text is displayed.
+   */
   def name:String = {
     val className = getClass.getSimpleName.replace("$", "")
     if (className.length > 1) className.head.toLower + className.tail else className.toLowerCase
@@ -42,6 +50,10 @@ case class FormattedIntRenderer(format:String="%05d") extends Renderer[Int] {
 
 case object IntegerRenderer extends Renderer[Integer] {
   override def render(value:Integer, locale:Locale) = value.toString
+}
+
+case class FormattedIntegerRenderer(format:String="%05d") extends Renderer[Integer] {
+  override def render(value:Integer, locale:Locale) = format.format(value)
 }
 
 case object DefaultRenderer extends Renderer[Any] {

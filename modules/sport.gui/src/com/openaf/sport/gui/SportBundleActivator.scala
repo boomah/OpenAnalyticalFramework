@@ -57,14 +57,14 @@ object SportRenderers {
 
   val RunningPageRenderers = Map(
     LocationField.id -> List(StringRenderer),
-    NumberField.id -> List(IntegerRenderer),
-    DateField.id -> List(LocalDateRenderer()),
-    PositionField.id -> List(IntegerRenderer),
+    NumberField.id -> List(IntegerRenderer, FormattedIntegerRenderer()),
+    DateField.id -> List(LocalDateRenderer(), LocalDateRenderer.MonthYearRenderer),
+    PositionField.id -> List(IntegerRenderer, FormattedIntegerRenderer()),
     TimeField.id -> List(DurationRenderer, HourDurationRenderer),
     AgeCatField.id -> List(StringRenderer),
     AgeGradeField.id -> List(StringRenderer),
     GenderField.id -> List(StringRenderer),
-    GenderPosField.id -> List(IntegerRenderer),
+    GenderPosField.id -> List(IntegerRenderer, FormattedIntegerRenderer()),
     ClubField.id -> List(StringRenderer),
     NoteField.id -> List(StringRenderer)
   )

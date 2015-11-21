@@ -37,9 +37,19 @@ trait SpecialHandlingDurationRenderer extends Renderer[Duration] {
   def renderDuration(value:Duration, locale:Locale):String
 }
 
-case class LocalDateRenderer(pattern:String="") extends Renderer[LocalDate] {
+class LocalDateRenderer(pattern:String="dd-MM-yyyy") extends Renderer[LocalDate] {
   override def render(value:LocalDate, locale:Locale) = {
-    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", locale)
+    val formatter = DateTimeFormatter.ofPattern(pattern, locale)
     value.format(formatter)
+  }
+}
+
+object LocalDateRenderer {
+  def apply(pattern:String="dd-MM-yyyy") = new LocalDateRenderer(pattern)
+
+  // Don't really need this as the LocalDateRenderer in the future will allow itself to be configured
+  val MonthYearRenderer = new LocalDateRenderer("MMM-yy") {
+    override def id = super.id + ".MonthYearRenderer"
+    override def name = "monthYearRenderer"
   }
 }
