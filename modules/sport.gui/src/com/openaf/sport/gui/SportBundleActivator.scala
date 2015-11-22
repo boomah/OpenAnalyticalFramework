@@ -45,27 +45,27 @@ object RunningPageFactory extends PageFactory {
 
 object SportRenderers {
   val GoalPageRenderers = Map(
-    PlayerField.id -> List(StringRenderer),
-    StartTimeField.id -> List(IntRenderer),
-    TeamField.id -> List(StringRenderer),
-    OppositionTeamField.id -> List(StringRenderer),
-    VenueField.id -> List(StringRenderer),
-    DateField.id -> List(StringRenderer),
-    KickOffTimeField.id -> List(StringRenderer),
-    CompetitionField.id -> List(StringRenderer)
+    PlayerField.id -> Renderer.StringRenderers,
+    StartTimeField.id -> Renderer.IntRenderers,
+    TeamField.id -> Renderer.StringRenderers,
+    OppositionTeamField.id -> Renderer.StringRenderers,
+    VenueField.id -> Renderer.StringRenderers,
+    DateField.id -> Renderer.StringRenderers,
+    KickOffTimeField.id -> Renderer.StringRenderers,
+    CompetitionField.id -> Renderer.StringRenderers
   )
 
   val RunningPageRenderers = Map(
-    LocationField.id -> List(StringRenderer),
-    NumberField.id -> List(IntegerRenderer, FormattedIntegerRenderer()),
-    DateField.id -> List(LocalDateRenderer(), LocalDateRenderer.MonthYearRenderer),
-    PositionField.id -> List(IntegerRenderer, FormattedIntegerRenderer()),
-    TimeField.id -> List(DurationRenderer, HourDurationRenderer),
-    AgeCatField.id -> List(StringRenderer),
-    AgeGradeField.id -> List(StringRenderer),
-    GenderField.id -> List(StringRenderer),
-    GenderPosField.id -> List(IntegerRenderer, FormattedIntegerRenderer()),
-    ClubField.id -> List(StringRenderer),
-    NoteField.id -> List(StringRenderer)
+    LocationField.id -> Renderer.StringRenderers,
+    NumberField.id -> Renderer.IntegerRenderers,
+    DateField.id -> Renderer.LocalDateRenderers,
+    PositionField.id -> Renderer.IntegerRenderers,
+    TimeField.id -> Renderer.DurationRenderers,
+    AgeCatField.id -> Renderer.StringRenderers,
+    AgeGradeField.id -> Renderer.StringRenderers,
+    GenderField.id -> Renderer.StringRenderers,
+    GenderPosField.id -> Renderer.IntegerRenderers,
+    ClubField.id -> Renderer.StringRenderers,
+    NoteField.id -> Renderer.StringRenderers
   )
 }

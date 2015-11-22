@@ -75,22 +75,47 @@ object MSetRenderer {
 }
 
 object Renderer {
-  val StandardRenderers:Map[FieldID,List[Renderer[_]]] = Map(
-    CountField.id -> List(IntRenderer)
+  val StandardRenderers:Map[FieldID,Map[TransformerType[_],List[Renderer[_]]]] = Map(
+    CountField.id -> Map(
+      IdentityTransformerType -> List(IntRenderer)
+    )
+  )
+
+  val IntRenderers:Map[TransformerType[_],List[Renderer[_]]] = Map(
+    IdentityTransformerType -> List(IntRenderer)
+  )
+
+  val IntegerRenderers:Map[TransformerType[_],List[Renderer[_]]] = Map(
+    IdentityTransformerType -> List(IntegerRenderer, FormattedIntegerRenderer())
+  )
+
+  val StringRenderers:Map[TransformerType[_],List[Renderer[_]]] = Map(
+    IdentityTransformerType -> List(StringRenderer)
+  )
+
+  val LocalDateRenderers:Map[TransformerType[_],List[Renderer[_]]] = Map(
+    IdentityTransformerType -> List(LocalDateRenderer(), LocalDateRenderer.MonthYearRenderer),
+    LocalDateToYearMonthTransformerType -> List(YearMonthRenderer())
+  )
+
+  val DurationRenderers:Map[TransformerType[_],List[Renderer[_]]] = Map(
+    IdentityTransformerType -> List(DurationRenderer, HourDurationRenderer)
   )
 }
 
-class Renderers(renderers:Map[FieldID,List[Renderer[_]]]=Map.empty) {
-  private val idToRenderers:Map[RendererId.RendererId,Renderer[_]] = renderers.flatMap{case (_,rendererList) =>
-      rendererList.map(renderer => renderer.id -> renderer)
+class Renderers(renderers:Map[FieldID,Map[TransformerType[_],List[Renderer[_]]]]=Map.empty) {
+  private val idToRenderers:Map[RendererId.RendererId,Renderer[_]] = renderers.flatMap{case (_,transformerTypeToRenderer) =>
+    transformerTypeToRenderer.flatMap{case (_,rendererList) => rendererList.map(renderer => renderer.id -> renderer)}
   }.toMap
   def renderer(field:Field[_]):Renderer[_] = {
     val selectedRenderer = if (field.rendererId == RendererId.DefaultRendererId) {
-      renderers.get(field.id).flatMap(_.headOption).getOrElse(DefaultRenderer)
+      renderers.get(field.id).flatMap(_.get(field.transformerType)).flatMap(_.headOption).getOrElse(DefaultRenderer)
     } else {
       idToRenderers.getOrElse(field.rendererId, DefaultRenderer)
     }
     NoValueAwareDelegatingRenderer(selectedRenderer)
   }
-  def renderers(fieldId:FieldID):List[Renderer[_]] = renderers.getOrElse(fieldId, Nil)
+  def renderers(fieldId:FieldID, transformerType:TransformerType[_]):List[Renderer[_]] = {
+    renderers.get(fieldId).flatMap(_.get(transformerType)).getOrElse(Nil)
+  }
 }

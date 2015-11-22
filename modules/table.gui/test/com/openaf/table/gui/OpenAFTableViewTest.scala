@@ -28,7 +28,7 @@ class OpenAFTableViewTest extends FunSuite {
       fieldPathsIndexes = Array(0,0),
       valueLookUp = GenderValuesLookUp
     )
-    val tableData = TableData(FieldGroupData, tableState, tableValues).generateFieldKeys
+    val tableData = TableData(FieldGroupData, tableState, tableValues, Transformers.Empty).generateFieldKeys
     tableDataProperty.set(tableData)
 
     val columns = tableView.getColumns

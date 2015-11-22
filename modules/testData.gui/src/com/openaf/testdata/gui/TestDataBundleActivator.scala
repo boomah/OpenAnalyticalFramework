@@ -3,9 +3,9 @@ package com.openaf.testdata.gui
 import java.util.Locale
 
 import com.openaf.browser.gui.api.{PageFactory, BrowserActionButton, BrowserContext}
-import com.openaf.table.gui.{Renderer, FormattedIntRenderer, IntRenderer}
+import com.openaf.table.gui.Renderer
 import com.openaf.table.gui.api.{TablePageComponentFactory, TableApplication, TableBundleActivator}
-import com.openaf.table.lib.api.TableState
+import com.openaf.table.lib.api.{IdentityTransformerType, TableState}
 import com.openaf.testdata.api.{TestDataPage, StringWrapper}
 import com.openaf.testdata.api.TestDataTablePageDataFacility._
 
@@ -16,9 +16,9 @@ class TestDataBundleActivator extends TableBundleActivator {
 object TestDataTableApplication extends TableApplication {
   override def nameId = NameId
   override def defaultRenderers = Map(
-    IdField.id -> List(IntRenderer, FormattedIntRenderer()),
-    PersonField.id -> List(StringWrapperRenderer),
-    ScoreField.id -> List(IntRenderer)
+    IdField.id -> Renderer.IntegerRenderers,
+    PersonField.id -> Map(IdentityTransformerType -> List(StringWrapperRenderer)),
+    ScoreField.id -> Renderer.IntRenderers
   )
   override def componentFactoryMap = Map(
     classOf[TestDataPage].getName -> new TablePageComponentFactory(nameId, defaultRenderers)

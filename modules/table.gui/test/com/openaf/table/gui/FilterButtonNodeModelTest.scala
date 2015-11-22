@@ -13,7 +13,7 @@ class FilterButtonNodeModelTest extends FunSuite {
     val tableState = TableState(tableLayout).generateFieldKeys
     val fieldValues = FieldValues(nameFieldValues(NameField))
     val tableValues = TableValues.Empty.copy(fieldValues = fieldValues, valueLookUp = NameValuesLookUp)
-    TableData(FieldGroupData, tableState, tableValues)
+    TableData(FieldGroupData, tableState, tableValues, Transformers.Empty)
   }
   val tableDataProperty = new SimpleObjectProperty[TableData](tableData)
   val requestTableStateProperty = new SimpleObjectProperty[RequestTableState](RequestTableState(tableData.tableState))
@@ -74,7 +74,7 @@ class FilterButtonNodeModelTest extends FunSuite {
       val tableState = TableState(tableLayout)
       val fieldValues = FieldValues(nameFieldValues(nameField))
       val tableValues = TableValues.Empty.copy(fieldValues = fieldValues, valueLookUp = NameValuesLookUp)
-      TableData(FieldGroupData, tableState, tableValues)
+      TableData(FieldGroupData, tableState, tableValues, Transformers.Empty)
     }
     val newTableDataProperty = new SimpleObjectProperty[TableData](newTableData)
     val model = new FilterButtonNodeModel[String](nameField, tableFields.copy(tableDataProperty = newTableDataProperty))
@@ -89,7 +89,7 @@ class FilterButtonNodeModelTest extends FunSuite {
       val tableState = TableState(tableLayout)
       val fieldValues = FieldValues(nameFieldValues(nameField))
       val tableValues = TableValues.Empty.copy(fieldValues = fieldValues, valueLookUp = NameValuesLookUp)
-      TableData(FieldGroupData, tableState, tableValues)
+      TableData(FieldGroupData, tableState, tableValues, Transformers.Empty)
     }
     val newTableDataProperty = new SimpleObjectProperty[TableData](newTableData)
     val model = new FilterButtonNodeModel[String](nameField, tableFields.copy(tableDataProperty = newTableDataProperty))

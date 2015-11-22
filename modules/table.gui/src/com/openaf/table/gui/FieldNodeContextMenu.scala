@@ -5,14 +5,21 @@ import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.event.{ActionEvent, EventHandler}
 import javafx.scene.control._
 
-import com.openaf.table.gui.binding.{RendererNameBinding, TableLocaleStringBinding}
+import com.openaf.table.gui.binding.{PackageNameBinding, TableLocaleStringBinding}
 import com.openaf.table.lib.api._
 
 class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) extends ContextMenu {
-  private def stringBinding(id:String) = new TableLocaleStringBinding(id, tableFields.localeProperty)
-  private def rendererBinding(renderer:Renderer[_]) = new RendererNameBinding(renderer, tableFields.localeProperty)
+  private def localeProperty = tableFields.localeProperty
+  private def stringBinding(id:String) = new TableLocaleStringBinding(id, localeProperty)
+  // TODO - the rendererBinding presumes all renderers are going to be in a package with a structure like
+  // com\.openaf\.(.+)\.gui which might not be the case for user defined renderers
+  private def rendererBinding(renderer:Renderer[_]) = new PackageNameBinding(renderer.name, renderer, localeProperty)
+  // TODO - the transformerTypeBinding presumes all transformer types are listed in com.openaf.table.gui.resources.table.properties
+  // which will not be the case for user defined transformer types
+  private def transformerTypeBinding(transformerType:TransformerType[_]) = stringBinding(transformerType.name)
   private def requestTableStateProperty = tableFields.requestTableStateProperty
   private def requestTableState = requestTableStateProperty.getValue.tableState
+  private def tableData = tableFields.tableDataProperty.getValue
 
   field.fieldType match {
     case MultipleFieldType(currentFieldType) =>
@@ -66,7 +73,7 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
   }
 
   {
-    val (topTotalStringID, bottomTotalStringID) = if (tableFields.tableDataProperty.getValue.tableState.isColumnHeaderField(field)) {
+    val (topTotalStringID, bottomTotalStringID) = if (tableData.tableState.isColumnHeaderField(field)) {
       ("leftTotal", "rightTotal")
     } else {
       ("topTotal", "bottomTotal")
@@ -99,7 +106,7 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
 
     getItems.addAll(new SeparatorMenuItem, expandAndCollapse.expandAllMenuItem, expandAndCollapse.collapseAllMenuItem)
 
-    val renderers = tableFields.renderers.renderers(field.id)
+    val renderers = tableFields.renderers.renderers(field.id, field.transformerType)
     if (renderers.nonEmpty) {
       val toggleGroup = new ToggleGroup
       val menuItems = new SeparatorMenuItem :: renderers.zipWithIndex.map{case (renderer,index) => {
@@ -114,7 +121,6 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
             if (newValue) {
               val newField = field.withRendererId(renderer.id)
               val newTableState = requestTableState.replaceField(field, newField)
-              val tableData = tableFields.tableDataProperty.getValue
               val newTableData = Some(tableData.replaceField(field, newField))
               requestTableStateProperty.setValue(RequestTableState(newTableState, newTableData))
             }
@@ -147,6 +153,33 @@ class FieldNodeContextMenu[T](field:Field[T], tableFields:OpenAFTableFields) ext
         combinerTypeMenuItem
       })
       getItems.addAll(menuItems.toArray:_*)
+    }
+
+    {
+      val transformerTypes = tableData.transformers.transformers(field.id)
+      if (transformerTypes.nonEmpty) {
+        val toggleGroup = new ToggleGroup
+        val menuItems = new SeparatorMenuItem :: (IdentityTransformerType :: transformerTypes).map(transformerType => {
+          val transformerTypeMenuItem = new RadioMenuItem
+          transformerTypeMenuItem.textProperty.bind(transformerTypeBinding(transformerType))
+          toggleGroup.getToggles.add(transformerTypeMenuItem)
+          if (field.transformerType == transformerType) {
+            toggleGroup.selectToggle(transformerTypeMenuItem)
+          }
+          transformerTypeMenuItem.selectedProperty.addListener(new ChangeListener[Boolean] {
+            def changed(observable:ObservableValue[_ <: Boolean], oldValue:Boolean, newValue:Boolean):Unit = {
+              if (newValue) {
+                val newField = field.withTransformerType(transformerType)
+                val newTableState = requestTableState.replaceField(field, newField)
+                requestTableStateProperty.setValue(RequestTableState(newTableState))
+              }
+            }
+          })
+          transformerTypeMenuItem
+        })
+
+        getItems.addAll(menuItems.toArray:_*)
+      }
     }
   }
 }

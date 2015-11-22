@@ -394,4 +394,14 @@ class UnfilteredArrayTableDataSourceTest extends FunSuite {
 
     check(tableState, expectedRowHeaderValues, expectedColHeaders, expectedData, expectedFieldValues, expectedValueLookUp)
   }
+
+  test("1 row (DateField), 0 measure, 0 column") {
+    val tableState = TableState.Blank.withRowHeaderFields(List(DateField))
+
+    val expectedRowHeaderValues = Set(List(1), List(2), List(3), List(4), List(5), List(1))
+    val expectedValueLookUp = Map(DateField.id -> List(DateField.id, Date1, Date2, Date3, Date4, Date5))
+    val expectedFieldValues = dateFieldValues(DateField.withKey(RowHeaderFieldKey(0)))
+
+    check(tableState, expectedRowHeaderValues, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
+  }
 }

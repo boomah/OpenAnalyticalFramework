@@ -1,5 +1,7 @@
 package com.openaf.table.server.datasources
 
+import java.time.LocalDate
+
 import com.openaf.table.lib.api._
 import com.openaf.table.server._
 import org.scalatest.Assertions._
@@ -14,12 +16,15 @@ object DataSourceTestData {
   val GroupField = Field[String]("group")
   val AgeField = Field[Int]("age")
   val ScoreField = Field[Int]("score", Measure)
+  val DateField = Field[LocalDate]("date")
 
   private val StringFields = List(NameField, GenderField, LocationField, GroupField)
   private val StringFieldDefinitions = StringFields.map(field => StringFieldDefinition(field))
+  private val DateFields = List(DateField)
+  private val DateFieldDefinitions = DateFields.map(field => LocalDateFieldDefinition(field))
   private val IntFields = List(AgeField, ScoreField)
   private val IntFieldDefinitions = IntFields.map(field => IntFieldDefinition(field))
-  private val FieldDefinitions:List[FieldDefinition] = StringFieldDefinitions ::: IntFieldDefinitions
+  private val FieldDefinitions:List[FieldDefinition] = StringFieldDefinitions ::: DateFieldDefinitions ::: IntFieldDefinitions
 
   val FieldIDs = FieldDefinitions.map(_.defaultField.id).toArray
   val Group = FieldDefinitionGroup("Fields", FieldDefinitions.map(definition => Right(definition)))
@@ -42,22 +47,33 @@ object DataSourceTestData {
 
   val Friends = "Friends"
 
+  val Date1 = LocalDate.of(2015, 5, 15)
+  val Date2 = LocalDate.of(2015, 5, 14)
+  val Date3 = LocalDate.of(2015, 6, 15)
+  val Date4 = LocalDate.of(2014, 3, 8)
+  val Date5 = LocalDate.of(2013, 5, 15)
+
+  val MonthYear1 = LocalDateToYearMonthTransformer.transform(Date1)
+  val MonthYear2 = LocalDateToYearMonthTransformer.transform(Date3)
+  val MonthYear3 = LocalDateToYearMonthTransformer.transform(Date4)
+  val MonthYear4 = LocalDateToYearMonthTransformer.transform(Date5)
+
   val data:Array[Array[Any]] = Array(
-    Array(Rosie, F, London,     Friends, 36, 50),
-    Array(Laura, F, Manchester, Friends, 36, 60),
-    Array(Josie, F, Manchester, Friends, 31, 70),
-    Array(Nick,  M, London,     Friends, 34, 80),
-    Array(Paul,  M, Manchester, Friends, 32, 90),
-    Array(Ally,  M, Edinburgh,  Friends, 34, 75)
+    Array(Rosie, F, London,     Friends, Date1, 36, 50),
+    Array(Laura, F, Manchester, Friends, Date2, 36, 60),
+    Array(Josie, F, Manchester, Friends, Date3, 31, 70),
+    Array(Nick,  M, London,     Friends, Date4, 34, 80),
+    Array(Paul,  M, Manchester, Friends, Date5, 32, 90),
+    Array(Ally,  M, Edinburgh,  Friends, Date1, 34, 75)
   )
 
   val dataWithNoValues:Array[Array[Any]] = Array(
-    Array(Rosie,   F,       London,     Friends, 36,      50),
-    Array(Laura,   F,       Manchester, Friends, 36,      60),
-    Array(Unknown, NoValue, NoValue,    NoValue, NoValue, 70),
-    Array(Nick,    M,       London,     Friends, 34,      80),
-    Array(Paul,    M,       Manchester, Friends, 32,      90),
-    Array(Unknown, NoValue, NoValue,    NoValue, NoValue, 75)
+    Array(Rosie,   F,       London,     Friends, Date1,   36,      50),
+    Array(Laura,   F,       Manchester, Friends, Date2,   36,      60),
+    Array(Unknown, NoValue, NoValue,    NoValue, NoValue, NoValue, 70),
+    Array(Nick,    M,       London,     Friends, Date4,   34,      80),
+    Array(Paul,    M,       Manchester, Friends, Date5,   32,      90),
+    Array(Unknown, NoValue, NoValue,    NoValue, NoValue, NoValue, 75)
   )
 
   val EmptyListSet:Set[List[Int]] = Set(Nil)
@@ -84,6 +100,9 @@ object DataSourceTestData {
   def groupFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1))
   def orderedGroupFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1))
   def countFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
+  def ageFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2,3,4))
+  def dateFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2,3,4,5))
+  def monthYearFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2,3,4))
 
   def row(rowIndex:Int=0, rowHeaderValues:List[Int]=Nil, columnHeaderAndDataValues:List[Any]=Nil) = {
     new OpenAFTableRow(rowIndex, rowHeaderValues.toArray, columnHeaderAndDataValues.toArray)

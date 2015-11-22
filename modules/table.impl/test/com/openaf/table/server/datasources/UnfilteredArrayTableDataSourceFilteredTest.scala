@@ -1,5 +1,7 @@
 package com.openaf.table.server.datasources
 
+import java.time.YearMonth
+
 import org.scalatest.FunSuite
 import DataSourceTestData._
 import com.openaf.table.lib.api._
@@ -266,6 +268,18 @@ class UnfilteredArrayTableDataSourceFilteredTest extends FunSuite {
     )
     val expectedFieldValues = genderFieldValues(genderField.withKey(FilterFieldKey(0))) ++
       Map(NameField.withKey(RowHeaderFieldKey(0)) -> List(1,2,3))
+
+    check(tableState, expectedRowHeaderValues, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("1 row (filtered first then transformed to MonthYear), 0 measure, 0 column, 0 filter") {
+    val dateField = DateField.withSingleFilter(Date1).withTransformerType(LocalDateToYearMonthTransformerType)
+    val tableState = TableState.Blank.withRowHeaderFields(List(dateField))
+
+    val expectedRowHeaderValues = Set(List(1))
+    val expectedValueLookUp = Map(DateField.id -> List(DateField.id, MonthYear1, MonthYear2, MonthYear3, MonthYear4))
+    val expectedDateField = dateField.asInstanceOf[Field[YearMonth]].withKey(RowHeaderFieldKey(0)).withSingleFilter(MonthYear1)
+    val expectedFieldValues = monthYearFieldValues(expectedDateField)
 
     check(tableState, expectedRowHeaderValues, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
   }

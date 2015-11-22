@@ -15,7 +15,8 @@ private[server] class TableDataGeneratorSorter(pivotData:PivotData) {
 
     tableState.filterFields.zipWithIndex.foreach{case (field,i) => {
       val fieldValues = pivotData.fieldValues.values(field)
-      val fieldDefinition = filterFieldDefinitions(i)
+      val currentFieldDefinition = filterFieldDefinitions(i)
+      val fieldDefinition = currentFieldDefinition.transformer(field.transformerType).transformedFieldDefinition(currentFieldDefinition)
       val ordering = fieldDefinition.ordering
       val lookUp = filterLookUps(i).asInstanceOf[Array[fieldDefinition.V]]
       FieldValuesSorting.sort(fieldValues, ordering, lookUp, field.sortOrder)
@@ -23,14 +24,17 @@ private[server] class TableDataGeneratorSorter(pivotData:PivotData) {
   }
 
   def sortRowHeaderAndFieldValues() {
-    val rowHeaderFieldIDs = tableState.tableLayout.rowHeaderFieldIDs
-    val rowHeaderFieldDefinitions = rowHeaderFieldIDs.map(fieldDefinition).toArray
-    val rowHeaderLookUps = rowHeaderFieldIDs.map(pivotData.valueLookUp).toArray
+    val rowHeaderFields = tableState.tableLayout.rowHeaderFields.toArray
+    val rowHeaderFieldIDs = rowHeaderFields.map(_.id)
+    val rowHeaderFieldDefinitions = rowHeaderFields.map(field => {
+      val currentFieldDefinition = fieldDefinition(field.id)
+      currentFieldDefinition.transformer(field.transformerType).transformedFieldDefinition(currentFieldDefinition)
+    })
+    val rowHeaderLookUps = rowHeaderFieldIDs.map(pivotData.valueLookUp)
 
     util.Arrays.sort(
       pivotData.rowHeaderValues,
-      new RowHeaderComparator(tableState.tableLayout.rowHeaderFields.toArray, rowHeaderFieldDefinitions,
-        rowHeaderLookUps)
+      new RowHeaderComparator(rowHeaderFields, rowHeaderFieldDefinitions, rowHeaderLookUps)
     )
 
     tableState.rowHeaderFields.zipWithIndex.foreach{case (field,i) => {
@@ -50,7 +54,9 @@ private[server] class TableDataGeneratorSorter(pivotData:PivotData) {
     val columnHeaderFieldKeyFieldDefinitions = new Array[FieldDefinition](columnHeaderFields.length)
     val columnHeaderFieldKeyLookUps = new Array[Array[Any]](columnHeaderFields.length)
     columnHeaderFields.foreach(field => {
-      columnHeaderFieldKeyFieldDefinitions(field.key.number) = fieldDefinition(field.id)
+      val currentFieldDefinition = fieldDefinition(field.id)
+      val transformedFieldDefinition = currentFieldDefinition.transformer(field.transformerType).transformedFieldDefinition(currentFieldDefinition)
+      columnHeaderFieldKeyFieldDefinitions(field.key.number) = transformedFieldDefinition
       columnHeaderFieldKeyLookUps(field.key.number) = pivotData.valueLookUp(field.id)
     })
 

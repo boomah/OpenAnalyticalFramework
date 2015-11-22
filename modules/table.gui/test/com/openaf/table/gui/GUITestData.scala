@@ -49,12 +49,12 @@ object GUITestData {
 
   def nameFieldValues(field:Field[_]):Map[Field[_],Array[Int]] = Map(field -> Array(1,2,3,4,5,6))
 
-  val DefaultRenderers:Map[FieldID,List[Renderer[_]]] = Map(
-    NameField.id -> List(StringRenderer),
-    GenderField.id -> List(StringRenderer),
-    LocationField.id -> List(StringRenderer),
-    AgeField.id -> List(IntRenderer),
-    ScoreField.id -> List(IntRenderer),
-    GroupField.id -> List(StringRenderer)
+  val DefaultRenderers:Map[FieldID,Map[TransformerType[_],List[Renderer[_]]]] = Map(
+    NameField.id -> Renderer.StringRenderers,
+    GenderField.id -> Renderer.StringRenderers,
+    LocationField.id -> Renderer.StringRenderers,
+    AgeField.id -> Renderer.IntRenderers,
+    ScoreField.id -> Renderer.IntRenderers,
+    GroupField.id -> Renderer.StringRenderers
   )
 }

@@ -1,6 +1,6 @@
 package com.openaf.table.server
 
-import java.time.{LocalDate, Duration}
+import java.time.{YearMonth, LocalDate, Duration}
 
 import com.openaf.table.lib.api._
 
@@ -32,9 +32,23 @@ class LocalDateFieldDefinition(override val defaultField:Field[LocalDate]) exten
   override val primaryKey = false
   override val ordering = LocalDateOrdering
   override def combiner = new LocalDateCombiner
+  override def transformers = List(LocalDateToYearMonthTransformer)
   override val parser = LocalDateParser
 }
 
 object LocalDateFieldDefinition {
   def apply(defaultField:Field[LocalDate]) = new LocalDateFieldDefinition(defaultField)
+}
+
+class YearMonthFieldDefinition(override val defaultField:Field[YearMonth]) extends FieldDefinition {
+  override type V = YearMonth
+  override type C = Set[YearMonth]
+  override val primaryKey = false
+  override val ordering = YearMonthOrdering
+  override def combiner = new YearMonthCombiner
+  override val parser = YearMonthParser
+}
+
+object YearMonthFieldDefinition {
+  def apply(defaultField:Field[YearMonth]) = new YearMonthFieldDefinition(defaultField)
 }

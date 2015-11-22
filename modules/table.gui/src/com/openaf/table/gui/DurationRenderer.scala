@@ -2,7 +2,7 @@ package com.openaf.table.gui
 
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
-import java.time.{LocalDate, Duration}
+import java.time.{YearMonth, LocalDate, Duration}
 import java.util.Locale
 
 case object DurationRenderer extends SpecialHandlingDurationRenderer {
@@ -47,9 +47,20 @@ class LocalDateRenderer(pattern:String="dd-MM-yyyy") extends Renderer[LocalDate]
 object LocalDateRenderer {
   def apply(pattern:String="dd-MM-yyyy") = new LocalDateRenderer(pattern)
 
-  // Don't really need this as the LocalDateRenderer in the future will allow itself to be configured
-  val MonthYearRenderer = new LocalDateRenderer("MMM-yy") {
+  // Don't really need this as the LocalDateRenderer in the future will allow itself to be configured with different patterns
+  val MonthYearRenderer = new LocalDateRenderer("MMM-yyyy") {
     override def id = super.id + ".MonthYearRenderer"
     override def name = "monthYearRenderer"
   }
+}
+
+class YearMonthRenderer(pattern:String="MMM-yyyy") extends Renderer[YearMonth] {
+  override def render(value:YearMonth, locale:Locale) = {
+    val formatter = DateTimeFormatter.ofPattern(pattern, locale)
+    value.format(formatter)
+  }
+}
+
+object YearMonthRenderer {
+  def apply(pattern:String="MMM-yyyy") = new YearMonthRenderer(pattern)
 }

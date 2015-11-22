@@ -14,7 +14,7 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
   type P <: TablePage
 
   override def providesTopBorder = true
-  def defaultRenderers:Map[FieldID,List[Renderer[_]]] = Map.empty
+  def defaultRenderers:Map[FieldID,Map[TransformerType[_],List[Renderer[_]]]] = Map.empty
 
   override def initialise() {
     localeProperty.bind(context.cache(BrowserCacheKey.LocaleKey))
@@ -26,7 +26,7 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
     doingSetup = true
     requestTableStateProperty.set(RequestTableState(pageData.tableData.tableState))
     tableDataProperty.set(pageData.tableData)
-    val allDefaultRenderers:Map[FieldID,List[Renderer[_]]] = Renderer.StandardRenderers ++ defaultRenderers
+    val allDefaultRenderers:Map[FieldID,Map[TransformerType[_],List[Renderer[_]]]] = Renderer.StandardRenderers ++ defaultRenderers
     renderersProperty.setValue(new Renderers(allDefaultRenderers))
 
     val fieldBindingsToAdd:Map[FieldID,StringBinding] = pageData.tableData.fieldGroup.fields.map(field => {
@@ -59,4 +59,4 @@ trait TablePageComponent extends OpenAFTable with PageComponent {
 }
 
 class StandardTablePageComponent(override val nameId:String,
-                                 override val defaultRenderers:Map[FieldID,List[Renderer[_]]]) extends TablePageComponent
+                                 override val defaultRenderers:Map[FieldID,Map[TransformerType[_],List[Renderer[_]]]]) extends TablePageComponent

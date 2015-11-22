@@ -2,7 +2,8 @@ package com.openaf.table.lib.api
 
 case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=RetainAllFilter[T](),
                     sortOrder:SortOrder=Ascending, totals:Totals=Totals.Default, combinerType:CombinerType=Sum,
-                    key:FieldKey=NoFieldKey, fieldNodeState:FieldNodeState=FieldNodeState.Default) {
+                    transformerType:TransformerType[_]=IdentityTransformerType, key:FieldKey=NoFieldKey,
+                    fieldNodeState:FieldNodeState=FieldNodeState.Default) {
   def totalTextID = "total"
   def withSingleFilter(value:T) = copy(filter = RetainFilter[T](Set(value)))
   def withFilter(filter:Filter[T]) = copy(filter = filter)
@@ -13,6 +14,17 @@ case class Field[T](id:FieldID, fieldType:FieldType=Dimension, filter:Filter[T]=
   def withRendererId(id:RendererId.RendererId) = withFieldNodeState(fieldNodeState.copy(rendererId = id))
   def withDefaultFieldNodeState = copy(fieldNodeState = FieldNodeState.Default)
   def withCombinerType(combinerType:CombinerType) = copy(combinerType = combinerType)
+  def withTransformerType(transformerType:TransformerType[_]) = {
+    // When setting the transformer the renderer has to be set back to the Default and the filter needs to indicate that
+    // it needs transforming or reset if going back to IdentityTransformerType.
+    val fieldWithUpdatedFilter = if (transformerType == IdentityTransformerType) {
+      withFilter(RetainAllFilter[T]())
+    } else {
+      withFilter(filter.enableTransform)
+    }
+    fieldWithUpdatedFilter.withFieldNodeState(fieldNodeState.withDefaultRendererId).copy(transformerType = transformerType)
+  }
+  def isTransformed = transformerType != IdentityTransformerType
   def rendererId = fieldNodeState.rendererId
   def toMeasure = {
     fieldType match {
@@ -76,7 +88,9 @@ import RendererId._
  * UI state that doesn't effect any data contained within the table. Therefore changing this state should only ever
  * effect the display of the data.
  */
-case class FieldNodeState(rendererId:RendererId=RendererId.DefaultRendererId, nameOverrideOption:Option[String]=None)
+case class FieldNodeState(rendererId:RendererId=RendererId.DefaultRendererId, nameOverrideOption:Option[String]=None) {
+  def withDefaultRendererId = copy(rendererId = RendererId.DefaultRendererId)
+}
 
 object FieldNodeState {
   val Default = FieldNodeState()

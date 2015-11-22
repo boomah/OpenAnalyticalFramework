@@ -2,6 +2,7 @@ package com.openaf.table.server
 
 import com.openaf.table.lib.api._
 import com.openaf.table.lib.api.Field
+import java.lang.{Double => JDouble}
 
 trait FieldDefinition {
   type V
@@ -27,6 +28,13 @@ trait FieldDefinition {
       case other => throw new IllegalStateException(s"No Combiner specified for $other")
     }
   }
+
+  def transformer[T](transformerType:TransformerType[T]):Transformer[V,T] = {
+    transformers.find(
+      transformer => transformer.transformerType == transformerType
+    ).getOrElse(IdentityTransformer).asInstanceOf[Transformer[V,T]]
+  }
+  def transformers:List[Transformer[_,_]] = Nil
 
   def parser:Parser[V]
 }
@@ -82,6 +90,7 @@ class IntFieldDefinition(val defaultField:Field[Int]) extends FieldDefinition {
       case Max => new MaxIntCombiner
     }
   }
+  override def transformers = List(IntToDoubleTransformer)
   override val parser = IntParser
 }
 
@@ -122,9 +131,55 @@ class IntegerFieldDefinition(val defaultField:Field[Integer]) extends FieldDefin
       case Max => new MaxIntegerCombiner
     }
   }
+  override def transformers = List(IntegerToJDoubleTransformer)
   override val parser = IntegerParser
 }
 
 object IntegerFieldDefinition {
   def apply(defaultField:Field[Integer]) = new IntegerFieldDefinition(defaultField)
+}
+
+class DoubleFieldDefinition(val defaultField:Field[Double]) extends FieldDefinition {
+  override type V = Double
+  override type C = Double
+  override val primaryKey = false
+  override val ordering = DoubleOrdering
+  override def combiner = new DoubleCombiner
+  override def combinerFromType(combinerType:CombinerType) = {
+    // TODO - put the proper combiners in
+    combinerType match {
+      case Sum => combiner
+      case Mean => combiner
+      case Median => combiner
+      case Min => combiner
+      case Max => combiner
+    }
+  }
+  override val parser = DoubleParser
+}
+
+object DoubleFieldDefinition {
+  def apply(defaultField:Field[Double]) = new DoubleFieldDefinition(defaultField)
+}
+
+class JDoubleFieldDefinition(val defaultField:Field[JDouble]) extends FieldDefinition {
+  override type V = JDouble
+  override type C = Double
+  override val primaryKey = false
+  override val ordering = JDoubleOrdering
+  override def combiner = new JDoubleCombiner
+  override def combinerFromType(combinerType:CombinerType) = {
+    combinerType match {
+      case Sum => combiner
+      case Mean => combiner
+      case Median => combiner
+      case Min => combiner
+      case Max => combiner
+    }
+  }
+  override val parser = JDoubleParser
+}
+
+object JDoubleFieldDefinition {
+  def apply(defaultField:Field[JDouble]) = new JDoubleFieldDefinition(defaultField)
 }

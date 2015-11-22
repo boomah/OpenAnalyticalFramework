@@ -1,6 +1,7 @@
 package com.openaf.table.lib.api
 
 import scala.collection.mutable
+import java.lang.{Double => JDouble}
 
 trait Combiner[C,V] {
   def combine(value:V):Unit
@@ -100,4 +101,16 @@ class MaxIntegerCombiner extends Combiner[Int,Integer] {
 object OneIntegerCombiner extends Combiner[Int,Integer] {
   def combine(value:Integer) = {}
   override def value = 1
+}
+
+class DoubleCombiner extends Combiner[Double,Double] {
+  private var count = 0.0
+  override def combine(value:Double) = {count += value}
+  override def value = count
+}
+
+class JDoubleCombiner extends Combiner[Double,JDouble] {
+  private var count = 0.0
+  def combine(value:JDouble) = {count += value.doubleValue}
+  override def value = count
 }

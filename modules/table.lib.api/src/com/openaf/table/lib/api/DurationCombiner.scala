@@ -1,6 +1,6 @@
 package com.openaf.table.lib.api
 
-import java.time.{LocalDate, Duration}
+import java.time.{YearMonth, LocalDate, Duration}
 
 import scala.collection.mutable
 
@@ -51,5 +51,11 @@ class MaxDurationCombiner extends Combiner[Duration,Duration] {
 class LocalDateCombiner extends Combiner[Set[LocalDate],LocalDate] {
   private val set = new mutable.HashSet[LocalDate]
   override def combine(value:LocalDate) = {set += value}
+  override def value = set.toSet
+}
+
+class YearMonthCombiner extends Combiner[Set[YearMonth],YearMonth] {
+  private val set = new mutable.HashSet[YearMonth]
+  override def combine(value:YearMonth) = {set += value}
   override def value = set.toSet
 }

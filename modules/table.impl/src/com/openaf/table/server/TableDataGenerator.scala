@@ -76,6 +76,12 @@ object TableDataGenerator {
     val fieldGroup = pivotData.fieldDefinitionGroups.fieldGroup
     val tableValues = TableValues(rows, fieldPathsIndexes, pivotData.fieldValues, pivotData.valueLookUp)
 
-    TableData(fieldGroup, tableState, tableValues)
+    val transformersMap = tableState.allFields.map {field =>
+      val transformerTypes = pivotData.fieldDefinitionGroups.fieldDefinition(field.id).transformers.map(_.transformerType)
+      field.id -> transformerTypes
+    }.toMap
+    val transformers = Transformers(transformersMap)
+
+    TableData(fieldGroup, tableState, tableValues, transformers)
   }
 }

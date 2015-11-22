@@ -4,8 +4,6 @@ import javafx.beans.property.Property
 import java.util.{ResourceBundle, Locale}
 import javafx.beans.binding.StringBinding
 
-import com.openaf.table.gui.Renderer
-
 class TableLocaleStringBinding(id:String, localeProperty:Property[Locale],
                                prefix:Option[String]=None) extends StringBinding {
   bind(localeProperty)
@@ -19,22 +17,21 @@ object TableLocaleStringBinding {
   }
 }
 
-object RendererNameBinding {
+object PackageNameBinding {
   val ModulePattern = """com\.openaf\.(.+)\.gui""".r
 }
 
-import RendererNameBinding._
+import PackageNameBinding._
 
-class RendererNameBinding(renderer:Renderer[_], localeProperty:Property[Locale]) extends StringBinding {
+class PackageNameBinding(name:String, instance:AnyRef, localeProperty:Property[Locale]) extends StringBinding {
   bind(localeProperty)
   override def computeValue = {
-    val name = renderer.name
-    val packageName = renderer.getClass.getPackage.getName
+    val packageName = instance.getClass.getPackage.getName
     packageName match {
       case ModulePattern(module) =>
         val locale = localeProperty.getValue
         val bundleLocation = packageName + ".resources." + module
-        val bundle = ResourceBundle.getBundle(bundleLocation, locale, renderer.getClass.getClassLoader)
+        val bundle = ResourceBundle.getBundle(bundleLocation, locale, instance.getClass.getClassLoader)
         if (bundle.containsKey(name)) bundle.getString(name) else name
       case _ => name
     }
