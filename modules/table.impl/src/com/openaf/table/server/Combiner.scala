@@ -1,4 +1,4 @@
-package com.openaf.table.lib.api
+package com.openaf.table.server
 
 import scala.collection.mutable
 import java.lang.{Double => JDouble}

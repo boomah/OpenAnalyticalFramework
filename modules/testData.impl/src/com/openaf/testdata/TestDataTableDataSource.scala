@@ -1,8 +1,8 @@
 package com.openaf.testdata
 
-import com.openaf.table.lib.api.{Parser, Combiner, TableState}
+import com.openaf.table.lib.api.{Parser, TableState}
 import com.openaf.table.server.datasources.{DataSourceTable, UnfilteredArrayTableDataSource}
-import com.openaf.table.server.{FieldDefinition, FieldDefinitionGroup, FieldDefinitionGroups, IntFieldDefinition}
+import com.openaf.table.server._
 import com.openaf.testdata.api.StringWrapper
 import com.openaf.testdata.api.TestDataTablePageDataFacility._
 

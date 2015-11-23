@@ -1,4 +1,4 @@
-package com.openaf.table.lib.api
+package com.openaf.table.server
 
 import java.time.{YearMonth, LocalDate, Duration}
 

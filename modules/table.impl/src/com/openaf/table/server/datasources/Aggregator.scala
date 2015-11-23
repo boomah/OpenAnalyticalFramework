@@ -1,7 +1,7 @@
 package com.openaf.table.server.datasources
 
-import com.openaf.table.lib.api.{CombinerType, Combiner, NoValue}
-import com.openaf.table.server.FieldDefinition
+import com.openaf.table.lib.api.{CombinerType, NoValue}
+import com.openaf.table.server.{Combiner, FieldDefinition}
 
 /**
  * Map like structure that efficiently aggregates values based on a key consisting of two Int arrays.

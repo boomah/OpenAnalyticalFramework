@@ -1,7 +1,7 @@
 package com.openaf.table.server.datasources
 
 import com.openaf.table.lib.api._
-import com.openaf.table.server.IntFieldDefinition
+import com.openaf.table.server.{Combiner, IntFieldDefinition}
 import org.scalatest.FunSuite
 
 import scala.collection.mutable
