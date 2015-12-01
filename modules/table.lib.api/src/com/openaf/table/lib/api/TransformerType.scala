@@ -3,7 +3,7 @@ package com.openaf.table.lib.api
 import java.lang.{Double => JDouble}
 import java.time.YearMonth
 
-trait TransformerType[T] {
+trait TransformerType[+T] {
   def name:String = {
     val className = getClass.getSimpleName.replace("$", "")
     if (className.length > 1) className.head.toLower + className.tail else className.toLowerCase

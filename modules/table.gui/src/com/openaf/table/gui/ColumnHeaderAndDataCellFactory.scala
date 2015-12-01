@@ -131,7 +131,7 @@ class ColumnHeaderAndDataCellFactory(valueLookUps:Array[Array[Any]], fieldPathsI
 
     private def measureFieldOption(columnIndex:Int) = columnHeaderLayoutPaths(fieldPathsIndexes(columnIndex)).measureFieldOption
 
-    private def fieldOption(rowIndex:Int, columnIndex:Int) = {
+    private def fieldOption(rowIndex:Int, columnIndex:Int):Option[Field[_]] = {
       val fields = columnHeaderLayoutPaths(fieldPathsIndexes(columnIndex)).fields
       if (rowIndex < fields.length) {
         Some(fields(rowIndex))

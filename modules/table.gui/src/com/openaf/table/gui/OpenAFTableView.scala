@@ -22,7 +22,7 @@ class OpenAFTableView(tableFields:OpenAFTableFields) extends TableView[OpenAFTab
   // I have to override the skin because the default one adds an additional 10 pixels when figuring out how width each 
   // column should be. This removes that padding. I have raised an issue so hopefully in some future JavaFX release this
   // can be removed.
-  private val tableViewSkin = new com.sun.javafx.scene.control.skin.TableViewSkin[OpenAFTableRow](this) {
+  private val tableViewSkin = new com.sun.javafx.scene.control.skin.TableViewSkin[OpenAFTableRow](this) with OpenAFTableViewSkin {
     def resizeColumnsToFitContent(startIndex:Int, endIndex:Int, maxRows:Int) {
       var index = startIndex
       while (index < endIndex) {
@@ -218,4 +218,8 @@ class OpenAFTableView(tableFields:OpenAFTableFields) extends TableView[OpenAFTab
     }
     columns
   }
+}
+
+trait OpenAFTableViewSkin {
+  def resizeColumnsToFitContent(startIndex:Int, endIndex:Int, maxRows:Int):Unit
 }
