@@ -1,5 +1,6 @@
 package com.openaf.table.gui
 
+import java.util.function.Predicate
 import javafx.beans.binding.StringBinding
 import javafx.beans.property.SimpleBooleanProperty
 import com.openaf.table.gui.binding.TableLocaleStringBinding
@@ -8,6 +9,8 @@ import javafx.collections.ObservableList
 import scala.collection.mutable
 import javafx.beans.value.{ObservableValue, ChangeListener}
 import java.lang.{Boolean => JBoolean}
+
+import scala.util.{Try, Success}
 
 class FilterButtonNodeModel[T](val field:Field[T], tableFields:OpenAFTableFields) {
   private val allBooleanProperty = new SimpleBooleanProperty
@@ -113,14 +116,56 @@ class FilterButtonNodeModel[T](val field:Field[T], tableFields:OpenAFTableFields
   }
 
   private[gui] def property(intValue:Int) = if (intValue == 0) allBooleanProperty else propertyLookUp(intValue)
-  private[gui] def text(intValue:Int) = {
-    val renderer = tableFields.renderers.renderer(field).asInstanceOf[Renderer[Any]]
+  private def text(intValue:Int) = {
     if (intValue == 0) {
       TableLocaleStringBinding.stringFromBundle("all", tableFields.localeProperty.getValue)
     } else {
       renderer.render(value(intValue), tableFields.localeProperty.getValue)
     }
   }
+
+  private def renderer = tableFields.renderers.renderer(field).asInstanceOf[Renderer[T]]
+  private def ordering = tableFields.tableData.orderings.orderings(field.withDefaultFieldNodeState).asInstanceOf[Ordering[T]]
+  private def orderingPredicateTry(textToParse:String, doesMatch:(T,Int)=>Boolean) = {
+    if (textToParse.trim.isEmpty) {
+      Try(AlwaysTruePredicate)
+    } else {
+      valueOption(textToParse).map(userValue => new AllAwarePredicate {
+        override def matches(intValue:Int) = doesMatch(userValue, intValue)
+      })
+    }
+  }
+  private def valueOption(userText:String) = renderer.parser.safeParse(userText.trim)
+
+  private val GreaterThanAndEqual = """\>=(.*)""".r
+  private val GreaterThan = """\>(.*)""".r
+  private val LessThanAndEqual = """\<=(.*)""".r
+  private val LessThan = """\<(.*)""".r
+
+  private[gui] def generatePredicate(userText:String) = {
+    val predicateTry = userText match {
+      case GreaterThanAndEqual(textToParse) => orderingPredicateTry(textToParse, (userValue,intValue) => ordering.gteq(value(intValue), userValue))
+      case GreaterThan(textToParse) => orderingPredicateTry(textToParse, (userValue,intValue) => ordering.gt(value(intValue), userValue))
+      case LessThanAndEqual(textToParse) => orderingPredicateTry(textToParse, (userValue,intValue) => ordering.lteq(value(intValue), userValue))
+      case LessThan(textToParse) => orderingPredicateTry(textToParse, (userValue,intValue) => ordering.lt(value(intValue), userValue))
+      case _ => Try(new TextMatchingPredicate(userText, text))
+    }
+    predicateTry.getOrElse(new TextMatchingPredicate(userText, text))
+  }
+
+  private[gui] def updateTableStateFromText(userText:String) = {
+    val filterTry:Try[Filter[T]] = userText match {
+      case GreaterThanAndEqual(textToParse) => valueOption(textToParse).map(value => OrderedFilter(value, ordering, greaterThan = true, andEqual = true))
+      case GreaterThan(textToParse) => valueOption(textToParse).map(value => OrderedFilter(value, ordering, greaterThan = true, andEqual = false))
+      case LessThanAndEqual(textToParse) => valueOption(textToParse).map(value => OrderedFilter(value, ordering, greaterThan = false, andEqual = true))
+      case LessThan(textToParse) => valueOption(textToParse).map(value => OrderedFilter(value, ordering, greaterThan = false, andEqual = false))
+      case _ =>
+        println(s"TODO - Generate filter based on current text ($userText)") // TODO - actually do this
+        Try(RetainAllFilter())
+    }
+    filterTry.foreach(filter => updateTableState(filter))
+  }
+
   private[gui] def stringProperty(intValue:Int) = {
     new StringBinding {
       bind(tableFields.localeProperty)
@@ -151,4 +196,17 @@ class FilterButtonNodeModel[T](val field:Field[T], tableFields:OpenAFTableFields
 
 object FilterButtonNodeModel {
   val AllValue = 0
+}
+
+trait AllAwarePredicate extends Predicate[Int] {
+  def matches(intValue:Int):Boolean
+  override def test(intValue:Int) = if (intValue == FilterButtonNodeModel.AllValue) true else matches(intValue)
+}
+
+object AlwaysTruePredicate extends Predicate[Int] {
+  override def test(intValue:Int) = true
+}
+
+class TextMatchingPredicate(userText:String, text:Int=>String) extends AllAwarePredicate {
+  override def matches(intValue:Int) = text(intValue).toLowerCase.contains(userText.toLowerCase)
 }

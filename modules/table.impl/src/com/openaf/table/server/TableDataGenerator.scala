@@ -82,6 +82,15 @@ object TableDataGenerator {
     }.toMap
     val transformers = Transformers(transformersMap)
 
-    TableData(fieldGroup, tableState, tableValues, transformers)
+    val orderings = tableState.allFields.map {field =>
+      val currentFieldDefinition = pivotData.fieldDefinition(field.id)
+      val ordering = currentFieldDefinition.transformer(field.transformerType)
+        .transformedFieldDefinition(currentFieldDefinition).ordering.asInstanceOf[Ordering[Any]]
+      // Don't include the field node state as it can change without a call back to the server, and the orderings
+      // don't change with field node state anyway.
+      field.withDefaultFieldNodeState -> ordering
+    }
+
+    TableData(fieldGroup, tableState, tableValues, transformers, Orderings(orderings.toMap))
   }
 }

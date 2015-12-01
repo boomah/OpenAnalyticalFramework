@@ -21,6 +21,8 @@ case class PivotData(tableState:TableState, fieldDefinitionGroups:FieldDefinitio
   val numColumnHeaderColumns = columnHeaderValues.length
   val numRows = numColumnHeaderRows + numRowHeaderRows
   val numColumns = numRowHeaderColumns + numColumnHeaderColumns
+
+  def fieldDefinition(id:FieldID) = fieldDefinitionGroups.fieldDefinition(id)
 }
 
 object PivotData {

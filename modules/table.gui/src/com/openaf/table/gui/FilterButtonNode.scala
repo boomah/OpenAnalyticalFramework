@@ -11,7 +11,6 @@ import javafx.util.Callback
 import com.openaf.gui.utils.Icons._
 import javafx.beans.binding.BooleanBinding
 import javafx.scene.text.{TextBoundsType, Text}
-import java.util.function.Predicate
 import javafx.beans.value.{ObservableValue, ChangeListener}
 
 class FilterButtonNode[T](field:Field[T], tableFields:OpenAFTableFields, hidePopup:()=>Unit) extends VBox {
@@ -70,17 +69,7 @@ class FilterButtonNode[T](field:Field[T], tableFields:OpenAFTableFields, hidePop
   })
   private val observableItems = FXCollections.observableArrayList(filterButtonNodeModel.values:_*)
   observableItems.add(0, FilterButtonNodeModel.AllValue)
-  def generatePredicate(text:String) = {
-    new Predicate[Int] {
-      def test(intValue:Int) = {
-        if (intValue == FilterButtonNodeModel.AllValue) {
-          true
-        } else {
-          filterButtonNodeModel.text(intValue).toLowerCase.contains(text.toLowerCase)
-        }
-      }
-    }
-  }
+
   private val filteredItems = observableItems.filtered(null)
   listView.setItems(filteredItems)
 
@@ -98,7 +87,7 @@ class FilterButtonNode[T](field:Field[T], tableFields:OpenAFTableFields, hidePop
     })
     filterTextAreaTextField.textProperty.addListener(new ChangeListener[String] {
       def changed(value:ObservableValue[_<:String], oldString:String, newString:String) {
-        filteredItems.setPredicate(generatePredicate(newString))
+        filteredItems.setPredicate(filterButtonNodeModel.generatePredicate(newString))
       }
     })
 
@@ -121,7 +110,7 @@ class FilterButtonNode[T](field:Field[T], tableFields:OpenAFTableFields, hidePop
         val valuesToRetain = filteredItems.collect{case (intValue) if intValue != 0 => filterButtonNodeModel.value(intValue)}.toSet
         val newFilter = if (valuesToRetain.isEmpty) {
           RejectAllFilter[T]()
-        } else if (valuesToRetain.size == filterButtonNodeModel.values.size) {
+        } else if (valuesToRetain.size == filterButtonNodeModel.values.length) {
           RetainAllFilter[T]()
         } else {
           RetainFilter[T](valuesToRetain)
@@ -143,7 +132,7 @@ class FilterButtonNode[T](field:Field[T], tableFields:OpenAFTableFields, hidePop
     generateFilterButton.setOnAction(new EventHandler[ActionEvent] {
       def handle(e:ActionEvent) {
         hidePopup()
-        println(s"TODO - Generate filter based on current text (${filterTextAreaTextField.getText})") // TODO - actually do this
+        filterButtonNodeModel.updateTableStateFromText(filterTextAreaTextField.getText)
       }
     })
 

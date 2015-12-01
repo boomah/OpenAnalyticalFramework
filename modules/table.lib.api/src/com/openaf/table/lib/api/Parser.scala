@@ -4,8 +4,11 @@ import java.time.format.DateTimeFormatter
 import java.time.{YearMonth, LocalDate, Duration}
 import java.lang.{Double => JDouble}
 
+import scala.util.Try
+
 trait Parser[V] {
   def parse(string:String):V
+  def safeParse(string:String):Try[V] = Try(parse(string))
 }
 
 object NullParser extends Parser[Null] {

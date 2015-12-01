@@ -36,9 +36,11 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
     val tableState = unTransformedTableState.allFields.foldLeft(unTransformedTableState)((tableState,field) => {
       if (field.filter.shouldTransform) {
         val fieldCast = field.asInstanceOf[Field[Any]]
-        val transformer = fieldDefinitionGroup.fieldDefinition(field.id).transformer(field.transformerType).asInstanceOf[Transformer[Any,Any]]
+        val currentFieldDefinition = fieldDefinitionGroup.fieldDefinition(field.id)
+        val transformer = currentFieldDefinition.transformer(field.transformerType).asInstanceOf[Transformer[Any,Any]]
         val transformedValues = field.filter.values.map(value => transformer.transform(value))
-        val newField = fieldCast.withFilter(fieldCast.filter.withTransformedValues(transformedValues))
+        val transformedOrdering = transformer.transformedFieldDefinition(currentFieldDefinition).ordering.asInstanceOf[Ordering[Any]]
+        val newField = fieldCast.withFilter(fieldCast.filter.withTransformedValues(transformedValues, transformedOrdering))
         tableState.replaceField(field, newField)
       } else {
         tableState

@@ -4,6 +4,7 @@ import java.util.Locale
 
 import com.openaf.table.lib.api.StandardFields._
 import com.openaf.table.lib.api._
+import java.lang.{Double => JDouble}
 
 trait Renderer[V] {
   /**
@@ -20,40 +21,54 @@ trait Renderer[V] {
     if (className.length > 1) className.head.toLower + className.tail else className.toLowerCase
   }
   def render(value:V, locale:Locale):String
+  def parser:Parser[V]
 }
 
 case object BlankRenderer extends Renderer[Any] {
   override def render(value:Any, locale:Locale) = ""
+  override def parser = AnyParser
 }
 
 case class NoValueAwareDelegatingRenderer[V](renderer:Renderer[V]) extends Renderer[Any] {
   override def id = renderer.id
   override def name = renderer.name
   override def render(value:Any, locale:Locale) = if (value == NoValue) "" else renderer.render(value.asInstanceOf[V], locale)
+  override def parser = renderer.parser.asInstanceOf[Parser[Any]]
 }
 
 case object AnyRenderer extends Renderer[Any] {
   override def render(value:Any, locale:Locale) = value.toString
+  override def parser = AnyParser
 }
 
 case object StringRenderer extends Renderer[String] {
   override def render(value:String, locale:Locale) = value
+  override def parser = StringParser
 }
 
 case object IntRenderer extends Renderer[Int] {
   override def render(value:Int, locale:Locale) = value.toString
+  override def parser = IntParser
 }
 
 case class FormattedIntRenderer(format:String="%05d") extends Renderer[Int] {
   override def render(value:Int, locale:Locale) = format.format(value)
+  override def parser = IntParser
 }
 
 case object IntegerRenderer extends Renderer[Integer] {
   override def render(value:Integer, locale:Locale) = value.toString
+  override def parser = IntegerParser
 }
 
 case class FormattedIntegerRenderer(format:String="%05d") extends Renderer[Integer] {
   override def render(value:Integer, locale:Locale) = format.format(value)
+  override def parser = IntegerParser
+}
+
+case object JDoubleRenderer extends Renderer[JDouble] {
+  override def render(value:JDouble, locale:Locale) = value.toString
+  override def parser = JDoubleParser
 }
 
 case object DefaultRenderer extends Renderer[Any] {
@@ -68,6 +83,7 @@ case object DefaultRenderer extends Renderer[Any] {
       }
     }
   }
+  override def parser = AnyParser
 }
 
 object MSetRenderer {
@@ -86,7 +102,8 @@ object Renderer {
   )
 
   val IntegerRenderers:Map[TransformerType[_],List[Renderer[_]]] = Map(
-    IdentityTransformerType -> List(IntegerRenderer, FormattedIntegerRenderer())
+    IdentityTransformerType -> List(IntegerRenderer, FormattedIntegerRenderer()),
+    IntegerToJDoubleTransformerType -> List(JDoubleRenderer)
   )
 
   val StringRenderers:Map[TransformerType[_],List[Renderer[_]]] = Map(

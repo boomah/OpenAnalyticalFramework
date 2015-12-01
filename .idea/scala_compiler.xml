@@ -3,5 +3,6 @@
   <component name="ScalaCompilerConfiguration">
     <option name="deprecationWarnings" value="true" />
     <option name="uncheckedWarnings" value="true" />
+    <option name="featureWarnings" value="true" />
   </component>
 </project>

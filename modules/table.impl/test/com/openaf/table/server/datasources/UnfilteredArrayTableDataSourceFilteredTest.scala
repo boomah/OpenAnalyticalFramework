@@ -283,5 +283,49 @@ class UnfilteredArrayTableDataSourceFilteredTest extends FunSuite {
 
     check(tableState, expectedRowHeaderValues, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
   }
+
+  test("1 row (< filtered), 0 measure, 0 column, 0 filter") {
+    val ageField = AgeField.withFilter(OrderedFilter(36, IntOrdering, andEqual = false, greaterThan = false))
+    val tableState = TableState.Blank.withRowHeaderFields(List(ageField))
+
+    val expectedRowHeaderValues = Set(List(2), List(3), List(4))
+    val expectedValueLookUp = Map(AgeField.id -> List(AgeField.id, 36, 31, 34, 32))
+    val expectedFieldValues = ageFieldValues(ageField.withKey(RowHeaderFieldKey(0)))
+
+    check(tableState, expectedRowHeaderValues, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("1 row (<= filtered), 0 measure, 0 column, 0 filter") {
+    val ageField = AgeField.withFilter(OrderedFilter(34, IntOrdering, andEqual = true, greaterThan = false))
+    val tableState = TableState.Blank.withRowHeaderFields(List(ageField))
+
+    val expectedRowHeaderValues = Set(List(2), List(3), List(4))
+    val expectedValueLookUp = Map(AgeField.id -> List(AgeField.id, 36, 31, 34, 32))
+    val expectedFieldValues = ageFieldValues(ageField.withKey(RowHeaderFieldKey(0)))
+
+    check(tableState, expectedRowHeaderValues, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("1 row (> filtered), 0 measure, 0 column, 0 filter") {
+    val ageField = AgeField.withFilter(OrderedFilter(34, IntOrdering, andEqual = false, greaterThan = true))
+    val tableState = TableState.Blank.withRowHeaderFields(List(ageField))
+
+    val expectedRowHeaderValues = Set(List(1))
+    val expectedValueLookUp = Map(AgeField.id -> List(AgeField.id, 36, 31, 34, 32))
+    val expectedFieldValues = ageFieldValues(ageField.withKey(RowHeaderFieldKey(0)))
+
+    check(tableState, expectedRowHeaderValues, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("1 row (>= filtered), 0 measure, 0 column, 0 filter") {
+    val ageField = AgeField.withFilter(OrderedFilter(34, IntOrdering, andEqual = true, greaterThan = true))
+    val tableState = TableState.Blank.withRowHeaderFields(List(ageField))
+
+    val expectedRowHeaderValues = Set(List(1), List(3))
+    val expectedValueLookUp = Map(AgeField.id -> List(AgeField.id, 36, 31, 34, 32))
+    val expectedFieldValues = ageFieldValues(ageField.withKey(RowHeaderFieldKey(0)))
+
+    check(tableState, expectedRowHeaderValues, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
+  }
 }
 

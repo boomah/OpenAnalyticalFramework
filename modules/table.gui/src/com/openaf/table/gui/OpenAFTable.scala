@@ -23,7 +23,8 @@ class OpenAFTable extends StackPane {
 
   protected val localeProperty = new SimpleObjectProperty[Locale](Locale.getDefault)
   protected val fieldBindings = FXCollections.observableHashMap[FieldID,StringBinding]
-  protected val unmodifiableFieldBindings = FXCollections.unmodifiableObservableMap(fieldBindings)
+  private val unmodifiableFieldBindings = FXCollections.unmodifiableObservableMap(fieldBindings)
+
 
   private val tableFields = OpenAFTableFields(tableDataProperty, requestTableStateProperty, dragAndDrop, localeProperty,
     unmodifiableFieldBindings, renderersProperty)
@@ -78,6 +79,8 @@ case class OpenAFTableFields(tableDataProperty:Property[TableData], requestTable
                              dragAndDrop:DragAndDrop, localeProperty:Property[Locale],
                              fieldBindings:ObservableMap[FieldID,StringBinding], renderersProperty:Property[Renderers]) {
   def renderers = renderersProperty.getValue
+  def tableData = tableDataProperty.getValue
+  def requestTableState = requestTableStateProperty.getValue
 }
 
 case class RequestTableState(tableState:TableState, newTableDataOption:Option[TableData]=None)

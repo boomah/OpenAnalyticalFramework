@@ -1,10 +1,10 @@
 package com.openaf.testdata
 
-import com.openaf.table.lib.api.{Parser, TableState}
-import com.openaf.table.server.datasources.{DataSourceTable, UnfilteredArrayTableDataSource}
+import com.openaf.table.lib.api.TableState
 import com.openaf.table.server._
-import com.openaf.testdata.api.StringWrapper
+import com.openaf.table.server.datasources.{DataSourceTable, UnfilteredArrayTableDataSource}
 import com.openaf.testdata.api.TestDataTablePageDataFacility._
+import com.openaf.testdata.api.{StringWrapper, StringWrapperParser}
 
 import scala.collection.mutable
 import scala.util.Random
@@ -54,8 +54,4 @@ class StringWrapperCombiner extends Combiner[Set[StringWrapper],StringWrapper] {
   private val set = new mutable.HashSet[StringWrapper]
   def combine(value:StringWrapper) = {set += value}
   override def value = set.toSet
-}
-
-object StringWrapperParser extends Parser[StringWrapper] {
-  override def parse(string:String) = StringWrapper(string)
 }

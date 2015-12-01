@@ -1,6 +1,7 @@
 package com.openaf.table.lib.api
 
-case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:TableValues, transformers:Transformers) {
+case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:TableValues, transformers:Transformers,
+                     orderings:Orderings) {
   def withTableState(newTableState:TableState) = copy(tableState = newTableState)
   def withTableValues(newTableValues:TableValues) = copy(tableValues = newTableValues)
   def rowHeaderFields = tableState.rowHeaderFields
@@ -13,7 +14,7 @@ case class TableData(fieldGroup:FieldGroup, tableState:TableState, tableValues:T
   def numRows = tableValues.numRows
 }
 object TableData {
-  val Empty = TableData(FieldGroup.Empty, TableState.Blank, TableValues.Empty, Transformers.Empty)
+  val Empty = TableData(FieldGroup.Empty, TableState.Blank, TableValues.Empty, Transformers.Empty, Orderings.Empty)
 }
 
 case object NoValue
@@ -53,4 +54,10 @@ case class Transformers(transformers:Map[FieldID,List[TransformerType[_]]])
 
 object Transformers {
   val Empty = Transformers(Map.empty)
+}
+
+case class Orderings(orderings:Map[Field[_],Ordering[_]])
+
+object Orderings {
+  val Empty = Orderings(Map.empty)
 }

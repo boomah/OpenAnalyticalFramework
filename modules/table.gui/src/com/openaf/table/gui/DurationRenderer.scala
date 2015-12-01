@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter
 import java.time.{YearMonth, LocalDate, Duration}
 import java.util.Locale
 
+import com.openaf.table.lib.api.{YearMonthParser, LocalDateParser, DurationParser}
+
 case object DurationRenderer extends SpecialHandlingDurationRenderer {
   override def renderDuration(value:Duration, locale:Locale) = {
     val days = value.toDays
@@ -18,11 +20,13 @@ case object DurationRenderer extends SpecialHandlingDurationRenderer {
       "%dd %02d:%02d:%02d".format(seconds / (3600 * 24), (seconds / 3600) % 24, (seconds % 3600) / 60, seconds % 60)
     }
   }
+  override def parser = DurationParser
 }
 
 case object HourDurationRenderer extends SpecialHandlingDurationRenderer {
   private val format = new DecimalFormat("0.00")
   override def renderDuration(value:Duration, locale:Locale) = format.format(value.getSeconds / 3600.0)
+  override def parser = ???
 }
 
 trait SpecialHandlingDurationRenderer extends Renderer[Duration] {
@@ -42,6 +46,7 @@ class LocalDateRenderer(pattern:String="dd-MM-yyyy") extends Renderer[LocalDate]
     val formatter = DateTimeFormatter.ofPattern(pattern, locale)
     value.format(formatter)
   }
+  override def parser = LocalDateParser
 }
 
 object LocalDateRenderer {
@@ -59,6 +64,7 @@ class YearMonthRenderer(pattern:String="MMM-yyyy") extends Renderer[YearMonth] {
     val formatter = DateTimeFormatter.ofPattern(pattern, locale)
     value.format(formatter)
   }
+  override def parser = YearMonthParser
 }
 
 object YearMonthRenderer {

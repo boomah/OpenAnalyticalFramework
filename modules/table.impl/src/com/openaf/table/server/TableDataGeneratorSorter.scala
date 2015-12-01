@@ -5,7 +5,7 @@ import com.openaf.table.server.datasources.PivotData
 import java.util
 
 private[server] class TableDataGeneratorSorter(pivotData:PivotData) {
-  private def fieldDefinition(id:FieldID) = pivotData.fieldDefinitionGroups.fieldDefinition(id)
+  private def fieldDefinition(id:FieldID) = pivotData.fieldDefinition(id)
   private val tableState = pivotData.tableState
 
   def sortFilterFieldValues() {

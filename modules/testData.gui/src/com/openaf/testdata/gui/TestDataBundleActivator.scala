@@ -6,7 +6,7 @@ import com.openaf.browser.gui.api.{PageFactory, BrowserActionButton, BrowserCont
 import com.openaf.table.gui.Renderer
 import com.openaf.table.gui.api.{TablePageComponentFactory, TableApplication, TableBundleActivator}
 import com.openaf.table.lib.api.{IdentityTransformerType, TableState}
-import com.openaf.testdata.api.{TestDataPage, StringWrapper}
+import com.openaf.testdata.api.{StringWrapperParser, TestDataPage, StringWrapper}
 import com.openaf.testdata.api.TestDataTablePageDataFacility._
 
 class TestDataBundleActivator extends TableBundleActivator {
@@ -30,6 +30,7 @@ object TestDataTableApplication extends TableApplication {
 
 case object StringWrapperRenderer extends Renderer[StringWrapper] {
   override def render(value:StringWrapper, locale:Locale) = value.string
+  override def parser = StringWrapperParser
 }
 
 object TestDataPageFactory extends PageFactory {
