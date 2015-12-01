@@ -3,3 +3,5 @@ out
 file-cache
 openaf.properties
 tmp.txt
+.DS_Store
+.idea/shelf/
