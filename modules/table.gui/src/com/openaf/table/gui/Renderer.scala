@@ -66,8 +66,8 @@ case class FormattedIntegerRenderer(format:String="%05d") extends Renderer[Integ
   override def parser = IntegerParser
 }
 
-case object JDoubleRenderer extends Renderer[JDouble] {
-  override def render(value:JDouble, locale:Locale) = value.toString
+case class JDoubleRenderer(format:String="%.4f") extends Renderer[JDouble] {
+  override def render(value:JDouble, locale:Locale) = format.format(value)
   override def parser = JDoubleParser
 }
 
@@ -103,7 +103,7 @@ object Renderer {
 
   val IntegerRenderers:Map[TransformerType[_],List[Renderer[_]]] = Map(
     IdentityTransformerType -> List(IntegerRenderer, FormattedIntegerRenderer()),
-    IntegerToJDoubleTransformerType -> List(JDoubleRenderer)
+    IntegerToJDoubleTransformerType -> List(JDoubleRenderer())
   )
 
   val StringRenderers:Map[TransformerType[_],List[Renderer[_]]] = Map(

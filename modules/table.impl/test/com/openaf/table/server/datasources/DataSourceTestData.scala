@@ -104,6 +104,8 @@ object DataSourceTestData {
   def dateFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2,3,4,5))
   def monthYearFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> List(1,2,3,4))
 
+  def emptyFieldValues(field:Field[_]):Map[Field[_],List[Int]] = Map(field -> Nil)
+
   def row(rowIndex:Int=0, rowHeaderValues:List[Int]=Nil, columnHeaderAndDataValues:List[Any]=Nil) = {
     new OpenAFTableRow(rowIndex, rowHeaderValues.toArray, columnHeaderAndDataValues.toArray)
   }
@@ -112,14 +114,20 @@ object DataSourceTestData {
 
   def check(tableState:TableState, expectedRowHeaderValues:Set[List[Int]],
             expectedColumnHeaderValues:Set[List[Int]], expectedData:Map[(List[Int],List[Int]),Any],
-            expectedFieldValues:Map[Field[_],List[Int]], expectedValueLookUp:Map[FieldID,List[Any]]) {
+            expectedFieldValues:Map[Field[_],List[Int]], expectedValueLookUp:Map[FieldID,List[Any]]) = {
     val pivotData = dataSource.pivotData(tableState.generateFieldKeys)
     assert(pivotData.rowHeaderValues.map(_.toList).toSet === expectedRowHeaderValues)
     assert(pivotData.columnHeaderValues.map(_.toList).toSet === expectedColumnHeaderValues)
+    if (expectedData.isEmpty && tableState.allFields.exists(_.fieldType.isMeasure)) {
+      // If the expected data is empty the transform below will always work so make sure we expect the data to be empty
+      assert(expectedRowHeaderValues.isEmpty && expectedColumnHeaderValues.isEmpty, "If expectedData is empty then " +
+        "expectedRowHeaderValues and expectedColumnHeaderValues should be empty too")
+    }
     val aggregatorData = expectedData.map{case ((row,column),_) => (row,column) -> pivotData.aggregator(row.toArray,column.toArray)}
     assert(aggregatorData === expectedData)
     assert(pivotData.fieldValues.values.mapValues(_.toList) === expectedFieldValues)
     assert(pivotData.valueLookUp.mapValues(_.toList) === expectedValueLookUp)
+    pivotData
   }
 
   def checkWithDataSource(dataSource:TableDataSource, tableState:TableState,

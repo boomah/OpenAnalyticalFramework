@@ -10,12 +10,12 @@ class UnfilteredArrayTableDataSourceTransformedTest extends FunSuite {
     val tableState = TableState.Blank.withRowHeaderFields(List(ageField))
 
     val expectedRowHeaderValues = Set(List(1), List(2), List(3), List(4))
-    // This is not a very good test because Int and Doubles equal each other in this case so it could be that the
-    // transform hasn't occurred
-    val expectedValueLookUp = Map(AgeField.id -> List(AgeField.id, 36.0, 31.0, 34.0, 32))
+    val expectedValueLookUp = Map(AgeField.id -> List(AgeField.id, 36.0, 31.0, 34.0, 32.0))
     val expectedFieldValues = ageFieldValues(ageField.withKey(RowHeaderFieldKey(0)))
 
-    check(tableState, expectedRowHeaderValues, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
+    val pivotData = check(tableState, expectedRowHeaderValues, Set.empty, Map.empty, expectedFieldValues, expectedValueLookUp)
+
+    assert(pivotData.valueLookUp(AgeField.id).tail.forall(_.isInstanceOf[Double]), "Row field values should have been transformed to doubles")
   }
 
   test("1 row (transformed to MonthYear), 0 measure, 0 column") {
@@ -39,5 +39,20 @@ class UnfilteredArrayTableDataSourceTransformedTest extends FunSuite {
     val expectedFieldValues = monthYearFieldValues(dateField.withKey(ColumnHeaderFieldKey(0)))
 
     check(tableState, EmptySet, expectedColHeaders, Map.empty, expectedFieldValues, expectedValueLookUp)
+  }
+
+  test("0 row, 1 measure (transformed to Double), 1 column") {
+    val scoreField = ScoreField.withTransformerType(IntToDoubleTransformerType)
+    val tableState = TableState.Blank.withColumnHeaderLayout(ColumnHeaderLayout(scoreField))
+
+    val expectedColHeaders = Set(List(0,0))
+    val expectedData = Map(p()(expectedColHeaders.head) -> 425.0)
+    val expectedValueLookUp = Map(ScoreField.id -> List(ScoreField.id))
+    val expectedFieldValues = emptyFieldValues(scoreField.withKey(ColumnHeaderFieldKey(0)))
+
+    val pivotData = check(tableState, EmptyListSet, expectedColHeaders, expectedData, expectedFieldValues, expectedValueLookUp)
+
+    val aggregatorData = expectedData.map{case ((row,column),_) => (row,column) -> pivotData.aggregator(row.toArray,column.toArray)}
+    assert(aggregatorData.values.forall(_.isInstanceOf[Double]), "All data should be transformed to doubles")
   }
 }

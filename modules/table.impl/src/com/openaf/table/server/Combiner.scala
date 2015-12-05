@@ -109,8 +109,60 @@ class DoubleCombiner extends Combiner[Double,Double] {
   override def value = count
 }
 
+class MinDoubleCombiner extends Combiner[Double,Double] {
+  private var min = Double.MaxValue
+  override def combine(value:Double) = {
+    if (value < min) {min = value}
+  }
+  override def value = min
+}
+
+class MaxDoubleCombiner extends Combiner[Double,Double] {
+  private var max = Double.MinValue
+  override def combine(value:Double) = {
+    if (value > max) {max = value}
+  }
+  override def value = max
+}
+
+class MeanDoubleCombiner extends Combiner[Double,Double] {
+  private var counter = 0
+  private var runningSum = 0.0
+  override def combine(value:Double) = {
+    counter += 1
+    runningSum += value
+  }
+  override def value = runningSum / counter
+}
+
 class JDoubleCombiner extends Combiner[Double,JDouble] {
   private var count = 0.0
   def combine(value:JDouble) = {count += value.doubleValue}
   override def value = count
+}
+
+class MinJDoubleCombiner extends Combiner[Double,JDouble] {
+  private var min = Double.MaxValue
+  override def combine(value:JDouble) = {
+    if (value.doubleValue < min) {min = value.doubleValue}
+  }
+  override def value = min
+}
+
+class MaxJDoubleCombiner extends Combiner[Double,JDouble] {
+  private var max = Double.MinValue
+  override def combine(value:JDouble) = {
+    if (value.doubleValue > max) {max = value.doubleValue}
+  }
+  override def value = max
+}
+
+class MeanJDoubleCombiner extends Combiner[Double,JDouble] {
+  private var counter = 0
+  private var runningSum = 0.0
+  override def combine(value:JDouble) = {
+    counter += 1
+    runningSum += value
+  }
+  override def value = runningSum / counter
 }

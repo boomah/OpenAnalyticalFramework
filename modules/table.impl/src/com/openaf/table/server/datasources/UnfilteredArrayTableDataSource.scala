@@ -120,10 +120,14 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
         }
       case _ => -1
     }
-    val measureFieldDefinitions = columnHeaderPathsMeasureOptions.map{
-      case Some(field) => fieldDefinitionGroup.fieldDefinition(field.id)
-      case _ => NullFieldDefinition
-    }
+    val (measureFieldDefinitions, measureFieldTransformers) = columnHeaderPathsMeasureOptions.map{
+      case Some(field) =>
+        val currentFieldDefinition = fieldDefinitionGroup.fieldDefinition(field.id)
+        val transformer = currentFieldDefinition.transformer(field.transformerType).asInstanceOf[Transformer[Any,Any]]
+        val transformedFieldDefinition = transformer.transformedFieldDefinition(currentFieldDefinition)
+        (transformedFieldDefinition, transformer)
+      case _ => (NullFieldDefinition, IdentityTransformer)
+    }.unzip
     val columnHeaderPathsFields = columnHeaderFieldPaths.map(_.fields.toArray)
     val columnHeaderPathsTransformers = columnHeaderPathsFields.map(_.map(field => {
       fieldDefinitionGroup.fieldDefinition(field.id).transformer(field.transformerType).asInstanceOf[Transformer[Any,Any]]
@@ -284,10 +288,10 @@ trait UnfilteredArrayTableDataSource extends TableDataSource {
           // If there isn't a measure field there is no need to update the aggregated data
           if (measureFieldPosition != -1) {
             if (measureFieldPosition >= 0) {
-              value = dataRow(measureFieldPosition)
+              value = measureFieldTransformers(pathsCounter).transform(dataRow(measureFieldPosition))
             } else if (measureFieldPosition == countFieldPosition) {
               // Count field
-              value = IntegerCombiner.One
+              value = measureFieldTransformers(pathsCounter).transform(IntegerCombiner.One)
             }
 
             val combinerType = columnHeaderPathsCombinerTypes(pathsCounter)

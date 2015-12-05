@@ -146,13 +146,12 @@ class DoubleFieldDefinition(val defaultField:Field[Double]) extends FieldDefinit
   override val ordering = DoubleOrdering
   override def combiner = new DoubleCombiner
   override def combinerFromType(combinerType:CombinerType) = {
-    // TODO - put the proper combiners in
     combinerType match {
       case Sum => combiner
-      case Mean => combiner
+      case Mean => new MeanDoubleCombiner
       case Median => combiner
-      case Min => combiner
-      case Max => combiner
+      case Min => new MinDoubleCombiner
+      case Max => new MaxDoubleCombiner
     }
   }
   override val parser = DoubleParser
@@ -171,10 +170,10 @@ class JDoubleFieldDefinition(val defaultField:Field[JDouble]) extends FieldDefin
   override def combinerFromType(combinerType:CombinerType) = {
     combinerType match {
       case Sum => combiner
-      case Mean => combiner
+      case Mean => new MeanJDoubleCombiner
       case Median => combiner
-      case Min => combiner
-      case Max => combiner
+      case Min => new MinJDoubleCombiner
+      case Max => new MaxJDoubleCombiner
     }
   }
   override val parser = JDoubleParser
